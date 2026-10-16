@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Globe,
   ShieldCheck,
@@ -17,7 +17,6 @@ import {
   Filter,
 } from 'lucide-react'
 import { ECOSYSTEM_DOMAINS, ECOSYSTEM_BRANDS, EcosystemDomainRecord, getBrandDomains } from '@/lib/ecosystem/registry'
-import { generateSecureReferralUrl, verifyReferralSignature } from '@/lib/ecosystem/referral-engine'
 import { ECOSYSTEM_KNOWLEDGE_INDEX, searchKnowledgeBase } from '@/lib/ecosystem/knowledge-base'
 import { routeEcosystemIntent, EcosystemRouteResult } from '@/lib/ai/ecosystem-router'
 
@@ -55,17 +54,48 @@ export default function EcosystemGrowthOSAdminPage() {
     })
   }, [selectedBrand, domainSearch])
 
-  // Generated Link calculation
-  const generatedUrl = useMemo(() => {
-    try {
-      return generateSecureReferralUrl({
-        sourceBrand: genSourceBrand,
-        destinationHost: genDestHost,
-        userIntent: genIntent,
-        campaign: genCampaign || 'ecosystem_growth',
-      })
-    } catch {
-      return ''
+  // Generated Link calculation via server-side signing endpoint
+  const [generatedUrl, setGeneratedUrl] = useState<string>('')
+  const [isSigning, setIsSigning] = useState<boolean>(false)
+  const [signError, setSignError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+    async function generateUrl() {
+      setIsSigning(true)
+      setSignError(null)
+      try {
+        const res = await fetch('/api/ecosystem/referral/sign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sourceBrand: genSourceBrand,
+            destinationHost: genDestHost,
+            destinationPath: '/',
+            userIntent: genIntent,
+            campaign: genCampaign || 'growth_os_direct',
+          }),
+        })
+        const data = await res.json()
+        if (isMounted) {
+          if (res.ok && data.secureUrl) {
+            setGeneratedUrl(data.secureUrl)
+          } else {
+            setSignError(data.error || 'Failed to sign referral URL')
+          }
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          setSignError(err.message || 'Network error')
+        }
+      } finally {
+        if (isMounted) setIsSigning(false)
+      }
+    }
+
+    generateUrl()
+    return () => {
+      isMounted = false
     }
   }, [genSourceBrand, genDestHost, genIntent, genCampaign])
 
@@ -435,12 +465,24 @@ export default function EcosystemGrowthOSAdminPage() {
               </button>
             </div>
 
-            <div className="p-2.5 rounded bg-white dark:bg-black border border-black/[0.06] dark:border-white/[0.08] font-mono text-xs break-all select-all text-neutral-800 dark:text-neutral-200">
-              {generatedUrl}
-            </div>
+            {signError ? (
+              <div className="p-3 rounded bg-red-500/10 border border-red-500/20 text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{signError}</span>
+              </div>
+            ) : isSigning ? (
+              <div className="p-2.5 text-xs text-neutral-400 flex items-center gap-2">
+                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                <span>Generating tamper-proof HMAC-SHA256 signature...</span>
+              </div>
+            ) : (
+              <div className="p-2.5 rounded bg-white dark:bg-black border border-black/[0.06] dark:border-white/[0.08] font-mono text-xs break-all select-all text-neutral-800 dark:text-neutral-200">
+                {generatedUrl}
+              </div>
+            )}
 
             <div className="text-[11px] text-neutral-500">
-              Payload includes cryptographic verification token: <code className="text-[#0080FF]">ref_sig</code> generated via HMAC-SHA256 with 7-day TTL.
+              Payload includes cryptographic verification token: <code className="text-[#0080FF]">ref_sig</code> (64-character HMAC-SHA256) with 7-day TTL.
             </div>
           </div>
         </div>
@@ -512,15 +554,25 @@ export default function EcosystemGrowthOSAdminPage() {
           {/* Simulation Output */}
           {simResult && (
             <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.06] pb-3">
+              <div className="flex flex-wrap items-center justify-between border-b border-black/[0.06] dark:border-white/[0.06] pb-3 gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Classification</span>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#0080FF]/10 text-[#0080FF] border border-[#0080FF]/20">
                     {simResult.brandName}
                   </span>
+                  {simResult.isAmbiguous && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      Ambiguous Multi-Intent
+                    </span>
+                  )}
+                  {simResult.isUnrelatedOrAdversarial && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                      Out of Scope / Fallback
+                    </span>
+                  )}
                 </div>
                 <div className="text-xs text-neutral-500 font-mono">
-                  Confidence: <span className="font-bold text-emerald-500">{(simResult.confidence * 100).toFixed(0)}%</span>
+                  Method: <span className="font-semibold text-neutral-700 dark:text-neutral-300">Deterministic Heuristic</span> • Match Score: <span className="font-bold text-emerald-500">{(simResult.heuristicMatchScore * 100).toFixed(0)}%</span>
                 </div>
               </div>
 

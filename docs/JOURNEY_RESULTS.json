@@ -21,8 +21,8 @@
   },
   {
     "journey": "4. Course Player & AI Tutor",
-    "status": "FAILED",
-    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/courses/ai-development/lessons/les-101\", waiting until \"networkidle\"\u001b[22m\n"
+    "status": "PASSED",
+    "route": "/courses/ai-development/lessons/les-101"
   },
   {
     "journey": "5. Programme Exploration",
@@ -36,13 +36,13 @@
   },
   {
     "journey": "7. Admin Operations Overview",
-    "status": "FAILED",
-    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"networkidle\"\u001b[22m\n"
+    "status": "PASSED",
+    "route": "/admin"
   },
   {
     "journey": "8. Security Boundary Enforcement",
-    "status": "FAILED",
-    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"networkidle\"\u001b[22m\n"
+    "status": "PASSED",
+    "route": "/admin -> /auth/login"
   },
   {
     "journey": "9. Blog & Educational Resources",
@@ -76,7 +76,7 @@
   },
   {
     "journey": "15. Personalized Learner Workspace",
-    "status": "FAILED",
-    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/dashboard\", waiting until \"networkidle\"\u001b[22m\n"
+    "status": "PASSED",
+    "route": "/dashboard"
   }
 ]

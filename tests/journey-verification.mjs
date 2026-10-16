@@ -150,7 +150,7 @@ async function runJourneys() {
     await page.waitForSelector('text=Super AI Learning Tutor', { timeout: 5000 })
 
     // Click "Get Hint #1"
-    const hintButton = page.locator('button:has-text("Get Hint #1")')
+    const hintButton = page.locator('button:has-text("Get Hint #1")').first()
     await hintButton.click()
 
     // Wait for response to appear

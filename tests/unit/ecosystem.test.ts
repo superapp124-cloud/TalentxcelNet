@@ -83,7 +83,7 @@ describe('HMAC Referral Engine & Cryptographic Integrity', () => {
     expect(url.searchParams.get('utm_campaign')).toBe('unit_test')
     expect(url.searchParams.get('ref_intent')).toBe('resume_analysis')
     expect(url.searchParams.get('ref_ts')).toBeDefined()
-    expect(url.searchParams.get('ref_sig')).toHaveLength(16)
+    expect(url.searchParams.get('ref_sig')).toHaveLength(64)
   })
 
   it('successfully verifies a legitimate HMAC referral signature', () => {
@@ -100,8 +100,9 @@ describe('HMAC Referral Engine & Cryptographic Integrity', () => {
     const intent = url.searchParams.get('ref_intent')!
     const ts = url.searchParams.get('ref_ts')!
     const sig = url.searchParams.get('ref_sig')!
+    const campaign = url.searchParams.get('utm_campaign') || 'ecosystem_growth'
 
-    const isValid = verifyReferralSignature(sourceBrand, destHost, intent, ts, sig)
+    const isValid = verifyReferralSignature(sourceBrand, destHost, intent, ts, sig, url.pathname || '/', campaign)
     expect(isValid).toBe(true)
   })
 

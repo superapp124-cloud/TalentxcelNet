@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react'
-import { generateSecureReferralUrl } from '@/lib/ecosystem/referral-engine'
 
 interface EcosystemDiscoveryBannerProps {
   variant?: 'card' | 'footer-strip' | 'compact'
@@ -30,34 +29,64 @@ export function EcosystemDiscoveryBanner({
     nutyUrl: 'https://nutytales.com',
   })
 
-  // Hydrate cryptographically-signed URLs post-mount to eliminate SSR hydration mismatch
+  // Hydrate cryptographically-signed URLs via server signing endpoint to keep secrets strictly server-side
   useEffect(() => {
-    setUrls({
-      careerUrl: generateSecureReferralUrl({
-        sourceBrand: 'talentxcel-academy',
-        destinationHost: 'resume.talentxcel.in',
-        userIntent: 'resume_analysis',
-        campaign: `${currentContext}_ecosystem_banner`,
-      }),
-      salaryUrl: generateSecureReferralUrl({
-        sourceBrand: 'talentxcel-academy',
-        destinationHost: 'salary.talentxcel.in',
-        userIntent: 'career_pathway',
-        campaign: `${currentContext}_ecosystem_banner`,
-      }),
-      chatrUrl: generateSecureReferralUrl({
-        sourceBrand: 'talentxcel-academy',
-        destinationHost: 'chatr.chat',
-        userIntent: 'chatr_community',
-        campaign: `${currentContext}_ecosystem_banner`,
-      }),
-      nutyUrl: generateSecureReferralUrl({
-        sourceBrand: 'talentxcel-academy',
-        destinationHost: 'nutytales.com',
-        userIntent: 'nuty_commerce_sandbox',
-        campaign: `${currentContext}_ecosystem_banner`,
-      }),
-    })
+    let isMounted = true
+
+    async function fetchSignedUrls() {
+      try {
+        const targets = [
+          { key: 'careerUrl', destinationHost: 'resume.talentxcel.in', userIntent: 'resume_analysis' },
+          { key: 'salaryUrl', destinationHost: 'salary.talentxcel.in', userIntent: 'career_pathway' },
+          { key: 'chatrUrl', destinationHost: 'chatr.chat', userIntent: 'chatr_community' },
+          { key: 'nutyUrl', destinationHost: 'nutytales.com', userIntent: 'nuty_commerce_sandbox' },
+        ]
+
+        const results = await Promise.all(
+          targets.map(async (t) => {
+            try {
+              const res = await fetch('/api/ecosystem/referral/sign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  sourceBrand: 'talentxcel-academy',
+                  destinationHost: t.destinationHost,
+                  destinationPath: '/',
+                  userIntent: t.userIntent,
+                  campaign: `${currentContext}_ecosystem_banner`,
+                }),
+              })
+              if (res.ok) {
+                const data = await res.json()
+                return { key: t.key, url: data.secureUrl }
+              }
+            } catch {
+              // Network error or offline; retain canonical URL
+            }
+            return null
+          })
+        )
+
+        if (isMounted) {
+          setUrls((prev) => {
+            const next = { ...prev }
+            for (const r of results) {
+              if (r) {
+                ;(next as any)[r.key] = r.url
+              }
+            }
+            return next
+          })
+        }
+      } catch {
+        // Fallback to canonical URLs
+      }
+    }
+
+    fetchSignedUrls()
+    return () => {
+      isMounted = false
+    }
   }, [currentContext])
 
   if (isDismissed) return null
@@ -161,41 +190,35 @@ export function EcosystemDiscoveryBanner({
             </div>
           </a>
 
-          {/* Card 2: chatr Community */}
+          {/* Card 2: CHATR Community */}
           <a
             href={chatrUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-[#00bba6]/40 hover:bg-[#00bba6]/5 transition-all text-left"
+            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all text-left"
           >
-            <div className="flex items-center justify-between text-[#00bba6] mb-1">
+            <div className="flex items-center justify-between text-emerald-500 mb-1">
               <MessageSquare className="h-4 w-4" />
               <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div className="text-xs font-semibold text-black dark:text-white flex items-center gap-1.5">
-              <span>chatr</span>
-              <span className="text-[9px] font-normal text-[#00bba6]">Say It. Share It.</span>
-            </div>
+            <div className="text-xs font-semibold text-black dark:text-white">CHATR Network</div>
             <div className="text-[11px] text-neutral-500 mt-0.5 line-clamp-2">
               Real-time peer study groups and AI engineering channels.
             </div>
           </a>
 
-          {/* Card 3: NutyTales Commerce */}
+          {/* Card 3: Nuty Tales Commerce */}
           <a
             href={nutyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all text-left"
+            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-amber-500/40 hover:bg-amber-500/5 transition-all text-left"
           >
-            <div className="flex items-center justify-between text-[#1e3a8a] dark:text-blue-400 mb-1">
+            <div className="flex items-center justify-between text-amber-500 mb-1">
               <ShoppingBag className="h-4 w-4" />
               <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div className="text-xs font-semibold text-black dark:text-white flex items-center gap-1.5">
-              <span>NutyTales</span>
-              <span className="text-[9px] font-normal text-amber-600 dark:text-amber-400">Nutty Delights</span>
-            </div>
+            <div className="text-xs font-semibold text-black dark:text-white">Nuty Tales MSME</div>
             <div className="text-[11px] text-neutral-500 mt-0.5 line-clamp-2">
               Artisanal commerce and enterprise gifting playbooks.
             </div>
