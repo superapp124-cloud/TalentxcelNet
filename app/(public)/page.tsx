@@ -29,6 +29,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TalentXcelEmblem, Logo, EcosystemTrioLogos } from '@/components/brand/logo'
 import { HeroProductDemo } from '@/components/public/hero-product-demo'
 import { SkillGraph } from '@/components/academy/skill-graph'
+import { SuperAiAmbitionCockpit } from '@/components/public/super-ai-ambition-cockpit'
+import { ProgrammeUniverseExplorer } from '@/components/public/programme-universe-explorer'
 
 const programmes = [
   {
@@ -262,17 +264,18 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Core Hero Headline */}
-          <div className="space-y-4 max-w-4xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
-              Learn with Super AI.{' '}
-              <span className="bg-gradient-to-r from-[#0080FF] via-cyan-400 to-blue-300 bg-clip-text text-transparent">
-                Build Real Systems.
-              </span>
-            </h1>
+          {/* Super AI Ambition Cockpit — Master Concept Experience */}
+          <SuperAiAmbitionCockpit />
+
+          {/* Core Hero Pillars & Interactive Sandbox Preview */}
+          <div className="space-y-6 max-w-4xl mx-auto pt-10 border-t border-white/[0.08]">
+            <div className="space-y-2 text-center">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Three Pillars of Demonstrated Mastery</h2>
+              <p className="text-xs text-neutral-400">Why TalentXcel Academy differs fundamentally from passive course websites.</p>
+            </div>
 
             {/* Immediate 3 Value Propositions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 max-w-3xl mx-auto text-left">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto text-left">
               <div className="flex items-start gap-2.5 p-3 rounded-2xl border border-white/[0.08] bg-white/[0.03]">
                 <Brain className="h-4 w-4 text-[#0080FF] shrink-0 mt-0.5" />
                 <div className="text-xs">
@@ -297,46 +300,46 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-            <Link href="/dashboard">
-              <Button
-                size="lg"
-                className="rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white px-8 font-semibold text-sm shadow-[0_4px_24px_rgba(0,128,255,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Enter Learner Workspace (Demo)
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/apply">
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-full border-white/20 bg-white/[0.04] text-white hover:bg-white/[0.1] px-7 font-medium text-sm backdrop-blur-md"
-              >
-                Apply for Admission
-              </Button>
-            </Link>
-            <Link href="/programmes">
-              <Button
-                size="lg"
-                variant="ghost"
-                className="text-neutral-400 hover:text-white text-xs px-5 font-normal"
-              >
-                Explore Syllabus →
-              </Button>
-            </Link>
-          </div>
+            {/* Action CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+              <Link href="/dashboard">
+                <Button
+                  size="lg"
+                  className="rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white px-8 font-semibold text-sm shadow-[0_4px_24px_rgba(0,128,255,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Enter Learner Workspace (Demo)
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/apply">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full border-white/20 bg-white/[0.04] text-white hover:bg-white/[0.1] px-7 font-medium text-sm backdrop-blur-md"
+                >
+                  Apply for Admission
+                </Button>
+              </Link>
+              <Link href="/programmes">
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="text-neutral-400 hover:text-white text-xs px-5 font-normal"
+                >
+                  Explore Syllabus →
+                </Button>
+              </Link>
+            </div>
 
-          <p className="text-xs text-neutral-500 max-w-xl mx-auto">
-            Platform-issued milestone certificates • Explicitly distinct from statutory university degrees or clinical licenses
-          </p>
+            <p className="text-xs text-neutral-500 max-w-xl mx-auto text-center">
+              Platform-issued milestone certificates • Explicitly distinct from statutory university degrees or clinical licenses
+            </p>
 
-          {/* Interactive Hero Product Demonstration Component */}
-          <div className="pt-8">
-            <HeroProductDemo />
+            {/* Interactive Hero Product Demonstration Component */}
+            <div className="pt-6">
+              <HeroProductDemo />
+            </div>
           </div>
         </div>
       </section>
@@ -530,22 +533,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Section 6: Approved Programme Pathways */}
-      <section className="py-20 sm:py-28 bg-neutral-50 dark:bg-[#070707] border-b border-black/[0.06] dark:border-white/[0.08]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <Badge variant="outline" className="text-[#0080FF] border-[#0080FF]/30">
-              Curriculum Tracks
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
-              Transparent, Outcome-Focused Programmes
-            </h2>
-            <p className="text-base text-neutral-600 dark:text-neutral-400">
-              Clear learning outcomes, defined syllabi, honest timelines, and no false commercial claims.
-            </p>
-          </div>
+      {/* Section 6: Complete 20-Family Programme Universe Explorer */}
+      <section id="programmes-universe" className="py-20 sm:py-28 bg-neutral-950 text-white border-b border-white/[0.08]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+          {/* Complete 20-Family Interactive Catalogue */}
+          <ProgrammeUniverseExplorer />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="pt-12 border-t border-white/[0.08]">
+            <div className="text-center max-w-3xl mx-auto space-y-3 pb-8">
+              <Badge variant="outline" className="text-[#0080FF] border-[#0080FF]/30">
+                Flagship Cohorts
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                Featured Flagship Pathways
+              </h2>
+              <p className="text-base text-neutral-400">
+                In-depth breakdown of currently enrolling programmes with verified hardware delivery and industry accreditation.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {programmes.map((p) => {
               const Icon = p.icon
               return (
@@ -629,7 +636,8 @@ export default function HomePage() {
             })}
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Section 7: Credible Explanation of Super AI */}
       <section className="py-20 sm:py-28 bg-white dark:bg-black border-b border-black/[0.06] dark:border-white/[0.08]">

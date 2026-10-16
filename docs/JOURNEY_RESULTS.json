@@ -78,5 +78,10 @@
     "journey": "15. Personalized Learner Workspace",
     "status": "PASSED",
     "route": "/dashboard"
+  },
+  {
+    "journey": "16. Titan Ambition Cockpit & Universe",
+    "status": "PASSED",
+    "route": "/#programmes-universe"
   }
 ]

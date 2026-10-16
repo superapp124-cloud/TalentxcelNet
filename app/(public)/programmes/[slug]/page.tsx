@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getProgrammeBySlug } from '@/lib/lms/programme-universe'
 
 interface ProjectRoadmapItem {
   title: string
@@ -561,13 +562,56 @@ const PROGRAMMES_DATA: Record<string, ProgrammeDetail> = {
   },
 }
 
+function resolveProgrammeDetail(slug: string): ProgrammeDetail | null {
+  if (PROGRAMMES_DATA[slug]) return PROGRAMMES_DATA[slug]
+
+  const universeProg = getProgrammeBySlug(slug)
+  if (!universeProg) return null
+
+  return {
+    slug: universeProg.slug,
+    title: universeProg.title,
+    subtitle: universeProg.subtitle,
+    duration: `${universeProg.durationMonths} months`,
+    workload: '8–12 hours / week',
+    level: universeProg.eligibility,
+    badge: universeProg.statusBadge,
+    overview: `${universeProg.tagline} ${universeProg.subtitle}`,
+    feeNotice: `Tuition: ₹${universeProg.pricing.tuitionInr.toLocaleString('en-IN')}${
+      universeProg.pricing.includesLaptop ? ' (Includes dedicated configured laptop)' : ''
+    }.`,
+    disclaimer: universeProg.regulatoryDisclaimer,
+    prerequisites: universeProg.prerequisites,
+    deliveryFormat: [
+      universeProg.deliveryFormat,
+      'Super AI contextual Socratic tutoring',
+      'Living Skill Graph competency tracking',
+      'Isolated sandboxed project execution',
+    ],
+    assessmentModel:
+      'Continuous milestone evaluation, automated sandboxed unit testing, and rubric assessment scoring.',
+    learningOutcomes: universeProg.learningOutcomes,
+    modules: universeProg.coreModules.map((m) => ({
+      title: m.title,
+      topics: m.topics,
+    })),
+    projectRoadmap: universeProg.handsOnProjects.map((proj) => ({
+      title: proj.title,
+      stack: universeProg.shortTitle,
+      description: proj.description,
+      deliverables: [proj.deliverable],
+      link: universeProg.slug === 'ai-development' ? '/projects/rag-engine' : undefined,
+    })),
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const prog = PROGRAMMES_DATA[slug]
+  const prog = resolveProgrammeDetail(slug)
   if (!prog) return { title: 'Programme Not Found' }
   return {
     title: `${prog.title} — Syllabus & Roadmap — TalentXcel`,
@@ -581,7 +625,7 @@ export default async function ProgrammeDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const programme = PROGRAMMES_DATA[slug]
+  const programme = resolveProgrammeDetail(slug)
 
   if (!programme) {
     notFound()

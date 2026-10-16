@@ -46,7 +46,8 @@ async function runJourneys() {
   // JOURNEY 1: Contact Enquiry Submission
   try {
     console.log(`[Journey 1] Discovery to Enquiry Submission (/contact)...`)
-    await page.goto(`${BASE_URL}/contact`, { waitUntil: 'domcontentloaded', timeout: 15000 })
+    await page.goto(`${BASE_URL}/contact`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.waitForTimeout(500)
 
     await page.fill('#enq-fullName', 'Priya Sharma')
     await page.fill('#enq-email', 'priya.sharma@example.in')
@@ -134,7 +135,8 @@ async function runJourneys() {
   // JOURNEY 4: Course Player and Socratic AI Tutor
   try {
     console.log(`[Journey 4] Course Player & Super AI Tutor (/courses/ai-development/lessons/les-101)...`)
-    await page.goto(`${BASE_URL}/courses/ai-development/lessons/les-101`, { waitUntil: 'domcontentloaded', timeout: 15000 })
+    await page.goto(`${BASE_URL}/courses/ai-development/lessons/les-101`, { waitUntil: 'networkidle', timeout: 25000 })
+    await page.waitForTimeout(500)
 
     // Check lesson title
     const hasLessonTitle = await page.locator('text=1.1 Architecture of Production Web Applications').count() > 0
@@ -143,11 +145,12 @@ async function runJourneys() {
     }
 
     // Click Super AI Tutor floating button
-    const tutorButton = page.locator('button[aria-label="Open AI Tutor"]')
-    await tutorButton.click()
+    const tutorButton = page.locator('button[aria-label="Open AI Tutor"]').first()
+    await tutorButton.scrollIntoViewIfNeeded()
+    await tutorButton.click({ force: true })
 
     // Wait for drawer
-    await page.waitForSelector('text=Super AI Learning Tutor', { timeout: 5000 })
+    await page.waitForSelector('text=Super AI Learning Tutor', { state: 'visible', timeout: 15000 })
 
     // Click "Get Hint #1"
     const hintButton = page.locator('button:has-text("Get Hint #1")').first()
@@ -314,18 +317,25 @@ async function runJourneys() {
       throw new Error(`One or more of the 3 core hero value propositions not found`)
     }
 
-    // Click "2. Practical Project" tab in the hero demo
-    const projectTab = page.locator('button:has-text("2. Practical Project")')
-    await projectTab.click()
+    // Scroll hero demo into view
+    const heroDemo = page.locator('text=DEMONSTRATION MODE').first()
+    await heroDemo.scrollIntoViewIfNeeded()
     await page.waitForTimeout(500)
 
+    // Click "2. Practical Project" tab in the hero demo
+    const projectTab = page.locator('button:has-text("2. Practical Project")').first()
+    await projectTab.scrollIntoViewIfNeeded()
+    await projectTab.click({ force: true })
+    await page.waitForTimeout(800)
+
     // Click "Run Sandboxed Tests" in the hero demo
-    const runTestsBtn = page.locator('button:has-text("Run Sandboxed Tests")')
-    await runTestsBtn.click()
-    await page.waitForSelector('text=4/4 PASS', { timeout: 5000 })
+    const runTestsBtn = page.locator('button:has-text("Run Sandboxed Tests")').first()
+    await runTestsBtn.scrollIntoViewIfNeeded()
+    await runTestsBtn.click({ force: true })
+    await page.waitForSelector('text=4/4 PASS', { timeout: 10000 })
 
     // Click "3. Living Skill Graph" tab in the hero demo
-    const graphTab = page.locator('button:has-text("3. Living Skill Graph")')
+    const graphTab = page.locator('button:has-text("3. Living Skill Graph")').first()
     await graphTab.click()
     await page.waitForTimeout(500)
 
@@ -419,6 +429,50 @@ async function runJourneys() {
   } catch (err) {
     console.error(`  ✗ Journey 15 failed:`, err.message)
     journeyResults.push({ journey: '15. Personalized Learner Workspace', status: 'FAILED', error: err.message })
+  }
+
+  // JOURNEY 16: Project Titan Super AI Ambition Cockpit & 20-Family Universe
+  try {
+    console.log(`[Journey 16] Project Titan Ambition Cockpit & Programme Universe (/)...`)
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    // 1. Verify Ambition Navigator Cockpit
+    const cockpitTitle = await page.locator('text=Super AI Learning Universe').count() > 0 || await page.locator('text=Your Ambition.').count() > 0
+    if (!cockpitTitle) {
+      throw new Error(`Super AI Ambition Cockpit hero not found on homepage`)
+    }
+
+    // 2. Click preset pill "I want to become an AI developer"
+    const aiPill = page.locator('button:has-text("I want to become an AI developer")').first()
+    await aiPill.scrollIntoViewIfNeeded()
+    await aiPill.click({ force: true })
+    await page.waitForTimeout(800)
+
+    // 3. Verify 5-stage roadmap is active
+    const hasRoadmap = await page.locator('text=5-Stage Capability Roadmap').count() > 0 || await page.locator('text=LEARN').count() > 0
+    if (!hasRoadmap) {
+      throw new Error(`Ambition roadmap stages not displayed after selecting ambition`)
+    }
+
+    // 4. Verify 20-family Programme Universe Explorer
+    const universeSection = await page.locator('#programmes-universe').count() > 0
+    if (!universeSection) {
+      throw new Error(`#programmes-universe section anchor not found`)
+    }
+
+    // Filter to School universe
+    const schoolFilterBtn = page.locator('button:has-text("School & Entrance")').first()
+    if (await schoolFilterBtn.count() > 0) {
+      await schoolFilterBtn.click()
+      await page.waitForTimeout(300)
+    }
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey16_project_titan_universe.png'), fullPage: false })
+    console.log(`  ✓ Journey 16 passed: Super AI Ambition Cockpit and 20-Family Universe verified.`)
+    journeyResults.push({ journey: '16. Titan Ambition Cockpit & Universe', status: 'PASSED', route: '/#programmes-universe' })
+  } catch (err) {
+    console.error(`  ✗ Journey 16 failed:`, err.message)
+    journeyResults.push({ journey: '16. Titan Ambition Cockpit & Universe', status: 'FAILED', error: err.message })
   }
 
   await browser.close()

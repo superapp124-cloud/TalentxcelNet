@@ -21,6 +21,7 @@ import {
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ProgrammeUniverseExplorer } from '@/components/public/programme-universe-explorer'
 
 export const metadata: Metadata = {
   title: 'Programmes — TalentXcel Academy',
@@ -229,8 +230,22 @@ export default async function ProgrammesPage() {
           </Link>
         </div>
 
+        {/* Complete 20-Family Programme Universe Explorer */}
+        <div className="pt-4 border-t border-border">
+          <ProgrammeUniverseExplorer />
+        </div>
+
         {/* Programmes Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="pt-8 border-t border-border space-y-6">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <h3 className="text-2xl font-bold tracking-tight text-foreground">
+              Legacy Catalogue & Regional Tracks
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Additional specialized community cohorts, teachers training, and small business enablement packages.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {displayProgrammes.map((prog) => {
             const Icon = iconMap[prog.slug] || DEFAULT_ICON
             return (
@@ -275,5 +290,6 @@ export default async function ProgrammesPage() {
         </div>
       </div>
     </div>
+  </div>
   )
 }
