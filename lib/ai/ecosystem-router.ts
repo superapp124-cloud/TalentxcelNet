@@ -61,7 +61,7 @@ export function routeEcosystemIntent(query: string, currentContext?: string): Ec
   let brandName = 'TalentXcel Academy'
   let intent: EcosystemRouteResult['intent'] = 'academy_enrolment'
   let rationale = 'Query aligns with AI engineering learning, course curriculum, and technical skill development.'
-  let maxScore = Math.max(careerScore, chatrScore, commerceScore, academyScore)
+  const maxScore = Math.max(careerScore, chatrScore, commerceScore, academyScore)
 
   if (careerScore > academyScore && careerScore >= chatrScore && careerScore >= commerceScore) {
     primaryBrand = 'talentxcel'

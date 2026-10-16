@@ -292,6 +292,127 @@ async function runJourneys() {
     journeyResults.push({ journey: '11. AI Admissions Assistant', status: 'FAILED', error: err.message })
   }
 
+  // JOURNEY 12: Homepage Hero Interactive Product Demo
+  try {
+    console.log(`[Journey 12] Homepage Hero Interactive Product Demo (/)...`)
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    // Verify 3 core value propositions on screen
+    const hasTutorProp = await page.locator('text=Grounded AI Tutor').count() > 0
+    const hasBuildProp = await page.locator('text=Build, Not Just Watch').count() > 0
+    const hasEvidenceProp = await page.locator('text=Credible Evidence').count() > 0
+
+    if (!hasTutorProp || !hasBuildProp || !hasEvidenceProp) {
+      throw new Error(`One or more of the 3 core hero value propositions not found`)
+    }
+
+    // Click "2. Practical Project" tab in the hero demo
+    const projectTab = page.locator('button:has-text("2. Practical Project")')
+    await projectTab.click()
+    await page.waitForTimeout(500)
+
+    // Click "Run Sandboxed Tests" in the hero demo
+    const runTestsBtn = page.locator('button:has-text("Run Sandboxed Tests")')
+    await runTestsBtn.click()
+    await page.waitForSelector('text=4/4 PASS', { timeout: 5000 })
+
+    // Click "3. Living Skill Graph" tab in the hero demo
+    const graphTab = page.locator('button:has-text("3. Living Skill Graph")')
+    await graphTab.click()
+    await page.waitForTimeout(500)
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey12_hero_product_demo.png'), fullPage: false })
+    console.log(`  ✓ Journey 12 passed: Hero product demo interactive across Super AI, Sandbox, and Skill Graph.`)
+    journeyResults.push({ journey: '12. Hero Interactive Product Demo', status: 'PASSED', route: '/' })
+  } catch (err) {
+    console.error(`  ✗ Journey 12 failed:`, err.message)
+    journeyResults.push({ journey: '12. Hero Interactive Product Demo', status: 'FAILED', error: err.message })
+  }
+
+  // JOURNEY 13: Living Skill Graph Interaction & Accessible Alternative
+  try {
+    console.log(`[Journey 13] Living Skill Graph Interaction & Accessibility (/)...`)
+    await page.goto(`${BASE_URL}/#skill-graph-section`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    const hasGraphHeading = await page.locator('h2:has-text("The Living Skill Graph")').count() > 0
+    if (!hasGraphHeading) {
+      throw new Error(`Living Skill Graph section heading not found`)
+    }
+
+    // Toggle to accessible table view
+    const accessibleBtn = page.locator('button[aria-label="View as accessible table"]')
+    await accessibleBtn.click()
+    await page.waitForSelector('table caption:has-text("Structured accessible table")', { timeout: 5000 })
+
+    // Toggle back to graph view
+    const graphBtn = page.locator('button[aria-label="View as interactive graph"]')
+    await graphBtn.click()
+    await page.waitForTimeout(500)
+
+    // Select a node (pgvector)
+    const pgVectorNode = page.locator('button[role="treeitem"]:has-text("pgvector")').first()
+    await pgVectorNode.click()
+    await page.waitForSelector('text=Defined Verification Criteria', { timeout: 5000 })
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey13_living_skill_graph.png'), fullPage: false })
+    console.log(`  ✓ Journey 13 passed: Skill Graph node selection and accessible table toggle operational.`)
+    journeyResults.push({ journey: '13. Living Skill Graph & Accessibility', status: 'PASSED', route: '/#skill-graph-section' })
+  } catch (err) {
+    console.error(`  ✗ Journey 13 failed:`, err.message)
+    journeyResults.push({ journey: '13. Living Skill Graph & Accessibility', status: 'FAILED', error: err.message })
+  }
+
+  // JOURNEY 14: Build While You Learn — Guided Project Workspace
+  try {
+    console.log(`[Journey 14] Guided Project Workspace & Sandbox Runner (/projects/rag-engine)...`)
+    await page.goto(`${BASE_URL}/projects/rag-engine`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    const hasProjectTitle = await page.locator('h1:has-text("Enterprise Grounded Knowledge Retrieval Engine")').count() > 0
+    if (!hasProjectTitle) {
+      throw new Error(`Project title not found in workspace`)
+    }
+
+    // Click "Run Tests" in the project workspace
+    const runTestsBtn = page.locator('button:has-text("Run Tests")')
+    await runTestsBtn.click()
+    await page.waitForSelector('text=Score:', { timeout: 8000 })
+
+    // Switch to Structured Tasks tab
+    const tasksTab = page.locator('button:has-text("Structured Tasks")')
+    await tasksTab.click()
+    await page.waitForSelector('text=Task 1 of 5', { timeout: 5000 })
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey14_project_workspace.png'), fullPage: false })
+    console.log(`  ✓ Journey 14 passed: Project workspace code execution, sandboxed tests, and rubric scored.`)
+    journeyResults.push({ journey: '14. Project Workspace & Sandbox', status: 'PASSED', route: '/projects/rag-engine' })
+  } catch (err) {
+    console.error(`  ✗ Journey 14 failed:`, err.message)
+    journeyResults.push({ journey: '14. Project Workspace & Sandbox', status: 'FAILED', error: err.message })
+  }
+
+  // JOURNEY 15: Personalized Learner Workspace
+  try {
+    console.log(`[Journey 15] Personalized Learner Workspace (/dashboard)...`)
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    // Verify workspace components
+    const hasObjective = await page.locator('text=Current Learning Objective').count() > 0
+    const hasAction = await page.locator('text=Recommended Action for Today').count() > 0
+    const hasProjectCard = await page.locator('text=In Progress Project').count() > 0
+    const hasSkillGaps = await page.locator('text=Identified Skill Gaps').count() > 0
+
+    if (!hasObjective || !hasAction || !hasProjectCard || !hasSkillGaps) {
+      throw new Error(`One or more objective workspace cards missing on /dashboard`)
+    }
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey15_learner_workspace.png'), fullPage: false })
+    console.log(`  ✓ Journey 15 passed: Objective-driven learner workspace rendered with all intelligence modules.`)
+    journeyResults.push({ journey: '15. Personalized Learner Workspace', status: 'PASSED', route: '/dashboard' })
+  } catch (err) {
+    console.error(`  ✗ Journey 15 failed:`, err.message)
+    journeyResults.push({ journey: '15. Personalized Learner Workspace', status: 'FAILED', error: err.message })
+  }
+
   await browser.close()
 
   console.log(`\n======================================================`)

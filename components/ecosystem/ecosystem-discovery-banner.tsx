@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Globe,
   Briefcase,
@@ -23,37 +23,46 @@ export function EcosystemDiscoveryBanner({
   currentContext = 'learner_portal',
 }: EcosystemDiscoveryBannerProps) {
   const [isDismissed, setIsDismissed] = useState(false)
+  const [urls, setUrls] = useState({
+    careerUrl: 'https://resume.talentxcel.in',
+    salaryUrl: 'https://salary.talentxcel.in',
+    chatrUrl: 'https://chatr.chat',
+    nutyUrl: 'https://nutytales.com',
+  })
+
+  // Hydrate cryptographically-signed URLs post-mount to eliminate SSR hydration mismatch
+  useEffect(() => {
+    setUrls({
+      careerUrl: generateSecureReferralUrl({
+        sourceBrand: 'talentxcel-academy',
+        destinationHost: 'resume.talentxcel.in',
+        userIntent: 'resume_analysis',
+        campaign: `${currentContext}_ecosystem_banner`,
+      }),
+      salaryUrl: generateSecureReferralUrl({
+        sourceBrand: 'talentxcel-academy',
+        destinationHost: 'salary.talentxcel.in',
+        userIntent: 'career_pathway',
+        campaign: `${currentContext}_ecosystem_banner`,
+      }),
+      chatrUrl: generateSecureReferralUrl({
+        sourceBrand: 'talentxcel-academy',
+        destinationHost: 'chatr.chat',
+        userIntent: 'chatr_community',
+        campaign: `${currentContext}_ecosystem_banner`,
+      }),
+      nutyUrl: generateSecureReferralUrl({
+        sourceBrand: 'talentxcel-academy',
+        destinationHost: 'nutytales.com',
+        userIntent: 'nuty_commerce_sandbox',
+        campaign: `${currentContext}_ecosystem_banner`,
+      }),
+    })
+  }, [currentContext])
 
   if (isDismissed) return null
 
-  // Generate safe cryptographically-signed URLs
-  const careerUrl = generateSecureReferralUrl({
-    sourceBrand: 'talentxcel-academy',
-    destinationHost: 'resume.talentxcel.in',
-    userIntent: 'resume_analysis',
-    campaign: `${currentContext}_ecosystem_banner`,
-  })
-
-  const salaryUrl = generateSecureReferralUrl({
-    sourceBrand: 'talentxcel-academy',
-    destinationHost: 'salary.talentxcel.in',
-    userIntent: 'career_pathway',
-    campaign: `${currentContext}_ecosystem_banner`,
-  })
-
-  const chatrUrl = generateSecureReferralUrl({
-    sourceBrand: 'talentxcel-academy',
-    destinationHost: 'chatr.chat',
-    userIntent: 'chatr_community',
-    campaign: `${currentContext}_ecosystem_banner`,
-  })
-
-  const nutyUrl = generateSecureReferralUrl({
-    sourceBrand: 'talentxcel-academy',
-    destinationHost: 'nutytales.com',
-    userIntent: 'nuty_commerce_sandbox',
-    campaign: `${currentContext}_ecosystem_banner`,
-  })
+  const { careerUrl, salaryUrl, chatrUrl, nutyUrl } = urls
 
   if (variant === 'footer-strip') {
     return (
@@ -152,35 +161,41 @@ export function EcosystemDiscoveryBanner({
             </div>
           </a>
 
-          {/* Card 2: CHATR Community */}
+          {/* Card 2: chatr Community */}
           <a
             href={chatrUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all text-left"
+            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-[#00bba6]/40 hover:bg-[#00bba6]/5 transition-all text-left"
           >
-            <div className="flex items-center justify-between text-emerald-500 mb-1">
+            <div className="flex items-center justify-between text-[#00bba6] mb-1">
               <MessageSquare className="h-4 w-4" />
               <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div className="text-xs font-semibold text-black dark:text-white">CHATR Network</div>
+            <div className="text-xs font-semibold text-black dark:text-white flex items-center gap-1.5">
+              <span>chatr</span>
+              <span className="text-[9px] font-normal text-[#00bba6]">Say It. Share It.</span>
+            </div>
             <div className="text-[11px] text-neutral-500 mt-0.5 line-clamp-2">
               Real-time peer study groups and AI engineering channels.
             </div>
           </a>
 
-          {/* Card 3: Nuty Tales Commerce */}
+          {/* Card 3: NutyTales Commerce */}
           <a
             href={nutyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-amber-500/40 hover:bg-amber-500/5 transition-all text-left"
+            className="group p-3 rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all text-left"
           >
-            <div className="flex items-center justify-between text-amber-500 mb-1">
+            <div className="flex items-center justify-between text-[#1e3a8a] dark:text-blue-400 mb-1">
               <ShoppingBag className="h-4 w-4" />
               <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div className="text-xs font-semibold text-black dark:text-white">Nuty Tales MSME</div>
+            <div className="text-xs font-semibold text-black dark:text-white flex items-center gap-1.5">
+              <span>NutyTales</span>
+              <span className="text-[9px] font-normal text-amber-600 dark:text-amber-400">Nutty Delights</span>
+            </div>
             <div className="text-[11px] text-neutral-500 mt-0.5 line-clamp-2">
               Artisanal commerce and enterprise gifting playbooks.
             </div>

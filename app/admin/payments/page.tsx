@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { CreditCard, Download, CheckCircle2, RefreshCcw, DollarSign, ArrowUpRight } from 'lucide-react'
+import { CreditCard, Download, RefreshCcw, ArrowUpRight } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,7 +67,15 @@ export default async function PaymentsAdminPage() {
       .limit(20)
 
     if (!error && dbOrders && dbOrders.length > 0) {
-      transactions = dbOrders.map((ord: any) => ({
+      transactions = (dbOrders as unknown as Array<{
+        id: string
+        order_number: string | null
+        amount_cents: number
+        currency: string
+        status: string
+        created_at: string
+        profiles: { full_name: string | null; email: string | null } | null
+      }>).map((ord) => ({
         orderId: ord.order_number || ord.id.slice(0, 8),
         learner: ord.profiles?.full_name || 'Enrolled Student',
         email: ord.profiles?.email || 'N/A',

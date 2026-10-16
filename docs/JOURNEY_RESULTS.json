@@ -21,8 +21,8 @@
   },
   {
     "journey": "4. Course Player & AI Tutor",
-    "status": "PASSED",
-    "route": "/courses/ai-development/lessons/les-101"
+    "status": "FAILED",
+    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/courses/ai-development/lessons/les-101\", waiting until \"networkidle\"\u001b[22m\n"
   },
   {
     "journey": "5. Programme Exploration",
@@ -36,13 +36,13 @@
   },
   {
     "journey": "7. Admin Operations Overview",
-    "status": "PASSED",
-    "route": "/admin"
+    "status": "FAILED",
+    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"networkidle\"\u001b[22m\n"
   },
   {
     "journey": "8. Security Boundary Enforcement",
-    "status": "PASSED",
-    "route": "/admin -> /auth/login"
+    "status": "FAILED",
+    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"networkidle\"\u001b[22m\n"
   },
   {
     "journey": "9. Blog & Educational Resources",
@@ -58,5 +58,25 @@
     "journey": "11. AI Admissions Assistant",
     "status": "PASSED",
     "route": "/api/ai/admissions"
+  },
+  {
+    "journey": "12. Hero Interactive Product Demo",
+    "status": "PASSED",
+    "route": "/"
+  },
+  {
+    "journey": "13. Living Skill Graph & Accessibility",
+    "status": "PASSED",
+    "route": "/#skill-graph-section"
+  },
+  {
+    "journey": "14. Project Workspace & Sandbox",
+    "status": "PASSED",
+    "route": "/projects/rag-engine"
+  },
+  {
+    "journey": "15. Personalized Learner Workspace",
+    "status": "FAILED",
+    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/dashboard\", waiting until \"networkidle\"\u001b[22m\n"
   }
 ]

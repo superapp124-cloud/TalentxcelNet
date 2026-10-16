@@ -9,6 +9,7 @@ export interface CrossBrandReferralParams {
   destinationPath?: string
   userIntent: 'career_pathway' | 'resume_analysis' | 'academy_enrolment' | 'chatr_community' | 'nuty_commerce_sandbox'
   campaign?: string
+  timestamp?: number
   extraParams?: Record<string, string>
 }
 
@@ -22,7 +23,8 @@ export function generateSecureReferralUrl(params: CrossBrandReferralParams): str
   queryParams.set('utm_medium', 'ecosystem_referral')
   queryParams.set('utm_campaign', params.campaign || 'ecosystem_growth')
   queryParams.set('ref_intent', params.userIntent)
-  queryParams.set('ref_ts', Math.floor(Date.now() / 1000).toString())
+  const ts = params.timestamp ? params.timestamp : Math.floor(Date.now() / 1000)
+  queryParams.set('ref_ts', ts.toString())
 
   if (params.extraParams) {
     for (const [k, v] of Object.entries(params.extraParams)) {

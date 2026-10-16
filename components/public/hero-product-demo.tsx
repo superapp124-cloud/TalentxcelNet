@@ -6,17 +6,13 @@ import {
   Brain,
   Code2,
   Network,
-  Sparkles,
   Play,
   CheckCircle2,
   ArrowRight,
-  ShieldCheck,
   Send,
   Loader2,
   Award,
-  Layers,
   ChevronRight,
-  FileCheck,
   Target,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -73,7 +69,7 @@ export function HeroProductDemo() {
           {
             role: 'assistant',
             content: data.content,
-            sources: data.sources?.map((s: any) => s.title),
+            sources: data.sources?.map((s: { title: string }) => s.title),
           },
         ])
       } else {

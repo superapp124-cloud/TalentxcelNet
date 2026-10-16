@@ -110,3 +110,95 @@ export function Logo({
 
   return content
 }
+
+export function ChatrLogo({
+  className = '',
+  size = 'md',
+  href,
+}: {
+  className?: string
+  size?: 'sm' | 'md' | 'lg'
+  href?: string
+}) {
+  const heightMap = { sm: 28, md: 36, lg: 48 }
+  const h = heightMap[size]
+
+  const img = (
+    <div className={`relative inline-flex items-center shrink-0 ${className}`}>
+      <Image
+        src="/logos/chatr-logo.png"
+        alt="chatr — Say It. Share It. Live It."
+        width={h}
+        height={h}
+        className="rounded-full object-contain shrink-0 shadow-xs"
+        style={{ height: `${h}px`, width: `${h}px` }}
+      />
+    </div>
+  )
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:opacity-90">
+        {img}
+      </a>
+    )
+  }
+  return img
+}
+
+export function NutyTalesLogo({
+  className = '',
+  size = 'md',
+  href,
+}: {
+  className?: string
+  size?: 'sm' | 'md' | 'lg'
+  href?: string
+}) {
+  const heightMap = { sm: 26, md: 34, lg: 46 }
+  const widthMap = { sm: 42, md: 56, lg: 76 }
+  const h = heightMap[size]
+  const w = widthMap[size]
+
+  const img = (
+    <div className={`relative inline-flex items-center shrink-0 ${className}`}>
+      <Image
+        src="/logos/nutytales-logo.png"
+        alt="NutyTales — Wholesome Nutty Delights"
+        width={w}
+        height={h}
+        className="object-contain shrink-0"
+        style={{ height: `${h}px`, width: 'auto' }}
+      />
+    </div>
+  )
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:opacity-90">
+        {img}
+      </a>
+    )
+  }
+  return img
+}
+
+export function EcosystemTrioLogos({ className = '' }: { className?: string }) {
+  return (
+    <div className={`inline-flex items-center gap-4 sm:gap-6 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-black/10 dark:border-white/10 shadow-xs ${className}`}>
+      <div className="flex items-center gap-2">
+        <Logo size="sm" href="/" />
+      </div>
+      <span className="h-5 w-px bg-neutral-200 dark:bg-neutral-800" aria-hidden="true" />
+      <div className="flex items-center gap-2">
+        <ChatrLogo size="sm" href="https://chatr.chat" />
+        <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">chatr</span>
+      </div>
+      <span className="h-5 w-px bg-neutral-200 dark:bg-neutral-800" aria-hidden="true" />
+      <div className="flex items-center gap-2">
+        <NutyTalesLogo size="sm" href="https://nutytales.com" />
+        <span className="text-xs font-serif font-bold text-[#1e3a8a] dark:text-blue-300">NutyTales</span>
+      </div>
+    </div>
+  )
+}

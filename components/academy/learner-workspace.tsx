@@ -11,6 +11,7 @@ import {
   Clock,
   Calendar,
   AlertCircle,
+  FileCheck,
   Award,
   Code2,
   Download,

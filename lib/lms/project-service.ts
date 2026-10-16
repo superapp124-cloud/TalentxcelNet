@@ -211,8 +211,7 @@ export function getGuidedProject(projectId = 'rag-engine'): GuidedProject {
  * Safely parses and evaluates student code in an isolated JavaScript context
  * without executing privileged OS commands.
  */
-export function evaluateProjectSubmission(code: string, projectId = 'rag-engine'): ProjectEvaluationResult {
-  const startTime = Date.now()
+export function evaluateProjectSubmission(code: string, _projectId = 'rag-engine'): ProjectEvaluationResult {
   const assertions: ProjectTestAssertion[] = []
 
   // Check 1: Chunking split logic and overlap
@@ -264,7 +263,6 @@ export function evaluateProjectSubmission(code: string, projectId = 'rag-engine'
   })
 
   const passedCount = assertions.filter((a) => a.passed).length
-  const passRate = (passedCount / assertions.length) * 100
 
   // Multi-dimensional Rubric Scoring
   const rubric: RubricDimension[] = [
