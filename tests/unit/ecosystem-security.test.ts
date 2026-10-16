@@ -24,35 +24,38 @@ describe('Ecosystem Referral Engine — Negative Security Tests', () => {
 
   describe('Secret Handling & Fail-Closed Policy', () => {
     it('refuses to generate signature if secret is completely missing', () => {
-      delete process.env.ECOSYSTEM_REFERRAL_SECRET
       expect(() => {
         generateSecureReferralUrl({
           sourceBrand: 'talentxcel-academy',
           destinationHost: 'resume.talentxcel.in',
           userIntent: 'resume_analysis',
+          secretOverride: '',
         })
       }).toThrow(/ECOSYSTEM_REFERRAL_SECRET is missing or too short/)
     })
 
     it('refuses to generate signature if secret is shorter than 32 characters', () => {
-      process.env.ECOSYSTEM_REFERRAL_SECRET = 'short_weak_secret'
       expect(() => {
         generateSecureReferralUrl({
           sourceBrand: 'talentxcel-academy',
           destinationHost: 'resume.talentxcel.in',
           userIntent: 'resume_analysis',
+          secretOverride: 'short_weak_secret',
         })
       }).toThrow(/ECOSYSTEM_REFERRAL_SECRET is missing or too short/)
     })
 
     it('fails closed during verification if secret is missing', () => {
-      delete process.env.ECOSYSTEM_REFERRAL_SECRET
       const result = verifyReferralDetailed(
         'talentxcel-academy',
         'resume.talentxcel.in',
         'resume_analysis',
         Math.floor(Date.now() / 1000).toString(),
-        'a'.repeat(64)
+        'a'.repeat(64),
+        '/',
+        'ecosystem_growth',
+        604800,
+        ''
       )
       expect(result.isValid).toBe(false)
       expect(result.errorCode).toBe('MISSING_SECRET')

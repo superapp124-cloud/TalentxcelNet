@@ -132,7 +132,7 @@ export function buildCanonicalSigningString(
  * Server-only: Fails closed if ECOSYSTEM_REFERRAL_SECRET is missing.
  */
 export function generateSecureReferralUrl(params: CrossBrandReferralParams): string {
-  const secret = getReferralSecret(true)
+  const secret = getReferralSecret(true, params.secretOverride)
 
   const validatedHost = validateDestinationHost(params.destinationHost)
   const normalizedPath = normalizeAndValidatePath(params.destinationPath)
@@ -190,9 +190,10 @@ export function verifyReferralDetailed(
   providedSignature: string,
   destinationPath: string = '/',
   campaign: string = 'ecosystem_growth',
-  ttlSeconds: number = DEFAULT_TTL_SECONDS
+  ttlSeconds: number = DEFAULT_TTL_SECONDS,
+  secretOverride?: string
 ): VerificationResult {
-  const secret = getReferralSecret(false)
+  const secret = getReferralSecret(false, secretOverride)
   if (!secret) {
     return {
       isValid: false,
@@ -328,7 +329,9 @@ export function verifyReferralSignature(
   timestampStr: string,
   providedSignature: string,
   destinationPath: string = '/',
-  campaign: string = 'ecosystem_growth'
+  campaign: string = 'ecosystem_growth',
+  ttlSeconds?: number,
+  secretOverride?: string
 ): boolean {
   const result = verifyReferralDetailed(
     sourceBrand,
@@ -337,7 +340,9 @@ export function verifyReferralSignature(
     timestampStr,
     providedSignature,
     destinationPath,
-    campaign
+    campaign,
+    ttlSeconds,
+    secretOverride
   )
   return result.isValid
 }
