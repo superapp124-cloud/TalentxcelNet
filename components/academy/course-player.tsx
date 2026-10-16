@@ -18,6 +18,7 @@ import { queueOfflineProgress } from '@/lib/offline/sync-queue'
 import { AITutorDrawer } from '@/components/academy/ai-tutor-drawer'
 import { QuizRunner } from '@/components/academy/quiz-runner'
 import { OfflineIndicator } from '@/components/offline/offline-indicator'
+import { Logo } from '@/components/brand/logo'
 import Link from 'next/link'
 
 interface LessonProps {
@@ -82,13 +83,16 @@ export function CoursePlayer({ programmeSlug, lesson }: LessonProps) {
       <OfflineIndicator />
       {/* Top Header */}
       <div className="border-b bg-card">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-          <Link
-            href={`/courses/${programmeSlug}`}
-            className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to Course Syllabus
-          </Link>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Logo size="sm" variant="emblem" href="/" />
+            <Link
+              href={`/courses/${programmeSlug}`}
+              className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Back to Syllabus
+            </Link>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

@@ -1,15 +1,15 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { GraduationCap, LayoutDashboard, BookOpen, Award, Settings, LogOut, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, BookOpen, Award, Settings, LogOut, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/brand/logo'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'My Courses', href: '/dashboard/courses', icon: BookOpen },
-  { label: 'Certificates', href: '/dashboard/certificates', icon: Award },
-  { label: 'AI Tutor', href: '/dashboard/ai-tutor', icon: MessageSquare },
-  { label: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { label: 'My Courses', href: '/courses/ai-development', icon: BookOpen },
+  { label: 'Certificates', href: '/verify/TXCERT-2026-DEMO01', icon: Award },
+  { label: 'Settings', href: '/dashboard', icon: Settings },
 ]
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -21,16 +21,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col border-r bg-background" aria-label="Dashboard navigation">
-        <div className="p-4 border-b">
-          <Link href="/" className="flex items-center gap-2" aria-label="TalentXcel Academy home">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />
-            </div>
-            <span className="font-bold text-foreground">TalentXcel</span>
-          </Link>
+    <div className="flex min-h-screen bg-neutral-50 dark:bg-black">
+      {/* Sleek Minimalist Sidebar */}
+      <aside className="hidden lg:flex w-64 flex-col border-r border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-neutral-950" aria-label="Dashboard navigation">
+        <div className="p-5 border-b border-black/[0.06] dark:border-white/[0.08]">
+          <Logo size="md" variant="full" href="/" />
         </div>
         <nav className="flex-1 p-4 space-y-1" aria-label="Dashboard sections">
           {navItems.map((item) => {
@@ -39,7 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white transition-colors"
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
                 {item.label}
@@ -47,9 +42,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
             )
           })}
         </nav>
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-black/[0.06] dark:border-white/[0.08]">
           <form action="/auth/signout" method="post">
-            <Button type="submit" variant="ghost" size="sm" className="w-full justify-start text-muted-foreground">
+            <Button
+              type="submit"
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-xs rounded-xl text-neutral-500 hover:text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
               Sign Out
             </Button>
@@ -58,7 +58,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </aside>
 
       {/* Main content */}
-      <main className="flex-1" id="dashboard-content">
+      <main className="flex-1 overflow-y-auto" id="dashboard-content">
         {children}
       </main>
     </div>

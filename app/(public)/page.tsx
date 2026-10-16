@@ -1,204 +1,262 @@
 import Link from 'next/link'
-import { ArrowRight, Brain, Zap, Award, Download, Users, BookOpen, Code2, Stethoscope, Building2, GraduationCap, CheckCircle2, Clock, Laptop } from 'lucide-react'
+import {
+  ArrowRight,
+  Brain,
+  Zap,
+  Award,
+  Download,
+  Users,
+  Code2,
+  Stethoscope,
+  Building2,
+  GraduationCap,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  ChevronRight,
+  ShieldCheck,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { TalentXcelEmblem, Logo } from '@/components/brand/logo'
 
 const programmes = [
   {
     id: 'ai-development',
     icon: Brain,
-    badge: 'Flagship',
-    badgeVariant: 'default' as const,
+    badge: 'Flagship Curriculum',
     title: 'AI Development & Automation',
-    description: 'Build real AI applications, APIs, and automated workflows. From programming fundamentals through RAG systems, AI agents, and deployment.',
+    tagline: 'Engineered for the frontier of software.',
+    description:
+      'From fundamentals to multi-tenant RAG systems, PostgreSQL pgvector optimization, supervised AI agents, and production deployment with automated CI/CD.',
     duration: '8 months',
     level: 'Beginner to Advanced',
-    topics: ['Python & Web Dev', 'AI Application Dev', 'RAG & Agents', 'Deployment & Security'],
+    topics: ['Python & Modern Web', 'RAG & pgvector', 'Supervised Agents', 'CI/CD & Testing'],
     href: '/programmes/ai-development',
-    status: 'Enrolling Soon',
+    status: 'Applications Open',
+    highlight: true,
   },
   {
     id: 'healthcare-tech',
     icon: Stethoscope,
-    badge: 'Specialist',
-    badgeVariant: 'secondary' as const,
+    badge: 'Specialist Track',
     title: 'Healthcare Technology',
-    description: 'Digital health systems, interoperability, data privacy, and technology product design for the healthcare sector. Technology programme only — not a clinical qualification.',
+    tagline: 'Health informatics & interoperability.',
+    description:
+      'Digital health information systems, FHIR/HL7 exchange standards, patient data privacy (DPDP & DISHA), and hospital workflow optimization.',
     duration: 'To be confirmed',
     level: 'Intermediate',
-    topics: ['Health Information Systems', 'Data Privacy', 'Interoperability', 'Analytics'],
+    topics: ['Hospital Information Systems', 'FHIR / HL7 Standards', 'Indian DPDP Act Privacy', 'Workflow Analytics'],
     href: '/programmes/healthcare-tech',
-    status: 'Coming Soon',
+    status: 'Waitlist',
+    highlight: false,
   },
   {
     id: 'entrepreneurship',
     icon: Building2,
-    badge: 'Business',
-    badgeVariant: 'secondary' as const,
+    badge: 'Operations Track',
     title: 'Entrepreneurship & Digitization',
-    description: 'Launch and operate a digital business. E-commerce, payments, CRM, inventory, marketing analytics, and practical automation.',
+    tagline: 'Modern digital enterprise operations.',
+    description:
+      'Launch and operate an online business. Omni-channel storefronts, Razorpay payments, CRM automation, inventory logic, and marketing analytics.',
     duration: 'To be confirmed',
     level: 'Beginner to Intermediate',
-    topics: ['Digital Storefronts', 'Payments & CRM', 'Marketing Analytics', 'Automation'],
+    topics: ['Digital Storefronts', 'Payment Reconciliation', 'Customer CRM Funnels', 'Operations Automation'],
     href: '/programmes/entrepreneurship',
-    status: 'Coming Soon',
+    status: 'Waitlist',
+    highlight: false,
   },
   {
     id: 'school-foundation',
     icon: GraduationCap,
-    badge: 'School',
-    badgeVariant: 'secondary' as const,
+    badge: 'School Bridge',
     title: 'School Foundation (Class 8 → 9)',
-    description: 'An 8-month standalone programme for students progressing from Class 8 to 9. Mathematics, science, digital literacy, and supervised projects with guardian involvement.',
+    tagline: 'Foundations for future innovators.',
+    description:
+      'An 8-month standalone bridge programme for learners progressing from Class 8 into Class 9. Foundational mathematics, science, digital literacy, and guardian-guided projects.',
     duration: '8 months',
     level: 'Foundation',
-    topics: ['Mathematics', 'Science', 'Digital Literacy', 'Study Skills'],
+    topics: ['Mathematical Thinking', 'Scientific Inquiry', 'Algorithmic Thinking', 'Guardian Oversight'],
     href: '/programmes/school-foundation',
-    status: 'Coming Soon',
+    status: 'Enrolling Soon',
+    highlight: false,
   },
 ]
 
-const features = [
+const pillars = [
   {
     icon: Brain,
-    title: 'AI-Powered Learning',
-    description: 'An AI tutor that explains concepts at your level, gives step-by-step hints, and links answers to your course materials.',
+    title: 'Super AI Tutor',
+    description:
+      'A curriculum-grounded Socratic assistant that gives progressive hints without revealing answers, teaching you to solve problems autonomously.',
   },
   {
     icon: Code2,
-    title: 'Real Projects',
-    description: 'Build an actual portfolio of projects assessed against defined rubrics — not just theoretical exercises.',
+    title: 'Verified Portfolios',
+    description:
+      'Build real, tested software portfolios evaluated against industry rubrics rather than memorizing theoretical trivia.',
   },
   {
     icon: Download,
-    title: 'Offline Access',
-    description: 'Download lessons for low-bandwidth or travel situations. Learn where and when it suits you.',
+    title: 'Offline-First PWA',
+    description:
+      'Download lessons and coding workbooks for off-grid or low-bandwidth travel. Progress syncs automatically when you reconnect.',
   },
   {
     icon: Users,
-    title: 'Mentor Feedback',
-    description: 'Qualified instructors review your work, provide structured feedback, and track your progress.',
+    title: 'Practitioner Mentors',
+    description:
+      'Weekly structured code reviews, office hours, and individualized guidance from experienced systems engineers.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Private & Secure',
+    description:
+      'PostgreSQL Row Level Security, child-safety safeguards for minors, and strict adherence to India’s DPDP Act 2023.',
   },
   {
     icon: Award,
-    title: 'Verified Certificates',
-    description: 'Completion certificates issued only after defined criteria are met, with a public verification page.',
-  },
-  {
-    icon: Zap,
-    title: 'Practical Outcomes',
-    description: 'Curriculum designed around real job tasks, business problems, and demonstrable skills — not just content consumption.',
-  },
-]
-
-const steps = [
-  {
-    number: '01',
-    title: 'Apply and Get Admitted',
-    description: 'Submit your enquiry, speak with an admissions counsellor, and complete your application. Enrolment follows the configured admission and payment rules.',
-  },
-  {
-    number: '02',
-    title: 'Learn, Practice, Build',
-    description: 'Follow structured modules at your pace. Get AI-assisted explanations, practise with real exercises, and build projects in each module.',
-  },
-  {
-    number: '03',
-    title: 'Demonstrate and Earn',
-    description: 'Submit assessments, receive instructor feedback, and earn your certificate when you meet the defined completion requirements.',
+    title: 'Publicly Verifiable',
+    description:
+      'Digital completion certificates issued upon meeting explicit milestone criteria, verifiable on our permanent registry.',
   },
 ]
 
 export default function HomePage() {
   return (
-    <>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 py-20 lg:py-32" aria-labelledby="hero-heading">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(59,130,246,0.15),transparent_70%)]" aria-hidden="true" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="outline" className="mb-6 border-blue-500/30 text-blue-400 bg-blue-500/10">
-              <Zap className="mr-1.5 h-3 w-3" aria-hidden="true" />
-              AI-First Education Platform
-            </Badge>
-            <h1 id="hero-heading" className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Learn Practical Skills.{' '}
-              <span className="text-blue-400">Build Real Projects.</span>
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-slate-300 sm:text-xl">
-              TalentXcel Academy delivers structured, career-oriented programmes with AI-powered tutoring, hands-on projects, and mentor feedback — designed for the digital economy.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/apply">
-                <Button size="xl" variant="gradient">
-                  Apply for Admission
-                  <ArrowRight className="ml-1 h-5 w-5" aria-hidden="true" />
-                </Button>
-              </Link>
-              <Link href="/programmes">
-                <Button size="xl" variant="outline" className="border-white/20 text-white hover:bg-white/10 hover:text-white">
-                  <BookOpen className="mr-2 h-5 w-5" aria-hidden="true" />
-                  Explore Programmes
-                </Button>
-              </Link>
-            </div>
-            <p className="mt-6 text-sm text-slate-400">
-              Platform-issued completion certificates. Not a regulated qualification.
-            </p>
+    <div className="bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 selection:bg-[#0080FF] selection:text-white">
+      {/* Hero Section — Apple-style Obsidian Dark Surface */}
+      <section className="relative overflow-hidden bg-[#000000] text-white pt-24 pb-28 sm:pt-32 sm:pb-36 border-b border-white/[0.08]">
+        {/* Subtle Ambient Radial Lighting */}
+        <div
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.22),_transparent_65%)]"
+          aria-hidden="true"
+        />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          {/* Brand Announcement Pill */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.15] bg-white/[0.05] px-4 py-1.5 text-xs font-medium backdrop-blur-md mb-8 hover:bg-white/[0.08] transition-colors">
+            <TalentXcelEmblem className="h-4 w-4" />
+            <span className="text-neutral-300">TalentXcel Super AI Platform</span>
+            <ChevronRight className="h-3 w-3 text-neutral-400" />
           </div>
+
+          {/* Apple-grade Headline with subtle gradient typography */}
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
+            Learn Practical Skills.{' '}
+            <span className="bg-gradient-to-r from-[#0080FF] via-cyan-400 to-blue-300 bg-clip-text text-transparent">
+              Build Real Systems.
+            </span>
+          </h1>
+
+          <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto font-normal leading-relaxed">
+            TalentXcel Academy delivers structured, career-defining programmes with intelligent Socratic AI tutoring, hands-on capstone engineering, and mentor review.
+          </p>
+
+          {/* Action Pills */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/apply">
+              <Button
+                size="xl"
+                className="rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white px-8 font-semibold text-sm shadow-[0_4px_24px_rgba(0,128,255,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Apply for Admission
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/programmes">
+              <Button
+                size="xl"
+                variant="outline"
+                className="rounded-full border-white/20 bg-white/[0.04] text-white hover:bg-white/[0.1] px-8 font-medium text-sm backdrop-blur-md"
+              >
+                Explore Syllabus
+              </Button>
+            </Link>
+          </div>
+
+          <p className="mt-6 text-xs text-neutral-500">
+            Platform-issued milestone certificates • Not an accredited university degree or clinical qualification
+          </p>
         </div>
       </section>
 
-      {/* Programmes */}
-      <section className="py-20 lg:py-28 bg-background" aria-labelledby="programmes-heading">
+      {/* Bento Grid: Programmes Showcase */}
+      <section className="py-24 sm:py-32 bg-neutral-50 dark:bg-[#080808]" aria-labelledby="programmes-heading">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 id="programmes-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Our Programmes
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <Badge variant="outline" className="mb-3 text-[#0080FF] border-[#0080FF]/30">
+              Curriculum Tracks
+            </Badge>
+            <h2 id="programmes-heading" className="text-3xl sm:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+              Designed for What Matters
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Structured learning paths built around real outcomes, practical skills, and demonstrable competencies.
+            <p className="mt-4 text-base sm:text-lg text-neutral-500 dark:text-neutral-400">
+              Each programme is structured around demonstrable engineering competencies, portfolio evidence, and real tasks.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {programmes.map((prog) => {
-              const Icon = prog.icon
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {programmes.map((p) => {
+              const Icon = p.icon
               return (
-                <Link key={prog.id} href={prog.href} className="group">
-                  <Card className="h-full transition-shadow hover:shadow-md hover:border-primary/30">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                          <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
-                        </div>
-                        <Badge variant={prog.status === 'Enrolling Soon' ? 'success' : 'secondary'} className="text-xs">
-                          {prog.status}
-                        </Badge>
+                <Link key={p.id} href={p.href} className="group">
+                  <div
+                    className={`h-full rounded-3xl p-8 sm:p-10 transition-all duration-300 ${
+                      p.highlight
+                        ? 'border-2 border-[#0080FF]/40 bg-white dark:bg-neutral-900/80 shadow-xl dark:shadow-[0_10px_35px_rgba(0,128,255,0.1)]'
+                        : 'border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-neutral-900/40 hover:border-black/[0.15] dark:hover:border-white/[0.18] shadow-sm'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/[0.04] dark:bg-white/[0.06]">
+                        <Icon className="h-6 w-6 text-[#0080FF]" />
                       </div>
-                      <h3 className="font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{prog.title}</h3>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm text-muted-foreground leading-relaxed">{prog.description}</p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                          {prog.duration}
+                      <Badge
+                        variant={p.highlight ? 'default' : 'secondary'}
+                        className="rounded-full text-xs font-semibold px-3 py-1"
+                      >
+                        {p.status}
+                      </Badge>
+                    </div>
+
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#0080FF] mb-1">
+                      {p.badge}
+                    </div>
+                    <h3 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white group-hover:text-[#0080FF] transition-colors">
+                      {p.title}
+                    </h3>
+                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+                      {p.tagline}
+                    </p>
+                    <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                      {p.description}
+                    </p>
+
+                    <div className="mt-6 pt-6 border-t border-black/[0.06] dark:border-white/[0.08] space-y-3">
+                      <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400">
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <Clock className="h-3.5 w-3.5 text-[#0080FF]" /> {p.duration}
                         </span>
+                        <span>•</span>
+                        <span>{p.level}</span>
                       </div>
-                      <ul className="space-y-1" role="list" aria-label="Programme topics">
-                        {prog.topics.map((topic) => (
-                          <li key={topic} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <CheckCircle2 className="h-3.5 w-3.5 text-primary flex-shrink-0" aria-hidden="true" />
-                            {topic}
-                          </li>
+
+                      <div className="grid grid-cols-2 gap-2 pt-2">
+                        {p.topics.map((t) => (
+                          <div key={t} className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-[#0080FF] flex-shrink-0" />
+                            <span className="truncate">{t}</span>
+                          </div>
                         ))}
-                      </ul>
-                      <div className="flex items-center text-sm font-medium text-primary group-hover:translate-x-0.5 transition-transform">
-                        Learn more <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+
+                    <div className="mt-8 flex items-center text-sm font-semibold text-[#0080FF] group-hover:translate-x-1 transition-transform">
+                      View Programme Syllabus <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </div>
+                  </div>
                 </Link>
               )
             })}
@@ -206,53 +264,89 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 lg:py-28 bg-muted/30" aria-labelledby="how-it-works-heading">
+      {/* Super AI Spotlight Section */}
+      <section className="py-24 bg-white dark:bg-black border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 id="how-it-works-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              How TalentXcel Works
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {steps.map((step) => (
-              <div key={step.number} className="text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">
-                  {step.number}
+          <div className="rounded-3xl border border-black/[0.08] dark:border-white/[0.1] bg-gradient-to-b from-neutral-50 to-white dark:from-neutral-900 dark:to-black p-8 sm:p-14 shadow-xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#0080FF]/10 text-[#0080FF] px-3.5 py-1 text-xs font-semibold">
+                  <Sparkles className="h-3.5 w-3.5" /> Super AI Architecture
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-3">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-tight">
+                  A Tutor that Teaches You to Think.
+                </h2>
+                <p className="text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Traditional chatbots give away the answer, cutting your learning short. The TalentXcel Super AI Tutor is grounded directly on your verified curriculum. It operates in progressive Socratic hint modes, gently nudging you past roadblocks without taking away the satisfaction of building the solution yourself.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <Link href="/how-it-works">
+                    <Button className="rounded-full bg-neutral-900 text-white dark:bg-white dark:text-black font-semibold text-xs px-6">
+                      See How It Works
+                    </Button>
+                  </Link>
+                  <Link href="/programmes/ai-development">
+                    <Button variant="outline" className="rounded-full text-xs px-6">
+                      Explore AI Curriculum
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            ))}
+
+              {/* Simulated UI Card of the AI Tutor */}
+              <div className="rounded-2xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-neutral-950 p-6 shadow-2xl space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+                  <div className="flex items-center gap-2.5">
+                    <TalentXcelEmblem className="h-6 w-6" />
+                    <span className="text-xs font-bold">TalentXcel AI Tutor</span>
+                  </div>
+                  <Badge variant="success" className="text-[10px] px-2 py-0.5">
+                    Socratic Mode
+                  </Badge>
+                </div>
+                <div className="space-y-3 text-xs leading-relaxed">
+                  <div className="bg-neutral-100 dark:bg-neutral-900 p-3 rounded-xl text-neutral-800 dark:text-neutral-200">
+                    <span className="font-semibold block mb-0.5">Learner:</span>
+                    How do I secure my Supabase table so only enrolled learners can view lesson content?
+                  </div>
+                  <div className="bg-[#0080FF]/10 border border-[#0080FF]/20 p-3.5 rounded-xl text-neutral-900 dark:text-neutral-100">
+                    <span className="font-semibold text-[#0080FF] block mb-1">Super AI Tutor (Hint #1):</span>
+                    Think about where the permission boundary belongs. Instead of checking in frontend JavaScript, look at PostgreSQL Row Level Security (RLS). Which existing relation links a learner&apos;s <code>auth.uid()</code> to their active course enrolment?
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 lg:py-28 bg-background" aria-labelledby="features-heading">
+      {/* Pillars Section */}
+      <section className="py-24 bg-neutral-50 dark:bg-[#050505] border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 id="features-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Built for Serious Learning
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+              Engineered with Integrity
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Every feature designed to support real learning, not just content access.
+            <p className="mt-3 text-base text-neutral-500 dark:text-neutral-400">
+              Built on uncompromising standards of software craft, privacy, and educational honesty.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => {
-              const Icon = feature.icon
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {pillars.map((pi) => {
+              const Icon = pi.icon
               return (
-                <div key={feature.title} className="flex gap-4 p-6 rounded-xl border bg-card hover:shadow-sm transition-shadow">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
-                    </div>
+                <div
+                  key={pi.title}
+                  className="rounded-3xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-neutral-900/50 p-8 shadow-xs hover:shadow-md transition-shadow"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0080FF]/10 mb-5">
+                    <Icon className="h-5 w-5 text-[#0080FF]" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1.5">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                  </div>
+                  <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">{pi.title}</h3>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    {pi.description}
+                  </p>
                 </div>
               )
             })}
@@ -260,65 +354,80 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Fees Preview */}
-      <section className="py-20 lg:py-28 bg-slate-900 text-white" aria-labelledby="fees-heading">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-          <Badge variant="outline" className="mb-6 border-blue-500/30 text-blue-400 bg-blue-500/10">
-            Transparent Pricing
+      {/* Transparent Fees Preview */}
+      <section className="py-24 bg-white dark:bg-black border-t border-black/[0.06] dark:border-white/[0.08]">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-8">
+          <Badge variant="outline" className="text-[#0080FF] border-[#0080FF]/30">
+            Commercial Transparency
           </Badge>
-          <h2 id="fees-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
-            AI Development Programme — Indicative Fees
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+            Honest, Structured Tuition Plans
           </h2>
-          <p className="mt-4 text-slate-300 text-lg">
-            The proposed fee structure for the 8-month flagship programme is subject to confirmation and GST.
+          <p className="text-base text-neutral-500 dark:text-neutral-400 max-w-2xl mx-auto">
+            Our flagship 8-month AI Development programme offers flexible instalment options designed for working professionals and learners.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-6 justify-center">
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6 flex-1 max-w-xs mx-auto sm:mx-0">
-              <div className="text-3xl font-bold text-white">₹29,999</div>
-              <div className="text-blue-300 text-sm font-medium mt-1">Upfront on enrolment</div>
-              <div className="text-slate-400 text-sm mt-2">+ ₹1,500/month × 8 months</div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto pt-4">
+            <div className="rounded-3xl border-2 border-[#0080FF] bg-white dark:bg-neutral-900 p-8 text-left shadow-lg">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0080FF]">Instalment Option</span>
+              <div className="mt-3 text-4xl font-extrabold text-neutral-900 dark:text-white">₹29,999</div>
+              <p className="text-xs text-neutral-500 mt-1">Upfront upon confirmed enrolment</p>
+              <div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.08] text-sm text-neutral-600 dark:text-neutral-300">
+                + ₹1,500/month for 8 months (Excl. GST)
+              </div>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6 flex-1 max-w-xs mx-auto sm:mx-0">
-              <div className="text-3xl font-bold text-white">₹41,999</div>
-              <div className="text-blue-300 text-sm font-medium mt-1">Total programme value</div>
-              <div className="text-slate-400 text-sm mt-2">Excl. GST. Installment plan available.</div>
+
+            <div className="rounded-3xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-neutral-900 p-8 text-left shadow-xs">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">Single Settlement</span>
+              <div className="mt-3 text-4xl font-extrabold text-neutral-900 dark:text-white">₹41,999</div>
+              <p className="text-xs text-neutral-500 mt-1">Total programme tuition</p>
+              <div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.08] text-sm text-neutral-600 dark:text-neutral-300">
+                Full course & mentor access (Excl. GST)
+              </div>
             </div>
           </div>
-          <p className="mt-6 text-xs text-slate-400 max-w-xl mx-auto">
-            Indicative pricing only. Final fees, tax handling, and payment terms are set by authorized administrators and subject to applicable consumer protection requirements. Please verify at the time of application.
-          </p>
-          <div className="mt-8">
+
+          <div className="pt-4">
             <Link href="/fees">
-              <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 hover:text-white">
-                View Full Fees & Payment Plans
+              <Button variant="outline" className="rounded-full text-xs font-semibold px-6">
+                View Complete Tuition & Refund Terms
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-background" aria-labelledby="cta-heading">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <h2 id="cta-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Ready to Start?
+      {/* Call to Action */}
+      <section className="py-24 bg-[#000000] text-white border-t border-white/[0.08] text-center">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-6">
+          <TalentXcelEmblem className="h-12 w-12 mx-auto" />
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl mx-auto">
+            Ready to Accelerate Your Career?
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Submit an enquiry and speak with an admissions counsellor about the right programme for your goals.
+          <p className="text-base text-neutral-400 max-w-xl mx-auto">
+            Connect with our admissions team to explore programme eligibility, curriculum pathways, and cohort schedules.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
             <Link href="/apply">
-              <Button size="lg">
+              <Button
+                size="xl"
+                className="rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white px-8 font-semibold text-sm shadow-[0_4px_24px_rgba(0,128,255,0.35)]"
+              >
                 Apply for Admission
-                <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline">Get in Touch</Button>
+              <Button
+                size="xl"
+                variant="outline"
+                className="rounded-full border-white/20 bg-white/[0.04] text-white hover:bg-white/[0.1] px-8 font-medium text-sm"
+              >
+                Speak with Counsellor
+              </Button>
             </Link>
           </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

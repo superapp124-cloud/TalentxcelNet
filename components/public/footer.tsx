@@ -1,65 +1,63 @@
 import Link from 'next/link'
-import { GraduationCap } from 'lucide-react'
+import { Logo } from '@/components/brand/logo'
 
 const footerLinks = {
   Programmes: [
-    { label: 'AI Development', href: '/programmes/ai-development' },
-    { label: 'Healthcare Tech', href: '/programmes/healthcare-tech' },
-    { label: 'Entrepreneurship', href: '/programmes/entrepreneurship' },
-    { label: 'School Foundation', href: '/programmes/school-foundation' },
+    { label: 'AI Development & Automation', href: '/programmes/ai-development' },
+    { label: 'Healthcare Technology', href: '/programmes/healthcare-tech' },
+    { label: 'Entrepreneurship & Digitization', href: '/programmes/entrepreneurship' },
+    { label: 'School Foundation (Class 8→9)', href: '/programmes/school-foundation' },
   ],
   Admissions: [
-    { label: 'Apply Now', href: '/apply' },
-    { label: 'How It Works', href: '/how-it-works' },
-    { label: 'Fees & Payment', href: '/fees' },
-    { label: 'FAQs', href: '/faq' },
+    { label: 'Apply for Admission', href: '/apply' },
+    { label: 'How Learning Works', href: '/how-it-works' },
+    { label: 'Fees & Payment Plans', href: '/fees' },
+    { label: 'Technical Requirements', href: '/laptop-requirements' },
+    { label: 'Frequently Asked Questions', href: '/faq' },
   ],
-  Academy: [
-    { label: 'About Us', href: '/about' },
-    { label: 'Faculty', href: '/faculty' },
-    { label: 'Student Projects', href: '/projects' },
-    { label: 'Blog', href: '/blog' },
+  Platform: [
+    { label: 'About TalentXcel', href: '/about' },
+    { label: 'Instructors & Mentors', href: '/faculty' },
+    { label: 'Student Capstones', href: '/projects' },
+    { label: 'Certificate Verification', href: '/verify/TXCERT-2026-DEMO01' },
+    { label: 'Contact & Grievance', href: '/contact' },
   ],
   Legal: [
-    { label: 'Privacy Policy', href: '/legal/privacy' },
+    { label: 'Privacy Policy (DPDP Act)', href: '/legal/privacy' },
     { label: 'Terms & Conditions', href: '/legal/terms' },
-    { label: 'Refund Policy', href: '/legal/refunds' },
-    { label: 'Accessibility', href: '/accessibility' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Refund & Cancellation Policy', href: '/legal/refunds' },
+    { label: 'Accessibility Statement', href: '/accessibility' },
   ],
 }
 
 export function PublicFooter() {
   return (
-    <footer className="border-t border-border bg-muted/30" role="contentinfo">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
-          {/* Brand */}
-          <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2" aria-label="TalentXcel Academy">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />
-              </div>
-              <span className="font-bold text-foreground">TalentXcel</span>
-            </Link>
-            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Practical, career-oriented education for the digital economy.
+    <footer className="border-t border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-black text-neutral-600 dark:text-neutral-400" role="contentinfo">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
+          {/* Brand Column */}
+          <div className="lg:col-span-1 space-y-4">
+            <Logo size="md" variant="full" href="/" />
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+              Practical, career-oriented and business-oriented skills development through a modern AI-first learning platform.
             </p>
-            <p className="mt-4 text-xs text-muted-foreground">
-              Platform-issued completion certificates. Not a regulated qualification or accreditation.
-            </p>
+            <div className="pt-2 text-[11px] text-neutral-400 leading-normal">
+              Platform-issued milestone certificates. Not an accredited university degree or regulated clinical qualification.
+            </div>
           </div>
 
-          {/* Links */}
+          {/* Links Columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="text-sm font-semibold text-foreground mb-3">{category}</h3>
-              <ul className="space-y-2" role="list">
+            <div key={category} className="space-y-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-900 dark:text-white">
+                {category}
+              </h3>
+              <ul className="space-y-2 text-xs" role="list">
                 {links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -70,14 +68,21 @@ export function PublicFooter() {
           ))}
         </div>
 
-        <div className="mt-10 border-t border-border pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} TalentXcel Academy. All rights reserved.
+        <div className="mt-14 border-t border-black/[0.06] dark:border-white/[0.08] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-neutral-500 dark:text-neutral-500">
+          <p>
+            &copy; {new Date().getFullYear()} TalentXcel.net. All rights reserved.
           </p>
-          <p className="text-xs text-muted-foreground">
-            Grievance Officer:{' '}
-            <Link href="/contact" className="underline hover:text-foreground">Contact us</Link>
-          </p>
+          <div className="flex items-center gap-6 text-[11px]">
+            <Link href="/contact" className="hover:text-black dark:hover:text-white transition-colors">
+              Statutory Grievance Officer
+            </Link>
+            <Link href="/legal/privacy" className="hover:text-black dark:hover:text-white transition-colors">
+              Data Protection
+            </Link>
+            <Link href="/accessibility" className="hover:text-black dark:hover:text-white transition-colors">
+              WCAG 2.1 AA
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

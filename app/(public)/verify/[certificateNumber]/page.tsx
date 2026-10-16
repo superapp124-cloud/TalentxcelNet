@@ -3,6 +3,7 @@ import { verifyCertificate } from '@/lib/lms/certificate-service'
 import { Award, CheckCircle2, XCircle, ShieldCheck, Calendar, User, BookOpen } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Logo } from '@/components/brand/logo'
 
 export const metadata: Metadata = {
   title: 'Certificate Verification — TalentXcel Academy',
@@ -35,6 +36,9 @@ export default async function CertificateVerificationPage({
         {certificate ? (
           <Card className="border-2 border-green-500/30 shadow-lg bg-card">
             <CardHeader className="bg-green-500/5 pb-4 border-b border-green-500/20 text-center">
+              <div className="flex justify-center mb-4">
+                <Logo size="md" variant="full" href="/" />
+              </div>
               <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-300">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
