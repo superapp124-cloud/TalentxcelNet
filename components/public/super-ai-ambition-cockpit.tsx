@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useTransition } from 'react'
+import React, { useState, useTransition, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -84,6 +84,34 @@ export function SuperAiAmbitionCockpit() {
   const [activeSubTab, setActiveSubTab] = useState<'tutor' | 'workspace' | 'graph' | 'opportunities'>('tutor')
   const [isPending, startTransition] = useTransition()
 
+  // 4D Spatial Depth & Specular Lighting State
+  const cockpitRef = useRef<HTMLDivElement>(null)
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const [light, setLight] = useState({ x: 50, y: 35 })
+  const [isHovered, setIsHovered] = useState(false)
+  const [is4DMode, setIs4DMode] = useState(true)
+  const [, setActiveBeacon] = useState<string | null>(null)
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!is4DMode || !cockpitRef.current) return
+    const rect = cockpitRef.current.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top) / rect.height
+
+    const tiltX = (y - 0.5) * -14
+    const tiltY = (x - 0.5) * 14
+
+    setTilt({ x: tiltX, y: tiltY })
+    setLight({ x: Math.round(x * 100), y: Math.round(y * 100) })
+    setIsHovered(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+    setTilt({ x: 0, y: 0 })
+    setLight({ x: 50, y: 35 })
+  }
+
   const handleQuerySubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     if (!query.trim()) return
@@ -103,96 +131,72 @@ export function SuperAiAmbitionCockpit() {
   }
 
   return (
-    <div className="w-full space-y-6">
-      {/* 1. Cinematic Hero Banner & Ambition Search Bar */}
-      <div className="relative mx-auto max-w-5xl text-center space-y-4">
+    <div className="w-full space-y-4">
+      {/* 1. Super AI Learning Universe 4D Command Center Header */}
+      <div className="flex items-center justify-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/40 px-3.5 py-1 text-xs font-semibold text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
           <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
           <span>Super AI Learning Universe • 20 Programme Families</span>
         </div>
-
-        <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl leading-[1.12]">
-          Your Ambition. <br className="hidden sm:inline" />
-          <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
-            One Intelligence.
-          </span>{' '}
-          Infinite Possibilities.
-        </h1>
-
-        <p className="mx-auto max-w-2xl text-sm sm:text-base text-neutral-300 leading-relaxed">
-          One platform. Every ambition. One personal Super AI. A unified path where knowledge becomes skills, skills
-          become projects, and projects become real-world opportunities.
-        </p>
-
-        {/* Ambient Conversational Ambition Input */}
-        <div className="mx-auto max-w-2xl pt-1">
-          <form
-            onSubmit={handleQuerySubmit}
-            className="relative flex items-center rounded-2xl border border-cyan-500/40 bg-neutral-950/80 p-2 shadow-[0_0_30px_rgba(0,240,255,0.15)] backdrop-blur-xl focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/30 transition-all"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
-              <Brain className="h-5 w-5" />
-            </div>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="What do you want to learn or become? (e.g. I want to crack NEET, I want to become an AI developer...)"
-              className="w-full bg-transparent px-3 text-sm sm:text-base text-white placeholder-neutral-400 focus:outline-none"
-              aria-label="Your learning ambition"
-            />
-            <Button
-              type="submit"
-              size="sm"
-              disabled={isPending}
-              className="shrink-0 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs sm:text-sm px-4 rounded-xl shadow-md gap-1.5"
-            >
-              {isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              <span className="hidden sm:inline">Navigate</span>
-            </Button>
-          </form>
-
-          {/* Quick Presets */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
-            <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">Try:</span>
-            {AMBITION_PRESETS.map((preset) => (
-              <button
-                key={preset}
-                onClick={() => handleSelectPreset(preset)}
-                className={`text-xs rounded-full border px-3 py-1 transition-all ${
-                  query === preset
-                    ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 shadow-[0_0_10px_rgba(0,240,255,0.3)]'
-                    : 'border-white/[0.1] bg-white/[0.04] text-neutral-300 hover:border-white/[0.25] hover:text-white'
-                }`}
-              >
-                {preset}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* 2. Interactive Super AI Holographic Cockpit (Directly visualizing Master Concept Artwork) */}
-      <div className="relative mx-auto max-w-6xl rounded-3xl border border-cyan-500/30 bg-gradient-to-b from-neutral-950/95 via-[#070d1e]/95 to-neutral-950/95 p-3 sm:p-6 shadow-[0_0_80px_rgba(0,180,255,0.22)] backdrop-blur-2xl space-y-6">
+      {/* 2. Interactive Super AI Holographic Cockpit (4D Spatial Experience — Pushed Up) */}
+      <div
+        ref={cockpitRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={handleMouseLeave}
+        className="relative mx-auto max-w-6xl rounded-3xl border border-cyan-500/40 bg-gradient-to-b from-neutral-950/95 via-[#070d1e]/95 to-neutral-950/95 p-2 sm:p-4 shadow-[0_0_90px_rgba(0,180,255,0.25)] hover:shadow-[0_0_120px_rgba(0,240,255,0.4)] transition-all duration-500 backdrop-blur-2xl space-y-5"
+        style={{
+          perspective: '1400px',
+        }}
+      >
         {/* Subtle grid background */}
         <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(#00f0ff_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
-        {/* Panoramic Cockpit Image Theater Viewport */}
-        <div className="relative w-full aspect-[16/9] sm:aspect-[21/10] rounded-2xl overflow-hidden border border-cyan-500/40 bg-black shadow-[0_0_40px_rgba(0,240,255,0.25)] group">
+        {/* 4D Panoramic Cockpit Image Theater Viewport */}
+        <div
+          className="relative w-full aspect-[16/9] sm:aspect-[21/10] rounded-2xl overflow-hidden border border-cyan-500/50 bg-black shadow-[0_0_50px_rgba(0,240,255,0.3)] group cursor-crosshair"
+          style={{
+            transform: isHovered && is4DMode
+              ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.02, 1.02, 1.02)`
+              : 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+            transition: isHovered ? 'transform 0.08s ease-out' : 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
+            transformStyle: 'preserve-3d',
+          }}
+        >
+          {/* Base High-Resolution Panoramic Cockpit Artwork */}
           <Image
             src="/images/titan-cockpit-panoramic.jpg"
             alt="TalentXcel Academy Super AI Ambition Cockpit Command Center"
             fill
             priority
-            sizes="(max-width: 1200px) 100vw, 1200px"
-            className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
+            sizes="(max-width: 1400px) 100vw, 1400px"
+            className="object-cover object-center pointer-events-none select-none transition-transform duration-700"
+            style={{
+              transform: 'translateZ(0px)',
+            }}
           />
 
-          {/* Holographic grid and vignette overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/95 via-transparent to-neutral-950/30 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(#00f0ff_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
+          {/* 4D Specular Holographic Reflection (Interactive 4th Dimension of Light) */}
+          <div
+            className="pointer-events-none absolute inset-0 z-20 rounded-2xl transition-opacity duration-300"
+            style={{
+              background: isHovered && is4DMode
+                ? `radial-gradient(circle 500px at ${light.x}% ${light.y}%, rgba(0, 240, 255, 0.35) 0%, rgba(0, 128, 255, 0.15) 35%, transparent 70%)`
+                : 'radial-gradient(circle 700px at 50% 30%, rgba(0, 240, 255, 0.16) 0%, transparent 65%)',
+              mixBlendMode: 'screen',
+            }}
+          />
 
-          {/* Interactive Beacons / Hotspots Overlaid on Key Cockpit Nodes */}
+          {/* 4D Kinetic Scanline Sweep */}
+          <div className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,240,255,0.06)_51%,transparent_52%)] bg-[length:100%_6px] opacity-70" />
+
+          {/* 4D Vignette & Holographic Grid Overlay */}
+          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-neutral-950/95 via-transparent to-neutral-950/30" />
+          <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(#00f0ff_1px,transparent_1px)] [background-size:24px_24px] opacity-15" />
+
+          {/* Floating 3D Spatial Beacons (translateZ for true stereoscopic parallax) */}
           
           {/* Beacon 1: Super AI Cognitive Avatar (Top Center) */}
           <button
@@ -200,7 +204,13 @@ export function SuperAiAmbitionCockpit() {
               setActiveSubTab('tutor')
               document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
             }}
-            className="group/beacon absolute top-[24%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-cyan-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-cyan-200 shadow-[0_0_20px_rgba(0,240,255,0.7)] backdrop-blur-md hover:scale-110 hover:bg-cyan-950 transition-all cursor-pointer"
+            onMouseEnter={() => setActiveBeacon('tutor')}
+            onMouseLeave={() => setActiveBeacon(null)}
+            className="group/beacon absolute top-[24%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-cyan-400 bg-neutral-950/90 px-3 py-1.5 text-[11px] font-bold text-cyan-200 shadow-[0_0_25px_rgba(0,240,255,0.8)] backdrop-blur-md hover:scale-110 hover:bg-cyan-950 transition-all cursor-pointer z-30"
+            style={{
+              transform: isHovered && is4DMode ? 'translateZ(55px)' : 'translateZ(0px)',
+              transition: 'transform 0.15s ease-out',
+            }}
             aria-label="Super AI Cognitive Co-Pilot"
           >
             <span className="relative flex h-2.5 w-2.5">
@@ -214,7 +224,13 @@ export function SuperAiAmbitionCockpit() {
           {/* Beacon 2: 20-Family Programme Universe (Left Floating Cards) */}
           <Link
             href="/#programmes-universe"
-            className="group/beacon absolute top-[48%] left-[16%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-blue-400/90 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-blue-200 shadow-[0_0_20px_rgba(0,128,255,0.6)] backdrop-blur-md hover:scale-110 hover:bg-blue-950 transition-all cursor-pointer"
+            onMouseEnter={() => setActiveBeacon('universe')}
+            onMouseLeave={() => setActiveBeacon(null)}
+            className="group/beacon absolute top-[48%] left-[16%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-blue-400/90 bg-neutral-950/90 px-3 py-1.5 text-[11px] font-bold text-blue-200 shadow-[0_0_25px_rgba(0,128,255,0.7)] backdrop-blur-md hover:scale-110 hover:bg-blue-950 transition-all cursor-pointer z-30"
+            style={{
+              transform: isHovered && is4DMode ? 'translateZ(45px)' : 'translateZ(0px)',
+              transition: 'transform 0.15s ease-out',
+            }}
             aria-label="20-Family Programme Universe"
           >
             <span className="relative flex h-2.5 w-2.5">
@@ -231,7 +247,13 @@ export function SuperAiAmbitionCockpit() {
               setActiveSubTab('workspace')
               document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
             }}
-            className="group/beacon absolute top-[62%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-emerald-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.7)] backdrop-blur-md hover:scale-110 hover:bg-emerald-950 transition-all cursor-pointer"
+            onMouseEnter={() => setActiveBeacon('workspace')}
+            onMouseLeave={() => setActiveBeacon(null)}
+            className="group/beacon absolute top-[62%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-emerald-400 bg-neutral-950/90 px-3 py-1.5 text-[11px] font-bold text-emerald-200 shadow-[0_0_25px_rgba(16,185,129,0.8)] backdrop-blur-md hover:scale-110 hover:bg-emerald-950 transition-all cursor-pointer z-30"
+            style={{
+              transform: isHovered && is4DMode ? 'translateZ(60px)' : 'translateZ(0px)',
+              transition: 'transform 0.15s ease-out',
+            }}
             aria-label="Live Sandboxed Code Workspace"
           >
             <span className="relative flex h-2.5 w-2.5">
@@ -248,7 +270,13 @@ export function SuperAiAmbitionCockpit() {
               setActiveSubTab('graph')
               document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
             }}
-            className="group/beacon absolute top-[44%] left-[78%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-purple-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.7)] backdrop-blur-md hover:scale-110 hover:bg-purple-950 transition-all cursor-pointer"
+            onMouseEnter={() => setActiveBeacon('graph')}
+            onMouseLeave={() => setActiveBeacon(null)}
+            className="group/beacon absolute top-[44%] left-[78%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-purple-400 bg-neutral-950/90 px-3 py-1.5 text-[11px] font-bold text-purple-200 shadow-[0_0_25px_rgba(168,85,247,0.8)] backdrop-blur-md hover:scale-110 hover:bg-purple-950 transition-all cursor-pointer z-30"
+            style={{
+              transform: isHovered && is4DMode ? 'translateZ(50px)' : 'translateZ(0px)',
+              transition: 'transform 0.15s ease-out',
+            }}
             aria-label="Living Skill Graph DAG"
           >
             <span className="relative flex h-2.5 w-2.5">
@@ -265,7 +293,13 @@ export function SuperAiAmbitionCockpit() {
               setActiveSubTab('opportunities')
               document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
             }}
-            className="group/beacon absolute top-[40%] left-[91%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-amber-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-amber-200 shadow-[0_0_20px_rgba(245,158,11,0.7)] backdrop-blur-md hover:scale-110 hover:bg-amber-950 transition-all cursor-pointer"
+            onMouseEnter={() => setActiveBeacon('ecosystem')}
+            onMouseLeave={() => setActiveBeacon(null)}
+            className="group/beacon absolute top-[40%] left-[91%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-amber-400 bg-neutral-950/90 px-3 py-1.5 text-[11px] font-bold text-amber-200 shadow-[0_0_25px_rgba(245,158,11,0.8)] backdrop-blur-md hover:scale-110 hover:bg-amber-950 transition-all cursor-pointer z-30"
+            style={{
+              transform: isHovered && is4DMode ? 'translateZ(45px)' : 'translateZ(0px)',
+              transition: 'transform 0.15s ease-out',
+            }}
             aria-label="Tri-Platform Ecosystem"
           >
             <span className="relative flex h-2.5 w-2.5">
@@ -277,16 +311,31 @@ export function SuperAiAmbitionCockpit() {
           </button>
 
           {/* Bottom HUD Bar on Theater */}
-          <div className="absolute bottom-3 left-3 right-3 flex flex-col sm:flex-row items-center justify-between gap-2 p-2.5 rounded-xl border border-white/[0.12] bg-neutral-950/85 backdrop-blur-md text-[11px]">
+          <div
+            className="absolute bottom-3 left-3 right-3 flex flex-col sm:flex-row items-center justify-between gap-2 p-2.5 rounded-xl border border-white/[0.12] bg-neutral-950/90 backdrop-blur-md text-[11px] z-30"
+            style={{
+              transform: isHovered && is4DMode ? 'translateZ(30px)' : 'translateZ(0px)',
+              transition: 'transform 0.15s ease-out',
+            }}
+          >
             <div className="flex items-center gap-2 text-neutral-300">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-cyan-300">TITAN_COCKPIT_HUD:</span>
+              <span className="inline-block h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+              <span className="font-mono text-cyan-300 font-bold">4D_COCKPIT_HUD:</span>
               <span className="text-white font-medium">{activeAmbition.matchedProgramme.title}</span>
+              <span className="hidden md:inline text-neutral-500">•</span>
+              <span className="hidden md:inline text-neutral-400">Interactive 3D Spatial Tilt Active</span>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-neutral-400 hidden lg:inline">Click any beacon to control the cockpit console</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIs4DMode(!is4DMode)}
+                className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+                  is4DMode ? 'border-cyan-400/80 bg-cyan-500/20 text-cyan-200' : 'border-neutral-700 bg-neutral-900 text-neutral-400'
+                }`}
+              >
+                4D Tilt: {is4DMode ? 'ON' : 'OFF'}
+              </button>
               <Link href={activeAmbition.firstGuidedProject.workspaceHref}>
-                <Button size="sm" className="h-7 text-[11px] bg-cyan-400 hover:bg-cyan-300 text-black font-bold px-3 rounded-lg gap-1">
+                <Button size="sm" className="h-7 text-[11px] bg-cyan-400 hover:bg-cyan-300 text-black font-bold px-3 rounded-lg gap-1 shadow-[0_0_15px_rgba(0,240,255,0.4)]">
                   Launch Interactive Sandbox <ArrowRight className="h-3 w-3" />
                 </Button>
               </Link>
@@ -295,7 +344,62 @@ export function SuperAiAmbitionCockpit() {
         </div>
 
         {/* Console Section Container */}
-        <div id="cockpit-console-section" className="space-y-6 pt-2">
+        <div id="cockpit-console-section" className="space-y-6 pt-4 border-t border-cyan-500/20">
+          {/* Ambition Resolution Bar & Conversational Search */}
+          <div className="text-center space-y-2 max-w-3xl mx-auto">
+            <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Your Ambition. <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">One Intelligence.</span> Infinite Possibilities.
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-300 max-w-xl mx-auto">
+              One platform. Every ambition. One personal Super AI. A path from learning to real-world capability.
+            </p>
+
+            {/* Ambient Conversational Ambition Input */}
+            <form
+              onSubmit={handleQuerySubmit}
+              className="relative flex items-center rounded-2xl border border-cyan-500/40 bg-neutral-950/90 p-2 shadow-[0_0_30px_rgba(0,240,255,0.15)] backdrop-blur-xl focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/30 transition-all mt-3"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
+                <Brain className="h-5 w-5" />
+              </div>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="What do you want to learn or become? (e.g. I want to crack NEET, I want to become an AI developer...)"
+                className="w-full bg-transparent px-3 text-sm sm:text-base text-white placeholder-neutral-400 focus:outline-none"
+                aria-label="Your learning ambition"
+              />
+              <Button
+                type="submit"
+                size="sm"
+                disabled={isPending}
+                className="shrink-0 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs sm:text-sm px-4 rounded-xl shadow-md gap-1.5"
+              >
+                {isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                <span className="hidden sm:inline">Navigate</span>
+              </Button>
+            </form>
+
+            {/* Quick Presets */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+              <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">Try:</span>
+              {AMBITION_PRESETS.map((preset) => (
+                <button
+                  key={preset}
+                  onClick={() => handleSelectPreset(preset)}
+                  className={`text-xs rounded-full border px-3 py-1 transition-all ${
+                    query === preset
+                      ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 shadow-[0_0_10px_rgba(0,240,255,0.3)]'
+                      : 'border-white/[0.1] bg-white/[0.04] text-neutral-300 hover:border-white/[0.25] hover:text-white'
+                  }`}
+                >
+                  {preset}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Top Header in Cockpit */}
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-6">
           <div className="flex items-center gap-3">
