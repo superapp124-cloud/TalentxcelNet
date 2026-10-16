@@ -243,23 +243,23 @@ const projectShowcase = [
 export default function HomePage() {
   return (
     <div className="bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 selection:bg-[#0080FF] selection:text-white">
-      {/* Hero Section — Apple-style Obsidian Dark Surface with Real Interactive Demo */}
-      <section className="relative overflow-hidden bg-[#000000] text-white pt-12 pb-16 sm:pt-16 sm:pb-24 border-b border-white/[0.08]">
+      {/* Hero Section — Master Titan Panoramic Cockpit & Interactive Learning Command Center */}
+      <section className="relative overflow-hidden bg-[#000000] text-white pt-6 pb-12 sm:pt-8 sm:pb-16 border-b border-white/[0.08]">
         {/* Subtle Ambient Radial Lighting */}
         <div
           className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[520px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.24),_transparent_65%)]"
           aria-hidden="true"
         />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-8">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-5">
           {/* Brand Announcement Pill & Official Ecosystem Trio */}
-          <div className="flex flex-col items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.15] bg-white/[0.05] px-4 py-1.5 text-xs font-medium backdrop-blur-md hover:bg-white/[0.08] transition-colors">
+          <div className="flex flex-col items-center gap-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.15] bg-white/[0.05] px-3.5 py-1 text-xs font-medium backdrop-blur-md hover:bg-white/[0.08] transition-colors">
               <TalentXcelEmblem className="h-3.5 w-3.5" pixelSize={16} />
               <span className="text-neutral-300">TalentXcel Academy • Tri-Platform Learning Ecosystem</span>
               <ChevronRight className="h-3 w-3 text-neutral-400" />
             </div>
-            <div className="pt-1">
+            <div>
               <EcosystemTrioLogos />
             </div>
           </div>

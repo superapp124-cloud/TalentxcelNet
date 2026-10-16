@@ -103,15 +103,15 @@ export function SuperAiAmbitionCockpit() {
   }
 
   return (
-    <div className="w-full space-y-12">
+    <div className="w-full space-y-6">
       {/* 1. Cinematic Hero Banner & Ambition Search Bar */}
-      <div className="relative mx-auto max-w-5xl text-center space-y-6">
-        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/40 px-4 py-1.5 text-xs font-semibold text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+      <div className="relative mx-auto max-w-5xl text-center space-y-4">
+        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/40 px-3.5 py-1 text-xs font-semibold text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
           <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
           <span>Super AI Learning Universe • 20 Programme Families</span>
         </div>
 
-        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-[1.15]">
+        <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl leading-[1.12]">
           Your Ambition. <br className="hidden sm:inline" />
           <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
             One Intelligence.
@@ -119,13 +119,13 @@ export function SuperAiAmbitionCockpit() {
           Infinite Possibilities.
         </h1>
 
-        <p className="mx-auto max-w-2xl text-base text-neutral-300 sm:text-lg leading-relaxed">
+        <p className="mx-auto max-w-2xl text-sm sm:text-base text-neutral-300 leading-relaxed">
           One platform. Every ambition. One personal Super AI. A unified path where knowledge becomes skills, skills
           become projects, and projects become real-world opportunities.
         </p>
 
         {/* Ambient Conversational Ambition Input */}
-        <div className="mx-auto max-w-2xl pt-2">
+        <div className="mx-auto max-w-2xl pt-1">
           <form
             onSubmit={handleQuerySubmit}
             className="relative flex items-center rounded-2xl border border-cyan-500/40 bg-neutral-950/80 p-2 shadow-[0_0_30px_rgba(0,240,255,0.15)] backdrop-blur-xl focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/30 transition-all"
