@@ -14,9 +14,15 @@ const navLinks = [
     href: '/programmes',
     children: [
       { label: 'AI Development & Automation', href: '/programmes/ai-development', badge: 'Flagship' },
+      { label: 'Government & Competitive Exams', href: '/programmes/competitive-exams', badge: 'UPSC/PSC' },
+      { label: 'School Foundation (Class 8 → 9)', href: '/programmes/school-foundation', badge: 'NEET/JEE' },
+      { label: 'High School Integrated (9–12)', href: '/programmes/highschool-integrated-foundation', badge: '2–4 Yrs' },
       { label: 'Healthcare Technology', href: '/programmes/healthcare-tech' },
-      { label: 'Entrepreneurship & Digitization', href: '/programmes/entrepreneurship' },
-      { label: 'School Foundation (Class 8→9)', href: '/programmes/school-foundation' },
+      { label: 'Entrepreneurship & Startups', href: '/programmes/entrepreneurship' },
+      { label: 'Small Business & Retailers', href: '/programmes/small-business' },
+      { label: 'Home Business (Women Founders)', href: '/programmes/home-business' },
+      { label: 'Teachers & Trainers Track', href: '/programmes/teachers-trainers' },
+      { label: 'Yoga, Fitness & Lifestyle Trainers', href: '/programmes/lifestyle-trainers' },
     ],
   },
   { label: 'How It Works', href: '/how-it-works' },
@@ -61,22 +67,34 @@ export function PublicNavbar() {
                   />
                 </button>
                 {openDropdown === link.label && (
-                  <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl border border-white/[0.1] bg-neutral-900/95 backdrop-blur-xl p-2 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-                    {link.children.map((child) => (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[590px] rounded-2xl border border-white/[0.12] bg-[#0c0c0e]/95 backdrop-blur-2xl p-3.5 shadow-2xl animate-in fade-in zoom-in-95 duration-150 z-50">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className="flex items-center justify-between rounded-xl px-3 py-2 text-[12.5px] text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors group"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <span className="font-medium group-hover:text-white line-clamp-1">{child.label}</span>
+                          {child.badge && (
+                            <span className="text-[10px] font-semibold text-[#0080FF] bg-[#0080FF]/10 px-2 py-0.5 rounded-full shrink-0 ml-1.5">
+                              {child.badge}
+                            </span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="mt-2.5 pt-2.5 border-t border-white/[0.08] flex items-center justify-between px-2 text-[11px] text-neutral-400">
+                      <span>All 10 programmes include dedicated pre-loaded laptops</span>
                       <Link
-                        key={child.href}
-                        href={child.href}
-                        className="flex items-center justify-between rounded-xl px-3 py-2 text-[13px] text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors"
+                        href="/programmes"
+                        className="text-[#0080FF] hover:underline font-semibold flex items-center gap-1"
                         onClick={() => setOpenDropdown(null)}
                       >
-                        <span>{child.label}</span>
-                        {child.badge && (
-                          <span className="text-[10px] font-semibold text-[#0080FF] bg-blue-500/10 px-2 py-0.5 rounded-full">
-                            {child.badge}
-                          </span>
-                        )}
+                        View Full Catalogue →
                       </Link>
-                    ))}
+                    </div>
                   </div>
                 )}
               </div>
