@@ -40,10 +40,9 @@ export function TalentXcelEmblem({
       {/* Outer circular track with bottom-right aperture */}
       <path
         d="M 68 80 A 38 38 0 1 1 85 55"
-        stroke="#0F172A"
+        stroke="currentColor"
         strokeWidth="11"
         strokeLinecap="round"
-        className="stroke-neutral-900 dark:stroke-white"
       />
       {/* Dynamic angled accent bar */}
       <line
@@ -80,10 +79,10 @@ export function Logo({
       />
     </div>
   ) : (
-    <div className={`flex items-center gap-2.5 select-none shrink-0 ${className}`}>
+    <div className={`flex items-center gap-2.5 select-none shrink-0 text-white dark:text-white ${className}`}>
       <TalentXcelEmblem className={emblem} pixelSize={px} />
       {variant === 'full' && (
-        <span className={`font-semibold tracking-tight text-neutral-900 dark:text-white ${text} font-sans leading-none inline-flex items-baseline`}>
+        <span className={`font-semibold tracking-tight text-white ${text} font-sans leading-none inline-flex items-baseline`}>
           talent<span className="font-bold text-[#0080FF]">X</span>cel
         </span>
       )}

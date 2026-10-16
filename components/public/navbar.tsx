@@ -31,13 +31,13 @@ export function PublicNavbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/[0.06] dark:border-white/[0.08] bg-white/80 dark:bg-black/80 backdrop-blur-2xl transition-all">
+    <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#000000]/85 backdrop-blur-2xl transition-all">
       <nav
         className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
         aria-label="Main navigation"
       >
         {/* Official Brand Logo */}
-        <Logo size="md" variant="full" href="/" />
+        <Logo size="md" variant="full" href="/" className="text-white" />
 
         {/* Desktop Nav with Apple-like minimalism */}
         <div className="hidden lg:flex items-center gap-1">
@@ -45,7 +45,7 @@ export function PublicNavbar() {
             link.children ? (
               <div key={link.label} className="relative">
                 <button
-                  className="flex items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-medium text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+                  className="flex items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-medium text-neutral-300 hover:text-white hover:bg-white/[0.08] transition-colors"
                   onClick={() => setOpenDropdown(openDropdown === link.label ? null : link.label)}
                   aria-expanded={openDropdown === link.label}
                   aria-haspopup="true"
@@ -59,12 +59,12 @@ export function PublicNavbar() {
                   />
                 </button>
                 {openDropdown === link.label && (
-                  <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl border border-black/[0.08] dark:border-white/[0.1] bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl p-2 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+                  <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl border border-white/[0.1] bg-neutral-900/95 backdrop-blur-xl p-2 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
                     {link.children.map((child) => (
                       <Link
                         key={child.href}
                         href={child.href}
-                        className="flex items-center justify-between rounded-xl px-3 py-2 text-[13px] text-neutral-600 dark:text-neutral-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white transition-colors"
+                        className="flex items-center justify-between rounded-xl px-3 py-2 text-[13px] text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors"
                         onClick={() => setOpenDropdown(null)}
                       >
                         <span>{child.label}</span>
@@ -82,7 +82,7 @@ export function PublicNavbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-neutral-300 hover:text-white hover:bg-white/[0.08] transition-colors"
               >
                 {link.label}
               </Link>
@@ -96,7 +96,7 @@ export function PublicNavbar() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs font-medium rounded-full text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white"
+              className="text-xs font-medium rounded-full text-neutral-300 hover:text-white hover:bg-white/[0.08]"
             >
               Sign In
             </Button>
@@ -104,7 +104,7 @@ export function PublicNavbar() {
           <Link href="/apply">
             <Button
               size="sm"
-              className="rounded-full bg-neutral-900 text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-100 text-xs font-semibold px-4 shadow-sm"
+              className="rounded-full bg-white text-black hover:bg-neutral-100 text-xs font-semibold px-4 shadow-sm"
             >
               Apply Now
             </Button>
@@ -113,7 +113,7 @@ export function PublicNavbar() {
 
         {/* Mobile menu button */}
         <button
-          className="lg:hidden p-2 rounded-xl text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+          className="lg:hidden p-2 rounded-xl text-neutral-300 hover:text-white hover:bg-white/[0.08]"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}

@@ -127,39 +127,39 @@ export default function HomePage() {
   return (
     <div className="bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 selection:bg-[#0080FF] selection:text-white">
       {/* Hero Section — Apple-style Obsidian Dark Surface */}
-      <section className="relative overflow-hidden bg-[#000000] text-white pt-24 pb-28 sm:pt-32 sm:pb-36 border-b border-white/[0.08]">
+      <section className="relative overflow-hidden bg-[#000000] text-white pt-12 pb-14 sm:pt-16 sm:pb-20 border-b border-white/[0.08]">
         {/* Subtle Ambient Radial Lighting */}
         <div
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.22),_transparent_65%)]"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[480px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.22),_transparent_65%)]"
           aria-hidden="true"
         />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           {/* Brand Announcement Pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.15] bg-white/[0.05] px-4 py-1.5 text-xs font-medium backdrop-blur-md mb-8 hover:bg-white/[0.08] transition-colors">
-            <TalentXcelEmblem className="h-4 w-4" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.15] bg-white/[0.05] px-3.5 py-1 text-xs font-medium backdrop-blur-md mb-6 hover:bg-white/[0.08] transition-colors">
+            <TalentXcelEmblem className="h-3.5 w-3.5" pixelSize={16} />
             <span className="text-neutral-300">TalentXcel Super AI Platform</span>
             <ChevronRight className="h-3 w-3 text-neutral-400" />
           </div>
 
           {/* Apple-grade Headline with subtle gradient typography */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.12]">
             Learn Practical Skills.{' '}
             <span className="bg-gradient-to-r from-[#0080FF] via-cyan-400 to-blue-300 bg-clip-text text-transparent">
               Build Real Systems.
             </span>
           </h1>
 
-          <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="mt-4 text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto font-normal leading-relaxed">
             TalentXcel Academy delivers structured, career-defining programmes with intelligent Socratic AI tutoring, hands-on capstone engineering, and mentor review.
           </p>
 
           {/* Action Pills */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <Link href="/apply">
               <Button
-                size="xl"
-                className="rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white px-8 font-semibold text-sm shadow-[0_4px_24px_rgba(0,128,255,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                size="lg"
+                className="rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white px-7 font-semibold text-sm shadow-[0_4px_24px_rgba(0,128,255,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 Apply for Admission
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -167,16 +167,16 @@ export default function HomePage() {
             </Link>
             <Link href="/programmes">
               <Button
-                size="xl"
+                size="lg"
                 variant="outline"
-                className="rounded-full border-white/20 bg-white/[0.04] text-white hover:bg-white/[0.1] px-8 font-medium text-sm backdrop-blur-md"
+                className="rounded-full border-white/20 bg-white/[0.04] text-white hover:bg-white/[0.1] px-7 font-medium text-sm backdrop-blur-md"
               >
                 Explore Syllabus
               </Button>
             </Link>
           </div>
 
-          <p className="mt-6 text-xs text-neutral-500">
+          <p className="mt-5 text-xs text-neutral-500">
             Platform-issued milestone certificates • Not an accredited university degree or clinical qualification
           </p>
         </div>
