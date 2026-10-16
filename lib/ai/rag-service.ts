@@ -60,9 +60,33 @@ export const VERIFIED_KNOWLEDGE_BASE: KnowledgeChunk[] = [
     content:
       'Eligible programmes include a development laptop equipped with minimum 16GB memory and high-speed NVMe storage with a 3-year OEM on-site warranty. Dispatched within 7-14 business days following verified payment settlement.',
   },
+  {
+    id: 'kb-curr-rag-02',
+    title: 'Enterprise pgvector Indexing & Performance',
+    category: 'curriculum',
+    tags: ['pgvector', 'hnsw', 'ivfflat', 'indexing', 'similarity', 'cosine'],
+    content:
+      'In PostgreSQL pgvector, HNSW (Hierarchical Navigable Small World) indexes deliver lower query latency than IVFFlat for high-dimensional embeddings (1536d). Always enforce WHERE tenant_id = x prior to vector similarity calculations to ensure data isolation.',
+  },
+  {
+    id: 'kb-curr-agent-02',
+    title: 'Supervised AI Agents & Bounded Loops',
+    category: 'curriculum',
+    tags: ['agents', 'loops', 'zod', 'guardrails', 'tools'],
+    content:
+      'Autonomous agents in enterprise environments must execute within bounded iteration budgets (max 5 tool calls). Schemas for every tool argument must be validated with Zod, and irreversible side effects require human supervisor approval.',
+  },
+  {
+    id: 'kb-pedagogy-01',
+    title: 'TalentXcel Socratic Tutoring & Rubric Evaluation',
+    category: 'pedagogy',
+    tags: ['socratic', 'pedagogy', 'hints', 'rubric', 'assessment'],
+    content:
+      'Super AI delivers progressive Socratic hints (Hint 1 conceptual clue, Hint 2 decomposition, Hint 3 code scaffolding). Full solutions are withheld until the learner demonstrates independent problem decomposition. Project submissions are scored against 4 rubric dimensions: Architectural Soundness, Security, Test Coverage, and Code Quality.',
+  },
 ]
 
-export function retrieveGroundedContext(query: string, maxResults = 3): string {
+export function retrieveGroundedChunks(query: string, maxResults = 3): KnowledgeChunk[] {
   const terms = query.toLowerCase().split(/\s+/).filter((t) => t.length > 2)
 
   const scored = VERIFIED_KNOWLEDGE_BASE.map((chunk) => {
@@ -78,13 +102,17 @@ export function retrieveGroundedContext(query: string, maxResults = 3): string {
 
   scored.sort((a, b) => b.score - a.score)
 
-  const topChunks = scored.filter((s) => s.score > 0).slice(0, maxResults)
+  return scored.filter((s) => s.score > 0).slice(0, maxResults).map((s) => s.chunk)
+}
+
+export function retrieveGroundedContext(query: string, maxResults = 3): string {
+  const topChunks = retrieveGroundedChunks(query, maxResults)
 
   if (topChunks.length === 0) {
     return 'General TalentXcel Academy educational framework and verified policies.'
   }
 
   return topChunks
-    .map((item) => `[Source: ${item.chunk.title}]\n${item.chunk.content}`)
+    .map((chunk) => `[Source: ${chunk.title}]\n${chunk.content}`)
     .join('\n\n')
 }

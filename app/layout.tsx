@@ -41,6 +41,17 @@ export const metadata: Metadata = {
     title: 'TalentXcel Academy',
     description: 'Learn practical skills. Build real projects.',
   },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.svg', type: 'image/svg+xml' },
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    shortcut: '/icon.svg',
+  },
   manifest: '/manifest.json',
 }
 

@@ -1,4 +1,26 @@
-import type { AICompletionRequest, AICompletionResponse, AIProvider, PromptMessage } from './types'
+import type { AICompletionRequest, AICompletionResponse, AIProvider } from './types'
+import { retrieveGroundedChunks } from './rag-service'
+
+// In-memory token tracker per user (reset daily)
+const tokenUsageMap = new Map<string, { tokens: number; resetAt: number }>()
+
+function checkAndTrackUsage(userId = 'anonymous', tokensToAdd = 50): { allowed: boolean; remaining: number } {
+  const dailyLimit = parseInt(process.env.AI_DAILY_TOKEN_LIMIT || '50000', 10)
+  const now = Date.now()
+  const entry = tokenUsageMap.get(userId)
+
+  if (!entry || now > entry.resetAt) {
+    tokenUsageMap.set(userId, { tokens: tokensToAdd, resetAt: now + 24 * 60 * 60 * 1000 })
+    return { allowed: true, remaining: dailyLimit - tokensToAdd }
+  }
+
+  if (entry.tokens + tokensToAdd > dailyLimit && dailyLimit > 0) {
+    return { allowed: false, remaining: 0 }
+  }
+
+  entry.tokens += tokensToAdd
+  return { allowed: true, remaining: dailyLimit - entry.tokens }
+}
 
 // Prompt Injection Detection Patterns
 const SUSPICIOUS_PATTERNS = [
@@ -29,8 +51,10 @@ export async function executeAIRequest(
 
   // 1. Sanitize user messages
   const lastUserMsg = [...request.messages].reverse().find((m) => m.role === 'user')
+  const userText = lastUserMsg?.content ?? ''
+
   if (lastUserMsg) {
-    const safetyCheck = sanitizePrompt(lastUserMsg.content)
+    const safetyCheck = sanitizePrompt(userText)
     if (!safetyCheck.isSafe) {
       return {
         content:
@@ -40,14 +64,31 @@ export async function executeAIRequest(
         tokensUsed: { prompt: 10, completion: 20, total: 30 },
         latencyMs: Date.now() - startTime,
         isFallback: true,
+        canEscalate: false,
       }
     }
   }
 
-  const primaryProvider = (process.env.AI_PRIMARY_PROVIDER as AIProvider) || 'openai'
+  // 2. Budget and usage enforcement
+  const usageCheck = checkAndTrackUsage(request.userId, 100)
+  if (!usageCheck.allowed) {
+    return {
+      content:
+        "Daily AI usage limit reached for this session. Please return tomorrow or escalate to a human mentor during scheduled office hours.",
+      provider: 'mock',
+      model: 'usage-limiter-v1',
+      tokensUsed: { prompt: 0, completion: 0, total: 0 },
+      latencyMs: Date.now() - startTime,
+      isFallback: true,
+      canEscalate: true,
+    }
+  }
 
-  // 2. OpenAI provider attempt
-  if (primaryProvider === 'openai' && process.env.OPENAI_API_KEY) {
+  const primaryProvider = (process.env.AI_PRIMARY_PROVIDER as AIProvider) || 'openai'
+  const relevantChunks = retrieveGroundedChunks(userText, 3)
+
+  // 3. OpenAI provider attempt
+  if ((primaryProvider === 'openai' || !primaryProvider) && process.env.OPENAI_API_KEY) {
     try {
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -78,6 +119,8 @@ export async function executeAIRequest(
           },
           latencyMs: Date.now() - startTime,
           isFallback: false,
+          sources: relevantChunks.map((c) => ({ title: c.title, category: c.category })),
+          canEscalate: true,
         }
       }
     } catch {
@@ -85,38 +128,115 @@ export async function executeAIRequest(
     }
   }
 
-  // 3. Fallback deterministic generator
-  return generateDeterministicFallback(request, startTime)
+  // 4. Google Gemini provider attempt
+  if (process.env.GOOGLE_AI_API_KEY) {
+    try {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`
+      const promptText = request.messages.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n')
+      const res = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: {
+            temperature: request.temperature ?? 0.3,
+            maxOutputTokens: request.maxTokens ?? 1000,
+          },
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+        if (text) {
+          return {
+            content: text,
+            provider: 'google',
+            model: 'gemini-1.5-flash',
+            tokensUsed: { prompt: 150, completion: 200, total: 350 },
+            latencyMs: Date.now() - startTime,
+            isFallback: false,
+            sources: relevantChunks.map((c) => ({ title: c.title, category: c.category })),
+            canEscalate: true,
+          }
+        }
+      }
+    } catch {
+      // Fallback gracefully
+    }
+  }
+
+  // 5. Fallback deterministic generator grounded with RAG
+  return generateDeterministicFallback(request, startTime, userText, relevantChunks)
 }
 
 function generateDeterministicFallback(
   request: AICompletionRequest,
-  startTime: number
+  startTime: number,
+  userQuery: string,
+  chunks: Array<{ id: string; title: string; category: string; content: string }>
 ): AICompletionResponse {
-  const lastQuery =
-    [...request.messages].reverse().find((m) => m.role === 'user')?.content.toLowerCase() ?? ''
-
+  const queryLower = userQuery.toLowerCase()
   let content = ''
+  const sources = chunks.map((c) => ({ title: c.title, category: c.category }))
+  let suggestedActions: string[] = []
 
   if (request.agentType === 'coding_mentor') {
     content =
       "### TalentXcel AI Coding Mentor Review\n\n" +
-      "1. **Code Structure Analysis**: Your solution addresses the core logic. Ensure variable naming follows clean code standards.\n" +
-      "2. **Error Prevention**: Check boundary conditions, null inputs, and asynchronous resolution.\n" +
-      "3. **Suggested Next Step**: Run automated unit tests using `pnpm test` to verify your test assertions.\n\n" +
-      "> *Note: AI running in verified deterministic mode.*"
+      "1. **Architecture & Boundaries**: Your code establishes clean function boundaries. Ensure you keep credentials and DB connection strings strictly on the server side.\n" +
+      "2. **Data Model Validation**: Validate all untrusted inputs with Zod schemas to reject unexpected shapes before database operations.\n" +
+      "3. **Performance & Isolation**: When performing vector similarity searches in pgvector, apply `WHERE tenant_id = ?` filters prior to sorting by cosine distance.\n" +
+      "4. **Verification Step**: Run the automated test runner in your project workspace to verify assertion criteria.\n\n" +
+      "> *Source reference: Curriculum Module 2 — Practical AI Development & pgvector Optimization.*"
+    suggestedActions = ['Run test suite', 'Check edge case with empty array', 'Ask for hint on tenant filter']
   } else if (request.agentType === 'learning_tutor') {
-    if (lastQuery.includes('hint')) {
+    if (queryLower.includes('hint #1') || queryLower.includes('hint 1') || (queryLower.includes('hint') && !queryLower.includes('2') && !queryLower.includes('3'))) {
       content =
-        "💡 **Step 1 Hint**: Break the problem down into its input, transformation, and output steps. What is the expected return type for this module's exercise?"
+        "💡 **Socratic Hint #1 (Conceptual Clue)**:\n\n" +
+        "Before writing implementation code, identify the core system boundary: what inputs are received, what security policy applies, and what output structure is required.\n\n" +
+        "In our curriculum architecture, state transitions must always be authenticated and idempotent. How can you split this task into an input validation phase and an execution phase?"
+      suggestedActions = ['Request Hint #2', 'Explain with real code example', 'Ask question on schema']
+    } else if (queryLower.includes('hint #2') || queryLower.includes('hint 2')) {
+      content =
+        "💡 **Socratic Hint #2 (Decomposition)**:\n\n" +
+        "Consider using a two-step pipeline:\n" +
+        "1. **Validation & Filtering**: Use a Zod schema to validate types, then inject tenant security filters (`tenant_id = user.id`).\n" +
+        "2. **Execution**: Pass the sanitized payload to PostgreSQL pgvector using the `<=>` cosine distance operator.\n\n" +
+        "What edge cases should you handle if the query returns zero matching vectors?"
+      suggestedActions = ['Request Hint #3', 'Show full solution', 'Run tests now']
+    } else if (queryLower.includes('hint #3') || queryLower.includes('hint 3')) {
+      content =
+        "💡 **Socratic Hint #3 (Scaffolding)**:\n\n" +
+        "Here is the structural skeleton for your handler:\n" +
+        "```typescript\n" +
+        "const results = await supabase.rpc('match_documents', {\n" +
+        "  query_embedding: embedding,\n" +
+        "  match_threshold: 0.78,\n" +
+        "  match_count: 5,\n" +
+        "  filter_tenant_id: tenantId\n" +
+        "})\n" +
+        "```\n" +
+        "Now connect this to your response formatter with appropriate error boundaries."
+      suggestedActions = ['Run test suite', 'Explain match_threshold', 'Ask for mentor review']
+    } else if (chunks.length > 0) {
+      const topChunk = chunks[0]
+      content =
+        `### Grounded Curriculum Explanation: ${topChunk.title}\n\n` +
+        `${topChunk.content}\n\n` +
+        "**Key takeaway**: Practical implementation focuses on reproducible engineering boundaries rather than memorizing syntax.\n\n" +
+        "> *Retrieved from verified TalentXcel Knowledge Base. Ask a follow-up or request a progressive hint.*"
+      suggestedActions = ['Give me a hint for this task', 'Show code structure', 'Escalate to mentor']
     } else {
       content =
         "I'm your **TalentXcel Super AI Tutor**. I'm here to guide you through your curriculum concepts step-by-step.\n\n" +
-        "Would you like a progressive hint to solve this problem, or a conceptual explanation of the underlying theory?"
+        "Would you like a progressive hint to solve your current task, or a conceptual explanation of the underlying theory?"
+      suggestedActions = ['Get Hint #1', 'Explain vector search', 'View project requirements']
     }
   } else {
     content =
       "Welcome to TalentXcel Academy! I can help you understand our curriculum, admissions criteria, and project requirements. What would you like to know?"
+    suggestedActions = ['View AI Development syllabus', 'Check fees and instalments', 'How do admissions work?']
   }
 
   return {
@@ -126,5 +246,9 @@ function generateDeterministicFallback(
     tokensUsed: { prompt: 50, completion: 150, total: 200 },
     latencyMs: Date.now() - startTime,
     isFallback: true,
+    sources,
+    confidence: 0.95,
+    suggestedActions,
+    canEscalate: true,
   }
 }
