@@ -19,6 +19,7 @@ const footerLinks = {
     { label: 'About TalentXcel', href: '/about' },
     { label: 'Instructors & Mentors', href: '/faculty' },
     { label: 'Student Capstones', href: '/projects' },
+    { label: 'Blog & Resources', href: '/blog' },
     { label: 'Certificate Verification', href: '/verify/TXCERT-2026-DEMO01' },
     { label: 'Contact & Grievance', href: '/contact' },
   ],
@@ -26,6 +27,7 @@ const footerLinks = {
     { label: 'Privacy Policy (DPDP Act)', href: '/legal/privacy' },
     { label: 'Terms & Conditions', href: '/legal/terms' },
     { label: 'Refund & Cancellation Policy', href: '/legal/refunds' },
+    { label: 'Hardware Warranty Terms', href: '/legal/hardware-terms' },
     { label: 'Accessibility Statement', href: '/accessibility' },
   ],
 }

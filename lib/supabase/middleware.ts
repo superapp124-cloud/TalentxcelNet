@@ -28,6 +28,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const host = request.headers.get('host') || ''
+  const isAcademySubdomain = host.startsWith('academy.')
+
+  // Multi-domain routing: on academy.talentxcel.net, root '/' routes to learner portal
+  if (isAcademySubdomain && request.nextUrl.pathname === '/') {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = user ? '/dashboard' : '/auth/login'
+    if (!user) redirectUrl.searchParams.set('redirectTo', '/dashboard')
+    return NextResponse.redirect(redirectUrl)
+  }
+
   // Protected academy routes
   const isAcademyRoute =
     request.nextUrl.pathname.startsWith('/academy') ||

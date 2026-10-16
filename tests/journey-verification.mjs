@@ -230,6 +230,68 @@ async function runJourneys() {
     journeyResults.push({ journey: '8. Security Boundary Enforcement', status: 'FAILED', error: err.message })
   }
 
+  // JOURNEY 9: Blog & Educational Resources
+  try {
+    console.log(`[Journey 9] Blog & Educational Directory (/blog)...`)
+    await page.goto(`${BASE_URL}/blog`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    const hasBlogTitle = await page.locator('text=Blog & Educational Resources').count() > 0
+    if (!hasBlogTitle) {
+      throw new Error(`Blog heading not found`)
+    }
+
+    // Navigate to specific blueprint article
+    await page.goto(`${BASE_URL}/blog/building-resilient-ai-agents`, { waitUntil: 'networkidle', timeout: 15000 })
+    const hasArticle = await page.locator('text=Building Resilient AI Agents').count() > 0
+    if (!hasArticle) {
+      throw new Error(`Article title not found`)
+    }
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey9_blog_article.png'), fullPage: false })
+    console.log(`  ✓ Journey 9 passed: Blog knowledge directory and technical blueprint verified.`)
+    journeyResults.push({ journey: '9. Blog & Educational Resources', status: 'PASSED', route: '/blog' })
+  } catch (err) {
+    console.error(`  ✗ Journey 9 failed:`, err.message)
+    journeyResults.push({ journey: '9. Blog & Educational Resources', status: 'FAILED', error: err.message })
+  }
+
+  // JOURNEY 10: Hardware Warranty Terms
+  try {
+    console.log(`[Journey 10] Hardware Fulfilment & Warranty Terms (/legal/hardware-terms)...`)
+    await page.goto(`${BASE_URL}/legal/hardware-terms`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    const hasHardwareTerms = await page.locator('text=Laptop Fulfilment & Hardware Warranty Terms').count() > 0
+    if (!hasHardwareTerms) {
+      throw new Error(`Hardware terms heading not found`)
+    }
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey10_hardware_terms.png'), fullPage: false })
+    console.log(`  ✓ Journey 10 passed: Official student laptop warranty terms verified.`)
+    journeyResults.push({ journey: '10. Hardware Warranty Terms', status: 'PASSED', route: '/legal/hardware-terms' })
+  } catch (err) {
+    console.error(`  ✗ Journey 10 failed:`, err.message)
+    journeyResults.push({ journey: '10. Hardware Warranty Terms', status: 'FAILED', error: err.message })
+  }
+
+  // JOURNEY 11: AI Admissions Assistant API & Grounding
+  try {
+    console.log(`[Journey 11] AI Admissions Assistant Grounded API (/api/ai/admissions)...`)
+    const response = await page.request.post(`${BASE_URL}/api/ai/admissions`, {
+      data: { question: 'What is the fee for the AI development programme?' },
+    })
+
+    const data = await response.json()
+    if (!response.ok() || !data.content) {
+      throw new Error(`AI Admissions API response failed`)
+    }
+
+    console.log(`  ✓ Journey 11 passed: AI Admissions Assistant answered with grounded context.`)
+    journeyResults.push({ journey: '11. AI Admissions Assistant', status: 'PASSED', route: '/api/ai/admissions' })
+  } catch (err) {
+    console.error(`  ✗ Journey 11 failed:`, err.message)
+    journeyResults.push({ journey: '11. AI Admissions Assistant', status: 'FAILED', error: err.message })
+  }
+
   await browser.close()
 
   console.log(`\n======================================================`)

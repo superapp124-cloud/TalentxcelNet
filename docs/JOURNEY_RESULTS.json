@@ -43,5 +43,20 @@
     "journey": "8. Security Boundary Enforcement",
     "status": "PASSED",
     "route": "/admin -> /auth/login"
+  },
+  {
+    "journey": "9. Blog & Educational Resources",
+    "status": "PASSED",
+    "route": "/blog"
+  },
+  {
+    "journey": "10. Hardware Warranty Terms",
+    "status": "PASSED",
+    "route": "/legal/hardware-terms"
+  },
+  {
+    "journey": "11. AI Admissions Assistant",
+    "status": "PASSED",
+    "route": "/api/ai/admissions"
   }
 ]
