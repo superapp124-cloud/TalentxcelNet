@@ -1,0 +1,47 @@
+[
+  {
+    "journey": "1. Contact Enquiry Submission",
+    "status": "PASSED",
+    "route": "/contact"
+  },
+  {
+    "journey": "2. Admissions Application",
+    "status": "PASSED",
+    "route": "/apply"
+  },
+  {
+    "journey": "3A. Certificate Verification (Valid)",
+    "status": "PASSED",
+    "route": "/verify/TXCERT-2026-DEMO01"
+  },
+  {
+    "journey": "3B. Certificate Verification (Invalid)",
+    "status": "PASSED",
+    "route": "/verify/INVALID-SERIAL-999"
+  },
+  {
+    "journey": "4. Course Player & AI Tutor",
+    "status": "PASSED",
+    "route": "/courses/ai-development/lessons/les-101"
+  },
+  {
+    "journey": "5. Programme Exploration",
+    "status": "PASSED",
+    "route": "/programmes/ai-development"
+  },
+  {
+    "journey": "6. Fees Transparency",
+    "status": "PASSED",
+    "route": "/fees"
+  },
+  {
+    "journey": "7. Admin Operations Overview",
+    "status": "PASSED",
+    "route": "/admin"
+  },
+  {
+    "journey": "8. Security Boundary Enforcement",
+    "status": "PASSED",
+    "route": "/admin -> /auth/login"
+  }
+]
