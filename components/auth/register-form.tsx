@@ -81,67 +81,67 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div>
-        <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-1.5">
-          Full name <span aria-hidden="true" className="text-destructive">*</span>
+        <label htmlFor="fullName" className="block text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1.5">
+          Full name <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           id="fullName"
           type="text"
           autoComplete="name"
           {...register('fullName')}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#0080FF] focus:border-transparent transition-all"
           placeholder="Your full name"
           aria-required="true"
           aria-describedby={errors.fullName ? 'fullname-error' : undefined}
         />
         {errors.fullName && (
-          <p id="fullname-error" className="mt-1.5 text-sm text-destructive" role="alert">
+          <p id="fullname-error" className="mt-1.5 text-sm text-red-500 font-medium" role="alert">
             {errors.fullName.message}
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="reg-email" className="block text-sm font-medium text-foreground mb-1.5">
-          Email address <span aria-hidden="true" className="text-destructive">*</span>
+        <label htmlFor="reg-email" className="block text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1.5">
+          Email address <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           id="reg-email"
           type="email"
           autoComplete="email"
           {...register('email')}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#0080FF] focus:border-transparent transition-all"
           placeholder="you@example.com"
           aria-required="true"
           aria-describedby={errors.email ? 'reg-email-error' : undefined}
         />
         {errors.email && (
-          <p id="reg-email-error" className="mt-1.5 text-sm text-destructive" role="alert">
+          <p id="reg-email-error" className="mt-1.5 text-sm text-red-500 font-medium" role="alert">
             {errors.email.message}
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1.5">
-          Phone <span className="text-muted-foreground text-xs">(optional)</span>
+        <label htmlFor="phone" className="block text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1.5">
+          Phone <span className="text-neutral-400 text-xs">(optional)</span>
         </label>
         <input
           id="phone"
           type="tel"
           autoComplete="tel"
           {...register('phone')}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#0080FF] focus:border-transparent transition-all"
           placeholder="+91 98765 43210"
         />
         {errors.phone && (
-          <p className="mt-1.5 text-sm text-destructive" role="alert">{errors.phone.message}</p>
+          <p className="mt-1.5 text-sm text-red-500 font-medium" role="alert">{errors.phone.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor="reg-password" className="block text-sm font-medium text-foreground mb-1.5">
-          Password <span aria-hidden="true" className="text-destructive">*</span>
+        <label htmlFor="reg-password" className="block text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1.5">
+          Password <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <div className="relative">
           <input
@@ -149,44 +149,44 @@ export function RegisterForm() {
             type={showPassword ? 'text' : 'password'}
             autoComplete="new-password"
             {...register('password')}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2.5 pr-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3.5 py-2.5 pr-10 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#0080FF] focus:border-transparent transition-all"
             placeholder="Create a strong password"
             aria-required="true"
             aria-describedby="password-requirements"
           />
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
             onClick={() => setShowPassword(!showPassword)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        <p id="password-requirements" className="mt-1 text-xs text-muted-foreground">
+        <p id="password-requirements" className="mt-1 text-xs text-neutral-400">
           Min. 8 characters, one uppercase letter, one number.
         </p>
         {errors.password && (
-          <p className="mt-1 text-sm text-destructive" role="alert">{errors.password.message}</p>
+          <p className="mt-1 text-sm text-red-500 font-medium" role="alert">{errors.password.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-1.5">
-          Confirm password <span aria-hidden="true" className="text-destructive">*</span>
+        <label htmlFor="confirmPassword" className="block text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1.5">
+          Confirm password <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           id="confirmPassword"
           type={showPassword ? 'text' : 'password'}
           autoComplete="new-password"
           {...register('confirmPassword')}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#0080FF] focus:border-transparent transition-all"
           placeholder="Confirm your password"
           aria-required="true"
           aria-describedby={errors.confirmPassword ? 'confirm-pw-error' : undefined}
         />
         {errors.confirmPassword && (
-          <p id="confirm-pw-error" className="mt-1.5 text-sm text-destructive" role="alert">
+          <p id="confirm-pw-error" className="mt-1.5 text-sm text-red-500 font-medium" role="alert">
             {errors.confirmPassword.message}
           </p>
         )}
@@ -197,21 +197,21 @@ export function RegisterForm() {
           id="agreeToTerms"
           type="checkbox"
           {...register('agreeToTerms')}
-          className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-ring"
+          className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-[#0080FF] focus:ring-[#0080FF]"
           aria-describedby={errors.agreeToTerms ? 'terms-error' : undefined}
         />
-        <label htmlFor="agreeToTerms" className="text-sm text-muted-foreground leading-tight">
+        <label htmlFor="agreeToTerms" className="text-xs text-neutral-500 dark:text-neutral-400 leading-tight">
           I agree to the{' '}
-          <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Terms & Conditions</a>{' '}
+          <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="text-[#0080FF] hover:underline font-medium">Terms & Conditions</a>{' '}
           and{' '}
-          <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Privacy Policy</a>
+          <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-[#0080FF] hover:underline font-medium">Privacy Policy</a>
         </label>
       </div>
       {errors.agreeToTerms && (
-        <p className="text-sm text-destructive" role="alert">{errors.agreeToTerms.message}</p>
+        <p className="text-sm text-red-500 font-medium" role="alert">{errors.agreeToTerms.message}</p>
       )}
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white font-semibold py-2.5 shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99]" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
         {isLoading ? 'Creating account...' : 'Create Account'}
       </Button>

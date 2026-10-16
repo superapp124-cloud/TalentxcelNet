@@ -62,7 +62,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
+        <label htmlFor="email" className="block text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1.5">
           Email address
         </label>
         <input
@@ -70,13 +70,13 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           {...register('email')}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#0080FF] focus:border-transparent transition-all disabled:opacity-50"
           placeholder="you@example.com"
           aria-describedby={errors.email ? 'email-error' : undefined}
           aria-invalid={!!errors.email}
         />
         {errors.email && (
-          <p id="email-error" className="mt-1.5 text-sm text-destructive" role="alert">
+          <p id="email-error" className="mt-1.5 text-sm text-red-500 font-medium" role="alert">
             {errors.email.message}
           </p>
         )}
@@ -84,10 +84,10 @@ export function LoginForm() {
 
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label htmlFor="password" className="block text-sm font-medium text-foreground">
+          <label htmlFor="password" className="block text-sm font-semibold text-neutral-800 dark:text-neutral-200">
             Password
           </label>
-          <Link href="/auth/forgot-password" className="text-xs text-primary hover:underline">
+          <Link href="/auth/forgot-password" className="text-xs text-[#0080FF] hover:underline font-medium">
             Forgot password?
           </Link>
         </div>
@@ -97,14 +97,14 @@ export function LoginForm() {
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
             {...register('password')}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2.5 pr-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3.5 py-2.5 pr-10 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#0080FF] focus:border-transparent transition-all disabled:opacity-50"
             placeholder="Enter your password"
             aria-describedby={errors.password ? 'password-error' : undefined}
             aria-invalid={!!errors.password}
           />
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
             onClick={() => setShowPassword(!showPassword)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
@@ -112,13 +112,13 @@ export function LoginForm() {
           </button>
         </div>
         {errors.password && (
-          <p id="password-error" className="mt-1.5 text-sm text-destructive" role="alert">
+          <p id="password-error" className="mt-1.5 text-sm text-red-500 font-medium" role="alert">
             {errors.password.message}
           </p>
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full rounded-full bg-[#0080FF] hover:bg-[#0070E0] text-white font-semibold py-2.5 shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99]" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
         {isLoading ? 'Signing in...' : 'Sign In'}
       </Button>

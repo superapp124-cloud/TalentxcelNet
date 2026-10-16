@@ -10,6 +10,7 @@ interface LogoProps {
   variant?: 'full' | 'emblem'
   href?: string
   useImage?: boolean
+  theme?: 'light' | 'dark' | 'auto'
 }
 
 const sizeMap = {
@@ -22,9 +23,11 @@ const sizeMap = {
 export function TalentXcelEmblem({
   className = 'h-8 w-8',
   pixelSize = 32,
+  strokeColor,
 }: {
   className?: string
   pixelSize?: number
+  strokeColor?: string
 }) {
   return (
     <svg
@@ -40,7 +43,7 @@ export function TalentXcelEmblem({
       {/* Outer circular track with bottom-right aperture */}
       <path
         d="M 68 80 A 38 38 0 1 1 85 55"
-        stroke="currentColor"
+        stroke={strokeColor || 'currentColor'}
         strokeWidth="11"
         strokeLinecap="round"
       />
@@ -64,8 +67,16 @@ export function Logo({
   variant = 'full',
   href = '/',
   useImage = false,
+  theme = 'auto',
 }: LogoProps) {
   const { emblem, text, px, imgH, imgW } = sizeMap[size]
+
+  const colorClass =
+    theme === 'dark'
+      ? 'text-white'
+      : theme === 'light'
+      ? 'text-neutral-900'
+      : 'text-neutral-900 dark:text-white'
 
   const content = useImage ? (
     <div className={`relative flex items-center shrink-0 ${className}`}>
@@ -79,10 +90,10 @@ export function Logo({
       />
     </div>
   ) : (
-    <div className={`flex items-center gap-2.5 select-none shrink-0 text-white dark:text-white ${className}`}>
+    <div className={`flex items-center gap-2.5 select-none shrink-0 ${colorClass} ${className}`}>
       <TalentXcelEmblem className={emblem} pixelSize={px} />
       {variant === 'full' && (
-        <span className={`font-semibold tracking-tight text-white ${text} font-sans leading-none inline-flex items-baseline`}>
+        <span className={`font-semibold tracking-tight ${text} font-sans leading-none inline-flex items-baseline`}>
           talent<span className="font-bold text-[#0080FF]">X</span>cel
         </span>
       )}

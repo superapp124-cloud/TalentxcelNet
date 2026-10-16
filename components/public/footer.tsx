@@ -32,16 +32,16 @@ const footerLinks = {
 
 export function PublicFooter() {
   return (
-    <footer className="border-t border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-black text-neutral-600 dark:text-neutral-400" role="contentinfo">
+    <footer className="border-t border-white/[0.08] bg-[#000000] text-neutral-400" role="contentinfo">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand Column */}
           <div className="lg:col-span-1 space-y-4">
-            <Logo size="md" variant="full" href="/" />
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+            <Logo size="md" variant="full" href="/" theme="dark" />
+            <p className="text-xs text-neutral-400 leading-relaxed">
               Practical, career-oriented and business-oriented skills development through a modern AI-first learning platform.
             </p>
-            <div className="pt-2 text-[11px] text-neutral-400 leading-normal">
+            <div className="pt-2 text-[11px] text-neutral-500 leading-normal">
               Platform-issued milestone certificates. Not an accredited university degree or regulated clinical qualification.
             </div>
           </div>
@@ -49,7 +49,7 @@ export function PublicFooter() {
           {/* Links Columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category} className="space-y-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-900 dark:text-white">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-white">
                 {category}
               </h3>
               <ul className="space-y-2 text-xs" role="list">
@@ -57,7 +57,7 @@ export function PublicFooter() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
+                      className="text-neutral-400 hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -68,18 +68,18 @@ export function PublicFooter() {
           ))}
         </div>
 
-        <div className="mt-14 border-t border-black/[0.06] dark:border-white/[0.08] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-neutral-500 dark:text-neutral-500">
+        <div className="mt-14 border-t border-white/[0.08] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
           <p>
             &copy; {new Date().getFullYear()} TalentXcel.net. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-[11px]">
-            <Link href="/contact" className="hover:text-black dark:hover:text-white transition-colors">
+            <Link href="/contact" className="hover:text-white transition-colors">
               Statutory Grievance Officer
             </Link>
-            <Link href="/legal/privacy" className="hover:text-black dark:hover:text-white transition-colors">
+            <Link href="/legal/privacy" className="hover:text-white transition-colors">
               Data Protection
             </Link>
-            <Link href="/accessibility" className="hover:text-black dark:hover:text-white transition-colors">
+            <Link href="/accessibility" className="hover:text-white transition-colors">
               WCAG 2.1 AA
             </Link>
           </div>

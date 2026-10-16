@@ -208,14 +208,14 @@ export default async function ProgrammeDetailPage({
             </span>
           </div>
 
-          <div className="flex items-center gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
             <Link href={`/apply?programme=${programme.slug}`}>
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2 w-full sm:w-auto">
                 Apply for this Programme <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/fees">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
                 View Fee Breakdown
               </Button>
             </Link>
