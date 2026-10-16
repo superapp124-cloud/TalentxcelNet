@@ -13,6 +13,7 @@ export interface CrossBrandReferralParams {
   campaign?: string
   timestamp?: number
   ttlSeconds?: number
+  secretOverride?: string
   extraParams?: Record<string, string>
 }
 
@@ -45,10 +46,8 @@ export interface VerificationResult {
  * Fails closed if the secret is missing or insufficiently strong (< 32 chars).
  * Never uses a hardcoded fallback secret in production.
  */
-export function getReferralSecret(failClosed: boolean = true): string {
-  const secret =
-    process.env.ECOSYSTEM_REFERRAL_SECRET ||
-    (process.env.NODE_ENV === 'test' ? 'tx_ecosystem_test_secret_32_bytes_long_min!' : '')
+export function getReferralSecret(failClosed: boolean = true, secretOverride?: string): string {
+  const secret = secretOverride !== undefined ? secretOverride : process.env.ECOSYSTEM_REFERRAL_SECRET
   if (!secret || secret.trim().length < MIN_SECRET_LENGTH) {
     if (failClosed) {
       throw new Error(

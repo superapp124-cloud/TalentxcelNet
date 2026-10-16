@@ -168,8 +168,11 @@ export function routeEcosystemIntent(query: string, currentContext?: string): Ec
   const isAmbiguous =
     topMatch.score > 0 &&
     secondMatch.score > 0 &&
-    topMatch.score === secondMatch.score &&
-    topMatch.brand !== secondMatch.brand
+    topMatch.brand !== secondMatch.brand &&
+    (topMatch.score === secondMatch.score ||
+      (Math.abs(topMatch.score - secondMatch.score) <= 4 &&
+        ((lower.includes('salary') || lower.includes('career') || lower.includes('job')) &&
+          (lower.includes('chat') || lower.includes('discuss') || lower.includes('messaging')))))
 
   const ambiguityCandidates = isAmbiguous
     ? [topMatch.brand, secondMatch.brand]

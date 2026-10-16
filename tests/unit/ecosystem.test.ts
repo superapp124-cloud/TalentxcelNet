@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest'
+
+process.env.ECOSYSTEM_REFERRAL_SECRET = 'test_secret_that_is_at_least_32_chars_long_2026'
+
 import {
   ECOSYSTEM_DOMAINS,
   ECOSYSTEM_BRANDS,

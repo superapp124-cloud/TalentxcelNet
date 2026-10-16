@@ -250,11 +250,16 @@ export default function HomePage() {
         />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          {/* Brand Announcement Pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.15] bg-white/[0.05] px-4 py-1.5 text-xs font-medium backdrop-blur-md hover:bg-white/[0.08] transition-colors">
-            <TalentXcelEmblem className="h-3.5 w-3.5" pixelSize={16} />
-            <span className="text-neutral-300">TalentXcel Next-Gen AI Learning Platform</span>
-            <ChevronRight className="h-3 w-3 text-neutral-400" />
+          {/* Brand Announcement Pill & Official Ecosystem Trio */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.15] bg-white/[0.05] px-4 py-1.5 text-xs font-medium backdrop-blur-md hover:bg-white/[0.08] transition-colors">
+              <TalentXcelEmblem className="h-3.5 w-3.5" pixelSize={16} />
+              <span className="text-neutral-300">TalentXcel Academy • Tri-Platform Learning Ecosystem</span>
+              <ChevronRight className="h-3 w-3 text-neutral-400" />
+            </div>
+            <div className="pt-1">
+              <EcosystemTrioLogos />
+            </div>
           </div>
 
           {/* Core Hero Headline */}
