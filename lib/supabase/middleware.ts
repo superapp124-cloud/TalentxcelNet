@@ -5,9 +5,12 @@ import type { Database } from '@/types/database'
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wvuvriewskvvievacida.supabase.co'
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_2OGNulCHMN3ID-W8eRermg_28PD1wuM'
+
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {

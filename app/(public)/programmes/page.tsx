@@ -170,10 +170,10 @@ const ALL_CATALOGUE_PROGRAMMES: ProgrammeCardItem[] = [
 ]
 
 export default async function ProgrammesPage() {
-  const supabase = await createClient()
   let displayProgrammes: ProgrammeCardItem[] = ALL_CATALOGUE_PROGRAMMES
 
   try {
+    const supabase = await createClient()
     const { data: dbProgrammes } = (await supabase
       .from('programmes')
       .select('id, slug, title, short_description, status, duration_months, level, category')

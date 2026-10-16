@@ -34,7 +34,6 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const {
     register,
@@ -48,6 +47,7 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterValues) {
     setIsLoading(true)
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,

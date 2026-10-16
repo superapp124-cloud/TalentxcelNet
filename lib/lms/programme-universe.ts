@@ -548,7 +548,7 @@ export const PROGRAMME_UNIVERSE: ProgrammeFamily[] = [
     category: 'technology',
     categoryLabel: 'Technology & Future Careers',
     lifecycleStatus: 'open_for_enrolment',
-    statusBadge: 'Flagship • Open for Enrolment',
+    statusBadge: 'Flagship • Applications opening soon',
     durationMonths: 8,
     eligibility: 'Open to diploma holders, university students, working professionals, and career switchers.',
     targetAudience: 'Software developers, automation engineers, and aspiring AI product creators.',

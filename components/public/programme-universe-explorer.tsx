@@ -33,7 +33,7 @@ const CATEGORY_TABS: Array<{
   count: number
   icon: any
 }> = [
-  { id: 'all', label: 'All 20 Programme Families', count: 20, icon: Layers },
+  { id: 'all', label: 'All 10 Flagship Tracks', count: 10, icon: Layers },
   { id: 'school_competitive', label: 'School & Competitive Examinations', count: 7, icon: GraduationCap },
   { id: 'technology', label: 'Technology & Future Careers', count: 5, icon: Cpu },
   { id: 'healthcare_business', label: 'Healthcare, Business & Careers', count: 8, icon: Stethoscope },
@@ -254,7 +254,7 @@ export function ProgrammeUniverseExplorer() {
         <div className="text-center py-12 rounded-2xl border border-white/[0.08] bg-black/40 space-y-3">
           <AlertCircle className="h-8 w-8 text-neutral-500 mx-auto" />
           <h4 className="text-base font-bold text-white">No Programme Families Match Your Filter</h4>
-          <p className="text-xs text-neutral-400">Try adjusting your search query or selecting &quot;All 20 Programme Families&quot;.</p>
+          <p className="text-xs text-neutral-400">Try adjusting your search query or selecting &quot;All 10 Flagship Tracks&quot;.</p>
           <Button
             size="sm"
             variant="outline"

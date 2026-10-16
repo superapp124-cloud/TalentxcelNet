@@ -31,6 +31,7 @@ import { HeroProductDemo } from '@/components/public/hero-product-demo'
 import { SkillGraph } from '@/components/academy/skill-graph'
 import { SuperAiAmbitionCockpit } from '@/components/public/super-ai-ambition-cockpit'
 import { ProgrammeUniverseExplorer } from '@/components/public/programme-universe-explorer'
+import { ProgrammePricingPlans } from '@/components/public/programme-pricing-plans'
 
 const programmes = [
   {
@@ -740,41 +741,30 @@ export default function HomePage() {
 
       {/* Section 9: Transparent Tuition Plans */}
       <section className="py-20 sm:py-28 bg-white dark:bg-black border-b border-black/[0.06] dark:border-white/[0.08]">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          <Badge variant="outline" className="text-[#0080FF] border-[#0080FF]/30">
-            Commercial Transparency
-          </Badge>
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
-            Honest, Milestone-Aligned Tuition
-          </h2>
-          <p className="text-base text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
-            Our flagship 8-month AI Development programme provides clear installment options with a 14-day cooling-off refund policy.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto pt-4 text-left">
-            <div className="rounded-3xl border-2 border-[#0080FF] bg-card p-8 shadow-md space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#0080FF]">Instalment Plan</span>
-              <div className="text-4xl font-extrabold text-foreground">₹29,999</div>
-              <p className="text-xs text-muted-foreground">Upfront upon confirmed admission</p>
-              <div className="pt-3 border-t text-xs text-muted-foreground">
-                + ₹1,500/month for 8 months (Excl. applicable GST)
-              </div>
-            </div>
-
-            <div className="rounded-3xl border bg-card p-8 shadow-xs space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Single Settlement</span>
-              <div className="text-4xl font-extrabold text-foreground">₹41,999</div>
-              <p className="text-xs text-muted-foreground">Total programme tuition</p>
-              <div className="pt-3 border-t text-xs text-muted-foreground">
-                Full 8-month course, mentor office hours & sandbox access (Excl. GST)
-              </div>
-            </div>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-10">
+          <div className="space-y-3 max-w-2xl mx-auto">
+            <Badge variant="outline" className="text-[#0080FF] border-[#0080FF]/30">
+              Commercial Transparency
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+              Honest, Milestone-Aligned Tuition
+            </h2>
+            <p className="text-base text-neutral-600 dark:text-neutral-400">
+              Transparent instalment plans and full payment options with dedicated laptop included.
+            </p>
           </div>
+
+          <ProgrammePricingPlans
+            programmeTitle="AI Development & Automation"
+            durationMonths={8}
+            slug="ai-development"
+            showProgrammeSelector={false}
+          />
 
           <div className="pt-2">
             <Link href="/fees">
               <Button variant="outline" className="rounded-full text-xs font-semibold px-6">
-                View Complete Tuition & Refund Terms
+                View All Programme Fees & Refund Terms →
               </Button>
             </Link>
           </div>

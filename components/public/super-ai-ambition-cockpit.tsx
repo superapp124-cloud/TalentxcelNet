@@ -136,7 +136,7 @@ export function SuperAiAmbitionCockpit() {
       <div className="flex items-center justify-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/40 px-3.5 py-1 text-xs font-semibold text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
           <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
-          <span>Super AI Learning Universe • 20 Programme Families</span>
+          <span>Super AI Learning Universe • 10 Flagship Programmes</span>
         </div>
       </div>
 
@@ -231,14 +231,14 @@ export function SuperAiAmbitionCockpit() {
               transform: isHovered && is4DMode ? 'translateZ(45px)' : 'translateZ(0px)',
               transition: 'transform 0.15s ease-out',
             }}
-            aria-label="20-Family Programme Universe"
+            aria-label="10 Flagship Programmes"
           >
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
             </span>
             <GraduationCap className="h-3.5 w-3.5 text-blue-300" />
-            <span className="hidden sm:inline">20 Programme Families</span>
+            <span className="hidden sm:inline">10 Flagship Programmes</span>
           </Link>
 
           {/* Beacon 3: Sandboxed IDE Workspace (Center Screens) */}
@@ -319,11 +319,10 @@ export function SuperAiAmbitionCockpit() {
             }}
           >
             <div className="flex items-center gap-2 text-neutral-300">
-              <span className="inline-block h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
-              <span className="font-mono text-cyan-300 font-bold">4D_COCKPIT_HUD:</span>
-              <span className="text-white font-medium">{activeAmbition.matchedProgramme.title}</span>
+              <span className="inline-block h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-white font-bold">{activeAmbition.matchedProgramme.title}</span>
               <span className="hidden md:inline text-neutral-500">•</span>
-              <span className="hidden md:inline text-neutral-400">Interactive 3D Spatial Tilt Active</span>
+              <span className="text-cyan-300 font-medium text-xs">{activeAmbition.matchedProgramme.durationMonths}-Month Programme</span>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -421,7 +420,7 @@ export function SuperAiAmbitionCockpit() {
                 </Badge>
               </div>
               <p className="text-xs text-neutral-400 mt-0.5">
-                Matched Programme #{activeAmbition.matchedProgramme.familyNumber} in {activeAmbition.matchedProgramme.categoryLabel}
+                {activeAmbition.matchedProgramme.categoryLabel} • {activeAmbition.matchedProgramme.durationMonths}-Month Programme
               </p>
             </div>
           </div>

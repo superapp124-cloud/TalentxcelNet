@@ -64,14 +64,15 @@ export function AdmissionsAssistantWidget() {
 
   return (
     <>
-      {/* Floating Admissions Trigger */}
+      {/* Floating Admissions Trigger - Compact & Non-Obtrusive */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-linear-to-r from-[#0080FF] to-blue-600 px-4 py-3 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-[#0080FF]"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2 rounded-full border border-white/20 bg-[#0080FF]/95 hover:bg-[#0070E0] px-3.5 py-2 text-white shadow-lg backdrop-blur-md hover:scale-105 transition-all text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0080FF]"
         aria-label="Open Admissions Assistant"
       >
-        <Sparkles className="h-5 w-5 animate-pulse" />
-        <span className="font-semibold text-xs sm:text-sm">Ask Admissions AI</span>
+        <Sparkles className="h-4 w-4 text-cyan-200 animate-pulse" />
+        <span className="hidden sm:inline">Ask Admissions AI</span>
+        <span className="sm:hidden">Admissions AI</span>
       </button>
 
       {/* Slide-in Modal Drawer */}

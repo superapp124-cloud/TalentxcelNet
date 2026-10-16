@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getProgrammeBySlug } from '@/lib/lms/programme-universe'
+import { ProgrammePricingPlans } from '@/components/public/programme-pricing-plans'
 
 interface ProjectRoadmapItem {
   title: string
@@ -853,21 +854,24 @@ export default async function ProgrammeDetailPage({
           </div>
         </div>
 
-        {/* Fee & Commercial Transparency */}
-        <Card className="border bg-muted/20">
-          <CardContent className="p-6 sm:p-8 space-y-4">
-            <h3 className="text-lg font-bold text-foreground">Tuition & Transparent Payment Terms</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{programme.feeNotice}</p>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t text-xs text-muted-foreground">
-              <span>*All pricing subject to applicable taxes. 14-day cooling-off refund policy applies prior to milestone delivery.</span>
-              <Link href="/fees">
-                <Button variant="outline" size="sm" className="text-xs">
-                  Review Milestone Refund Terms
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Fee & Transparent Payment Plans */}
+        <div id="fees-plans" className="pt-8 border-t space-y-6">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              Tuition Fees & Payment Plans
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Transparent tuition with monthly instalment options. Staged cohort admissions.
+            </p>
+          </div>
+
+          <ProgrammePricingPlans
+            programmeTitle={programme.title}
+            durationMonths={parseInt(programme.duration) || 8}
+            slug={programme.slug}
+            showProgrammeSelector={false}
+          />
+        </div>
       </div>
     </div>
   )

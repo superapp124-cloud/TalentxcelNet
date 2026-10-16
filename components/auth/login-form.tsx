@@ -22,7 +22,6 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const {
     register,
@@ -35,6 +34,7 @@ export function LoginForm() {
   async function onSubmit(values: LoginValues) {
     setIsLoading(true)
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
