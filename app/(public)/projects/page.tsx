@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Code2, ArrowUpRight, CheckCircle2 } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -80,6 +82,13 @@ export default function ProjectsPage() {
                     </ul>
                   </div>
                 </CardContent>
+              </div>
+              <div className="p-6 pt-0">
+                <Link href={p.category === 'AI Development' ? '/projects/rag-engine' : '/projects/rag-engine'}>
+                  <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 font-medium">
+                    Open Project Workspace <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Button>
+                </Link>
               </div>
             </Card>
           ))}

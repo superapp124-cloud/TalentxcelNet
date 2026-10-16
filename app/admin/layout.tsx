@@ -6,12 +6,14 @@ import {
   CreditCard,
   Laptop,
   Cpu,
+  Globe,
   ArrowLeft,
 } from 'lucide-react'
 import { Logo } from '@/components/brand/logo'
 
 const navItems = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { label: 'Ecosystem Growth OS', href: '/admin/growth-os', icon: Globe },
   { label: 'Admissions CRM', href: '/admin/admissions', icon: Users },
   { label: 'Programmes & Content', href: '/admin/programmes', icon: BookOpen },
   { label: 'Payments & Revenue', href: '/admin/payments', icon: CreditCard },

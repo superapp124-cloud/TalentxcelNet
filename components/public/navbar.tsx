@@ -22,6 +22,7 @@ const navLinks = [
   { label: 'How It Works', href: '/how-it-works' },
   { label: 'Fees & Plans', href: '/fees' },
   { label: 'Projects', href: '/projects' },
+  { label: 'Workspace', href: '/dashboard' },
   { label: 'Blog', href: '/blog' },
   { label: 'Faculty', href: '/faculty' },
   { label: 'Contact', href: '/contact' },

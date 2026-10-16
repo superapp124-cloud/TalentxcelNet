@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Logo } from '@/components/brand/logo'
+import { EcosystemDiscoveryBanner } from '@/components/ecosystem/ecosystem-discovery-banner'
 
 const footerLinks = {
   Programmes: [
@@ -87,6 +88,7 @@ export function PublicFooter() {
           </div>
         </div>
       </div>
+      <EcosystemDiscoveryBanner variant="footer-strip" />
     </footer>
   )
 }

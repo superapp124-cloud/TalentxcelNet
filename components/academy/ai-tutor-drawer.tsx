@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge'
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  sources?: Array<{ title: string; category: string }>
+  suggestedActions?: string[]
 }
 
 export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
@@ -17,16 +19,19 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
     {
       role: 'assistant',
       content:
-        'Hi! I am your **TalentXcel AI Tutor**. How can I help you with this lesson? You can ask for a hint or a conceptual breakdown.',
+        'Hi! I am your **TalentXcel Super AI Tutor**. I am grounded on your curriculum modules and learning objectives. Ask for a Socratic hint, code review, or conceptual explanation.',
+      suggestedActions: ['Get Hint #1', 'Explain system boundaries', 'Review project criteria'],
     },
   ])
   const [loading, setLoading] = useState(false)
   const [hintStep, setHintStep] = useState(1)
+  const [reportStatus, setReportStatus] = useState<string | null>(null)
 
-  const handleSend = async (mode: 'hint' | 'full_solution' = 'hint') => {
-    if (!input.trim() && mode !== 'hint') return
+  const handleSend = async (mode: 'hint' | 'full_solution' = 'hint', customText?: string) => {
+    const textToSend = customText || input.trim()
+    if (!textToSend && mode !== 'hint') return
 
-    const questionText = input.trim() || `I need hint #${hintStep} for this concept.`
+    const questionText = textToSend || `I need hint #${hintStep} for this concept.`
     const userMsg: Message = { role: 'user', content: questionText }
     setMessages((prev) => [...prev, userMsg])
     setInput('')
@@ -46,14 +51,22 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
 
       const data = await res.json()
       if (res.ok && data.content) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.content }])
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: data.content,
+            sources: data.sources,
+            suggestedActions: data.suggestedActions,
+          },
+        ])
         if (mode === 'hint') setHintStep((h) => Math.min(h + 1, 5))
       } else {
         setMessages((prev) => [
           ...prev,
           {
             role: 'assistant',
-            content: 'I had trouble generating a response. Please try again or ask an instructor.',
+            content: 'I encountered an issue generating a response. You can escalate directly to an academy mentor.',
           },
         ])
       }
@@ -67,6 +80,48 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
       ])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleEscalate = async (lastAssistantMsg: Message) => {
+    setReportStatus('Escalating to instructor...')
+    try {
+      const res = await fetch('/api/ai/report-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: input || 'Learner requested direct instructor intervention',
+          responseContent: lastAssistantMsg.content,
+          feedbackType: 'escalate_instructor',
+          courseContext: courseContext || 'Course Lesson',
+        }),
+      })
+      if (res.ok) {
+        setReportStatus('Escalated to instructor. Mentor will review.')
+        setTimeout(() => setReportStatus(null), 5000)
+      }
+    } catch {
+      setReportStatus('Unable to reach escalation server.')
+    }
+  }
+
+  const handleReport = async (lastAssistantMsg: Message) => {
+    setReportStatus('Submitting report...')
+    try {
+      await fetch('/api/ai/report-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: 'Inaccurate answer report',
+          responseContent: lastAssistantMsg.content,
+          feedbackType: 'report_inaccurate',
+          courseContext: courseContext || 'Course Lesson',
+        }),
+      })
+      setReportStatus('Feedback logged. Thank you.')
+      setTimeout(() => setReportStatus(null), 4000)
+    } catch {
+      setReportStatus('Failed to send report.')
     }
   }
 
@@ -95,10 +150,10 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
                 <div>
                   <h3 className="font-bold text-sm leading-tight">Super AI Learning Tutor</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <Badge variant="success" className="text-[10px] py-0 px-1.5">
+                    <Badge variant="default" className="text-[10px] py-0 px-1.5 bg-emerald-600">
                       Grounded
                     </Badge>
-                    <span className="text-[11px] text-muted-foreground">Socratic mode</span>
+                    <span className="text-[11px] text-muted-foreground">Socratic mode • Curriculum RAG</span>
                   </div>
                 </div>
               </div>
@@ -134,6 +189,13 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
               </Button>
             </div>
 
+            {/* Status notice */}
+            {reportStatus && (
+              <div className="bg-primary/10 text-primary text-xs px-4 py-1.5 border-b text-center font-medium">
+                {reportStatus}
+              </div>
+            )}
+
             {/* Messages Feed */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
               {messages.map((m, idx) => (
@@ -144,20 +206,68 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
                   }`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                    className={`max-w-[90%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
                       m.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted border text-foreground'
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{m.content}</p>
+
+                    {/* Sources Badge */}
+                    {m.sources && m.sources.length > 0 && (
+                      <div className="mt-2.5 pt-2 border-t border-border/40 text-[11px] text-muted-foreground space-y-1">
+                        <div className="font-semibold text-[10px] uppercase tracking-wider text-primary">
+                          Verified Curriculum Sources:
+                        </div>
+                        {m.sources.map((s, sIdx) => (
+                          <div key={sIdx} className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span>{s.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Report & Escalate row for assistant messages */}
+                    {m.role === 'assistant' && idx > 0 && (
+                      <div className="mt-2.5 pt-2 border-t border-border/30 flex items-center justify-between text-[10px] text-muted-foreground">
+                        <button
+                          onClick={() => handleReport(m)}
+                          className="hover:text-destructive underline"
+                        >
+                          Report Inaccuracy
+                        </button>
+                        <button
+                          onClick={() => handleEscalate(m)}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          Escalate to Instructor →
+                        </button>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Suggested Actions chips */}
+                  {m.suggestedActions && m.suggestedActions.length > 0 && idx === messages.length - 1 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {m.suggestedActions.map((action, aIdx) => (
+                        <button
+                          key={aIdx}
+                          onClick={() => handleSend('hint', action)}
+                          className="text-[11px] rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary px-2.5 py-0.5 transition-colors"
+                        >
+                          {action}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
               {loading && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  <span>AI Tutor is thinking...</span>
+                  <span>Super AI is consulting curriculum...</span>
                 </div>
               )}
             </div>
@@ -166,14 +276,14 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
             <div className="px-4 py-1.5 bg-muted/30 border-t flex items-center justify-between text-[11px] text-muted-foreground">
               <span className="flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
-                AI may produce inaccuracies.
+                Curriculum grounded • Discloses uncertainty
               </span>
               <a
                 href="/contact"
                 target="_blank"
                 className="text-primary hover:underline"
               >
-                Ask Instructor
+                Direct Support
               </a>
             </div>
 
@@ -190,7 +300,7 @@ export function AITutorDrawer({ courseContext }: { courseContext?: string }) {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask a question or request a hint..."
+                  placeholder="Ask Super AI or request a hint..."
                   className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   disabled={loading}
                 />
