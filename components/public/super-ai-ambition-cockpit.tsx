@@ -172,13 +172,132 @@ export function SuperAiAmbitionCockpit() {
         </div>
       </div>
 
-      {/* 2. Interactive Super AI Holographic Cockpit (Visualized as in the concept art) */}
-      <div className="relative mx-auto max-w-6xl rounded-3xl border border-cyan-500/30 bg-gradient-to-b from-neutral-950/90 via-[#070d1e]/90 to-neutral-950/90 p-4 sm:p-8 shadow-[0_0_60px_rgba(0,128,255,0.15)] backdrop-blur-2xl">
+      {/* 2. Interactive Super AI Holographic Cockpit (Directly visualizing Master Concept Artwork) */}
+      <div className="relative mx-auto max-w-6xl rounded-3xl border border-cyan-500/30 bg-gradient-to-b from-neutral-950/95 via-[#070d1e]/95 to-neutral-950/95 p-3 sm:p-6 shadow-[0_0_80px_rgba(0,180,255,0.22)] backdrop-blur-2xl space-y-6">
         {/* Subtle grid background */}
         <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(#00f0ff_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
-        {/* Top Header in Cockpit */}
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-6">
+        {/* Panoramic Cockpit Image Theater Viewport */}
+        <div className="relative w-full aspect-[16/9] sm:aspect-[21/10] rounded-2xl overflow-hidden border border-cyan-500/40 bg-black shadow-[0_0_40px_rgba(0,240,255,0.25)] group">
+          <Image
+            src="/images/titan-cockpit-panoramic.jpg"
+            alt="TalentXcel Academy Super AI Ambition Cockpit Command Center"
+            fill
+            priority
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
+          />
+
+          {/* Holographic grid and vignette overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/95 via-transparent to-neutral-950/30 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(#00f0ff_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
+
+          {/* Interactive Beacons / Hotspots Overlaid on Key Cockpit Nodes */}
+          
+          {/* Beacon 1: Super AI Cognitive Avatar (Top Center) */}
+          <button
+            onClick={() => {
+              setActiveSubTab('tutor')
+              document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="group/beacon absolute top-[24%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-cyan-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-cyan-200 shadow-[0_0_20px_rgba(0,240,255,0.7)] backdrop-blur-md hover:scale-110 hover:bg-cyan-950 transition-all cursor-pointer"
+            aria-label="Super AI Cognitive Co-Pilot"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+            </span>
+            <Brain className="h-3.5 w-3.5 text-cyan-300" />
+            <span className="hidden sm:inline">Super AI • Cognitive Co-Pilot</span>
+          </button>
+
+          {/* Beacon 2: 20-Family Programme Universe (Left Floating Cards) */}
+          <Link
+            href="/#programmes-universe"
+            className="group/beacon absolute top-[48%] left-[16%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-blue-400/90 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-blue-200 shadow-[0_0_20px_rgba(0,128,255,0.6)] backdrop-blur-md hover:scale-110 hover:bg-blue-950 transition-all cursor-pointer"
+            aria-label="20-Family Programme Universe"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+            </span>
+            <GraduationCap className="h-3.5 w-3.5 text-blue-300" />
+            <span className="hidden sm:inline">20 Programme Families</span>
+          </Link>
+
+          {/* Beacon 3: Sandboxed IDE Workspace (Center Screens) */}
+          <button
+            onClick={() => {
+              setActiveSubTab('workspace')
+              document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="group/beacon absolute top-[62%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-emerald-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.7)] backdrop-blur-md hover:scale-110 hover:bg-emerald-950 transition-all cursor-pointer"
+            aria-label="Live Sandboxed Code Workspace"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <Terminal className="h-3.5 w-3.5 text-emerald-300" />
+            <span className="hidden sm:inline">Code Sandbox • 4/4 PASS</span>
+          </button>
+
+          {/* Beacon 4: Living Skill Graph DAG (Right Constellation Screen) */}
+          <button
+            onClick={() => {
+              setActiveSubTab('graph')
+              document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="group/beacon absolute top-[44%] left-[78%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-purple-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.7)] backdrop-blur-md hover:scale-110 hover:bg-purple-950 transition-all cursor-pointer"
+            aria-label="Living Skill Graph DAG"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-500"></span>
+            </span>
+            <Layers className="h-3.5 w-3.5 text-purple-300" />
+            <span className="hidden sm:inline">Living Skill Graph DAG</span>
+          </button>
+
+          {/* Beacon 5: Multi-Brand Ecosystem Dock (Far Right) */}
+          <button
+            onClick={() => {
+              setActiveSubTab('opportunities')
+              document.getElementById('cockpit-console-section')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="group/beacon absolute top-[40%] left-[91%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 rounded-full border border-amber-400 bg-neutral-950/85 px-3 py-1.5 text-[11px] font-bold text-amber-200 shadow-[0_0_20px_rgba(245,158,11,0.7)] backdrop-blur-md hover:scale-110 hover:bg-amber-950 transition-all cursor-pointer"
+            aria-label="Tri-Platform Ecosystem"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+            </span>
+            <Briefcase className="h-3.5 w-3.5 text-amber-300" />
+            <span className="hidden sm:inline">TalentXcel • CHATR • NutyTales</span>
+          </button>
+
+          {/* Bottom HUD Bar on Theater */}
+          <div className="absolute bottom-3 left-3 right-3 flex flex-col sm:flex-row items-center justify-between gap-2 p-2.5 rounded-xl border border-white/[0.12] bg-neutral-950/85 backdrop-blur-md text-[11px]">
+            <div className="flex items-center gap-2 text-neutral-300">
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="font-mono text-cyan-300">TITAN_COCKPIT_HUD:</span>
+              <span className="text-white font-medium">{activeAmbition.matchedProgramme.title}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-neutral-400 hidden lg:inline">Click any beacon to control the cockpit console</span>
+              <Link href={activeAmbition.firstGuidedProject.workspaceHref}>
+                <Button size="sm" className="h-7 text-[11px] bg-cyan-400 hover:bg-cyan-300 text-black font-bold px-3 rounded-lg gap-1">
+                  Launch Interactive Sandbox <ArrowRight className="h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Console Section Container */}
+        <div id="cockpit-console-section" className="space-y-6 pt-2">
+          {/* Top Header in Cockpit */}
+          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-6">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,240,255,0.25)]">
               <Brain className="h-6 w-6" />
@@ -491,5 +610,6 @@ export function SuperAiAmbitionCockpit() {
         </div>
       </div>
     </div>
+  </div>
   )
 }
