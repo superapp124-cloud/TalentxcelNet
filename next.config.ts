@@ -51,7 +51,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    serverActions: { allowedOrigins: ['talentxcel.net', 'academy.talentxcel.net', 'localhost:3000'] },
+    serverActions: { allowedOrigins: ['talentxcel.net', 'academy.talentxcel.net', 'ai.talentxcel.net', 'localhost:3000'] },
   },
 }
 

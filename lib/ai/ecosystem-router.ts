@@ -201,6 +201,14 @@ export function routeEcosystemIntent(query: string, currentContext?: string): Ec
       actionLabel: 'Go to Cockpit',
       secureUrl: '/dashboard',
     })
+    destinations.push({
+      title: 'Super AI Copilot & Learning Laboratory',
+      hostname: 'ai.talentxcel.net',
+      path: '/dashboard',
+      description: 'Engage 8 specialized Super AI agents for Socratic tutoring and project code evaluation.',
+      actionLabel: 'Launch AI Copilot',
+      secureUrl: 'https://ai.talentxcel.net/dashboard',
+    })
   }
 
   // Fetch relevant knowledge items

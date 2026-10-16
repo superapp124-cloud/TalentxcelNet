@@ -25,6 +25,14 @@ async function runJourneys() {
     extraHTTPHeaders: { 'x-e2e-audit': '1' },
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 TalentXcelQA/1.0',
   })
+  await auditContext.addCookies([
+    {
+      name: 'e2e_audit',
+      value: '1',
+      domain: 'localhost',
+      path: '/',
+    },
+  ])
 
   // Clean unauthenticated context for boundary testing
   const publicContext = await browser.newContext({
@@ -38,7 +46,7 @@ async function runJourneys() {
   // JOURNEY 1: Contact Enquiry Submission
   try {
     console.log(`[Journey 1] Discovery to Enquiry Submission (/contact)...`)
-    await page.goto(`${BASE_URL}/contact`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/contact`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     await page.fill('#enq-fullName', 'Priya Sharma')
     await page.fill('#enq-email', 'priya.sharma@example.in')
@@ -65,7 +73,7 @@ async function runJourneys() {
   // JOURNEY 2: Admissions Application Flow
   try {
     console.log(`[Journey 2] Admissions Application (/apply)...`)
-    await page.goto(`${BASE_URL}/apply`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/apply`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     await page.fill('#enq-fullName', 'Aditya Verma')
     await page.fill('#enq-email', 'aditya.verma@example.com')
@@ -88,7 +96,7 @@ async function runJourneys() {
   // JOURNEY 3A: Certificate Verification (Valid)
   try {
     console.log(`[Journey 3A] Certificate Verification - Valid (/verify/TXCERT-2026-DEMO01)...`)
-    await page.goto(`${BASE_URL}/verify/TXCERT-2026-DEMO01`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/verify/TXCERT-2026-DEMO01`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const isAuthentic = await page.locator('text=Verified Authentic').count() > 0
     const hasGraduate = await page.locator('text=Sample Graduate').count() > 0
@@ -108,7 +116,7 @@ async function runJourneys() {
   // JOURNEY 3B: Certificate Verification (Invalid)
   try {
     console.log(`[Journey 3B] Certificate Verification - Invalid (/verify/INVALID-SERIAL-999)...`)
-    await page.goto(`${BASE_URL}/verify/INVALID-SERIAL-999`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/verify/INVALID-SERIAL-999`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const isNotFound = await page.locator('text=Certificate Record Not Found').count() > 0
     if (!isNotFound) {
@@ -126,7 +134,7 @@ async function runJourneys() {
   // JOURNEY 4: Course Player and Socratic AI Tutor
   try {
     console.log(`[Journey 4] Course Player & Super AI Tutor (/courses/ai-development/lessons/les-101)...`)
-    await page.goto(`${BASE_URL}/courses/ai-development/lessons/les-101`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/courses/ai-development/lessons/les-101`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     // Check lesson title
     const hasLessonTitle = await page.locator('text=1.1 Architecture of Production Web Applications').count() > 0
@@ -159,7 +167,7 @@ async function runJourneys() {
   // JOURNEY 5: Programme Exploration & Details
   try {
     console.log(`[Journey 5] Programme Details Exploration (/programmes/ai-development)...`)
-    await page.goto(`${BASE_URL}/programmes/ai-development`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/programmes/ai-development`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const hasTitle = await page.locator('h1:has-text("AI Development & Automation")').count() > 0
     if (!hasTitle) {
@@ -177,7 +185,7 @@ async function runJourneys() {
   // JOURNEY 6: Fees & Milestone Cost Calculator
   try {
     console.log(`[Journey 6] Fees & Pricing Transparency (/fees)...`)
-    await page.goto(`${BASE_URL}/fees`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/fees`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const hasFees = await page.locator('text=Tuition Fees & Payment Plans').count() > 0
     if (!hasFees) {
@@ -195,7 +203,7 @@ async function runJourneys() {
   // JOURNEY 7: Admin Operations Overview
   try {
     console.log(`[Journey 7] Admin Operations Console (/admin)...`)
-    await page.goto(`${BASE_URL}/admin`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const hasOps = await page.locator('text=Operations Overview').count() > 0
     if (!hasOps) {
@@ -213,7 +221,7 @@ async function runJourneys() {
   // JOURNEY 8: Security Boundary (Unauthenticated Access Redirect)
   try {
     console.log(`[Journey 8] Security Boundary Test (Unauthenticated /admin redirect)...`)
-    await publicPage.goto(`${BASE_URL}/admin`, { waitUntil: 'networkidle', timeout: 15000 })
+    await publicPage.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const currentUrl = publicPage.url()
     const redirectedToLogin = currentUrl.includes('/auth/login') && currentUrl.includes('redirectTo=%2Fadmin')
@@ -233,7 +241,7 @@ async function runJourneys() {
   // JOURNEY 9: Blog & Educational Resources
   try {
     console.log(`[Journey 9] Blog & Educational Directory (/blog)...`)
-    await page.goto(`${BASE_URL}/blog`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/blog`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const hasBlogTitle = await page.locator('text=Blog & Educational Resources').count() > 0
     if (!hasBlogTitle) {
@@ -241,7 +249,7 @@ async function runJourneys() {
     }
 
     // Navigate to specific blueprint article
-    await page.goto(`${BASE_URL}/blog/building-resilient-ai-agents`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/blog/building-resilient-ai-agents`, { waitUntil: 'domcontentloaded', timeout: 15000 })
     const hasArticle = await page.locator('text=Building Resilient AI Agents').count() > 0
     if (!hasArticle) {
       throw new Error(`Article title not found`)
@@ -258,7 +266,7 @@ async function runJourneys() {
   // JOURNEY 10: Hardware Warranty Terms
   try {
     console.log(`[Journey 10] Hardware Fulfilment & Warranty Terms (/legal/hardware-terms)...`)
-    await page.goto(`${BASE_URL}/legal/hardware-terms`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/legal/hardware-terms`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const hasHardwareTerms = await page.locator('text=Laptop Fulfilment & Hardware Warranty Terms').count() > 0
     if (!hasHardwareTerms) {
@@ -295,7 +303,7 @@ async function runJourneys() {
   // JOURNEY 12: Homepage Hero Interactive Product Demo
   try {
     console.log(`[Journey 12] Homepage Hero Interactive Product Demo (/)...`)
-    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     // Verify 3 core value propositions on screen
     const hasTutorProp = await page.locator('text=Grounded AI Tutor').count() > 0
@@ -332,7 +340,7 @@ async function runJourneys() {
   // JOURNEY 13: Living Skill Graph Interaction & Accessible Alternative
   try {
     console.log(`[Journey 13] Living Skill Graph Interaction & Accessibility (/)...`)
-    await page.goto(`${BASE_URL}/#skill-graph-section`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/#skill-graph-section`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const hasGraphHeading = await page.locator('h2:has-text("The Living Skill Graph")').count() > 0
     if (!hasGraphHeading) {
@@ -365,7 +373,7 @@ async function runJourneys() {
   // JOURNEY 14: Build While You Learn — Guided Project Workspace
   try {
     console.log(`[Journey 14] Guided Project Workspace & Sandbox Runner (/projects/rag-engine)...`)
-    await page.goto(`${BASE_URL}/projects/rag-engine`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/projects/rag-engine`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     const hasProjectTitle = await page.locator('h1:has-text("Enterprise Grounded Knowledge Retrieval Engine")').count() > 0
     if (!hasProjectTitle) {
@@ -393,7 +401,7 @@ async function runJourneys() {
   // JOURNEY 15: Personalized Learner Workspace
   try {
     console.log(`[Journey 15] Personalized Learner Workspace (/dashboard)...`)
-    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded', timeout: 15000 })
 
     // Verify workspace components
     const hasObjective = await page.locator('text=Current Learning Objective').count() > 0

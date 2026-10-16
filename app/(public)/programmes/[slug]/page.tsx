@@ -265,6 +265,300 @@ const PROGRAMMES_DATA: Record<string, ProgrammeDetail> = {
       },
     ],
   },
+  'highschool-integrated-foundation': {
+    slug: 'highschool-integrated-foundation',
+    title: 'High School Integrated Foundation Programme (Classes 9–12)',
+    subtitle: 'Comprehensive 2–4 year multi-grade track for NEET, JEE, Olympiads, and CBSE/State Boards.',
+    duration: '2–4 years',
+    workload: '10–14 hours / week',
+    level: 'Secondary to Senior Secondary',
+    badge: 'Multi-Year Foundation Track',
+    overview:
+      'A deep, continuous 2–4 year foundation programme covering Physics, Chemistry, Biology, and Mathematics from fundamental concepts to competitive entrance level. Includes dedicated hardware, offline lesson access, and ongoing faculty mentorship.',
+    feeNotice:
+      'Structured annual or multi-year enrolment. Year 1 foundation starts at ₹29,999 upfront plus ₹1,500/month for 8 months (Total ₹41,999 + GST) with laptop activation included. Multi-year renewal discounts apply.',
+    prerequisites: [
+      'Successful completion of Class 8 or Class 9 with minimum 60% in Mathematics and Science.',
+      'Guardian consent and enrolment commitment.',
+    ],
+    deliveryFormat: [
+      'Live subject mastery lectures & weekly problem-solving labs',
+      'AI Tutor for 24/7 instant doubt clarification and formula practice',
+      'Chapter-wise mock test series with detailed percentile analytics',
+      'Pre-loaded offline content on provided laptop',
+    ],
+    assessmentModel:
+      'Continuous chapter assessments, monthly Olympiad/JEE-format mock exams, and quarterly comprehensive reviews evaluated against competitive test benchmarks.',
+    learningOutcomes: [
+      'Build unshakeable concept clarity across Physics, Chemistry, and Advanced Mathematics.',
+      'Develop speed and accuracy in numerical problem-solving and NEET/JEE question patterns.',
+      'Cultivate strong study habits, disciplined time management, and exam temperament.',
+      'Achieve top percentiles in school board examinations and national entrance evaluations.',
+    ],
+    modules: [
+      {
+        title: 'Foundation Physics',
+        topics: ['Mechanics & Motion Laws', 'Thermodynamics & Heat', 'Electromagnetism & Circuits', 'Optics & Modern Physics'],
+      },
+      {
+        title: 'Foundation Chemistry',
+        topics: ['Physical Chemistry Calculations', 'Inorganic Chemistry & Periodic Trends', 'Organic Reaction Mechanisms', 'Practical Laboratory Insights'],
+      },
+      {
+        title: 'Advanced Mathematics',
+        topics: ['Algebra & Complex Numbers', 'Coordinate Geometry & Trigonometry', 'Calculus (Differential & Integral)', 'Vectors & Probability Distributions'],
+      },
+      {
+        title: 'Study Skills, Aptitude & Exam Readiness',
+        topics: ['Logical Reasoning & Analytical Deduction', 'Speed Problem-Solving Techniques', 'Mock Exam Temperament & Stress Management', 'Career & College Roadmap Guidance'],
+      },
+    ],
+  },
+  'competitive-exams': {
+    slug: 'competitive-exams',
+    title: 'Government & Competitive Exams Programme',
+    subtitle: 'Strategic preparation for UPSC, State PSC, NEET, JEE, LAW/CLAT, Banking, SSC, and Defence.',
+    duration: '8 months',
+    workload: '12–15 hours / week',
+    level: 'Aspirants & Graduates',
+    badge: 'Public Sector & Career Track',
+    overview:
+      'A structured, intensive 8-month preparation ecosystem designed for civil service and government competitive examinations. Combines expert-curated syllabus modules, daily current affairs analysis, full-length test series, and dedicated laptop with offline question banks.',
+    feeNotice:
+      'Indicative proposed fee: ₹29,999 upfront plus ₹1,500/month for 8 months (Total ₹41,999 before applicable GST). Laptop included with pre-installed offline question bank.',
+    prerequisites: [
+      'Graduation or final-year undergraduate status for civil service/banking tracks; 10+2 for defence/CLAT.',
+      'Commitment of 12+ hours per week for daily reading and test series.',
+    ],
+    deliveryFormat: [
+      'Live conceptual classes & daily current affairs debriefs',
+      'AI-powered doubt resolution and essay evaluation assistance',
+      'Comprehensive topic-wise and full-length simulated test series',
+      'Offline learning access on the pre-configured laptop',
+    ],
+    assessmentModel:
+      'Weekly sectional tests, bi-weekly full-length mock examinations matching authentic exam timing and negative marking, plus individual mentor performance reports.',
+    learningOutcomes: [
+      'Master General Studies core: Indian Polity, Modern History, Geography, Economy, and Science & Tech.',
+      'Excel in Quantitative Aptitude, Logical Reasoning, and Reading Comprehension.',
+      'Formulate structured, evidence-grounded answers for descriptive and essay components.',
+      'Gain speed and composure for high-pressure competitive examination environments.',
+    ],
+    modules: [
+      {
+        title: 'Module 1: General Studies & Current Affairs',
+        topics: ['Indian Constitution, Governance & Polity', 'Indian Economy & Budget Analysis', 'History, Culture & Geography', 'Daily Editorial & National Affairs Synthesis'],
+      },
+      {
+        title: 'Module 2: Quantitative Aptitude & CSAT Reasoning',
+        topics: ['Data Interpretation & Arithmetic Shortcuts', 'Analytical & Critical Logical Reasoning', 'Reading Comprehension & Critical Analysis', 'Time-Bounded Problem Sets'],
+      },
+      {
+        title: 'Module 3: Exam Specialization Tracks',
+        topics: ['UPSC/State PSC Prelims & Mains Answer Writing', 'Banking & SSC Speed Arithmetic & Financial Awareness', 'CLAT Legal Reasoning & Constitutional Law', 'Defence NDA/CDS Service Selection Board (SSB) Orientation'],
+      },
+      {
+        title: 'Module 4: Full-Length Mock Series & Revision Strategy',
+        topics: ['Simulated All-India Ranking Mock Tests', 'Section-wise Error Diagnosis & Weak-Area Remediation', 'Interview & Personality Test Guidance', 'Exam Day Strategy & Time Allocation'],
+      },
+    ],
+  },
+  'small-business': {
+    slug: 'small-business',
+    title: 'Small Business & Retailers Digital Programme',
+    subtitle: 'Practical digital skills for shopkeepers, chemists, retailers, distributors, and local merchants.',
+    duration: '8 months',
+    workload: '6–8 hours / week',
+    level: 'Beginner',
+    badge: 'MSME Growth Track',
+    overview:
+      'Designed specifically for local business owners, Kirana store operators, chemists, and distributors who want to increase sales, take orders online, manage inventory digitally, and use modern WhatsApp business and payment tools. Includes a pre-configured laptop pre-loaded with digital business software.',
+    feeNotice:
+      'Proposed fee: ₹29,999 upfront plus ₹1,500/month for 8 months (Total ₹41,999 + GST). Includes dedicated business laptop with pre-installed accounting, GST billing, and inventory software.',
+    prerequisites: [
+      'Operate or work in a retail store, wholesale agency, or local trade enterprise.',
+      'Basic smartphone familiarity (WhatsApp, UPI).',
+    ],
+    deliveryFormat: [
+      'Practical video modules in accessible regional language formats',
+      'One-on-one setup sessions for WhatsApp Business and digital catalog',
+      'Offline business software pre-installed on the included laptop',
+      'Ongoing merchant community support via CHATR',
+    ],
+    assessmentModel:
+      'Practical milestones: setting up a verified Google Business profile, activating a WhatsApp digital catalog, generating the first digital GST invoice, and reconciling payments.',
+    learningOutcomes: [
+      'Create and manage a digital storefront on WhatsApp Business and e-commerce platforms.',
+      'Automate customer enquiries, order confirmations, and delivery updates.',
+      'Manage inventory, track fast-moving stock, and streamline supplier orders digitally.',
+      'Use modern digital billing tools to track sales, expenses, and GST compliance.',
+    ],
+    modules: [
+      {
+        title: 'Module 1: Digital Store Setup & Local Online Presence',
+        topics: ['Google Business Profile & Local Search Optimization', 'WhatsApp Business Setup, Catalogues & Quick Replies', 'Digital Storefront Creation & Online Ordering Links'],
+      },
+      {
+        title: 'Module 2: Marketing, Customer Acquisition & Retention',
+        topics: ['Social Media Marketing for Local Retailers', 'Customer Loyalty Programmes & Broadcast Lists', 'Festive Offers, Discount Campaigns & Promotional Posters'],
+      },
+      {
+        title: 'Module 3: Inventory, Supply Chain & Financial Control',
+        topics: ['Digital Stock Tracking & Re-order Alerts', 'Supplier Relationship & Purchase Order Automation', 'GST Billing, Expense Bookkeeping & Profit Tracking'],
+      },
+      {
+        title: 'Module 4: AI & Modern Business Productivity',
+        topics: ['AI for Generating Marketing Copy & Product Descriptions', 'Customer Service Chatbots & Automation Tools', 'B2B Wholesale Expansion on NutyTales & Regional Portals'],
+      },
+    ],
+  },
+  'home-business': {
+    slug: 'home-business',
+    title: 'Home Business & Women Entrepreneurs Programme',
+    subtitle: 'Practical skills to launch, market, and earn from home: clothing, foods, crafts, and online selling.',
+    duration: '8 months',
+    workload: '5–7 hours / week',
+    level: 'Beginner',
+    badge: 'Financial Independence Track',
+    overview:
+      'A supportive, practical programme for housewives, stay-at-home parents, and aspiring women entrepreneurs to turn creative skills into profitable home-based enterprises. Learn packaging, pricing, digital marketing, marketplace selling, and financial management.',
+    feeNotice:
+      'Proposed fee: ₹29,999 upfront plus ₹1,500/month for 8 months (Total ₹41,999 + GST). Dedicated laptop included for running your online business from home.',
+    prerequisites: [
+      'A passion for creating products (fashion, baking, handicrafts, art, wellness) or offering home services.',
+      'Willingness to spend 5–7 hours per week learning and building your business.',
+    ],
+    deliveryFormat: [
+      'Step-by-step video tutorials and practical worksheets',
+      'Live mentoring circles with successful women founders',
+      'Offline-enabled learning on the provided laptop',
+      'Supportive community on CHATR and seller listing on NutyTales',
+    ],
+    assessmentModel:
+      'Milestone-based: completing product costing, designing brand packaging, launching an online storefront, and completing initial client orders.',
+    learningOutcomes: [
+      'Validate product ideas and calculate cost-of-goods, profit margins, and retail pricing.',
+      'Create eye-catching product photographs and videos using your phone.',
+      'Set up online storefronts on social channels, marketplaces, and NutyTales.',
+      'Manage packaging, shipping logistics, customer service, and repeat orders.',
+    ],
+    modules: [
+      {
+        title: 'Module 1: Product Development & Business Foundations',
+        topics: ['Identifying Profitable Home Business Ideas', 'Costing, Sourcing Raw Materials & Setting Healthy Margins', 'Product Packaging, Hygiene & Quality Standards'],
+      },
+      {
+        title: 'Module 2: Branding, Photography & Content Creation',
+        topics: ['Creating a Distinct Brand Identity & Logo', 'Mobile Product Photography & Reel Creation', 'Social Media Storytelling on Instagram & WhatsApp'],
+      },
+      {
+        title: 'Module 3: Selling Online & Marketplace Onboarding',
+        topics: ['Online Storefront Setup & UPI Payment Links', 'Listing Products on NutyTales & Artisan Marketplaces', 'Courier Tie-ups, Packaging & Cash-on-Delivery Handling'],
+      },
+      {
+        title: 'Module 4: Customer Delight & Business Scaling',
+        topics: ['Handling Customer Enquiries & Building Loyal Patronage', 'Holiday & Festival Gift Hamper Collections', 'Managing Personal Income, Savings & Business Expansion'],
+      },
+    ],
+  },
+  'teachers-trainers': {
+    slug: 'teachers-trainers',
+    title: 'Teachers & Trainers Digital Empowerment Programme',
+    subtitle: 'Upgrade your pedagogical skills: create digital courses, teach online, and build your educator brand.',
+    duration: '8 months',
+    workload: '6–8 hours / week',
+    level: 'Educators & Subject Experts',
+    badge: 'Educator Upskilling Track',
+    overview:
+      'Empowers school teachers, corporate trainers, college professors, and subject experts to transition into modern digital education. Learn to record high-quality lessons, create interactive quizzes, conduct engaging live classes, and monetize courses globally.',
+    feeNotice:
+      'Proposed fee: ₹29,999 upfront plus ₹1,500/month for 8 months (Total ₹41,999 + GST). Includes pre-loaded educator laptop with course authoring, screen recording, and presentation tools.',
+    prerequisites: [
+      'Background in teaching, tutoring, corporate coaching, or subject matter expertise.',
+      'Desire to reach online learners and adopt modern EdTech tools.',
+    ],
+    deliveryFormat: [
+      'Hands-on digital pedagogy workshops & live recording simulations',
+      'Personal feedback on lesson slides, micro-videos, and assessments',
+      'Pre-installed authoring software on dedicated laptop',
+      'Community discussion and educator matchmaking on CHATR',
+    ],
+    assessmentModel:
+      'Capstone submission of a complete 4-module digital course with video lectures, automated quizzes, PDF workbooks, and a live teaching demonstration.',
+    learningOutcomes: [
+      'Design modern interactive curricula using micro-learning principles.',
+      'Master video recording, audio editing, and screen presentation software.',
+      'Conduct engaging live virtual classrooms with polls, breakouts, and collaborative whiteboards.',
+      'Publish and monetize courses on TalentXcel Academy and personal digital platforms.',
+    ],
+    modules: [
+      {
+        title: 'Module 1: Modern Digital Pedagogy & Course Design',
+        topics: ['Curriculum Mapping & Backward Design Frameworks', 'Micro-learning Principles & Student Engagement Psychology', 'Developing High-Impact Slides & Digital Handouts'],
+      },
+      {
+        title: 'Module 2: Video Production & Educational Media',
+        topics: ['Screen Recording Tools & Best Practices (OBS Studio, Loom)', 'Microphone & Lighting Setup on Modest Budgets', 'Basic Video Editing, Subtitling & Visual Callouts'],
+      },
+      {
+        title: 'Module 3: Virtual Classrooms & Assessment Tools',
+        topics: ['Interactive Live Teaching on Zoom, Teams & Google Meet', 'Creating Automated Quizzes, Rubrics & Diagnostic Tests', 'Student Progress Tracking & Data-Informed Interventions'],
+      },
+      {
+        title: 'Module 4: Personal Branding, Monetization & Community',
+        topics: ['Building an Educator Profile on LinkedIn & YouTube', 'Course Pricing Models, Cohorts & Membership Clubs', 'Launching on TalentXcel Academy and Partner Marketplaces'],
+      },
+    ],
+  },
+  'lifestyle-trainers': {
+    slug: 'lifestyle-trainers',
+    title: 'Yoga, Fitness, Music & Dance Trainers Programme',
+    subtitle: 'Learn. Create. Teach. Go Online. Earn — For coaches, performers, and wellness experts.',
+    duration: '8 months',
+    workload: '6–8 hours / week',
+    level: 'Instructors & Practitioners',
+    badge: 'Creator & Wellness Track',
+    overview:
+      'Tailored for yoga teachers, fitness instructors, dance choreographers, music teachers, and wellness coaches who want to build a thriving digital training brand. Learn client acquisition, live session streaming, recurring membership programs, and digital client management.',
+    feeNotice:
+      'Proposed fee: ₹29,999 upfront plus ₹1,500/month for 8 months (Total ₹41,999 + GST). Includes laptop pre-loaded with fitness/wellness client scheduling and video tools.',
+    prerequisites: [
+      'Certified or practicing instructor in yoga, gym/fitness, dance, vocal/instrumental music, or wellness arts.',
+      'Commitment to building a loyal online and offline community.',
+    ],
+    deliveryFormat: [
+      'Studio-to-screen masterclasses on camera presence and coaching cues',
+      'Templates for client intake, progress tracking, and diet/routine plans',
+      'Laptop pre-loaded with digital management tools',
+      'Live networking and collaborative workshops',
+    ],
+    assessmentModel:
+      'Launch of a paid 21-day fitness/dance challenge or music masterclass with verified enrolled students and automated payment collection.',
+    learningOutcomes: [
+      'Command camera presence with clear verbal coaching cues and professional audio/video setup.',
+      'Package coaching into tiered subscription memberships, workshops, and 1-on-1 consultations.',
+      'Use modern social media marketing, reels, and WhatsApp funnels to acquire high-paying clients.',
+      'Manage client scheduling, payments, attendance, and renewals effortlessly.',
+    ],
+    modules: [
+      {
+        title: 'Module 1: Studio Setup & Online Session Delivery',
+        topics: ['Camera Angles, Wireless Audio & Lighting for Movement', 'Online Group Class Mechanics & Real-Time Form Correction', 'Preventing Student Injury in Virtual Training'],
+      },
+      {
+        title: 'Module 2: Packaging & Recurring Membership Models',
+        topics: ['Designing 21-Day Challenges, Bootcamps & Monthly Subscriptions', 'Creating Guided Meditation, Workout & Practice Audio Tracks', 'Pricing Strategy for High-Ticket 1-on-1 vs High-Volume Groups'],
+      },
+      {
+        title: 'Module 3: Social Media Growth & Client Funnels',
+        topics: ['Short-Form Video Mastery (Reels, Shorts) for Trainers', 'Turning Followers into Paying Clients via WhatsApp Automation', 'Organizing Free Workshops & Converting Free Trials'],
+      },
+      {
+        title: 'Module 4: Client Management, Community & Expansion',
+        topics: ['Managing Student Schedules, Renewals & Payment Links', 'Building an Active Community on CHATR & Telegram', 'Branded Merchandise & Health Nutrition Collaborations on NutyTales'],
+      },
+    ],
+  },
 }
 
 export async function generateMetadata({

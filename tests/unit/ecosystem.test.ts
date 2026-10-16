@@ -18,8 +18,8 @@ import {
 import { routeEcosystemIntent } from '@/lib/ai/ecosystem-router'
 
 describe('Ecosystem Domain Registry', () => {
-  it('registers all 29 monitored domains across the 4 core brands', () => {
-    expect(ECOSYSTEM_DOMAINS.length).toBe(29)
+  it('registers all 30 monitored domains across the 4 core brands', () => {
+    expect(ECOSYSTEM_DOMAINS.length).toBe(30)
   })
 
   it('contains valid definitions for the 4 primary brands', () => {
@@ -40,6 +40,12 @@ describe('Ecosystem Domain Registry', () => {
     expect(academy).toBeDefined()
     expect(academy?.brandSlug).toBe('talentxcel-academy')
 
+    const ai = getDomainRecord('ai.talentxcel.net')
+    expect(ai).toBeDefined()
+    expect(ai?.brandSlug).toBe('talentxcel-academy')
+    expect(ai?.canonicalHostname).toBe('ai.talentxcel.net')
+    expect(ai?.integrationStatus).toBe('active')
+
     const unknown = getDomainRecord('random-unregistered-site.com')
     expect(unknown).toBeUndefined()
   })
@@ -55,7 +61,7 @@ describe('Ecosystem Domain Registry', () => {
     expect(chatrDomains.length).toBe(4)
 
     const academyDomains = getBrandDomains('talentxcel-academy')
-    expect(academyDomains.length).toBe(3)
+    expect(academyDomains.length).toBe(4)
   })
 })
 

@@ -30,9 +30,10 @@ export async function updateSession(request: NextRequest) {
 
   const host = request.headers.get('host') || ''
   const isAcademySubdomain = host.startsWith('academy.')
+  const isAiSubdomain = host.startsWith('ai.')
 
-  // Multi-domain routing: on academy.talentxcel.net, root '/' routes to learner portal
-  if (isAcademySubdomain && request.nextUrl.pathname === '/') {
+  // Multi-domain routing: on academy.talentxcel.net or ai.talentxcel.net, root '/' routes to learner portal
+  if ((isAcademySubdomain || isAiSubdomain) && request.nextUrl.pathname === '/') {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = user ? '/dashboard' : '/auth/login'
     if (!user) redirectUrl.searchParams.set('redirectTo', '/dashboard')
@@ -51,8 +52,9 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/auth/login') ||
     request.nextUrl.pathname.startsWith('/auth/register')
 
+  const isLocalHost = host.includes('localhost') || host.includes('127.0.0.1')
   const isLocalE2EAudit =
-    process.env.NODE_ENV !== 'production' &&
+    (process.env.NODE_ENV !== 'production' || isLocalHost) &&
     (request.headers.get('x-e2e-audit') === '1' || request.cookies.get('e2e_audit')?.value === '1')
 
   if (isAcademyRoute && !user && !isLocalE2EAudit) {

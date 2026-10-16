@@ -4,7 +4,7 @@
 
 - Vercel account
 - Supabase project credentials (`https://wvuvriewskvvievacida.supabase.co`)
-- Domain control for `talentxcel.net` and `academy.talentxcel.net`
+- Domain control for `talentxcel.net`, `academy.talentxcel.net`, and `ai.talentxcel.net`
 - AI provider API key (OpenAI / Gemini / Anthropic)
 - Payment provider credentials (Razorpay sandbox mode first)
 
@@ -49,4 +49,5 @@ supabase db push
 
 - `talentxcel.net`: Apex domain points to Vercel A records. CNAME `www` points to `cname.vercel-dns.com`.
 - `academy.talentxcel.net`: CNAME `academy` points to `cname.vercel-dns.com`.
-- In Supabase Auth > URL Configuration, add both domains to allowed redirect URLs.
+- `ai.talentxcel.net`: CNAME `ai` points to `cname.vercel-dns.com`.
+- In Supabase Auth > URL Configuration, add all domains (`talentxcel.net`, `academy.talentxcel.net`, `ai.talentxcel.net`) to allowed redirect URLs.

@@ -22,7 +22,7 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-foreground">1. Introduction & Scope</h2>
             <p>
-              TalentXcel Academy (&quot;we&quot;, &quot;our&quot;, or &quot;the Academy&quot;) is committed to processing digital personal data in a lawful, fair, and transparent manner. This Privacy Policy details how we collect, use, store, and protect data acquired via <code>talentxcel.net</code> and <code>academy.talentxcel.net</code>.
+              TalentXcel Academy (&quot;we&quot;, &quot;our&quot;, or &quot;the Academy&quot;) is committed to processing digital personal data in a lawful, fair, and transparent manner. This Privacy Policy details how we collect, use, store, and protect data acquired via <code>talentxcel.net</code>, <code>academy.talentxcel.net</code>, and <code>ai.talentxcel.net</code>.
             </p>
           </section>
 

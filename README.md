@@ -49,7 +49,8 @@
 | Domain | Purpose |
 |--------|---------|
 | `talentxcel.net` | Public website, programme catalogue, admissions |
-| `academy.talentxcel.net` | Learner portal, courses, AI tutor |
+| `academy.talentxcel.net` | Learner portal, courses, LMS |
+| `ai.talentxcel.net` | Super AI copilot, intelligent tutoring, code evaluation & learning workbench |
 
 ## Tech Stack
 

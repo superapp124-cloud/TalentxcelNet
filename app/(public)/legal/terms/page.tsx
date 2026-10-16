@@ -22,7 +22,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-foreground">1. Agreement to Terms</h2>
             <p>
-              By accessing or creating an account on TalentXcel Academy (<code>talentxcel.net</code> or <code>academy.talentxcel.net</code>), you agree to be bound by these Terms of Service. If you do not agree, do not access or use the platform.
+              By accessing or creating an account on TalentXcel Academy (<code>talentxcel.net</code>, <code>academy.talentxcel.net</code>, or <code>ai.talentxcel.net</code>), you agree to be bound by these Terms of Service. If you do not agree, do not access or use the platform.
             </p>
           </section>
 

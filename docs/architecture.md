@@ -2,11 +2,12 @@
 
 ## Overview
 
-TalentXcel.net is a modular monolith Next.js 16 application split across two domains:
+TalentXcel.net is a modular monolith Next.js 16 application configured across domains:
 - `talentxcel.net` — public website (SSR/SSG, SEO-optimized)
 - `academy.talentxcel.net` — learner portal (CSR/SSR, authenticated)
+- `ai.talentxcel.net` — Super AI copilot, interactive tutoring, and AI learning laboratory
 
-Both domains share one Next.js application, one Supabase project, and one PostgreSQL database.
+All domains share one Next.js application, one Supabase project, and one PostgreSQL database.
 
 ## Architecture Diagram
 
@@ -19,12 +20,19 @@ Both domains share one Next.js application, one Supabase project, and one Postgr
     │               ├── Admissions/Enquiry
     │               └── Marketing content
     │
-    └── academy.talentxcel.net
-            └── Authenticated portal (SSR + CSR)
-                    ├── Learner dashboard
-                    ├── Course player
-                    ├── AI tutor
-                    └── Admin console
+    ├── academy.talentxcel.net
+    │       └── Authenticated portal (SSR + CSR)
+    │               ├── Learner dashboard
+    │               ├── Course player
+    │               ├── AI tutor
+    │               └── Admin console
+    │
+    └── ai.talentxcel.net
+            └── Super AI Laboratory & Copilot
+                    ├── Socratic AI Tutor Drawer
+                    ├── Automated Code Evaluation
+                    ├── 8 Super AI Specialist Mentors
+                    └── Skill Graph Telemetry
 
 [Next.js App]
     ├── App Router

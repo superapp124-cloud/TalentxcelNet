@@ -81,7 +81,7 @@ export const ECOSYSTEM_DOMAINS: EcosystemDomainRecord[] = [
     technicalOwner: 'Academy Engineering Team',
     lastVerifiedAt: '2026-10-16T15:30:00Z',
     isParkedOrRedirect: false,
-    approvedCrossDomainLinks: ['careers.talentxcel.in', 'resume.talentxcel.in', 'chatr.chat', 'business.nutytales.com'],
+    approvedCrossDomainLinks: ['careers.talentxcel.in', 'resume.talentxcel.in', 'chatr.chat', 'business.nutytales.com', 'ai.talentxcel.net'],
   },
   {
     hostname: 'www.talentxcel.net',
@@ -109,7 +109,21 @@ export const ECOSYSTEM_DOMAINS: EcosystemDomainRecord[] = [
     technicalOwner: 'Academy LMS Team',
     lastVerifiedAt: '2026-10-16T15:30:00Z',
     isParkedOrRedirect: false,
-    approvedCrossDomainLinks: ['talentxcel.net', 'passport.talentxcel.in'],
+    approvedCrossDomainLinks: ['talentxcel.net', 'passport.talentxcel.in', 'ai.talentxcel.net'],
+  },
+  {
+    hostname: 'ai.talentxcel.net',
+    canonicalHostname: 'ai.talentxcel.net',
+    brandSlug: 'talentxcel-academy',
+    purpose: 'Super AI Copilot & AI Learning Laboratory — interactive Socratic tutoring, automated code evaluation, multi-agent mentorship, and generative skill workflows.',
+    audienceSegments: ['Enrolled Learners', 'AI Engineers & Researchers', 'Faculty Mentors', 'Prospective Students'],
+    publicEntryUrl: 'https://ai.talentxcel.net',
+    healthStatus: 'healthy',
+    integrationStatus: 'active',
+    technicalOwner: 'Academy Super AI Engineering',
+    lastVerifiedAt: '2026-10-16T15:30:00Z',
+    isParkedOrRedirect: false,
+    approvedCrossDomainLinks: ['talentxcel.net', 'academy.talentxcel.net', 'careers.talentxcel.in', 'resume.talentxcel.in'],
   },
 
   // --- TalentXcel Career & Employment ---

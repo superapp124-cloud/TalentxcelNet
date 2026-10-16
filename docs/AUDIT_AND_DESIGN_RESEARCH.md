@@ -3,7 +3,7 @@
 **Document Status:** Approved Architectural Reference  
 **Evaluation Date:** October 2026  
 **Standards:** WCAG 2.2 AA, Apple Human Interface Guidelines (HIG), India DPDP Act 2023  
-**Target Domains:** `talentxcel.net` (Public & Catalogue) | `academy.talentxcel.net` (LMS & Super AI)
+**Target Domains:** `talentxcel.net` (Public & Catalogue) | `academy.talentxcel.net` (LMS & Courses) | `ai.talentxcel.net` (Super AI Copilot & Workbench)
 
 ---
 

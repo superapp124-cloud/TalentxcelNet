@@ -53,6 +53,19 @@ export const ECOSYSTEM_KNOWLEDGE_INDEX: EcosystemKnowledgeItem[] = [
     targetAudience: ['Learners', 'Global Students'],
     relevantIntents: ['academy_enrolment'],
   },
+  {
+    id: 'kb-txa-04',
+    title: 'Super AI Copilot & Automated Learning Laboratory',
+    brandSlug: 'talentxcel-academy',
+    brandName: 'TalentXcel Academy',
+    summary: 'Dedicated AI portal providing continuous Socratic tutoring, automated project code evaluation, and personalized skill graph diagnostics.',
+    content: 'Accessible at ai.talentxcel.net, learners access real-time Super AI assistance, code grading against industry standards, RAG-grounded documentation queries, and multi-agent capstone project reviews.',
+    sourceDomain: 'ai.talentxcel.net',
+    publicUrl: 'https://ai.talentxcel.net',
+    tags: ['ai-copilot', 'ai-portal', 'socratic-tutor', 'code-evaluation', 'super-ai', 'skill-graph'],
+    targetAudience: ['Learners', 'AI Engineers', 'Mentors'],
+    relevantIntents: ['academy_enrolment', 'career_pathway'],
+  },
 
   // --- TALENTXCEL CAREER NETWORK ---
   {
