@@ -717,6 +717,15 @@ RETURNS BOOLEAN AS $$
   );
 $$ LANGUAGE SQL SECURITY DEFINER STABLE;
 
+-- FUNCTION: is_course_instructor
+CREATE OR REPLACE FUNCTION is_course_instructor(p_programme_id UUID, p_user_id UUID)
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM course_instructors
+    WHERE programme_id = p_programme_id AND instructor_id = p_user_id
+  );
+$$ LANGUAGE SQL SECURITY DEFINER STABLE;
+
 -- FUNCTION: create profile and prospect role on signup
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
@@ -799,7 +808,7 @@ CREATE POLICY "audit: admin" ON audit_events FOR SELECT USING (is_admin_or_above
 CREATE POLICY "programmes: published public" ON programmes FOR SELECT USING (status = 'published');
 CREATE POLICY "programmes: admin full" ON programmes FOR ALL USING (is_admin_or_above(auth.uid()));
 CREATE POLICY "programmes: instructor read" ON programmes FOR SELECT USING (
-  EXISTS (SELECT 1 FROM course_instructors WHERE programme_id = programmes.id AND instructor_id = auth.uid())
+  is_course_instructor(id, auth.uid())
 );
 
 -- modules: published visible to enrolled learners or admins
@@ -828,11 +837,8 @@ CREATE POLICY "outcomes: public" ON learning_outcomes FOR SELECT USING (
 );
 CREATE POLICY "outcomes: admin" ON learning_outcomes FOR ALL USING (is_admin_or_above(auth.uid()));
 
--- course_instructors: public read when published, admins full
-CREATE POLICY "instructors: public" ON course_instructors FOR SELECT USING (
-  EXISTS (SELECT 1 FROM programmes p WHERE p.id = course_instructors.programme_id AND p.status = 'published')
-  OR is_admin_or_above(auth.uid())
-);
+-- course_instructors: public read, admins full
+CREATE POLICY "instructors: public" ON course_instructors FOR SELECT USING (true);
 CREATE POLICY "instructors: admin" ON course_instructors FOR ALL USING (is_admin_or_above(auth.uid()));
 
 -- learning_enrolments: own only
