@@ -5,9 +5,12 @@ import { EcosystemDiscoveryBanner } from '@/components/ecosystem/ecosystem-disco
 const footerLinks = {
   Programmes: [
     { label: 'AI Development & Automation', href: '/programmes/ai-development' },
+    { label: 'Government & Competitive Exams', href: '/programmes/competitive-exams' },
+    { label: 'School Foundation Track (8→9)', href: '/programmes/school-foundation' },
+    { label: 'High School Integrated (9–12)', href: '/programmes/highschool-integrated-foundation' },
     { label: 'Healthcare Technology', href: '/programmes/healthcare-tech' },
-    { label: 'Entrepreneurship & Digitization', href: '/programmes/entrepreneurship' },
-    { label: 'School Foundation (Class 8→9)', href: '/programmes/school-foundation' },
+    { label: 'Small Business & MSME Track', href: '/programmes/small-business' },
+    { label: 'Explore All 10 Programmes →', href: '/programmes' },
   ],
   Admissions: [
     { label: 'Apply for Admission', href: '/apply' },

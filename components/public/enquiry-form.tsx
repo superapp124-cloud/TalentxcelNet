@@ -21,10 +21,16 @@ type EnquiryValues = z.infer<typeof enquirySchema>
 
 const programmes = [
   { id: '', label: 'Select a programme (optional)' },
-  { id: 'ai-development', label: 'AI Development & Automation' },
-  { id: 'healthcare-tech', label: 'Healthcare Technology' },
-  { id: 'entrepreneurship', label: 'Entrepreneurship & Digitization' },
-  { id: 'school-foundation', label: 'School Foundation (Class 8 → 9)' },
+  { id: 'ai-development', label: 'AI Development & Automation Programme' },
+  { id: 'competitive-exams', label: 'Government & Competitive Exams (UPSC, PSC, Banking)' },
+  { id: 'school-foundation', label: 'School Foundation Track (Class 8 → 9)' },
+  { id: 'highschool-integrated-foundation', label: 'High School Integrated Foundation (Classes 9–12)' },
+  { id: 'healthcare-tech', label: 'Healthcare Technology Programme' },
+  { id: 'entrepreneurship', label: 'Entrepreneurship & Startup Launch' },
+  { id: 'small-business', label: 'Small Business & Retailers Programme' },
+  { id: 'home-business', label: 'Home Business & Women Entrepreneurs' },
+  { id: 'teachers-trainers', label: 'Teachers & Trainers Digital Track' },
+  { id: 'lifestyle-trainers', label: 'Yoga, Fitness, Dance & Music Trainers' },
   { id: 'not-sure', label: 'Not sure yet — help me choose' },
 ]
 
