@@ -372,27 +372,30 @@ export function Class9FoundationSalesExperience() {
   return (
     <div className="space-y-16">
       {/* 1. HERO SECTION (Matching brochure exactly) */}
-      <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-b from-primary/[0.07] via-background to-background p-6 sm:p-10 lg:p-12 shadow-xl">
+      <section className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#0a1b44]/90 via-[#06122d]/95 to-[#020919] p-5 sm:p-8 lg:p-10 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="space-y-6 max-w-2xl text-left">
+          <div className="space-y-4 max-w-2xl text-left">
             {/* Top Audience Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 shadow-xs">
-              <Sparkles className="h-4 w-4" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1 text-xs font-extrabold text-amber-300 shadow-sm backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
               <span>For Class 9 Students (After Class 8)</span>
             </div>
 
             {/* Main Headline */}
             <div className="space-y-2">
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-foreground">
-                Class 9 Foundation Programme
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.15]">
+                Build a Strong Academic Foundation for{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent">
+                  NEET, JEE & Competitive Exams
+                </span>
               </h1>
-              <p className="text-lg sm:text-xl font-semibold text-primary">
-                Build a strong academic foundation for NEET, JEE and all other competitive exams.
+              <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed max-w-xl">
+                8-month comprehensive foundation with 96 live interactive sessions, 7 core subjects, personal 24/7 Super AI Socratic Tutor, and dedicated student laptop included.
               </p>
             </div>
 
             {/* 5 Core Pillars */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
               {[
                 'Clear Concepts',
                 'Regular Practice',
@@ -400,46 +403,55 @@ export function Class9FoundationSalesExperience() {
                 'Personal Attention',
                 'Online & Offline Support',
               ].map((pillar) => (
-                <div key={pillar} className="flex items-center gap-2 text-xs font-bold text-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                <span
+                  key={pillar}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-400/25 text-[11px] font-bold text-blue-100 shadow-xs"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                   <span>{pillar}</span>
-                </div>
+                </span>
               ))}
             </div>
 
             {/* Core Delivery Metrics Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div className="flex items-start gap-2.5 p-3 rounded-2xl border border-primary/20 bg-background/60 shadow-xs">
-                <Calendar className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+              <div className="flex items-center gap-2.5 p-2.5 rounded-xl border border-sky-500/25 bg-sky-950/30 backdrop-blur-md">
+                <div className="h-8 w-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                  <Calendar className="h-4 w-4" />
+                </div>
                 <div className="text-xs">
-                  <span className="font-extrabold text-foreground block">3 Live Classes / Wk</span>
-                  <span className="text-[11px] text-muted-foreground">Expert faculty led</span>
+                  <span className="font-extrabold text-white block text-xs">3 Live Classes / Wk</span>
+                  <span className="text-[10px] text-slate-300">Expert faculty led</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 p-3 rounded-2xl border border-primary/20 bg-background/60 shadow-xs">
-                <Users className="h-4 w-4 text-purple-500 shrink-0 mt-0.5" />
+              <div className="flex items-center gap-2.5 p-2.5 rounded-xl border border-indigo-500/25 bg-indigo-950/30 backdrop-blur-md">
+                <div className="h-8 w-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                  <Users className="h-4 w-4" />
+                </div>
                 <div className="text-xs">
-                  <span className="font-extrabold text-foreground block">96 Live Sessions</span>
-                  <span className="text-[11px] text-muted-foreground">Across 8 months</span>
+                  <span className="font-extrabold text-white block text-xs">96 Live Sessions</span>
+                  <span className="text-[10px] text-slate-300">Across 8 months</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 p-3 rounded-2xl border border-primary/20 bg-background/60 shadow-xs">
-                <PlayCircle className="h-4 w-4 text-rose-500 shrink-0 mt-0.5" />
+              <div className="flex items-center gap-2.5 p-2.5 rounded-xl border border-rose-500/25 bg-rose-950/30 backdrop-blur-md">
+                <div className="h-8 w-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                  <PlayCircle className="h-4 w-4" />
+                </div>
                 <div className="text-xs">
-                  <span className="font-extrabold text-foreground block">Live + Recorded</span>
-                  <span className="text-[11px] text-muted-foreground">Anytime 24/7 access</span>
+                  <span className="font-extrabold text-white block text-xs">Live + Recorded</span>
+                  <span className="text-[10px] text-slate-300">24/7 unlimited access</span>
                 </div>
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            {/* Above-the-fold Action CTAs */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <Button
                 size="lg"
                 onClick={() => setIsModalOpen(true)}
-                className="font-extrabold text-sm sm:text-base px-6 py-6 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg gap-2"
+                className="h-12 px-7 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-110 text-white font-extrabold text-sm sm:text-base shadow-[0_0_25px_rgba(0,128,255,0.45)] border border-white/20 gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 Enrol Now • Choose Package <ArrowRight className="h-4 w-4" />
               </Button>
@@ -449,10 +461,22 @@ export function Class9FoundationSalesExperience() {
                 onClick={() => {
                   document.getElementById('learning-packages-section')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="font-bold text-sm px-5 py-6 rounded-2xl border-primary/30 hover:bg-primary/5"
+                className="h-12 px-6 rounded-full border-white/25 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md font-bold text-sm cursor-pointer"
               >
-                View Fees & Laptop Options
+                View Fees & Laptop (From ₹29,999)
               </Button>
+            </div>
+
+            {/* Trust and Assurance Strip */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 pt-1">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                14-Day Money-Back Guarantee
+              </span>
+              <span className="text-slate-600">•</span>
+              <span>CBSE, ICSE & State Boards</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-amber-300 font-semibold">Limited 30 Seats / Batch</span>
             </div>
           </div>
 
@@ -463,21 +487,28 @@ export function Class9FoundationSalesExperience() {
         </div>
 
         {/* 7 Feature Chips Bar */}
-        <div className="mt-8 pt-6 border-t border-primary/20 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-center">
+        <div className="mt-8 pt-6 border-t border-white/15 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-center">
           {[
-            { label: '3 Live Classes Every Week', icon: Calendar },
-            { label: 'Live & Recorded Classes', icon: PlayCircle },
-            { label: 'Downloadable Study Material', icon: FileText },
-            { label: 'Chapter-wise Practice & Tests', icon: CheckCircle2 },
-            { label: 'Mentor Support & Doubts', icon: Users },
-            { label: 'Progress Tracking Reports', icon: Award },
-            { label: 'Career & Exam Guidance', icon: Compass },
+            { label: '3 Live Classes / Week', icon: Calendar, color: 'text-sky-400 bg-sky-500/15' },
+            { label: 'Live & Recorded Classes', icon: PlayCircle, color: 'text-rose-400 bg-rose-500/15' },
+            { label: 'Downloadable Study Notes', icon: FileText, color: 'text-amber-400 bg-amber-500/15' },
+            { label: 'Chapter Practice & Tests', icon: CheckCircle2, color: 'text-emerald-400 bg-emerald-500/15' },
+            { label: 'Mentor Doubt Support', icon: Users, color: 'text-purple-400 bg-purple-500/15' },
+            { label: 'Progress Reports & Analytics', icon: Award, color: 'text-cyan-400 bg-cyan-500/15' },
+            { label: 'Career & Exam Guidance', icon: Compass, color: 'text-orange-400 bg-orange-500/15' },
           ].map((feat) => {
             const Icon = feat.icon
             return (
-              <div key={feat.label} className="p-3 rounded-xl bg-card/60 border border-border/60 flex flex-col items-center justify-center gap-2 hover:bg-card transition-colors">
-                <Icon className="h-4 w-4 text-primary shrink-0" />
-                <span className="text-[11px] font-semibold text-foreground leading-tight">{feat.label}</span>
+              <div
+                key={feat.label}
+                className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 hover:border-blue-400/30 flex flex-col items-center justify-center gap-1.5 hover:bg-white/[0.08] transition-all backdrop-blur-md"
+              >
+                <div className={`p-1.5 rounded-lg ${feat.color}`}>
+                  <Icon className="h-4 w-4 shrink-0" />
+                </div>
+                <span className="text-[11px] font-bold text-slate-200 leading-tight">
+                  {feat.label}
+                </span>
               </div>
             )
           })}
