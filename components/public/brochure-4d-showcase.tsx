@@ -65,7 +65,7 @@ export function Brochure4DShowcase({
   }
 
   return (
-    <div className="relative w-full max-w-[440px] mx-auto select-none">
+    <div className="relative w-full max-w-[315px] sm:max-w-[335px] lg:max-w-[340px] mx-auto select-none">
       {/* Outer Glow Halo */}
       <div
         className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-indigo-500/20 rounded-3xl blur-xl opacity-60 pointer-events-none"
@@ -115,14 +115,14 @@ export function Brochure4DShowcase({
           />
 
           {/* The Poster Mat with Generous Inner Padding - GUARANTEES NO CUTTING ON ANY SIDE */}
-          <div className="relative rounded-xl p-2 sm:p-2.5 bg-white shadow-md flex items-center justify-center overflow-visible">
+          <div className="relative rounded-xl p-2 sm:p-2.5 bg-white shadow-xl flex items-center justify-center overflow-visible">
             <Image
-              src="/images/class-9-foundation-brochure.png"
+              src="/images/class-9-foundation-brochure.jpg"
               alt="Class 9 Foundation Programme Official Syllabus & Package Brochure"
-              width={512}
-              height={512}
+              width={682}
+              height={1024}
               priority
-              className="w-full h-auto max-h-[380px] sm:max-h-[410px] object-contain rounded-sm block"
+              className="w-full h-auto object-contain rounded-sm block shadow-xs"
             />
 
             {/* Hover overlay hint */}
@@ -252,9 +252,9 @@ export function Brochure4DShowcase({
                 className="max-w-2xl w-full p-2 bg-white rounded-xl shadow-2xl"
               >
                 <Image
-                  src="/images/class-9-foundation-brochure.png"
+                  src="/images/class-9-foundation-brochure.jpg"
                   alt="Official Class 9 Foundation Programme Brochure Full View"
-                  width={1024}
+                  width={682}
                   height={1024}
                   className="w-full h-auto object-contain rounded-lg"
                 />

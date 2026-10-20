@@ -481,7 +481,7 @@ export function Class9FoundationSalesExperience() {
           </div>
 
           {/* Right Column: Interactive 4D Brochure Showcase (Safely proportioned) */}
-          <div className="w-full lg:w-[420px] xl:w-[450px] shrink-0">
+          <div className="w-full lg:w-[330px] xl:w-[350px] shrink-0">
             <Brochure4DShowcase onEnrolClick={() => setIsModalOpen(true)} />
           </div>
         </div>
