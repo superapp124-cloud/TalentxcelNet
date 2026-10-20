@@ -418,44 +418,44 @@ export function Class9FoundationSalesExperience() {
             </div>
 
             {/* Core Delivery Metrics Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-0.5">
-              <div className="flex items-center gap-2 p-2 rounded-xl border border-sky-500/25 bg-sky-950/30 backdrop-blur-md">
-                <div className="h-7 w-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
-                  <Calendar className="h-3.5 w-3.5" />
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-0.5">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-xl border border-sky-500/25 bg-sky-950/30 backdrop-blur-md">
+                <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                  <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 </div>
-                <div className="text-xs">
-                  <span className="font-extrabold text-white block text-xs">3 Live Classes / Wk</span>
-                  <span className="text-[10px] text-slate-300">Expert faculty led</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 p-2 rounded-xl border border-indigo-500/25 bg-indigo-950/30 backdrop-blur-md">
-                <div className="h-7 w-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
-                  <Users className="h-3.5 w-3.5" />
-                </div>
-                <div className="text-xs">
-                  <span className="font-extrabold text-white block text-xs">96 Live Sessions</span>
-                  <span className="text-[10px] text-slate-300">Across 8 months</span>
+                <div className="text-[11px] sm:text-xs">
+                  <span className="font-extrabold text-white block leading-tight">3 Classes/Wk</span>
+                  <span className="text-[9px] sm:text-[10px] text-slate-300 hidden sm:block">Expert faculty</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl border border-rose-500/25 bg-rose-950/30 backdrop-blur-md">
-                <div className="h-7 w-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
-                  <PlayCircle className="h-3.5 w-3.5" />
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-xl border border-indigo-500/25 bg-indigo-950/30 backdrop-blur-md">
+                <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                  <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 </div>
-                <div className="text-xs">
-                  <span className="font-extrabold text-white block text-xs">Live + Recorded</span>
-                  <span className="text-[10px] text-slate-300">24/7 unlimited access</span>
+                <div className="text-[11px] sm:text-xs">
+                  <span className="font-extrabold text-white block leading-tight">96 Sessions</span>
+                  <span className="text-[9px] sm:text-[10px] text-slate-300 hidden sm:block">Across 8 months</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-xl border border-rose-500/25 bg-rose-950/30 backdrop-blur-md">
+                <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                  <PlayCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                </div>
+                <div className="text-[11px] sm:text-xs">
+                  <span className="font-extrabold text-white block leading-tight">Live+Recorded</span>
+                  <span className="text-[9px] sm:text-[10px] text-slate-300 hidden sm:block">24/7 access</span>
                 </div>
               </div>
             </div>
 
             {/* Above-the-fold Action CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
               <Button
                 size="lg"
                 onClick={() => setIsModalOpen(true)}
-                className="h-11 px-6 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm shadow-[0_0_25px_rgba(0,128,255,0.45)] border border-white/20 gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto h-11 px-6 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm shadow-[0_0_25px_rgba(0,128,255,0.45)] border border-white/20 gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer justify-center"
               >
                 Enrol Now • Choose Package <ArrowRight className="h-4 w-4" />
               </Button>
@@ -465,7 +465,7 @@ export function Class9FoundationSalesExperience() {
                 onClick={() => {
                   document.getElementById('learning-packages-section')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="h-11 px-5 rounded-full border-white/25 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md font-bold text-xs sm:text-sm cursor-pointer"
+                className="w-full sm:w-auto h-11 px-5 rounded-full border-white/25 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md font-bold text-xs sm:text-sm cursor-pointer justify-center"
               >
                 View Fees & Laptop (From ₹29,999)
               </Button>

@@ -297,12 +297,12 @@ export function SocraticEvaluatorDemo() {
               </div>
 
               {/* Actions: Submit, Progressive Hints, Reset */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                   <Button
                     onClick={handleSubmitAnswer}
                     disabled={!selectedOptionId}
-                    className="font-extrabold text-xs sm:text-sm bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-110 text-white rounded-xl h-10 px-5 shadow-md gap-1.5 disabled:opacity-50 cursor-pointer"
+                    className="w-full sm:w-auto font-extrabold text-xs sm:text-sm bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-110 text-white rounded-xl h-11 sm:h-10 px-5 shadow-md gap-1.5 disabled:opacity-50 cursor-pointer justify-center"
                   >
                     Submit Answer for AI Evaluation <ArrowRight className="h-3.5 w-3.5" />
                   </Button>
@@ -310,7 +310,7 @@ export function SocraticEvaluatorDemo() {
                   <Button
                     variant="outline"
                     onClick={handleReset}
-                    className="border-white/20 text-slate-300 hover:bg-white/10 rounded-xl h-10 px-3 text-xs gap-1.5 cursor-pointer"
+                    className="w-full sm:w-auto border-white/20 text-slate-300 hover:bg-white/10 rounded-xl h-11 sm:h-10 px-3 text-xs gap-1.5 cursor-pointer justify-center"
                   >
                     <RotateCcw className="h-3.5 w-3.5" /> Reset
                   </Button>

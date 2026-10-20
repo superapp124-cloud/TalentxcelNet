@@ -266,10 +266,10 @@ export default function HomePage() {
       </aside>
 
       {/* 2. Flagship Sales Section: Class 9 Foundation Programme with 4D Interactive Brochure */}
-      <section id="class-9-flagship" className="relative bg-gradient-to-b from-[#020716] via-[#04122d] to-[#020817] text-white pt-4 pb-16 px-3 sm:px-6 lg:px-8 border-b border-blue-500/20">
+      <section id="class-9-flagship" className="relative overflow-hidden bg-gradient-to-b from-[#020716] via-[#04122d] to-[#020817] text-white pt-4 pb-16 px-3 sm:px-6 lg:px-8 border-b border-blue-500/20">
         {/* Ambient Spatial Lighting */}
         <div
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[580px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.28),_transparent_70%)]"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[580px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.28),_transparent_70%)]"
           aria-hidden="true"
         />
 
@@ -294,7 +294,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-[#000000] text-white pt-16 pb-12 sm:pt-20 sm:pb-16 border-b border-white/[0.08]">
         {/* Subtle Ambient Radial Lighting */}
         <div
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[520px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.24),_transparent_65%)]"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1100px] h-[520px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.24),_transparent_65%)]"
           aria-hidden="true"
         />
 

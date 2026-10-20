@@ -4,7 +4,7 @@ import { AdmissionsAssistantWidget } from '@/components/public/admissions-assist
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-hidden w-full max-w-full">
       <PublicNavbar />
       <main className="flex-1" id="main-content">
         {children}

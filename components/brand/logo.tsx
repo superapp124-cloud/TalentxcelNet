@@ -185,7 +185,7 @@ export function NutyTalesLogo({
 
 export function EcosystemTrioLogos({ className = '' }: { className?: string }) {
   return (
-    <div className={`inline-flex items-center gap-4 sm:gap-6 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-black/10 dark:border-white/10 shadow-xs ${className}`}>
+    <div className={`inline-flex items-center justify-between sm:justify-start gap-2.5 sm:gap-6 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl border border-black/10 dark:border-white/10 shadow-xs max-w-full ${className}`}>
       <div className="flex items-center gap-2">
         <Logo size="sm" href="/" />
       </div>

@@ -66,24 +66,34 @@ export async function POST(req: NextRequest) {
     const validSourceBrands = ['talentxcel', 'talentxcel-academy', 'chatr', 'nuty-tales']
     const brand = validSourceBrands.includes(sourceBrand) ? sourceBrand : 'talentxcel-academy'
 
-    const secureUrl = generateSecureReferralUrl({
-      sourceBrand: brand,
-      destinationHost,
-      destinationPath: destinationPath || '/',
-      userIntent,
-      campaign: campaign || 'ecosystem_web',
-    })
+    let secureUrl: string
+    let isSigned = true
+    try {
+      secureUrl = generateSecureReferralUrl({
+        sourceBrand: brand,
+        destinationHost,
+        destinationPath: destinationPath || '/',
+        userIntent,
+        campaign: campaign || 'ecosystem_web',
+      })
+    } catch {
+      // Graceful fallback when ECOSYSTEM_REFERRAL_SECRET is not configured
+      isSigned = false
+      const cleanPath = (destinationPath || '/').startsWith('/') ? destinationPath || '/' : `/${destinationPath}`
+      secureUrl = `https://${domainRecord.canonicalHostname}${cleanPath}?ref=${encodeURIComponent(brand)}&intent=${encodeURIComponent(userIntent)}`
+    }
 
     return NextResponse.json({
       success: true,
       secureUrl,
       destinationHost: domainRecord.canonicalHostname,
+      isSigned,
     })
   } catch (error: any) {
     console.error('Referral signing error:', error.message)
     return NextResponse.json(
       { error: error.message || 'Failed to sign referral URL' },
-      { status: 500 }
+      { status: 400 }
     )
   }
 }

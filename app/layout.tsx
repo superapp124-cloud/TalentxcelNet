@@ -69,8 +69,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
+      <body className={`${inter.variable} font-sans antialiased overflow-x-hidden w-full max-w-full min-w-0`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
