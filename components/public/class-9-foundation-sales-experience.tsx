@@ -372,9 +372,9 @@ export function Class9FoundationSalesExperience() {
   return (
     <div className="space-y-16">
       {/* 1. HERO SECTION (Matching brochure exactly) */}
-      <section className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#0a1b44]/90 via-[#06122d]/95 to-[#020919] p-5 sm:p-8 lg:p-10 shadow-2xl backdrop-blur-xl">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="space-y-4 max-w-2xl text-left">
+      <section className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#0a1b44]/90 via-[#06122d]/95 to-[#020919] p-4 sm:p-6 lg:p-7 shadow-2xl backdrop-blur-xl">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="space-y-3.5 max-w-xl text-left">
             {/* Top Audience Badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1 text-xs font-extrabold text-amber-300 shadow-sm backdrop-blur-md">
               <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
@@ -382,20 +382,20 @@ export function Class9FoundationSalesExperience() {
             </div>
 
             {/* Main Headline */}
-            <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.15]">
+            <div className="space-y-1.5">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
                 Build a Strong Academic Foundation for{' '}
                 <span className="bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent">
                   NEET, JEE & Competitive Exams
                 </span>
               </h1>
-              <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed max-w-xl">
+              <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
                 8-month comprehensive foundation with 96 live interactive sessions, 7 core subjects, personal 24/7 Super AI Socratic Tutor, and dedicated student laptop included.
               </p>
             </div>
 
             {/* 5 Core Pillars */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
               {[
                 'Clear Concepts',
                 'Regular Practice',
@@ -405,7 +405,7 @@ export function Class9FoundationSalesExperience() {
               ].map((pillar) => (
                 <span
                   key={pillar}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-400/25 text-[11px] font-bold text-blue-100 shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-950/70 border border-blue-400/25 text-[11px] font-bold text-blue-100 shadow-xs"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                   <span>{pillar}</span>
@@ -414,10 +414,10 @@ export function Class9FoundationSalesExperience() {
             </div>
 
             {/* Core Delivery Metrics Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-              <div className="flex items-center gap-2.5 p-2.5 rounded-xl border border-sky-500/25 bg-sky-950/30 backdrop-blur-md">
-                <div className="h-8 w-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
-                  <Calendar className="h-4 w-4" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-0.5">
+              <div className="flex items-center gap-2 p-2 rounded-xl border border-sky-500/25 bg-sky-950/30 backdrop-blur-md">
+                <div className="h-7 w-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                  <Calendar className="h-3.5 w-3.5" />
                 </div>
                 <div className="text-xs">
                   <span className="font-extrabold text-white block text-xs">3 Live Classes / Wk</span>
@@ -425,9 +425,9 @@ export function Class9FoundationSalesExperience() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 p-2.5 rounded-xl border border-indigo-500/25 bg-indigo-950/30 backdrop-blur-md">
-                <div className="h-8 w-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
-                  <Users className="h-4 w-4" />
+              <div className="flex items-center gap-2 p-2 rounded-xl border border-indigo-500/25 bg-indigo-950/30 backdrop-blur-md">
+                <div className="h-7 w-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                  <Users className="h-3.5 w-3.5" />
                 </div>
                 <div className="text-xs">
                   <span className="font-extrabold text-white block text-xs">96 Live Sessions</span>
@@ -435,9 +435,9 @@ export function Class9FoundationSalesExperience() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 p-2.5 rounded-xl border border-rose-500/25 bg-rose-950/30 backdrop-blur-md">
-                <div className="h-8 w-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
-                  <PlayCircle className="h-4 w-4" />
+              <div className="flex items-center gap-2 p-2 rounded-xl border border-rose-500/25 bg-rose-950/30 backdrop-blur-md">
+                <div className="h-7 w-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                  <PlayCircle className="h-3.5 w-3.5" />
                 </div>
                 <div className="text-xs">
                   <span className="font-extrabold text-white block text-xs">Live + Recorded</span>
@@ -447,11 +447,11 @@ export function Class9FoundationSalesExperience() {
             </div>
 
             {/* Above-the-fold Action CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <Button
                 size="lg"
                 onClick={() => setIsModalOpen(true)}
-                className="h-12 px-7 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-110 text-white font-extrabold text-sm sm:text-base shadow-[0_0_25px_rgba(0,128,255,0.45)] border border-white/20 gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                className="h-11 px-6 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm shadow-[0_0_25px_rgba(0,128,255,0.45)] border border-white/20 gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 Enrol Now • Choose Package <ArrowRight className="h-4 w-4" />
               </Button>
@@ -461,14 +461,14 @@ export function Class9FoundationSalesExperience() {
                 onClick={() => {
                   document.getElementById('learning-packages-section')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="h-12 px-6 rounded-full border-white/25 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md font-bold text-sm cursor-pointer"
+                className="h-11 px-5 rounded-full border-white/25 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md font-bold text-xs sm:text-sm cursor-pointer"
               >
                 View Fees & Laptop (From ₹29,999)
               </Button>
             </div>
 
             {/* Trust and Assurance Strip */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 pt-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400 pt-0.5">
               <span className="inline-flex items-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
                 14-Day Money-Back Guarantee
@@ -480,8 +480,8 @@ export function Class9FoundationSalesExperience() {
             </div>
           </div>
 
-          {/* Right Column: Interactive 4D Brochure Showcase */}
-          <div className="w-full lg:w-[440px] xl:w-[480px] shrink-0">
+          {/* Right Column: Interactive 4D Brochure Showcase (Safely proportioned) */}
+          <div className="w-full lg:w-[420px] xl:w-[450px] shrink-0">
             <Brochure4DShowcase onEnrolClick={() => setIsModalOpen(true)} />
           </div>
         </div>

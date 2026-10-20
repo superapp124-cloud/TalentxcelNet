@@ -11,7 +11,6 @@ import {
   Laptop,
   ArrowRight,
   RotateCcw,
-  ShieldCheck,
   X,
   Eye,
 } from 'lucide-react'
@@ -42,16 +41,16 @@ export function Brochure4DShowcase({
     const centerX = rect.width / 2
     const centerY = rect.height / 2
 
-    // Smooth rotation - max 10 degrees
-    const rotX = -((y - centerY) / centerY) * 10
-    const rotY = ((x - centerX) / centerX) * 10
+    // Smooth subtle rotation - max 8 degrees
+    const rotX = -((y - centerY) / centerY) * 8
+    const rotY = ((x - centerX) / centerX) * 8
 
     const glareX = (x / rect.width) * 100
     const glareY = (y / rect.height) * 100
 
     setRotateX(rotX)
     setRotateY(rotY)
-    setGlarePosition({ x: glareX, y: glareY, opacity: 0.35 })
+    setGlarePosition({ x: glareX, y: glareY, opacity: 0.3 })
   }
 
   const handleMouseEnter = () => {
@@ -66,29 +65,29 @@ export function Brochure4DShowcase({
   }
 
   return (
-    <div className="relative w-full max-w-xl mx-auto select-none">
+    <div className="relative w-full max-w-[440px] mx-auto select-none">
       {/* Outer Glow Halo */}
       <div
-        className="absolute -inset-3 bg-gradient-to-r from-blue-500/25 via-cyan-500/20 to-indigo-500/25 rounded-3xl blur-2xl opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none"
+        className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-indigo-500/20 rounded-3xl blur-xl opacity-60 pointer-events-none"
         aria-hidden="true"
       />
 
-      {/* Floating Header Chips (Cleanly positioned ABOVE the image to avoid clipping title) */}
+      {/* Clean Header Bar Outside the Poster Canvas */}
       <div className="flex items-center justify-between gap-2 mb-2 px-1">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 text-amber-300 border border-amber-400/40 px-3 py-1 text-xs font-bold shadow-md backdrop-blur-md">
-          <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-950/90 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 text-[11px] font-bold shadow-xs">
+          <Sparkles className="h-3 w-3 text-amber-400 animate-pulse" />
           <span>Official 2026–27 Prospectus</span>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-600/90 text-white px-3 py-1 text-xs font-extrabold shadow-md">
-          <Calendar className="h-3.5 w-3.5" />
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-600/90 text-white px-2.5 py-0.5 text-[11px] font-bold shadow-xs">
+          <Calendar className="h-3 w-3" />
           <span>96 Live Sessions</span>
         </div>
       </div>
 
       {/* 3D Perspective Viewport */}
       <div
-        style={{ perspective: 1200 }}
+        style={{ perspective: 1000 }}
         className="relative z-10 cursor-pointer"
         onClick={() => setIsFullscreenModalOpen(true)}
       >
@@ -99,37 +98,37 @@ export function Brochure4DShowcase({
           onMouseLeave={handleMouseLeave}
           style={{
             transform: isHovered
-              ? `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.015, 1.015, 1.015)`
+              ? `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`
               : 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
             transformStyle: 'preserve-3d',
-            transition: isHovered ? 'transform 0.08s ease-out' : 'transform 0.5s ease-out',
+            transition: isHovered ? 'transform 0.08s ease-out' : 'transform 0.4s ease-out',
           }}
-          className="relative rounded-2xl p-2 bg-gradient-to-b from-white/10 via-white/5 to-white/10 border border-white/20 shadow-[0_20px_50px_-10px_rgba(0,128,255,0.35)] backdrop-blur-xl group overflow-hidden"
+          className="relative rounded-2xl p-2.5 sm:p-3 bg-gradient-to-b from-white/15 via-white/5 to-white/10 border border-blue-400/30 shadow-[0_15px_40px_-10px_rgba(0,128,255,0.35)] backdrop-blur-md group"
         >
-          {/* Dynamic 4D Interactive Glare Overlay */}
+          {/* Dynamic Interactive Glare Overlay */}
           <div
-            className="pointer-events-none absolute inset-0 z-40 transition-opacity duration-300 rounded-2xl"
+            className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300 rounded-2xl"
             style={{
-              background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.05) 50%, transparent 80%)`,
+              background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.35) 0%, transparent 70%)`,
               opacity: glarePosition.opacity,
             }}
           />
 
-          {/* The High-Resolution Brochure Image (Proper aspect ratio, uncropped) */}
-          <div className="relative rounded-xl overflow-hidden bg-white shadow-inner">
+          {/* The Poster Mat with Generous Inner Padding - GUARANTEES NO CUTTING ON ANY SIDE */}
+          <div className="relative rounded-xl p-2 sm:p-2.5 bg-white shadow-md flex items-center justify-center overflow-visible">
             <Image
               src="/images/class-9-foundation-brochure.png"
               alt="Class 9 Foundation Programme Official Syllabus & Package Brochure"
-              width={900}
-              height={900}
+              width={512}
+              height={512}
               priority
-              className="w-full h-auto object-contain rounded-xl block"
+              className="w-full h-auto max-h-[380px] sm:max-h-[410px] object-contain rounded-sm block"
             />
 
             {/* Hover overlay hint */}
-            <div className="absolute inset-0 bg-blue-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 backdrop-blur-[2px] p-4 text-center">
-              <span className="text-white text-xs font-bold flex items-center gap-1.5 bg-black/60 px-3 py-1.5 rounded-full border border-white/20 shadow-lg">
-                <Eye className="h-4 w-4 text-cyan-400" /> Click to Inspect High-Resolution Full Prospectus
+            <div className="absolute inset-0 bg-blue-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-[2px] p-3 text-center rounded-xl z-20">
+              <span className="text-white text-xs font-bold flex items-center gap-1.5 bg-black/70 px-3 py-1 rounded-full border border-white/20 shadow-lg">
+                <Eye className="h-3.5 w-3.5 text-cyan-400" /> Click to View Full Prospectus
               </span>
               <div className="flex items-center gap-2">
                 <Button
@@ -139,9 +138,9 @@ export function Brochure4DShowcase({
                     e.stopPropagation()
                     setIsFullscreenModalOpen(true)
                   }}
-                  className="rounded-full shadow-lg gap-1.5 bg-white text-neutral-900 hover:bg-neutral-100 text-xs font-extrabold"
+                  className="rounded-full shadow-lg gap-1.5 bg-white text-neutral-900 hover:bg-neutral-100 text-xs font-extrabold h-8"
                 >
-                  <Maximize2 className="h-3.5 w-3.5" /> Fullscreen Zoom
+                  <Maximize2 className="h-3 w-3" /> Zoom 4K
                 </Button>
                 {onEnrolClick && (
                   <Button
@@ -150,67 +149,30 @@ export function Brochure4DShowcase({
                       e.stopPropagation()
                       onEnrolClick()
                     }}
-                    className="rounded-full shadow-lg gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white text-xs font-extrabold"
+                    className="rounded-full shadow-lg gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold h-8"
                   >
-                    Enrol Now <ArrowRight className="h-3.5 w-3.5" />
+                    Enrol <ArrowRight className="h-3 w-3" />
                   </Button>
                 )}
               </div>
             </div>
           </div>
-
-          {/* 3D Floating Bottom Ribbon */}
-          <div
-            style={{ transform: 'translateZ(40px)' }}
-            className="mt-2.5 p-2.5 rounded-xl bg-slate-900/95 border border-white/15 text-white flex flex-wrap items-center justify-between gap-2 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                <Laptop className="h-4 w-4" />
-              </div>
-              <div className="text-left text-xs">
-                <div className="font-extrabold flex items-center gap-1 text-white text-[11px] sm:text-xs">
-                  <span>Option 2: Course + Laptop Included</span>
-                  <Badge variant="secondary" className="bg-rose-500/30 text-rose-300 border-none text-[9px] py-0 px-1 font-bold">
-                    Save ₹3,000
-                  </Badge>
-                </div>
-                <div className="text-neutral-400 text-[10px]">
-                  One-time: ₹61,999 + GST or ₹39,999 + ₹3,125/mo
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setIsFullscreenModalOpen(true)}
-                className="h-7 rounded-full border-white/20 text-[11px] text-white hover:bg-white/10 px-2.5"
-              >
-                <Maximize2 className="h-3 w-3 mr-1" /> Zoom
-              </Button>
-              {onEnrolClick && (
-                <Button
-                  size="sm"
-                  onClick={onEnrolClick}
-                  className="h-7 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-3"
-                >
-                  Enrol
-                </Button>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* 4D Gyro / Tilt Indicator Pill */}
-      <div className="text-center pt-2">
-        <span className="text-[10px] text-blue-200/80 font-medium inline-flex items-center gap-1.5">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-          Interactive 4D Prospectus • Hover to tilt in 3D • Click to expand full resolution
+      {/* Clean Footer Bar Underneath Card (Not covering the poster!) */}
+      <div className="flex items-center justify-between gap-2 mt-2 px-1 text-[11px] text-slate-300">
+        <span className="inline-flex items-center gap-1 text-slate-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+          Hover to tilt 3D • Click to expand
         </span>
+
+        <button
+          onClick={() => setIsFullscreenModalOpen(true)}
+          className="text-cyan-400 hover:text-cyan-300 font-semibold underline flex items-center gap-1 text-[11px] cursor-pointer"
+        >
+          <Maximize2 className="h-3 w-3" /> View Fullscreen
+        </button>
       </div>
 
       {/* Fullscreen High-Resolution Inspection Modal */}
@@ -220,19 +182,19 @@ export function Brochure4DShowcase({
           onClick={() => setIsFullscreenModalOpen(false)}
         >
           <div
-            className="relative max-w-5xl w-full max-h-[94vh] flex flex-col bg-slate-950 border border-white/20 rounded-2xl overflow-hidden shadow-2xl"
+            className="relative max-w-4xl w-full max-h-[95vh] flex flex-col bg-slate-950 border border-white/20 rounded-2xl overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/10 bg-slate-900/90">
               <div className="flex items-center gap-2.5">
-                <Sparkles className="h-5 w-5 text-amber-400" />
+                <Sparkles className="h-4 w-4 text-amber-400" />
                 <div>
                   <h3 className="text-sm font-bold text-white">
-                    Official Class 9 Foundation Programme Prospectus
+                    Class 9 Foundation Programme Prospectus
                   </h3>
                   <p className="text-[11px] text-neutral-400">
-                    High-Resolution View • All 7 Subjects, 96 Live Sessions & Pricing Packages
+                    All 7 Subjects, 96 Live Sessions, Option 1 (₹29,999) & Option 2 with Laptop (₹61,999)
                   </p>
                 </div>
               </div>
@@ -242,37 +204,37 @@ export function Brochure4DShowcase({
                   size="sm"
                   variant="outline"
                   onClick={() => setZoomLevel((z) => Math.max(0.75, z - 0.25))}
-                  className="h-8 w-8 p-0 rounded-full border-white/20 text-white"
+                  className="h-7 w-7 p-0 rounded-full border-white/20 text-white"
                   title="Zoom Out"
                 >
-                  <ZoomOut className="h-3.5 w-3.5" />
+                  <ZoomOut className="h-3 w-3" />
                 </Button>
-                <span className="text-xs text-neutral-300 font-mono w-12 text-center">
+                <span className="text-xs text-neutral-300 font-mono w-10 text-center">
                   {Math.round(zoomLevel * 100)}%
                 </span>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => setZoomLevel((z) => Math.min(2.5, z + 0.25))}
-                  className="h-8 w-8 p-0 rounded-full border-white/20 text-white"
+                  className="h-7 w-7 p-0 rounded-full border-white/20 text-white"
                   title="Zoom In"
                 >
-                  <ZoomIn className="h-3.5 w-3.5" />
+                  <ZoomIn className="h-3 w-3" />
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => setZoomLevel(1)}
-                  className="h-8 w-8 p-0 rounded-full border-white/20 text-white"
+                  className="h-7 w-7 p-0 rounded-full border-white/20 text-white"
                   title="Reset Zoom"
                 >
-                  <RotateCcw className="h-3.5 w-3.5" />
+                  <RotateCcw className="h-3 w-3" />
                 </Button>
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => setIsFullscreenModalOpen(false)}
-                  className="h-8 w-8 p-0 rounded-full text-white hover:bg-white/20 ml-2"
+                  className="h-7 w-7 p-0 rounded-full text-white hover:bg-white/20 ml-2"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -287,14 +249,14 @@ export function Brochure4DShowcase({
                   transformOrigin: 'top center',
                   transition: 'transform 0.15s ease-out',
                 }}
-                className="max-w-3xl w-full"
+                className="max-w-2xl w-full p-2 bg-white rounded-xl shadow-2xl"
               >
                 <Image
                   src="/images/class-9-foundation-brochure.png"
                   alt="Official Class 9 Foundation Programme Brochure Full View"
-                  width={1200}
-                  height={1200}
-                  className="w-full h-auto object-contain rounded-xl shadow-2xl border border-white/10"
+                  width={1024}
+                  height={1024}
+                  className="w-full h-auto object-contain rounded-lg"
                 />
               </div>
             </div>
