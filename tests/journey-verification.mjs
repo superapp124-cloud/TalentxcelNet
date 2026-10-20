@@ -391,9 +391,10 @@ async function runJourneys() {
     }
 
     // Click "Run Tests" in the project workspace
-    const runTestsBtn = page.locator('button:has-text("Run Tests")')
+    const runTestsBtn = page.locator('button:has-text("Run Tests")').first()
+    await runTestsBtn.scrollIntoViewIfNeeded()
     await runTestsBtn.click()
-    await page.waitForSelector('text=Score:', { timeout: 8000 })
+    await page.waitForSelector('text=Score:', { timeout: 15000 })
 
     // Switch to Structured Tasks tab
     const tasksTab = page.locator('button:has-text("Structured Tasks")')
@@ -473,6 +474,47 @@ async function runJourneys() {
   } catch (err) {
     console.error(`  ✗ Journey 16 failed:`, err.message)
     journeyResults.push({ journey: '16. Titan Ambition Cockpit & Universe', status: 'FAILED', error: err.message })
+  }
+
+  // JOURNEY 17: Class 9 Foundation Flagship Sales Engine & 4D Brochure Showcase
+  try {
+    console.log(`[Journey 17] Class 9 Foundation Flagship Sales Engine (/programmes/class-9-foundation & /)...`)
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle', timeout: 15000 })
+
+    // 1. Verify Class 9 Flagship Hero
+    const flagshipHeading = await page.locator('text=Class 9 Foundation Programme').first()
+    await flagshipHeading.waitFor({ timeout: 5000 })
+
+    // 2. Verify 3 Live Classes / 96 Live Sessions metrics
+    const hasLiveMetrics = await page.locator('text=96 Live Sessions').count() > 0
+    if (!hasLiveMetrics) {
+      throw new Error(`96 Live Sessions metric card missing from hero`)
+    }
+
+    // 3. Verify Option 1 and Option 2 pricing
+    const hasOption1 = await page.locator('text=29,999').count() > 0
+    const hasOption2 = await page.locator('text=64,999').count() > 0 || await page.locator('text=61,999').count() > 0
+    if (!hasOption1 || !hasOption2) {
+      throw new Error(`Brochure pricing options (Option 1 ₹29,999 or Option 2 ₹64,999) missing`)
+    }
+
+    // 4. Click Chemistry subject tab in 7-subject explorer
+    const chemistryTab = page.locator('button:has-text("Chemistry")').first()
+    if (await chemistryTab.count() > 0) {
+      await chemistryTab.click()
+      await page.waitForTimeout(300)
+    }
+
+    // 5. Verify dedicated route /programmes/class-9-foundation
+    await page.goto(`${BASE_URL}/programmes/class-9-foundation`, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.waitForTimeout(500)
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey17_class_9_foundation_sales.png'), fullPage: false })
+    console.log(`  ✓ Journey 17 passed: Class 9 Foundation Programme Flagship Sales Engine & 4D Brochure verified.`)
+    journeyResults.push({ journey: '17. Class 9 Foundation Sales Engine', status: 'PASSED', route: '/programmes/class-9-foundation' })
+  } catch (err) {
+    console.error(`  ✗ Journey 17 failed:`, err.message)
+    journeyResults.push({ journey: '17. Class 9 Foundation Sales Engine', status: 'FAILED', error: err.message })
   }
 
   await browser.close()

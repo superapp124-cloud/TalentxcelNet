@@ -40,12 +40,32 @@ export const PROGRAMME_PRICING: Record<string, PricingTier> = {
     currency: 'INR',
     taxRatePercent: 18,
   },
+  'class-9-foundation': {
+    programmeSlug: 'class-9-foundation',
+    programmeTitle: 'Class 9 Foundation Programme',
+    basePrice: 29999, // Course Only One-Time
+    upfrontAmount: 9999, // Course Only Installment upfront
+    monthlyAmount: 2500, // Course Only Installment monthly (8 months)
+    instalmentMonths: 8,
+    currency: 'INR',
+    taxRatePercent: 18,
+  },
+  'class-9-foundation-laptop': {
+    programmeSlug: 'class-9-foundation-laptop',
+    programmeTitle: 'Class 9 Foundation Programme (Course + Laptop)',
+    basePrice: 61999, // Course + Laptop One-Time (Discounted from 64,999 - Save 3,000)
+    upfrontAmount: 39999, // Course + Laptop Installment upfront
+    monthlyAmount: 3125, // Course + Laptop Installment monthly (8 months)
+    instalmentMonths: 8,
+    currency: 'INR',
+    taxRatePercent: 18,
+  },
   'school-foundation': {
     programmeSlug: 'school-foundation',
-    programmeTitle: 'School Foundation (Class 8 → 9)',
-    basePrice: 24999,
-    upfrontAmount: 16999,
-    monthlyAmount: 1000,
+    programmeTitle: 'Class 9 Foundation Programme',
+    basePrice: 29999,
+    upfrontAmount: 9999,
+    monthlyAmount: 2500,
     instalmentMonths: 8,
     currency: 'INR',
     taxRatePercent: 18,

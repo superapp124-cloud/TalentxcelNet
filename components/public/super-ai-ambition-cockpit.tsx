@@ -29,6 +29,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 const AMBITION_PRESETS = [
+  'I want Class 9 Foundation (NEET/JEE)',
   'I want to become an AI developer',
   'I want to crack NEET',
   'I want a healthcare technology career',

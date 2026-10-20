@@ -14,8 +14,8 @@ const navLinks = [
     href: '/programmes',
     children: [
       { label: 'AI Development & Automation', href: '/programmes/ai-development', badge: 'Flagship' },
+      { label: 'Class 9 Foundation Programme', href: '/programmes/class-9-foundation', badge: 'NEET/JEE • 8 Mos' },
       { label: 'Government & Competitive Exams', href: '/programmes/competitive-exams', badge: 'UPSC/PSC' },
-      { label: 'School Foundation (Class 8 → 9)', href: '/programmes/school-foundation', badge: 'NEET/JEE' },
       { label: 'High School Integrated (9–12)', href: '/programmes/highschool-integrated-foundation', badge: '2–4 Yrs' },
       { label: 'Healthcare Technology', href: '/programmes/healthcare-tech' },
       { label: 'Entrepreneurship & Startups', href: '/programmes/entrepreneurship' },

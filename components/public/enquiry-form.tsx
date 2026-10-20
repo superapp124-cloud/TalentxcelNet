@@ -21,6 +21,7 @@ type EnquiryValues = z.infer<typeof enquirySchema>
 
 const programmes = [
   { id: '', label: 'Select a programme (optional)' },
+  { id: 'class-9-foundation', label: 'Class 9 Foundation Programme (NEET/JEE Prep • After Class 8)' },
   { id: 'ai-development', label: 'AI Development & Automation Programme' },
   { id: 'competitive-exams', label: 'Government & Competitive Exams (UPSC, PSC, Banking)' },
   { id: 'school-foundation', label: 'School Foundation Track (Class 8 → 9)' },

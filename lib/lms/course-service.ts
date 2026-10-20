@@ -199,39 +199,305 @@ export const PROGRAMME_CURRICULUM: Record<string, { title: string; modules: Cour
       },
     ],
   },
-  'school-foundation': {
-    title: 'School Foundation (Class 8 → 9)',
+  'class-9-foundation': {
+    title: 'Class 9 Foundation Programme',
     modules: [
       {
-        id: 'sch-mod-1',
-        title: 'Module 1: Analytical Reasoning & Mathematical Foundations',
-        description: 'Algebraic decomposition, logical thinking, and structured problem-solving stamina.',
+        id: 'c9-mod-physics',
+        title: 'Subject 1: Physics — Concepts, Problem Solving & Real-Life Applications',
+        description: 'Kinematics, Newton’s laws of motion, gravitation, work, power, and wave acoustic fundamentals.',
         position: 1,
         lessons: [
           {
-            id: 'sch-101',
-            title: '1.1 Mathematical Logic & Problem Decomposition',
-            description: 'Breaking down multi-step word problems and understanding mathematical proof concepts.',
+            id: 'c9-phy-101',
+            title: '1.1 Describing Motion: Distance, Displacement & Acceleration',
+            description: 'Uniform and non-uniform motion, distance-time graphs, and velocity-time derivations.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 1,
+            contentBody:
+              '# Kinematics & The 3 Equations of Motion\n\nMotion in Class 9 forms the unshakeable cornerstone of classical mechanics needed for NEET and JEE.\n\n### The Fundamental Equations\nFor uniform acceleration $a$, initial velocity $u$, final velocity $v$, time $t$, and displacement $s$:\n1. $$v = u + at$$\n2. $$s = ut + \\frac{1}{2}at^2$$\n3. $$v^2 = u^2 + 2as$$\n\n### Real-Life Application Lab\nWhen a car travelling at $20\\text{ m/s}$ applies emergency brakes causing a deceleration of $4\\text{ m/s}^2$:\n- Time to stop: $t = \\frac{v - u}{a} = \\frac{0 - 20}{-4} = 5\\text{ s}$\n- Stopping distance: $s = \\frac{v^2 - u^2}{2a} = \\frac{0 - 400}{2(-4)} = 50\\text{ m}$',
+          },
+          {
+            id: 'c9-phy-102',
+            title: '1.2 Force & Newton’s Three Laws of Motion',
+            description: 'Inertia, momentum, action-reaction pairs, and the law of conservation of momentum.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 2,
+            contentBody:
+              '# Dynamics: Force & Laws of Motion\n\nNewton’s second law establishes the mathematical definition of force: $F = ma = \\frac{dp}{dt}$.\n\n### The Conservation of Momentum\nIn an isolated system without external forces:\n$$m_1 u_1 + m_2 u_2 = m_1 v_1 + m_2 v_2$$\n\n**NEET/JEE Foundation Insight**: Recoil velocity of a gun of mass $M$ firing bullet of mass $m$ with velocity $v$ is $V = -\\frac{mv}{M}$.',
+          },
+          {
+            id: 'c9-phy-103',
+            title: '1.3 Gravitation, Free Fall & Archimedes’ Principle',
+            description: 'Universal law of gravitation, acceleration due to gravity g, thrust, pressure, and buoyancy.',
+            lessonType: 'text',
+            durationMinutes: 50,
+            position: 3,
+            contentBody:
+              '# Gravitation & Floatation\n\nEvery object attracts every other object with a force proportional to the product of their masses and inversely proportional to the square of distance:\n$$F = G \\frac{M m}{R^2}$$\nwhere $G = 6.674 \\times 10^{-11}\\text{ N}\\cdot\\text{m}^2/\\text{kg}^2$.\n\n### Archimedes’ Principle\nWhen a body is immersed fully or partially in a fluid, it experiences an upward buoyant force equal to the weight of the fluid displaced by it.',
+          },
+          {
+            id: 'c9-phy-104',
+            title: '1.4 Physics Problem Solving & Interactive Calculations',
+            description: 'Solve numerical problems on kinetic energy, work done, and power with Super AI guidance.',
+            lessonType: 'code',
+            durationMinutes: 40,
+            position: 4,
+            contentBody:
+              '# Physics Computational Problem Solving\n\n```python\n# Calculate Work, Kinetic Energy and Stopping Distance\ndef calculate_mechanics(mass_kg, initial_velocity_mps, braking_force_n):\n    ke_initial = 0.5 * mass_kg * (initial_velocity_mps ** 2)\n    acceleration = -braking_force_n / mass_kg\n    stopping_distance = ke_initial / braking_force_n\n    time_to_stop = initial_velocity_mps / abs(acceleration)\n    return {\n        "Kinetic Energy (J)": ke_initial,\n        "Deceleration (m/s^2)": abs(acceleration),\n        "Stopping Distance (m)": stopping_distance,\n        "Time to Stop (s)": time_to_stop\n    }\n\nprint(calculate_mechanics(1200, 25, 6000))\n```',
+          },
+          {
+            id: 'c9-phy-105',
+            title: '1.5 Physics Chapter-Wise Mastery & Diagnostic Test',
+            description: 'Assess velocity-time graphs, numerical mechanics, and Newton’s laws.',
+            lessonType: 'quiz',
+            durationMinutes: 25,
+            position: 5,
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-chemistry',
+        title: 'Subject 2: Chemistry — Concept Clarity, Numerical Practice & Practical Insight',
+        description: 'States of matter, mixtures, solutions, atoms, molecules, the mole concept, and atomic structure.',
+        position: 2,
+        lessons: [
+          {
+            id: 'c9-chm-201',
+            title: '2.1 Matter in Our Surroundings & Is Matter Around Us Pure',
+            description: 'Latent heat, evaporation, solutions, suspensions, colloids, and Tyndall effect.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 1,
+            contentBody:
+              '# Matter, Solutions & Colloids\n\nClass 9 Chemistry bridges empirical observation to microscopic particle models.\n\n### Key Classifications\n- **True Solution**: Homogeneous, particle size $< 1\\text{ nm}$, does not scatter light.\n- **Colloid**: Heterogeneous, particle size $1\\text{ nm} - 1000\\text{ nm}$, shows Tyndall effect.\n- **Suspension**: Heterogeneous, particle size $> 1000\\text{ nm}$, particles settle under gravity.',
+          },
+          {
+            id: 'c9-chm-202',
+            title: '2.2 Atoms, Molecules & The Mole Concept',
+            description: 'Law of chemical combination, molecular mass calculations, and Avogadro constant.',
+            lessonType: 'text',
+            durationMinutes: 50,
+            position: 2,
+            contentBody:
+              '# The Mole Concept\n\n1 mole contains exactly $6.022 \\times 10^{23}$ elementary entities (Avogadro constant $N_A$).\n\n$$\\text{Number of Moles } (n) = \\frac{\\text{Given Mass } (m)}{\\text{Molar Mass } (M)} = \\frac{\\text{Number of Particles } (N)}{N_A}$$\n\n**Example**: Find the mass of $0.5$ moles of Water ($H_2O$):\n- Molar mass of $H_2O = 2(1) + 16 = 18\\text{ g/mol}$\n- $\\text{Mass } = 0.5 \\times 18 = 9\\text{ g}$.',
+          },
+          {
+            id: 'c9-chm-203',
+            title: '2.3 Structure of the Atom: Rutherford, Bohr & Isotopes',
+            description: 'Subatomic particles, Thomson’s model, Rutherford’s scattering experiment, Bohr model, and valency.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 3,
+            contentBody:
+              '# Atomic Architecture\n\n- **Atomic Number ($Z$)**: Number of protons in the nucleus.\n- **Mass Number ($A$)**: Sum of protons and neutrons in the nucleus ($A = Z + N$).\n- **Electronic Distribution (Bohr-Bury Rule)**: Maximum electrons in orbit $n$ is $2n^2$.\n- **Valency**: Combining capacity determined by valence shell electrons.',
+          },
+          {
+            id: 'c9-chm-204',
+            title: '2.4 Chemistry Numerical Problem Set & Lab Insights',
+            description: 'Mole calculations, valency determination, and chapter-wise chemistry quiz.',
+            lessonType: 'quiz',
+            durationMinutes: 25,
+            position: 4,
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-biology',
+        title: 'Subject 3: Biology — NCERT Focus, Diagrams & Application for NEET',
+        description: 'The fundamental unit of life (cell), plant & animal tissues, and food resource enhancement.',
+        position: 3,
+        lessons: [
+          {
+            id: 'c9-bio-301',
+            title: '3.1 The Fundamental Unit of Life: Cell Structure & Organelles',
+            description: 'Prokaryotes vs eukaryotes, osmosis, plasma membrane, nucleus, mitochondria, and plastids.',
+            lessonType: 'text',
+            durationMinutes: 50,
+            position: 1,
+            contentBody:
+              '# Cell: The Unit of Life (NEET Anchor Topic)\n\nClass 9 cell biology accounts for fundamental NEET marks.\n\n### Essential Organelles & Functions\n- **Mitochondria**: Cellular respiration & ATP synthesis (contains its own DNA & ribosomes).\n- **Lysosomes**: Suicidal bags with hydrolytic digestive enzymes.\n- **Endoplasmic Reticulum (RER & SER)**: Protein and lipid synthesis; detoxification.\n- **Golgi Apparatus**: Storage, modification, and packaging of secretory proteins.',
+          },
+          {
+            id: 'c9-bio-302',
+            title: '3.2 Plant & Animal Tissues: Structure & Functions',
+            description: 'Meristematic tissues, parenchyma, collenchyma, sclerenchyma, xylem, phloem, and animal tissues.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 2,
+            contentBody:
+              '# Tissues: Plant vs Animal\n\n### Complex Permanent Plant Tissues\n- **Xylem**: Conducts water & minerals un-directionally (Tracheids, Vessels, Xylem Parenchyma, Xylem Fibres).\n- **Phloem**: Translocates organic food bi-directionally (Sieve tubes, Companion cells, Phloem parenchyma, Phloem fibres).\n\n### Animal Tissues\nEpithelial, Connective (blood, bone, cartilage, tendon, ligament), Muscular (striated, unstriated, cardiac), and Nervous tissue.',
+          },
+          {
+            id: 'c9-bio-303',
+            title: '3.3 Biology Diagram Lab & NCERT Line-by-Line Quiz',
+            description: 'Test identification of cell organelles, tissue cross-sections, and NEET-style conceptual MCQs.',
+            lessonType: 'quiz',
+            durationMinutes: 25,
+            position: 3,
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-math',
+        title: 'Subject 4: Mathematics — Fundamentals, Advanced Problem Solving & Logical Thinking',
+        description: 'Real numbers, polynomials, coordinate geometry, linear equations, congruence proofs, and surface areas.',
+        position: 4,
+        lessons: [
+          {
+            id: 'c9-mat-401',
+            title: '4.1 Real Numbers, Rationalisation & Laws of Exponents',
+            description: 'Irrational numbers, representation on number line, rationalising the denominator, and radical exponents.',
+            lessonType: 'text',
+            durationMinutes: 50,
+            position: 1,
+            contentBody:
+              '# Number Systems & Rationalisation\n\n### Rationalising Surds\nTo rationalise $\\frac{1}{\\sqrt{a} + \\sqrt{b}}$, multiply numerator and denominator by conjugate $(\\sqrt{a} - \\sqrt{b})$:\n$$\\frac{1}{\\sqrt{a} + \\sqrt{b}} \\times \\frac{\\sqrt{a} - \\sqrt{b}}{\\sqrt{a} - \\sqrt{b}} = \\frac{\\sqrt{a} - \\sqrt{b}}{a - b}$$\n\n**Laws of Exponents**:\n- $a^m \\cdot a^n = a^{m+n}$\n- $(a^m)^n = a^{mn}$\n- $\\frac{a^m}{a^n} = a^{m-n}$',
+          },
+          {
+            id: 'c9-mat-402',
+            title: '4.2 Polynomials & Algebraic Identities for Competitive Exams',
+            description: 'Zeroes of polynomials, remainder theorem, factor theorem, and 8 standard algebraic identities.',
+            lessonType: 'text',
+            durationMinutes: 50,
+            position: 2,
+            contentBody:
+              '# Polynomials & Factorisation\n\n### Essential Algebraic Identities\n1. $(a+b+c)^2 = a^2 + b^2 + c^2 + 2ab + 2bc + 2ca$\n2. $(a+b)^3 = a^3 + b^3 + 3ab(a+b)$\n3. $(a-b)^3 = a^3 - b^3 - 3ab(a-b)$\n4. $a^3 + b^3 + c^3 - 3abc = (a+b+c)(a^2+b^2+c^2-ab-bc-ca)$\n\n*Special Case*: If $a+b+c = 0$, then $a^3 + b^3 + c^3 = 3abc$.',
+          },
+          {
+            id: 'c9-mat-403',
+            title: '4.3 Lines, Angles & Triangle Congruence Theorems',
+            description: 'Angle sum property, parallel lines transversal relations, and SAS, ASA, AAS, SSS, RHS proofs.',
+            lessonType: 'text',
+            durationMinutes: 50,
+            position: 3,
+            contentBody:
+              '# Euclidean Geometry & Triangle Congruence\n\nTwo triangles are congruent if all corresponding sides and angles are equal.\n\n### Strict Congruence Criteria\n- **SAS**: Two sides and included angle.\n- **ASA**: Two angles and included side.\n- **AAS**: Two angles and non-included side.\n- **SSS**: Three pairs of sides equal.\n- **RHS**: Right angle, hypotenuse, and one side.\n\n*Note*: AAA and SSA do NOT guarantee congruence!',
+          },
+          {
+            id: 'c9-mat-404',
+            title: '4.4 Surface Areas, Volumes & Statistics',
+            description: 'Cylinders, cones, spheres, histograms, and frequency polygon data presentation.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 4,
+            contentBody:
+              '# Mensuration Formulas\n\n- **Right Circular Cylinder**: Curved Area $= 2\\pi r h$, Total $= 2\\pi r(r+h)$, Volume $= \\pi r^2 h$\n- **Right Circular Cone**: Slant height $l = \\sqrt{r^2 + h^2}$, Curved Area $= \\pi r l$, Volume $= \\frac{1}{3}\\pi r^2 h$\n- **Sphere**: Total Surface Area $= 4\\pi r^2$, Volume $= \\frac{4}{3}\\pi r^3$\n- **Hemisphere**: Curved $= 2\\pi r^2$, Total $= 3\\pi r^2$, Volume $= \\frac{2}{3}\\pi r^3$',
+          },
+          {
+            id: 'c9-mat-405',
+            title: '4.5 Mathematics Problem Challenge & Diagnostic Test',
+            description: 'Timed multi-step problem solving test with detailed step-by-step solutions.',
+            lessonType: 'quiz',
+            durationMinutes: 30,
+            position: 5,
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-english',
+        title: 'Subject 5: English & Communication — Reading, Writing, Comprehension & Presentation',
+        description: 'Advanced comprehension, applied grammar, creative expression, and confident spoken presentation skills.',
+        position: 5,
+        lessons: [
+          {
+            id: 'c9-eng-501',
+            title: '5.1 Reading Comprehension & Inference Strategies',
+            description: 'Discursive and analytical passages, vocabulary deduction in context, and speed reading.',
             lessonType: 'text',
             durationMinutes: 40,
             position: 1,
             contentBody:
-              '# The Transition from Class 8 to 9\n\nClass 9 mathematics shifts from rote memorization to abstract algebraic relationships and geometric proof structures.\n\n### Core Analytical Principles\n- **Decomposition**: Step 1 is always identifying the known values and what unknown target is sought.\n- **Variable Mapping**: Translating real-world relationships into algebraic equations.\n- **Verification**: Back-substituting solutions into original conditions to test validity.',
+              '# Critical Reading Comprehension\n\nLearn to extract factual, inferential, and evaluative insights from complex texts under time constraints.',
           },
           {
-            id: 'sch-102',
-            title: '1.2 Computational Thinking & Algorithmic Problem Solving',
-            description: 'Pattern recognition, sorting sequences, and flowchart logic.',
-            lessonType: 'code',
+            id: 'c9-eng-502',
+            title: '5.2 Applied Grammar: Tenses, Modals & Subject-Verb Concord',
+            description: 'Sentence correction, error detection, reported speech transformation, and determiners.',
+            lessonType: 'text',
             durationMinutes: 45,
             position: 2,
             contentBody:
-              '# Algorithmic Thinking for Young Innovators\n\n```python\n# Finding prime factors systematically\ndef find_prime_factors(number):\n    factors = []\n    divisor = 2\n    while number > 1:\n        while number % divisor == 0:\n            factors.append(divisor)\n            number //= divisor\n        divisor += 1\n    return factors\n\nprint(find_prime_factors(84))  # [2, 2, 3, 7]\n```',
+              '# Applied Grammar for Flawless Writing\n\nMaster Subject-Verb Concord rules and direct-to-indirect speech transformation for board exams and essays.',
           },
           {
-            id: 'sch-103',
-            title: '1.3 Foundations Knowledge Check & Diagnostic Quiz',
-            description: 'Evaluate mastery of fractions, algebraic notation, and deductive logic.',
+            id: 'c9-eng-503',
+            title: '5.3 Spoken English, Articulation & Vocabulary Test',
+            description: 'Public speaking structures, debate rebuttal techniques, and vocabulary mastery quiz.',
+            lessonType: 'quiz',
+            durationMinutes: 20,
+            position: 3,
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-aptitude',
+        title: 'Subject 6: Logical Reasoning & Aptitude — Practice Tests & Competitive Exam Prep',
+        description: 'Verbal reasoning, non-verbal matrices, number series, coding-decoding, and Olympiad puzzles.',
+        position: 6,
+        lessons: [
+          {
+            id: 'c9-apt-601',
+            title: '6.1 Verbal Reasoning: Series, Analogies & Coding-Decoding',
+            description: 'Letter and number sequences, pattern recognition, and cipher decoding techniques.',
+            lessonType: 'text',
+            durationMinutes: 40,
+            position: 1,
+            contentBody:
+              '# Verbal Reasoning for Olympiads & NTSE\n\nLearn systematic position numbering (A=1, Z=26) and difference-of-differences logic for number series.',
+          },
+          {
+            id: 'c9-apt-602',
+            title: '6.2 Analytical Reasoning: Venn Diagrams, Syllogisms & Seating Puzzles',
+            description: 'Deductive logic diagrams, direction sense tests, and constraint-satisfaction seating layouts.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 2,
+            contentBody:
+              '# Analytical Puzzles & Syllogisms\n\nUse Venn diagram intersections to test truth values of syllogistic statements reliably without fallacy.',
+          },
+          {
+            id: 'c9-apt-603',
+            title: '6.3 Logical Reasoning Speed Simulation & Olympiad Test',
+            description: 'Timed 25-question mental ability test with speed-accuracy score breakdown.',
+            lessonType: 'quiz',
+            durationMinutes: 30,
+            position: 3,
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-strategy',
+        title: 'Subject 7: Study Skills & Exam Strategy — Time Management, Techniques & Future Planning',
+        description: 'Active recall, spaced repetition, error logs, and the 4-year NEET/JEE academic foundation roadmap.',
+        position: 7,
+        lessons: [
+          {
+            id: 'c9-str-701',
+            title: '7.1 Scientific Learning Habits: Active Recall & Spaced Repetition',
+            description: 'Evidence-based cognitive retention techniques: flashcard Leitner systems and Feynman technique.',
+            lessonType: 'text',
+            durationMinutes: 35,
+            position: 1,
+            contentBody:
+              '# The Science of Long-Term Memory\n\nPassive reading leads to rapid decay (Ebbinghaus forgetting curve). Active retrieval produces neural consolidation.\n\n### The 1-3-7-30 Spaced Repetition Schedule\n- **Day 1**: Learn concept in live class & solve 5 practice questions.\n- **Day 3**: Self-test with closed book flashcard questions.\n- **Day 7**: Solve mixed-topic timed quiz.\n- **Day 30**: Comprehensive revision and error log update.',
+          },
+          {
+            id: 'c9-str-702',
+            title: '7.2 The Error Notebook & Stress-Free Exam Conditioning',
+            description: 'Root-cause categorization: conceptual errors vs calculation errors vs question misreadings.',
+            lessonType: 'text',
+            durationMinutes: 35,
+            position: 2,
+            contentBody:
+              '# The High-Achiever’s Error Notebook\n\nTop performers in NEET and JEE maintain an error diary analyzing why every missed mark occurred.',
+          },
+          {
+            id: 'c9-str-703',
+            title: '7.3 Class 9 to 12 NEET/JEE Master Roadmap & Milestone Assessment',
+            description: 'Year-by-year academic targets and foundation readiness milestone evaluation.',
             lessonType: 'quiz',
             durationMinutes: 20,
             position: 3,
@@ -240,9 +506,81 @@ export const PROGRAMME_CURRICULUM: Record<string, { title: string; modules: Cour
       },
     ],
   },
+  'school-foundation': {
+    title: 'Class 9 Foundation Programme',
+    modules: [
+      {
+        id: 'c9-mod-physics-sf',
+        title: 'Subject 1: Physics — Concepts, Problem Solving & Real-Life Applications',
+        description: 'Kinematics, Newton’s laws of motion, gravitation, work, power, and wave acoustic fundamentals.',
+        position: 1,
+        lessons: [
+          {
+            id: 'c9-phy-101-sf',
+            title: '1.1 Describing Motion: Distance, Displacement & Acceleration',
+            description: 'Uniform and non-uniform motion, distance-time graphs, and velocity-time derivations.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 1,
+            contentBody:
+              '# Kinematics & The 3 Equations of Motion\n\nMotion in Class 9 forms the unshakeable cornerstone of classical mechanics needed for NEET and JEE.\n\n### The Fundamental Equations\nFor uniform acceleration $a$, initial velocity $u$, final velocity $v$, time $t$, and displacement $s$:\n1. $$v = u + at$$\n2. $$s = ut + \\frac{1}{2}at^2$$\n3. $$v^2 = u^2 + 2as$$',
+          },
+          {
+            id: 'c9-phy-102-sf',
+            title: '1.2 Force & Newton’s Three Laws of Motion',
+            description: 'Inertia, momentum, action-reaction pairs, and the law of conservation of momentum.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 2,
+            contentBody:
+              '# Dynamics: Force & Laws of Motion\n\nNewton’s second law establishes the mathematical definition of force: $F = ma = \\frac{dp}{dt}$.',
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-chemistry-sf',
+        title: 'Subject 2: Chemistry — Concept Clarity, Numerical Practice & Practical Insight',
+        description: 'States of matter, mixtures, solutions, atoms, molecules, the mole concept, and atomic structure.',
+        position: 2,
+        lessons: [
+          {
+            id: 'c9-chm-201-sf',
+            title: '2.1 Matter in Our Surroundings & The Mole Concept',
+            description: 'Latent heat, evaporation, solutions, suspensions, colloids, and mole calculations.',
+            lessonType: 'text',
+            durationMinutes: 45,
+            position: 1,
+            contentBody:
+              '# The Mole Concept\n\n1 mole contains exactly $6.022 \\times 10^{23}$ particles.\n\n$$n = \\frac{m}{M} = \\frac{N}{N_A}$$',
+          },
+        ],
+      },
+      {
+        id: 'c9-mod-math-sf',
+        title: 'Subject 4: Mathematics — Fundamentals, Advanced Problem Solving & Logical Thinking',
+        description: 'Real numbers, polynomials, coordinate geometry, linear equations, and congruence proofs.',
+        position: 3,
+        lessons: [
+          {
+            id: 'c9-mat-401-sf',
+            title: '4.1 Real Numbers & Polynomial Identities',
+            description: 'Rationalising surds, laws of exponents, and algebraic identities.',
+            lessonType: 'text',
+            durationMinutes: 50,
+            position: 1,
+            contentBody:
+              '# Polynomials & Algebraic Identities\n\n$$(a+b+c)^2 = a^2 + b^2 + c^2 + 2ab + 2bc + 2ca$$',
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export function getCurriculum(programmeSlug: string) {
+  if (programmeSlug === 'class-9-foundation' || programmeSlug === 'school-foundation') {
+    return PROGRAMME_CURRICULUM['class-9-foundation']
+  }
   return PROGRAMME_CURRICULUM[programmeSlug] ?? PROGRAMME_CURRICULUM['ai-development']
 }
 

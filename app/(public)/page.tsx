@@ -32,6 +32,7 @@ import { SkillGraph } from '@/components/academy/skill-graph'
 import { SuperAiAmbitionCockpit } from '@/components/public/super-ai-ambition-cockpit'
 import { ProgrammeUniverseExplorer } from '@/components/public/programme-universe-explorer'
 import { ProgrammePricingPlans } from '@/components/public/programme-pricing-plans'
+import { Class9FoundationSalesExperience } from '@/components/public/class-9-foundation-sales-experience'
 
 const programmes = [
   {
@@ -244,25 +245,70 @@ const projectShowcase = [
 export default function HomePage() {
   return (
     <div className="bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 selection:bg-[#0080FF] selection:text-white">
-      {/* Hero Section — Master Titan Panoramic Cockpit & Interactive Learning Command Center */}
-      <section className="relative overflow-hidden bg-[#000000] text-white pt-2 pb-12 sm:pt-4 sm:pb-16 border-b border-white/[0.08]">
+      {/* 1. Urgent Admissions Alert Banner */}
+      <aside aria-label="Admissions announcement" className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white py-2.5 px-4 text-xs font-semibold shadow-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-extrabold tracking-wide uppercase text-[10px] sm:text-[11px] text-amber-300 bg-black/40 px-2 py-0.5 rounded-full border border-amber-300/30">
+              Admissions Open 2026–27
+            </span>
+            <span className="text-white/95">
+              <strong>Class 9 Foundation Programme (After Class 8)</strong>: 96 Live Sessions, 7 Subjects, Laptop Included Option.
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <a href="#class-9-flagship" className="underline hover:text-amber-200 transition-colors font-bold text-[11px]">
+              Enrol Now • Batches Starting Soon →
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      {/* 2. Flagship Sales Section: Class 9 Foundation Programme with 4D Interactive Brochure */}
+      <section id="class-9-flagship" className="relative bg-gradient-to-b from-neutral-950 via-neutral-900 to-black text-white pt-6 pb-20 px-3 sm:px-6 lg:px-8 border-b border-white/[0.08]">
+        {/* Ambient Spatial Lighting */}
+        <div
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[520px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.22),_transparent_65%)]"
+          aria-hidden="true"
+        />
+
+        <div className="relative mx-auto max-w-7xl space-y-6">
+          {/* Brand Announcement Pill & Official Ecosystem Trio in Streamlined Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-white/10">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.15] bg-white/[0.05] px-3 py-1 text-[11px] font-medium backdrop-blur-md">
+              <TalentXcelEmblem className="h-3 w-3" pixelSize={16} />
+              <span className="text-neutral-300">TalentXcel Academy • Flagship Foundation 2026–27</span>
+            </div>
+            <div>
+              <EcosystemTrioLogos />
+            </div>
+          </div>
+
+          {/* Full Interactive Class 9 Sales Experience with 4D Brochure, 7 Subjects, Pricing & Checkout */}
+          <Class9FoundationSalesExperience />
+        </div>
+      </section>
+
+      {/* 3. The Multi-Ambition Horizon: One Platform. Every Ambition. One Personal Super AI. */}
+      <section className="relative overflow-hidden bg-[#000000] text-white pt-16 pb-12 sm:pt-20 sm:pb-16 border-b border-white/[0.08]">
         {/* Subtle Ambient Radial Lighting */}
         <div
           className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[520px] bg-[radial-gradient(ellipse_at_top,_rgba(0,128,255,0.24),_transparent_65%)]"
           aria-hidden="true"
         />
 
-        <div className="relative mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 text-center space-y-3">
-          {/* Brand Announcement Pill & Official Ecosystem Trio in Streamlined Row */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.15] bg-white/[0.05] px-3 py-0.5 text-[11px] font-medium backdrop-blur-md hover:bg-white/[0.08] transition-colors">
-              <TalentXcelEmblem className="h-3 w-3" pixelSize={16} />
-              <span className="text-neutral-300">TalentXcel Academy • Tri-Platform Learning Ecosystem</span>
-              <ChevronRight className="h-3 w-3 text-neutral-400" />
-            </div>
-            <div>
-              <EcosystemTrioLogos />
-            </div>
+        <div className="relative mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 text-center space-y-6">
+          <div className="space-y-3 max-w-3xl mx-auto">
+            <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-500/10 text-xs">
+              Next-Generation AI Learning Platform
+            </Badge>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+              One Platform. Every Ambition. One Personal Super AI.
+            </h2>
+            <p className="text-sm sm:text-base text-neutral-300 leading-relaxed">
+              A path from learning to real-world capability. A student should be able to say, &ldquo;I want to crack NEET,&rdquo; &ldquo;I want to become an AI developer,&rdquo; &ldquo;I want a healthcare technology career,&rdquo; or &ldquo;I want to start a business&rdquo;—and the platform should build a relevant journey without forcing them to navigate dozens of unrelated websites.
+            </p>
           </div>
 
           {/* Super AI Ambition Cockpit — Master Concept Experience */}

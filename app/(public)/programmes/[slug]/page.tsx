@@ -17,12 +17,14 @@ import {
   Layers,
   FileCheck,
   Zap,
+  ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getProgrammeBySlug } from '@/lib/lms/programme-universe'
 import { ProgrammePricingPlans } from '@/components/public/programme-pricing-plans'
+import { Class9FoundationSalesExperience } from '@/components/public/class-9-foundation-sales-experience'
 
 interface ProjectRoadmapItem {
   title: string
@@ -630,6 +632,28 @@ export default async function ProgrammeDetailPage({
 
   if (!programme) {
     notFound()
+  }
+
+  if (programme.slug === 'class-9-foundation' || programme.slug === 'school-foundation') {
+    return (
+      <div className="py-10 sm:py-16 lg:py-20 bg-background text-foreground">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+          <nav className="flex items-center gap-2 text-xs text-muted-foreground" aria-label="Breadcrumb">
+            <Link href="/" className="hover:text-primary transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="h-3 w-3" />
+            <Link href="/programmes" className="hover:text-primary transition-colors">
+              Programmes
+            </Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="text-foreground font-semibold">Class 9 Foundation Programme</span>
+          </nav>
+
+          <Class9FoundationSalesExperience />
+        </div>
+      </div>
+    )
   }
 
   return (

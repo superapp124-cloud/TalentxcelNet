@@ -78,132 +78,290 @@ export function ProgrammePricingPlans({
       </div>
 
       {/* Plan Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {/* Plan card 1: Instalment Plan */}
-        <Card className="border-2 border-primary/40 bg-card shadow-md flex flex-col justify-between">
-          <CardHeader className="p-6 sm:p-8 pb-4 space-y-2 border-b bg-muted/20">
-            <div className="text-xs font-bold uppercase tracking-wider text-primary">
-              Plan card 1: Instalment Plan
-            </div>
-            <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">
-              Instalment Plan ({currentTitle})
-            </CardTitle>
-            <p className="text-xs font-semibold text-muted-foreground">
-              {currentDuration}-month programme
-            </p>
-          </CardHeader>
-          <CardContent className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-extrabold text-foreground">₹29,999</span>
-                <span className="text-sm text-muted-foreground">upfront</span>
+      {currentSlug === 'class-9-foundation' || currentSlug === 'school-foundation' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          {/* Option 1: Course Only */}
+          <Card className="border-2 border-emerald-500/30 bg-card shadow-md flex flex-col justify-between">
+            <CardHeader className="p-6 sm:p-8 pb-4 space-y-2 border-b bg-muted/20">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs w-fit">
+                Option 1 • Course Only
               </div>
-              <div className="text-sm font-semibold text-foreground">
-                + ₹1,500 a month for {currentDuration} months
+              <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">
+                Course Only
+              </CardTitle>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Learn with your own laptop or device
+              </p>
+            </CardHeader>
+            <CardContent className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-foreground">₹29,999</span>
+                  <span className="text-xs text-muted-foreground">+ applicable GST</span>
+                </div>
+                {/* Payment Options (Course Only) */}
+                <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-muted/40 border text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground block">One-Time</span>
+                    <span className="font-extrabold text-foreground text-sm">₹29,999</span>
+                    <span className="text-[10px] text-muted-foreground block">+ GST</span>
+                  </div>
+                  <div className="border-l pl-2">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground block">Easy Installments</span>
+                    <span className="font-extrabold text-foreground text-sm">₹9,999 upfront</span>
+                    <span className="text-[10px] text-muted-foreground block">+ ₹2,500 × 8 mos</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground pt-1 border-t">
-                Total ₹41,999 + 18% GST
-              </div>
-              <div className="text-[11px] text-muted-foreground/80 font-mono">
-                (GST included: about ₹35,399 upfront and ₹1,770 a month)
-              </div>
-            </div>
 
-            <div className="space-y-2.5 text-xs text-muted-foreground border-t pt-4">
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span>Full curriculum access and project evaluations</span>
+              <div className="space-y-2.5 text-xs text-muted-foreground border-t pt-4">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span><strong>3 live classes every week</strong> (96 sessions across 8 months*)</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Live & recorded classes with unlimited replay</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Downloadable study material & formula sheets</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Chapter-wise practice & tests across all 7 subjects</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Dedicated mentor support and doubt resolution</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Progress tracking and guardian performance reports</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Career guidance and NEET/JEE academic foundation</span>
+                </div>
               </div>
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span>Offline lesson downloads</span>
+
+              <div className="pt-2">
+                <Link href={`/apply?programme=class-9-foundation&package=course-only`} className="block">
+                  <Button size="lg" className="w-full font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
+                    Enrol in Course Only (₹29,999)
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <div className="flex items-start gap-2.5">
-                <Laptop className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span>
-                  <strong>Laptop</strong>: included with your admission, model and specifications confirmed in writing before you enrol
+            </CardContent>
+          </Card>
+
+          {/* Option 2: Course + Laptop (Most Popular) */}
+          <Card className="border-2 border-primary bg-card shadow-xl flex flex-col justify-between relative overflow-hidden ring-2 ring-primary/20">
+            <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-rose-500 text-white text-[11px] font-extrabold px-4 py-1 rounded-bl-xl uppercase tracking-wider flex items-center gap-1 shadow-sm">
+              <Sparkles className="h-3.5 w-3.5" /> Most Popular
+            </div>
+            <CardHeader className="p-6 sm:p-8 pb-4 space-y-2 border-b bg-primary/5">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-xs w-fit">
+                Option 2 • All-in-One Learning Solution
+              </div>
+              <CardTitle className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
+                Course + Laptop
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                  Laptop Included
                 </span>
+              </CardTitle>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Complete learning package with a dedicated laptop
+              </p>
+            </CardHeader>
+            <CardContent className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-foreground">₹64,999</span>
+                  <span className="text-xs text-muted-foreground">+ applicable GST</span>
+                </div>
+                {/* Payment Options (Course + Laptop) */}
+                <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-primary block">One-Time Payment</span>
+                    <span className="font-extrabold text-foreground text-sm">₹61,999</span>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 block">Save ₹3,000!</span>
+                  </div>
+                  <div className="border-l border-primary/20 pl-2">
+                    <span className="text-[10px] font-bold uppercase text-primary block">Easy Installments</span>
+                    <span className="font-extrabold text-foreground text-sm">₹39,999 upfront</span>
+                    <span className="text-[10px] text-muted-foreground block">+ ₹3,125 × 8 mos</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>
-                  <strong>AI Tutor and Coding Mentor</strong>: coming soon
-                </span>
-              </div>
-            </div>
 
-            <div className="pt-2">
-              <Link href={`/apply?programme=${currentSlug}&plan=instalment`} className="block">
-                <Button size="lg" className="w-full font-bold text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
-                  Register Your Interest
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="space-y-2.5 text-xs text-muted-foreground border-t pt-4">
+                <div className="flex items-start gap-2.5 text-foreground font-semibold">
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Everything in Course Only (all 96 live sessions, materials & tests)</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Laptop className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span><strong>A new student laptop</strong> with confirmed specifications</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Pre-loaded learning tools, offline lessons and study resources</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Laptop delivery before programme start</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Comprehensive manufacturer warranty and dedicated support</span>
+                </div>
+                <div className="flex items-start gap-2.5 text-primary font-medium">
+                  <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Ideal for students without an existing learning laptop</span>
+                </div>
+              </div>
 
-        {/* Plan card 2: Full Payment */}
-        <Card className="border bg-card shadow-xs flex flex-col justify-between">
-          <CardHeader className="p-6 sm:p-8 pb-4 space-y-2 border-b bg-muted/10">
-            <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Plan card 2: Full Payment
-            </div>
-            <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">
-              Full Payment
-            </CardTitle>
-            <p className="text-xs font-semibold text-muted-foreground">
-              {currentDuration}-month programme
-            </p>
-          </CardHeader>
-          <CardContent className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-extrabold text-foreground">₹41,999</span>
-                <span className="text-sm text-muted-foreground">+ 18% GST</span>
+              <div className="pt-2">
+                <Link href={`/apply?programme=class-9-foundation&package=course-laptop`} className="block">
+                  <Button size="lg" className="w-full font-bold text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
+                    Enrol with Laptop (₹61,999 One-Time)
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <div className="text-xs text-muted-foreground font-mono">
-                One payment of ₹41,999 + 18% GST (about ₹49,559)
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {/* Plan card 1: Instalment Plan */}
+          <Card className="border-2 border-primary/40 bg-card shadow-md flex flex-col justify-between">
+            <CardHeader className="p-6 sm:p-8 pb-4 space-y-2 border-b bg-muted/20">
+              <div className="text-xs font-bold uppercase tracking-wider text-primary">
+                Plan card 1: Instalment Plan
               </div>
-              <div className="text-sm font-semibold text-foreground pt-1 border-t">
-                No monthly debits
+              <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">
+                Instalment Plan ({currentTitle})
+              </CardTitle>
+              <p className="text-xs font-semibold text-muted-foreground">
+                {currentDuration}-month programme
+              </p>
+            </CardHeader>
+            <CardContent className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-foreground">₹29,999</span>
+                  <span className="text-sm text-muted-foreground">upfront</span>
+                </div>
+                <div className="text-sm font-semibold text-foreground">
+                  + ₹1,500 a month for {currentDuration} months
+                </div>
+                <div className="text-xs text-muted-foreground pt-1 border-t">
+                  Total ₹41,999 + 18% GST
+                </div>
+                <div className="text-[11px] text-muted-foreground/80 font-mono">
+                  (GST included: about ₹35,399 upfront and ₹1,770 a month)
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2.5 text-xs text-muted-foreground border-t pt-4">
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span>Same programme and inclusions as the Instalment Plan</span>
+              <div className="space-y-2.5 text-xs text-muted-foreground border-t pt-4">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Full curriculum access and project evaluations</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Offline lesson downloads</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Laptop className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Laptop</strong>: included with your admission, model and specifications confirmed in writing before you enrol
+                  </span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>AI Tutor and Coding Mentor</strong>: coming soon
+                  </span>
+                </div>
               </div>
-              <div className="flex items-start gap-2.5 text-emerald-600 dark:text-emerald-400 font-medium">
-                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>₹2,000 early-payment discount (Pay ₹39,999 + 18% GST / about ₹47,199)</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <Laptop className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span>
-                  <strong>Laptop</strong>: included with your admission, model and specifications confirmed in writing before you enrol
-                </span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>
-                  <strong>AI Tutor and Coding Mentor</strong>: coming soon
-                </span>
-              </div>
-            </div>
 
-            <div className="pt-2">
-              <Link href={`/apply?programme=${currentSlug}&plan=full`} className="block">
-                <Button size="lg" variant="outline" className="w-full font-bold text-sm hover:bg-muted">
-                  Register Your Interest
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              <div className="pt-2">
+                <Link href={`/apply?programme=${currentSlug}&plan=instalment`} className="block">
+                  <Button size="lg" className="w-full font-bold text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+                    Register Your Interest
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Plan card 2: Full Payment */}
+          <Card className="border bg-card shadow-xs flex flex-col justify-between">
+            <CardHeader className="p-6 sm:p-8 pb-4 space-y-2 border-b bg-muted/10">
+              <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Plan card 2: Full Payment
+              </div>
+              <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">
+                Full Payment
+              </CardTitle>
+              <p className="text-xs font-semibold text-muted-foreground">
+                {currentDuration}-month programme
+              </p>
+            </CardHeader>
+            <CardContent className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-foreground">₹41,999</span>
+                  <span className="text-sm text-muted-foreground">+ 18% GST</span>
+                </div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  One payment of ₹41,999 + 18% GST (about ₹49,559)
+                </div>
+                <div className="text-sm font-semibold text-foreground pt-1 border-t">
+                  No monthly debits
+                </div>
+              </div>
+
+              <div className="space-y-2.5 text-xs text-muted-foreground border-t pt-4">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Same programme and inclusions as the Instalment Plan</span>
+                </div>
+                <div className="flex items-start gap-2.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>₹2,000 early-payment discount (Pay ₹39,999 + 18% GST / about ₹47,199)</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Laptop className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Laptop</strong>: included with your admission, model and specifications confirmed in writing before you enrol
+                  </span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>AI Tutor and Coding Mentor</strong>: coming soon
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Link href={`/apply?programme=${currentSlug}&plan=full`} className="block">
+                  <Button size="lg" variant="outline" className="w-full font-bold text-sm hover:bg-muted">
+                    Register Your Interest
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Block: What’s included and what’s not */}
       <div className="max-w-4xl mx-auto rounded-3xl border border-border bg-card p-6 sm:p-8 space-y-6 shadow-xs">

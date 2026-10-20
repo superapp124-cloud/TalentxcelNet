@@ -38,11 +38,11 @@ export const VERIFIED_KNOWLEDGE_BASE: KnowledgeChunk[] = [
   },
   {
     id: 'kb-curr-sch-01',
-    title: 'School Foundation Programme (Class 8 to 9 Progression)',
+    title: 'Class 9 Foundation Programme (NEET/JEE Foundation After Class 8)',
     category: 'curriculum',
-    tags: ['school', 'class-8-9', 'mathematics', 'computational-thinking'],
+    tags: ['class-9', 'school-foundation', 'neet', 'jee', 'physics', 'chemistry', 'biology', 'mathematics', 'aptitude', 'english'],
     content:
-      'Programme D is an 8-month foundation course for students transitioning from Class 8 into Class 9. Focus areas include mathematical reasoning, algebraic decomposition, computational thinking with Python, and safe study habits under guardian supervision.',
+      'Class 9 Foundation Programme is an 8-month academic foundation for students moving from Class 8 into Class 9 preparing for NEET, JEE, and competitive exams. Features: 3 live classes every week (96 live sessions across 8 months), live and recorded learning, downloadable study materials, chapter-wise tests, mentor support, and progress tracking. Comprehensive coverage of all 7 subjects: Physics (kinematics, Newton laws, gravitation, work, sound), Chemistry (matter, mixtures, atoms, molecules, mole concept), Biology (cell organelles, tissues, food resources for NEET), Mathematics (real numbers, polynomials, coordinate geometry, lines & angles, triangles, circles, surface areas), English & Communication, Logical Reasoning & Aptitude (Olympiads), and Study Skills & Exam Strategy. Pricing Packages: Option 1 (Course Only): ₹29,999 + GST with One-Time or Easy Installments (₹9,999 upfront + ₹2,500/mo × 8). Option 2 (Course + Laptop): ₹64,999 + GST with One-Time ₹61,999 (Save ₹3,000) or Easy Installments (₹39,999 upfront + ₹3,125/mo × 8). Includes a brand new dedicated student laptop delivered before batch start.',
   },
   {
     id: 'kb-fees-01',

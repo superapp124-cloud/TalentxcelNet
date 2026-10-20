@@ -83,5 +83,10 @@
     "journey": "16. Titan Ambition Cockpit & Universe",
     "status": "PASSED",
     "route": "/#programmes-universe"
+  },
+  {
+    "journey": "17. Class 9 Foundation Sales Engine",
+    "status": "PASSED",
+    "route": "/programmes/class-9-foundation"
   }
 ]
