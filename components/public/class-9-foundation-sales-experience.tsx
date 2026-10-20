@@ -36,6 +36,10 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Brochure4DShowcase } from '@/components/public/brochure-4d-showcase'
+import { SocraticEvaluatorDemo } from '@/components/academic/socratic-evaluator-demo'
+import { InteractiveCurriculumCockpit } from '@/components/academic/interactive-curriculum-cockpit'
+import { LivingSkillRadar } from '@/components/academic/living-skill-radar'
+import { ParentIntelligencePreview } from '@/components/academic/parent-intelligence-preview'
 
 export function Class9FoundationSalesExperience() {
   const [activeSubject, setActiveSubject] = useState<'physics' | 'chemistry' | 'biology' | 'mathematics' | 'english' | 'aptitude' | 'strategy'>('physics')
@@ -515,6 +519,9 @@ export function Class9FoundationSalesExperience() {
         </div>
       </section>
 
+      {/* 1.5 TRYABLE LIVE PRODUCT PREVIEW: SOCRATIC EVALUATOR DEMO */}
+      <SocraticEvaluatorDemo />
+
       {/* 2. COMPLETE SUBJECT COVERAGE WITH PRACTICAL LEARNING */}
       <section className="space-y-8">
         <div className="text-center space-y-2 max-w-3xl mx-auto">
@@ -797,6 +804,12 @@ export function Class9FoundationSalesExperience() {
           *Laptop model and specifications will be confirmed before enrolment. Laptop is included only in the Course + Laptop package.
         </p>
       </section>
+
+      {/* 3.5 LIVING SKILL RADAR: CLASS 8 -> CLASS 9 -> NEET/JEE 2029 */}
+      <LivingSkillRadar onEnrolClick={() => setIsModalOpen(true)} />
+
+      {/* 3.6 SUNDAY PARENT INTELLIGENCE PREVIEW */}
+      <ParentIntelligencePreview onEnrolClick={() => setIsModalOpen(true)} />
 
       {/* 4. INTERACTIVE 96 LIVE SESSIONS SCHEDULE & ROUTINE */}
       <section className="rounded-3xl border bg-muted/10 p-6 sm:p-10 space-y-6">
