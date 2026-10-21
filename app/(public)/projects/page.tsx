@@ -8,6 +8,9 @@ import { Code2, ArrowUpRight, CheckCircle2 } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Student Capstones & Projects — TalentXcel Academy',
   description: 'Exemplary project portfolios built by TalentXcel Academy learners.',
+  alternates: {
+    canonical: 'https://talentxcel.net/projects',
+  },
 }
 
 const projects = [

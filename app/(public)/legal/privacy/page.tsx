@@ -3,6 +3,9 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Privacy Policy — TalentXcel Academy',
   description: 'Digital Personal Data Protection Act 2023 compliant privacy policy and consent guidelines.',
+  alternates: {
+    canonical: 'https://talentxcel.net/legal/privacy',
+  },
 }
 
 export default function PrivacyPolicyPage() {

@@ -6,6 +6,9 @@ import { GraduationCap, Code2, Stethoscope, Building2 } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Faculty & Mentors — TalentXcel Academy',
   description: 'Meet our experienced instructors, curriculum architects, and industry mentors.',
+  alternates: {
+    canonical: 'https://talentxcel.net/faculty',
+  },
 }
 
 const faculty = [

@@ -1,12 +1,15 @@
 import { Metadata } from 'next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Mail, Phone, MapPin, ShieldAlert, Clock } from 'lucide-react'
+import { Mail, Phone, MapPin, ShieldAlert, Clock, MessageSquare } from 'lucide-react'
 import { EnquiryForm } from '@/components/public/enquiry-form'
 
 export const metadata: Metadata = {
   title: 'Contact & Grievance Redressal — TalentXcel Academy',
   description: 'Reach our admissions, student support, and statutory Grievance Officer.',
+  alternates: {
+    canonical: 'https://talentxcel.net/contact',
+  },
 }
 
 export default function ContactPage() {
@@ -44,14 +47,28 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5 text-primary flex-shrink-0" />
                   <div>
                     <div className="font-semibold text-foreground">Helpline</div>
-                    <div className="text-xs text-muted-foreground">+91 (080) 4123-5678 (Mon–Fri, 9:30 AM – 6:30 PM IST)</div>
+                    <div className="text-xs text-muted-foreground">+91 9717161809 (Mon–Fri, 10:00 AM – 6:00 PM IST)</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="h-5 w-5 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold text-foreground">WhatsApp Support</div>
+                    <a
+                      href="https://wa.me/919717161809"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline font-medium"
+                    >
+                      Chat on WhatsApp (+91 9717161809)
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
                   <div>
                     <div className="font-semibold text-foreground">Operating Address</div>
-                    <div className="text-xs text-muted-foreground">TalentXcel Academy, Tech Hub Campus, Bangalore, Karnataka 560103, India</div>
+                    <div className="text-xs text-muted-foreground">TalentXcel Services, Pavilion Court, Noida, Gautam Buddha Nagar, Uttar Pradesh 201301, India</div>
                   </div>
                 </div>
               </CardContent>

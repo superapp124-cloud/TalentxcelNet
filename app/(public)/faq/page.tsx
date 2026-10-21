@@ -6,6 +6,9 @@ import { HelpCircle } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions — TalentXcel Academy',
   description: 'Common questions regarding admissions, curriculum, AI tutoring, fees, and certification.',
+  alternates: {
+    canonical: 'https://talentxcel.net/faq',
+  },
 }
 
 const faqs = [

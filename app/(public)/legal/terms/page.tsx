@@ -3,6 +3,9 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Terms of Service — TalentXcel Academy',
   description: 'General terms and conditions governing platform usage, learning access, and intellectual property.',
+  alternates: {
+    canonical: 'https://talentxcel.net/legal/terms',
+  },
 }
 
 export default function TermsPage() {

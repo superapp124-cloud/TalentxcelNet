@@ -4,6 +4,9 @@ import { GraduationCap, Target, Shield, Zap } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'About TalentXcel Academy',
   description: 'Learn about TalentXcel Academy — our mission, approach to education, and commitment to practical skills development.',
+  alternates: {
+    canonical: 'https://talentxcel.net/about',
+  },
 }
 
 export default function AboutPage() {

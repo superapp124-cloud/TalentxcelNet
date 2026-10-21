@@ -119,6 +119,58 @@ Using optimistic UI updates with deterministic timestamp resolution ensures lear
   },
 }
 
+const BLOG_EXCERPTS: Record<string, string> = {
+  'building-resilient-ai-agents':
+    'Explore deterministic routing, prompt-injection defense, and Socratic scaffolding for enterprise educational agents.',
+  'digital-health-interoperability-abdm':
+    'A comprehensive technical overview of healthcare interoperability protocols, patient consent management, and data security under ABDM and FHIR.',
+  'msme-digitization-automated-workflows':
+    'Practical playbooks for Indian small businesses to digitize inventory, streamline GST invoicing, and automate order reconciliation.',
+  'computational-thinking-middle-school':
+    'A guide for parents and educators on nurturing problem-solving stamina, structured logic, and healthy digital habits in teenagers transitioning to Class 9.',
+  'offline-first-pwa-architecture':
+    'Technical deep-dive on designing sync queues, conflict resolution, and cached media storage for low-bandwidth learners in Tier 2/3 locations.',
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const post = blogPosts[slug]
+  if (!post) {
+    return {
+      title: 'Article Not Found',
+    }
+  }
+
+  const canonicalUrl = `https://talentxcel.net/blog/${slug}`
+  const description =
+    BLOG_EXCERPTS[slug] ||
+    post.content.replace(/[#*`\n]/g, ' ').trim().slice(0, 160)
+
+  return {
+    title: post.title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description,
+      url: canonicalUrl,
+      authors: [post.author],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description,
+    },
+  }
+}
+
 export default async function BlogPostPage({
   params,
 }: {

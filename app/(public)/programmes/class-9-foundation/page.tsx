@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 const PAGE_URL = 'https://talentxcel.net/programmes/class-9-foundation'
 
 export const metadata: Metadata = {
-  title: 'Class 9 Foundation Programme — NEET & JEE Foundation | TalentXcel Academy',
+  title: 'Class 9 Foundation Programme — NEET & JEE Foundation',
   description:
     '8-Month Class 9 Foundation Programme after Class 8. 3 Live Classes every week (96 sessions across 8 months), live & recorded access, comprehensive coverage of Physics, Chemistry, Biology, Mathematics, English, Logical Reasoning, and Study Skills. Option 1: Course Only (₹29,999) or Option 2: Course + Laptop (₹64,999).',
   alternates: {

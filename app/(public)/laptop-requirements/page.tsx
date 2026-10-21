@@ -6,6 +6,9 @@ import { Laptop, Cpu, HardDrive, Monitor, ShieldCheck, AlertTriangle } from 'luc
 export const metadata: Metadata = {
   title: 'Laptop & Technical Requirements — TalentXcel Academy',
   description: 'Recommended hardware specifications and operating system requirements.',
+  alternates: {
+    canonical: 'https://talentxcel.net/laptop-requirements',
+  },
 }
 
 export default function LaptopRequirementsPage() {

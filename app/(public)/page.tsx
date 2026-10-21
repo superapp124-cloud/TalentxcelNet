@@ -1,4 +1,16 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: {
+    absolute: 'TalentXcel Academy — Practical AI, Tech & Business Education',
+  },
+  description:
+    'TalentXcel Academy offers practical, career-oriented programmes in AI Development, Healthcare Technology, Entrepreneurship, and School Foundation. Learn real skills. Build real projects.',
+  alternates: {
+    canonical: 'https://talentxcel.net',
+  },
+}
 import {
   ArrowRight,
   Brain,

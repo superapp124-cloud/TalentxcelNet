@@ -616,9 +616,22 @@ export async function generateMetadata({
   const { slug } = await params
   const prog = resolveProgrammeDetail(slug)
   if (!prog) return { title: 'Programme Not Found' }
+  const canonicalUrl = `https://talentxcel.net/programmes/${prog.slug}`
   return {
-    title: `${prog.title} — Syllabus & Roadmap — TalentXcel`,
+    title: `${prog.title} — Syllabus & Roadmap`,
     description: prog.subtitle,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${prog.title} — TalentXcel Academy`,
+      description: prog.subtitle,
+      url: canonicalUrl,
+    },
+    twitter: {
+      title: `${prog.title} — TalentXcel Academy`,
+      description: prog.subtitle,
+    },
   }
 }
 

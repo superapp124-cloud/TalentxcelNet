@@ -3,6 +3,9 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Refund & Cancellation Policy — TalentXcel Academy',
   description: 'Cooling-off windows, refund eligibility, and cancellation procedures.',
+  alternates: {
+    canonical: 'https://talentxcel.net/legal/refunds',
+  },
 }
 
 export default function RefundsPage() {

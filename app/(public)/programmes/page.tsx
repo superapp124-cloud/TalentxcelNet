@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   title: 'Programmes — TalentXcel Academy',
   description:
     'Explore TalentXcel Academy programmes: AI Development, Healthcare Tech, Competitive Exams, Entrepreneurship, Small Business, Home Business, Teaching, and Foundation tracks.',
+  alternates: {
+    canonical: 'https://talentxcel.net/programmes',
+  },
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {

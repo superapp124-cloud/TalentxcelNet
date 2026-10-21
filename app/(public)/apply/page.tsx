@@ -4,6 +4,9 @@ import { EnquiryForm } from '@/components/public/enquiry-form'
 export const metadata: Metadata = {
   title: 'Apply for Admission — TalentXcel Academy',
   description: 'Start your application to TalentXcel Academy. Speak with an admissions counsellor about our programmes.',
+  alternates: {
+    canonical: 'https://talentxcel.net/apply',
+  },
 }
 
 export default function ApplyPage() {
