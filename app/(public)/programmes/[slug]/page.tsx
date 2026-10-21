@@ -909,7 +909,89 @@ export default async function ProgrammeDetailPage({
             showProgrammeSelector={false}
           />
         </div>
+
+        {/* Programme Specific FAQ & AEO Structured Intelligence */}
+        <section className="pt-8 border-t space-y-6" aria-labelledby="programme-faq-heading">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <Badge variant="outline" className="text-primary border-primary/30">
+              Programme Details &amp; Admissions FAQ
+            </Badge>
+            <h2 id="programme-faq-heading" className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              Frequently Asked Questions: {programme.title}
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Verified information on curriculum prerequisites, workload, hardware delivery, and evaluation.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl mx-auto">
+            <div className="rounded-2xl border bg-card p-5 space-y-2">
+              <h3 className="font-bold text-sm text-foreground">What is the required weekly workload?</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Learners should budget {programme.workload} across {programme.duration} to complete live sessions, hands-on coding labs, and milestone rubric evaluations.
+              </p>
+            </div>
+            <div className="rounded-2xl border bg-card p-5 space-y-2">
+              <h3 className="font-bold text-sm text-foreground">What are the prerequisites for this track?</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {programme.prerequisites.join(' ')}
+              </p>
+            </div>
+            <div className="rounded-2xl border bg-card p-5 space-y-2">
+              <h3 className="font-bold text-sm text-foreground">How does continuous competency assessment work?</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {programme.assessmentModel}
+              </p>
+            </div>
+            <div className="rounded-2xl border bg-card p-5 space-y-2">
+              <h3 className="font-bold text-sm text-foreground">Is dedicated hardware provided with enrolment?</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Yes, our Course + Laptop package includes a pre-configured student laptop tested for your curriculum, delivered directly to your address with a 14-day refund cooling-off guarantee.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Contextual Topic Cluster Link (GEO & Authority) */}
+        {programme.slug === 'ai-development' && (
+          <div className="rounded-2xl border bg-muted/30 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Architectural Guide</span>
+              <h4 className="font-bold text-sm text-foreground">
+                Building Resilient AI Agents with Grounded System Boundaries
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                Explore our engineering blueprint for deterministic routing and Socratic scaffolding.
+              </p>
+            </div>
+            <Link href="/blog/building-resilient-ai-agents">
+              <Button variant="outline" size="sm" className="shrink-0 text-xs gap-1.5">
+                Read Blueprint <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+          </div>
+        )}
+
+        {programme.slug === 'healthcare-tech' && (
+          <div className="rounded-2xl border bg-muted/30 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Standards Whitepaper</span>
+              <h4 className="font-bold text-sm text-foreground">
+                Digital Health Standards: FHIR, ABDM, and Health Informatics
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                A technical overview of consent architecture, encryption, and health record exchange in India.
+              </p>
+            </div>
+            <Link href="/blog/digital-health-interoperability-abdm">
+              <Button variant="outline" size="sm" className="shrink-0 text-xs gap-1.5">
+                Read Whitepaper <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
 }
+

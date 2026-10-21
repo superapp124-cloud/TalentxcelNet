@@ -220,18 +220,66 @@ export default async function BlogPostPage({
           </div>
         </div>
 
-        {/* CTA Banner */}
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="font-bold text-lg text-foreground">Apply practical skills in structured cohorts</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              Master hands-on project engineering with the TalentXcel Academy curriculum and Super AI Tutor.
-            </p>
-          </div>
-          <Link href="/apply">
-            <Button size="sm" className="shrink-0">Explore Admissions</Button>
-          </Link>
-        </div>
+        {/* Topic Cluster Pathway CTA */}
+        {(() => {
+          const programmeMap: Record<string, { href: string; title: string; subtitle: string; label: string }> = {
+            'building-resilient-ai-agents': {
+              href: '/programmes/ai-development',
+              title: 'AI Development & Automation Programme',
+              subtitle: 'Learn to build production-grade RAG pipelines, pgvector search, and supervised agent boundaries.',
+              label: 'View AI Curriculum & Admissions',
+            },
+            'digital-health-interoperability-abdm': {
+              href: '/programmes/healthcare-tech',
+              title: 'Healthcare Technology Programme',
+              subtitle: 'Master FHIR HL7 standards, ABDM consent architecture, and DPDP-compliant health records.',
+              label: 'View Healthcare Curriculum & Admissions',
+            },
+            'msme-digitization-automated-workflows': {
+              href: '/programmes/entrepreneurship',
+              title: 'Entrepreneurship & Small Business Digitization',
+              subtitle: 'Digitize your store operations, automate GST invoicing, and launch resilient payment workflows.',
+              label: 'View Business Curriculum & Admissions',
+            },
+            'computational-thinking-middle-school': {
+              href: '/programmes/class-9-foundation',
+              title: 'Class 9 Foundation Programme (After Class 8)',
+              subtitle: 'Build early analytical mastery across Physics, Chemistry, Biology, Math, and Study Skills.',
+              label: 'View Class 9 Syllabus & Laptop Package',
+            },
+            'offline-first-pwa-architecture': {
+              href: '/programmes/ai-development',
+              title: 'Full-Stack Software Architecture Track',
+              subtitle: 'Learn client-side persistence, background sync, and offline-first PWA engineering.',
+              label: 'View Software Curriculum',
+            },
+          }
+          const linkedProg = programmeMap[slug] || {
+            href: '/apply',
+            title: 'Apply practical skills in structured cohorts',
+            subtitle: 'Master hands-on project engineering with the TalentXcel Academy curriculum and Super AI Tutor.',
+            label: 'Explore Admissions',
+          }
+
+          return (
+            <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/5 via-card to-background p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-sm">
+              <div className="space-y-1.5">
+                <Badge variant="outline" className="text-primary border-primary/30 text-[10px] uppercase font-bold">
+                  Recommended Pathway
+                </Badge>
+                <h3 className="font-extrabold text-lg text-foreground">{linkedProg.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
+                  {linkedProg.subtitle}
+                </p>
+              </div>
+              <Link href={linkedProg.href} className="shrink-0">
+                <Button size="sm" className="font-bold text-xs gap-1.5">
+                  {linkedProg.label} <ArrowLeft className="h-3.5 w-3.5 rotate-180" />
+                </Button>
+              </Link>
+            </div>
+          )
+        })()}
       </div>
     </div>
   )
