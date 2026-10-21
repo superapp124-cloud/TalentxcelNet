@@ -7,6 +7,9 @@ import { ShieldCheck, Laptop, Truck, RefreshCcw, AlertTriangle, ArrowLeft } from
 export const metadata: Metadata = {
   title: 'Laptop Fulfilment & Hardware Warranty Terms — TalentXcel Academy',
   description: 'Official policy on student hardware allocation, delivery tracking, manufacturer warranty, returns, and replacement eligibility.',
+  alternates: {
+    canonical: 'https://talentxcel.net/legal/hardware-terms',
+  },
 }
 
 export default function HardwareTermsPage() {

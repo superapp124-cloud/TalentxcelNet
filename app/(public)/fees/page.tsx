@@ -7,6 +7,9 @@ import { AlertCircle, HelpCircle } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Fees & Payment Plans — TalentXcel Academy',
   description: 'Transparent tuition, instalment schedules, laptop inclusions, and refund policy.',
+  alternates: {
+    canonical: 'https://talentxcel.net/fees',
+  },
 }
 
 export default function FeesPage() {

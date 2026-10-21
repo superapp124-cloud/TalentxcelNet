@@ -7,6 +7,9 @@ import { Card, CardContent } from '@/components/ui/card'
 export const metadata: Metadata = {
   title: 'How It Works — TalentXcel Academy',
   description: 'Understand the step-by-step learning journey at TalentXcel Academy.',
+  alternates: {
+    canonical: 'https://talentxcel.net/how-it-works',
+  },
 }
 
 const steps = [

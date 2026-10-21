@@ -3,6 +3,9 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Accessibility Statement — TalentXcel Academy',
   description: 'Our commitment to digital accessibility, WCAG 2.1 AA conformance, and grievance contact.',
+  alternates: {
+    canonical: 'https://talentxcel.net/accessibility',
+  },
 }
 
 export default function AccessibilityPage() {

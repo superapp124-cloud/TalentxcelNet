@@ -8,6 +8,9 @@ import { BookOpen, Calendar, Clock, ArrowRight, Sparkles, Code2, Stethoscope, Br
 export const metadata: Metadata = {
   title: 'Blog & Educational Resources — TalentXcel Academy',
   description: 'Practical guides, architectural blueprints, and career insights across AI development, healthcare technology, digitization, and foundational education.',
+  alternates: {
+    canonical: 'https://talentxcel.net/blog',
+  },
 }
 
 const articles = [
