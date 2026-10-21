@@ -34,13 +34,28 @@ const faqs = [
   },
   {
     category: 'Fees, Hardware & Certification',
-    q: 'Are TalentXcel completion certificates accredited as university degrees?',
-    a: 'No. TalentXcel Academy issues verified platform completion certificates based on demonstrated competency. They are not accredited university degrees, government qualifications, or clinical licenses. Each certificate features a public verification link.',
+    q: 'Can I get a refund if I change my mind?',
+    a: 'Yes. You have a 14-calendar-day cooling-off period starting from admission confirmation. If you withdraw within this window before major milestone coursework is evaluated or proprietary hardware is unsealed, you are eligible for a refund according to our published refund policy.',
   },
   {
     category: 'Fees, Hardware & Certification',
-    q: 'What is the refund policy?',
-    a: 'We offer a transparent 7-day initial cooling-off period from enrolment activation during which you can request a refund if you decide the course does not meet your expectations, subject to our written refund terms and pro-rata administrative fees.',
+    q: 'What happens to the laptop if I withdraw?',
+    a: 'If dedicated hardware has been dispatched or delivered, it must be returned in its original packaging, complete with all accessories and without cosmetic or internal damage, within 7 business days of initiating withdrawal. A standard hardware inspection fee applies upon return.',
+  },
+  {
+    category: 'Fees, Hardware & Certification',
+    q: 'Are taxes included in the fee?',
+    a: 'Base tuition figures (₹29,999 upfront + ₹1,500/mo or ₹41,999 full settlement) exclude statutory 18% GST. With GST included, instalment payments are approximately ₹35,399 upfront and ₹1,770 a month, and full settlement is approximately ₹49,559 (or ₹47,199 with the ₹2,000 early-payment discount).',
+  },
+  {
+    category: 'Fees, Hardware & Certification',
+    q: 'Why can’t I pay online yet?',
+    a: 'Direct commerce checkouts are currently in staged rollout. Registering your interest reserves your cohort priority. You will receive an official written admission agreement with exact specifications, schedule details, and payment instructions before enrolment.',
+  },
+  {
+    category: 'Fees, Hardware & Certification',
+    q: 'Are TalentXcel completion certificates accredited as university degrees?',
+    a: 'No. TalentXcel Academy issues verified platform completion certificates based on demonstrated competency. They are not accredited university degrees, government qualifications, or clinical licenses. Each certificate features a public verification link.',
   },
 ]
 

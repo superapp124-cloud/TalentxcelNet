@@ -714,11 +714,8 @@ export function Class9FoundationSalesExperience() {
             </div>
           </div>
 
-          {/* Option 2: Course + Laptop (Most Popular) */}
-          <div className="rounded-3xl border-2 border-primary bg-card p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden ring-4 ring-primary/10">
-            <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-rose-500 text-white text-xs font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-              <Sparkles className="h-4 w-4" /> Most Popular
-            </div>
+          {/* Option 2: Course + Laptop */}
+          <div className="rounded-3xl border-2 border-primary bg-card p-6 sm:p-8 flex flex-col justify-between shadow-lg relative overflow-hidden">
 
             <div className="space-y-6">
               <div className="space-y-2 border-b pb-4">
