@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { LoginForm } from '@/components/auth/login-form'
@@ -26,7 +27,9 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white dark:bg-neutral-900/80 rounded-3xl border border-black/[0.08] dark:border-white/[0.1] shadow-xl p-8 backdrop-blur-xl">
-          <LoginForm />
+          <Suspense fallback={<div className="py-12 text-center text-sm text-neutral-400">Loading sign in form...</div>}>
+            <LoginForm />
+          </Suspense>
         </div>
 
         <p className="text-center text-xs text-neutral-500">
