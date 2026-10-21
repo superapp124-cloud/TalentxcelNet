@@ -1,5 +1,6 @@
 import { PublicNavbar } from '@/components/public/navbar'
 import { PublicFooter } from '@/components/public/footer'
+import { AdmissionsAssistantWidget } from '@/components/public/admissions-assistant-modal'
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <main className="flex-1" id="main-content">
         {children}
       </main>
+      <AdmissionsAssistantWidget />
       <PublicFooter />
     </div>
   )
