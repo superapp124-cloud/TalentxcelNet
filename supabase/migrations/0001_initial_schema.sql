@@ -1,14 +1,53 @@
 -- TALENTXCEL GREENFIELD PLATFORM INITIAL SCHEMA
 -- Migration: 0001_initial_schema.sql
+-- 100% Idempotent for Supabase SQL Editor execution
 -- Enforces strict question-solution separation, immutable credit ledger, and server-authoritative scoring.
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================================================
--- 1. IDENTITY & MULTI-PROFILE ACCESS
+-- 1. ENUMS (IDEMPOTENT CREATION)
 -- ============================================================================
 
-CREATE TYPE user_role AS ENUM ('learner', 'guardian', 'teacher', 'admin');
+DO $$ BEGIN
+    CREATE TYPE user_role AS ENUM ('learner', 'guardian', 'teacher', 'admin');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE question_type_enum AS ENUM ('single_choice', 'multi_select', 'numeric', 'true_false');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE difficulty_level_enum AS ENUM ('easy', 'medium', 'hard');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE exam_type_enum AS ENUM ('periodic_test', 'unit_test', 'mock_exam', 'topic_practice');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE product_type_enum AS ENUM ('single_assessment', 'monthly_pass', 'annual_pass');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE order_status_enum AS ENUM ('created', 'attempted', 'paid', 'failed', 'refunded');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+-- ============================================================================
+-- 2. IDENTITY & MULTI-PROFILE ACCESS
+-- ============================================================================
 
 CREATE TABLE IF NOT EXISTS profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -41,7 +80,7 @@ CREATE TABLE IF NOT EXISTS guardian_learner_relationships (
 );
 
 -- ============================================================================
--- 2. CURRICULUM HIERARCHY
+-- 3. CURRICULUM HIERARCHY
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS curriculum_boards (
@@ -110,12 +149,8 @@ CREATE TABLE IF NOT EXISTS syllabus_mappings (
 );
 
 -- ============================================================================
--- 3. ASSESSMENT & STRICT QUESTION-KEY SEPARATION
+-- 4. ASSESSMENT & STRICT QUESTION-KEY SEPARATION
 -- ============================================================================
-
-CREATE TYPE question_type_enum AS ENUM ('single_choice', 'multi_select', 'numeric', 'true_false');
-CREATE TYPE difficulty_level_enum AS ENUM ('easy', 'medium', 'hard');
-CREATE TYPE exam_type_enum AS ENUM ('periodic_test', 'unit_test', 'mock_exam', 'topic_practice');
 
 CREATE TABLE IF NOT EXISTS exam_categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -228,11 +263,8 @@ CREATE TABLE IF NOT EXISTS attempt_answers (
 );
 
 -- ============================================================================
--- 4. COMMERCE, ENTITLEMENTS & APPEND-ONLY CREDIT LEDGER
+-- 5. COMMERCE, ENTITLEMENTS & APPEND-ONLY CREDIT LEDGER
 -- ============================================================================
-
-CREATE TYPE product_type_enum AS ENUM ('single_assessment', 'monthly_pass', 'annual_pass');
-CREATE TYPE order_status_enum AS ENUM ('created', 'attempted', 'paid', 'failed', 'refunded');
 
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -307,7 +339,7 @@ CREATE TABLE IF NOT EXISTS refunds (
 );
 
 -- ============================================================================
--- 5. ROW LEVEL SECURITY (RLS) POLICIES
+-- 6. ROW LEVEL SECURITY (RLS) POLICIES (IDEMPOTENT)
 -- ============================================================================
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -328,24 +360,42 @@ ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE entitlements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE credit_ledger ENABLE ROW LEVEL SECURITY;
 
--- Public read for catalog
+-- Drop existing policies if any before re-creating
+DROP POLICY IF EXISTS "Public can read curriculum boards" ON curriculum_boards;
 CREATE POLICY "Public can read curriculum boards" ON curriculum_boards FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read classes" ON classes;
 CREATE POLICY "Public can read classes" ON classes FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read subjects" ON subjects;
 CREATE POLICY "Public can read subjects" ON subjects FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read chapters" ON chapters;
 CREATE POLICY "Public can read chapters" ON chapters FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read topics" ON topics;
 CREATE POLICY "Public can read topics" ON topics FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read active blueprints" ON assessment_blueprints;
 CREATE POLICY "Public can read active blueprints" ON assessment_blueprints FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read active products" ON products;
 CREATE POLICY "Public can read active products" ON products FOR SELECT USING (is_active = true);
 
 -- Questions: Accessible during active tests, but questions NEVER have answers
+DROP POLICY IF EXISTS "Authenticated users can read questions" ON questions;
 CREATE POLICY "Authenticated users can read questions" ON questions FOR SELECT TO authenticated USING (status = 'published');
 
 -- QUESTION SOLUTIONS: LOCKED DOWN! No authenticated or anonymous role may directly select!
 -- Accessible solely through security definer RPC
+DROP POLICY IF EXISTS "No direct client access to solutions" ON question_solutions;
 CREATE POLICY "No direct client access to solutions" ON question_solutions FOR ALL USING (false);
 
 -- Profiles & Learners
+DROP POLICY IF EXISTS "Users read own profile" ON profiles;
 CREATE POLICY "Users read own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Guardians read own learners" ON learner_profiles;
 CREATE POLICY "Guardians read own learners" ON learner_profiles FOR SELECT USING (
     guardian_id = auth.uid() OR id IN (
         SELECT learner_id FROM guardian_learner_relationships WHERE guardian_id = auth.uid()
@@ -353,11 +403,14 @@ CREATE POLICY "Guardians read own learners" ON learner_profiles FOR SELECT USING
 );
 
 -- Attempts & Answers
+DROP POLICY IF EXISTS "Users read own attempts" ON attempts;
 CREATE POLICY "Users read own attempts" ON attempts FOR SELECT USING (
     learner_id IN (
         SELECT id FROM learner_profiles WHERE guardian_id = auth.uid()
     )
 );
+
+DROP POLICY IF EXISTS "Users read own attempt answers" ON attempt_answers;
 CREATE POLICY "Users read own attempt answers" ON attempt_answers FOR SELECT USING (
     attempt_id IN (
         SELECT id FROM attempts WHERE learner_id IN (
@@ -367,12 +420,17 @@ CREATE POLICY "Users read own attempt answers" ON attempt_answers FOR SELECT USI
 );
 
 -- Entitlements & Credit Ledger
+DROP POLICY IF EXISTS "Users read own entitlements" ON entitlements;
 CREATE POLICY "Users read own entitlements" ON entitlements FOR SELECT USING (user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Users read own credit ledger" ON credit_ledger;
 CREATE POLICY "Users read own credit ledger" ON credit_ledger FOR SELECT USING (user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Users read own orders" ON orders;
 CREATE POLICY "Users read own orders" ON orders FOR SELECT USING (user_id = auth.uid());
 
 -- ============================================================================
--- 6. SERVER-AUTHORITATIVE ASSESSMENT SUBMISSION FUNCTION
+-- 7. SERVER-AUTHORITATIVE ASSESSMENT SUBMISSION FUNCTION
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION submit_assessment_attempt(

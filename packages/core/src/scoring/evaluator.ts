@@ -143,16 +143,20 @@ export function evaluateAssessmentAttempt(payload: ScoringPayload): AssessmentRe
     ? Math.round((correctCount / attemptedCount) * 1000) / 10
     : 0
 
-  // Calculate weak topics (accuracy < 60%)
+  // Calculate weak topics (< 60%) and strong topics (>= 60%)
   const weakTopics: Array<{ topicId: string; topicName: string; accuracy: number }> = []
+  const strongTopics: Array<{ topicId: string; topicName: string; accuracy: number }> = []
   for (const [topicId, stat] of topicStats.entries()) {
     const topicAccuracy = stat.total > 0 ? (stat.correct / stat.total) * 100 : 0
+    const entry = {
+      topicId,
+      topicName: topicsMap.get(topicId) || `Topic ${topicId}`,
+      accuracy: Math.round(topicAccuracy),
+    }
     if (topicAccuracy < 60) {
-      weakTopics.push({
-        topicId,
-        topicName: topicsMap.get(topicId) || `Topic ${topicId}`,
-        accuracy: Math.round(topicAccuracy),
-      })
+      weakTopics.push(entry)
+    } else {
+      strongTopics.push(entry)
     }
   }
 
@@ -162,6 +166,7 @@ export function evaluateAssessmentAttempt(payload: ScoringPayload): AssessmentRe
   return {
     attemptId,
     blueprintId: blueprint.id,
+    blueprintTitle: blueprint.title,
     learnerId,
     scoreObtained,
     maxMarks: blueprint.totalMarks,
@@ -175,6 +180,7 @@ export function evaluateAssessmentAttempt(payload: ScoringPayload): AssessmentRe
     totalTimeSpentSeconds: totalTimeSpent,
     evaluatedAt: new Date().toISOString(),
     weakTopics,
+    strongTopics,
     earnedPassCredits,
     evaluations,
   }

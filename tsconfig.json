@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@talentxcel/core": ["./packages/core/src"],
+      "@talentxcel/ui": ["./packages/ui/src"]
     }
   },
   "include": [
