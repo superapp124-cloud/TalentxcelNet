@@ -16,11 +16,25 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
   public: 1,
 }
 
+export const SUPER_ADMIN_EMAILS = [
+  'arsh.wani@gmail.com',
+  'talentxcelservices@gmail.com',
+  'talentxcelservices@gmail.ocm',
+  'admin@talentxcel.net',
+]
+
+export function isSuperAdminEmail(email?: string | null): boolean {
+  if (!email) return false
+  const normalized = email.toLowerCase().trim()
+  return SUPER_ADMIN_EMAILS.some((adminEmail) => adminEmail.toLowerCase() === normalized)
+}
+
 export function hasRoleOrAbove(userRole: UserRole, requiredRole: UserRole): boolean {
   return (ROLE_HIERARCHY[userRole] ?? 0) >= (ROLE_HIERARCHY[requiredRole] ?? 0)
 }
 
-export function isAdmin(role: UserRole): boolean {
+export function isAdmin(role: UserRole, email?: string | null): boolean {
+  if (email && isSuperAdminEmail(email)) return true
   return role === 'academy_admin' || role === 'super_admin'
 }
 

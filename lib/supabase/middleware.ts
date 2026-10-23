@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
+import { isSuperAdminEmail } from '@/lib/auth/permissions'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -56,11 +57,15 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/auth/register')
 
   const isLocalHost = host.includes('localhost') || host.includes('127.0.0.1')
+  const isPreview = request.nextUrl.searchParams.get('preview') === '1'
   const isLocalE2EAudit =
     (process.env.NODE_ENV !== 'production' || isLocalHost) &&
-    (request.headers.get('x-e2e-audit') === '1' || request.cookies.get('e2e_audit')?.value === '1')
+    (request.headers.get('x-e2e-audit') === '1' ||
+      request.cookies.get('e2e_audit')?.value === '1' ||
+      isPreview)
+  const isSuperAdminUser = isSuperAdminEmail(user?.email)
 
-  if (isAcademyRoute && !user && !isLocalE2EAudit) {
+  if (isAcademyRoute && !user && !isLocalE2EAudit && !isSuperAdminUser) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/auth/login'
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)

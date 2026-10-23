@@ -8,11 +8,13 @@ import {
   Cpu,
   Globe,
   ArrowLeft,
+  Calculator,
 } from 'lucide-react'
 import { Logo } from '@/components/brand/logo'
 
 const navItems = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { label: 'Maths Bank (36.5k Qs)', href: '/admin/question-bank', icon: Calculator },
   { label: 'Ecosystem Growth OS', href: '/admin/growth-os', icon: Globe },
   { label: 'Admissions CRM', href: '/admin/admissions', icon: Users },
   { label: 'Programmes & Content', href: '/admin/programmes', icon: BookOpen },
