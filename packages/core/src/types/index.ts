@@ -316,3 +316,145 @@ export interface LearnerAnalyticsSummary {
   weakTopics: Array<{ topicId: string; topicTitle: string; chapterTitle: string; subjectName: string; errorCount: number }>
   recentAttempts: Array<AssessmentResult>
 }
+
+// ============================================================================
+// THREE-DOMAIN ARCHITECTURE & SHARED INTELLIGENCE TYPES
+// ============================================================================
+
+export type LearningDomain = 'assessment' | 'skills' | 'academic'
+
+export type SkillCategory =
+  | 'ai_automation'
+  | 'coding_computation'
+  | 'math_problem_solving'
+  | 'robotics_engineering'
+  | 'design_production'
+  | 'communication_collaboration'
+  | 'entrepreneurship_finance'
+  | 'digital_vocational'
+
+export type PedagogicalPhilosophy = 'japanese_kaizen' | 'chinese_progression' | 'universal_mastery'
+
+export interface SkillTrack {
+  id: string
+  category: SkillCategory
+  title: string
+  description: string
+  targetGrades: string
+  level: 'foundation' | 'intermediate' | 'advanced'
+  philosophy: PedagogicalPhilosophy
+  philosophyNote: string
+  modulesCount: number
+  projectsCount: number
+  iconName: string
+  colorTheme: 'indigo' | 'cyan' | 'purple' | 'amber' | 'emerald' | 'blue' | 'rose'
+}
+
+export interface SkillModule {
+  id: string
+  trackId: string
+  moduleNumber: number
+  title: string
+  description: string
+  durationMinutes: number
+  keyTechniques: string[]
+  status: SyllabusStatus
+}
+
+export interface SkillRubricItem {
+  criterion: string
+  weightPercentage: number
+  masteryDescription: string
+}
+
+export interface SkillProject {
+  id: string
+  trackId: string
+  moduleId?: string
+  title: string
+  brief: string
+  realWorldContext: string
+  deliverables: string[]
+  rubricCriteria: SkillRubricItem[]
+  estimatedHours: number
+  difficulty: DifficultyLevel
+  status: SyllabusStatus
+}
+
+export interface SkillSubmission {
+  id: string
+  projectId: string
+  learnerId: string
+  submissionUrl?: string
+  notes?: string
+  status: 'draft' | 'submitted' | 'reviewed'
+  feedback?: string
+  awardedBadges: string[]
+  completedAt?: string
+}
+
+export interface AcademicWorkedExample {
+  problemText: string
+  stepByStepSolution: string[]
+  finalAnswer: string
+}
+
+export interface AcademicLesson {
+  id: string
+  chapterId: string
+  topicId: string
+  lessonNumber: number
+  title: string
+  readingTimeMinutes: number
+  conceptBreakdown: Array<{ heading: string; body: string }>
+  workedExamples: AcademicWorkedExample[]
+  revisionNotes: string[]
+  keyFormulasOrRules?: string[]
+  linkedBlueprintId?: string // Seamlessly connects lesson to chapter diagnostic test
+  status: SyllabusStatus
+}
+
+export interface CompetitiveExamBatch {
+  id: string
+  examCode: string // 'JEE' | 'NEET' | 'CUET' | 'UPSC' | 'STATE_PSC' | 'JKSSB' | 'SSC' | 'BANKING' | 'GATE' | 'UGC_NET'
+  name: string
+  category: 'engineering_medical' | 'civil_services' | 'graduate_state' | 'banking_ssc'
+  targetStage: string
+  verifiedStatus: SyllabusStatus
+  sampleTestsAvailable: number
+  expectedLaunchBatch: string
+}
+
+export interface PersonalisedGrowthRecommendation {
+  id: string
+  identifiedGapTopicId: string
+  gapDescription: string
+  recommendedLessonId: string
+  recommendedLessonTitle: string
+  recommendedProjectId: string
+  recommendedProjectTitle: string
+  reassessmentBlueprintId: string
+}
+
+export interface LearnerTriDomainProgress {
+  learnerId: string
+  learnerName: string
+  assessmentStats: {
+    totalAttempted: number
+    accuracyPercentage: number
+    weakTopicsCount: number
+    passCreditsEarned: number
+  }
+  academicStats: {
+    lessonsCompleted: number
+    chaptersCovered: number
+    revisionReadyCount: number
+  }
+  skillStats: {
+    projectsCompleted: number
+    competenciesMastered: number
+    activeProjectsCount: number
+  }
+  growthRecommendations: PersonalisedGrowthRecommendation[]
+}
+

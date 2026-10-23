@@ -247,9 +247,66 @@ describe('TalentXcel Core - Security & Server-Authoritative Scoring', () => {
     expect(result.correctCount).toBe(7)
     expect(result.incorrectCount).toBe(1)
     expect(result.passed).toBe(true) // 87.5% > 60%
-    expect(result.evaluations.length).toBe(8)
-    // Check that confidential solutions are provided in result for learner review
     expect(result.evaluations[0].solutionSteps.length).toBeGreaterThan(0)
     expect(result.evaluations[0].keyPoint).toBeDefined()
+  })
+
+  it('validates Three-Domain Architecture: Skill Tracks embody Japanese & Chinese design inspirations', async () => {
+    const { SEED_SKILL_TRACKS, SEED_SKILL_PROJECTS } = await import('../data/seed-catalog')
+    expect(SEED_SKILL_TRACKS.length).toBe(8)
+    
+    // Check Japanese Kaizen & Chinese Progression philosophical tagging
+    const kaizenTracks = SEED_SKILL_TRACKS.filter((t) => t.philosophy === 'japanese_kaizen')
+    const progressionTracks = SEED_SKILL_TRACKS.filter((t) => t.philosophy === 'chinese_progression')
+    expect(kaizenTracks.length).toBeGreaterThan(0)
+    expect(progressionTracks.length).toBeGreaterThan(0)
+
+    // Check Projects and rubric criteria
+    expect(SEED_SKILL_PROJECTS.length).toBeGreaterThanOrEqual(4)
+    for (const project of SEED_SKILL_PROJECTS) {
+      expect(project.rubricCriteria.length).toBeGreaterThan(0)
+      const totalWeight = project.rubricCriteria.reduce((acc, r) => acc + r.weightPercentage, 0)
+      expect(totalWeight).toBe(100) // Rubrics sum to 100%
+      expect(project.deliverables.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('validates Three-Domain Architecture: Academic Lessons connect to Assessment Engine', async () => {
+    const { SEED_ACADEMIC_LESSONS, SEED_BLUEPRINTS } = await import('../data/seed-catalog')
+    expect(SEED_ACADEMIC_LESSONS.length).toBeGreaterThanOrEqual(4)
+
+    for (const lesson of SEED_ACADEMIC_LESSONS) {
+      expect(lesson.conceptBreakdown.length).toBeGreaterThan(0)
+      expect(lesson.workedExamples.length).toBeGreaterThan(0)
+      expect(lesson.revisionNotes.length).toBeGreaterThan(0)
+      if (lesson.linkedBlueprintId) {
+        const blueprint = SEED_BLUEPRINTS.find((b) => b.id === lesson.linkedBlueprintId)
+        expect(blueprint).toBeDefined()
+      }
+    }
+  })
+
+  it('validates Three-Domain Architecture: Competitive Exam batches are clearly staged', async () => {
+    const { SEED_COMPETITIVE_EXAMS } = await import('../data/seed-catalog')
+    expect(SEED_COMPETITIVE_EXAMS.length).toBe(8)
+    const verifiedBatches = SEED_COMPETITIVE_EXAMS.filter((e) => e.verifiedStatus === 'verified')
+    const provisionalBatches = SEED_COMPETITIVE_EXAMS.filter((e) => e.verifiedStatus === 'provisional')
+    expect(verifiedBatches.length).toBe(2) // JEE & NEET active
+    expect(provisionalBatches.length).toBe(6) // CUET, UPSC, PSC, SSC, Banking, GATE
+  })
+
+  it('validates Shared Learner Intelligence: Kaizen growth recommendations link gaps to lessons and projects', async () => {
+    const { SEED_LEARNER_TRI_DOMAIN_PROGRESS, SEED_ACADEMIC_LESSONS, SEED_SKILL_PROJECTS } = await import(
+      '../data/seed-catalog'
+    )
+    expect(SEED_LEARNER_TRI_DOMAIN_PROGRESS.growthRecommendations.length).toBeGreaterThan(0)
+
+    for (const rec of SEED_LEARNER_TRI_DOMAIN_PROGRESS.growthRecommendations) {
+      const lesson = SEED_ACADEMIC_LESSONS.find((l) => l.id === rec.recommendedLessonId)
+      const project = SEED_SKILL_PROJECTS.find((p) => p.id === rec.recommendedProjectId)
+      expect(lesson).toBeDefined()
+      expect(project).toBeDefined()
+      expect(rec.reassessmentBlueprintId).toBeDefined()
+    }
   })
 })

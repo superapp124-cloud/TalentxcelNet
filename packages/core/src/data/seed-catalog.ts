@@ -11,6 +11,15 @@ import type {
   LearnerAnalyticsSummary,
   AssessmentResult,
   AptitudeCategory,
+  LearningDomain,
+  SkillTrack,
+  SkillModule,
+  SkillProject,
+  SkillSubmission,
+  AcademicLesson,
+  CompetitiveExamBatch,
+  LearnerTriDomainProgress,
+  PersonalisedGrowthRecommendation,
 } from '../types'
 
 // ============================================================================
@@ -2128,3 +2137,530 @@ export function buildLearnerAnalyticsSummary(
     recentAttempts: attempts,
   }
 }
+
+// ============================================================================
+// 11. DOMAIN 2 — SKILL DEVELOPMENT CATALOGUE (JAPANESE & CHINESE INSPIRATIONS)
+// ============================================================================
+
+export const SEED_SKILL_TRACKS: SkillTrack[] = [
+  {
+    id: 'track_ai_automation',
+    category: 'ai_automation',
+    title: 'AI & Automated Intelligence',
+    description:
+      'Master prompt engineering, neural concepts, workflow automation and grounded generative agents.',
+    targetGrades: 'Classes 5–12 & Emerging Engineers',
+    level: 'foundation',
+    philosophy: 'japanese_kaizen',
+    philosophyNote:
+      'Design inspiration: Japanese craftsmanship (Kodawari) in model refinement and continuous prompt optimization.',
+    modulesCount: 6,
+    projectsCount: 4,
+    iconName: 'Sparkles',
+    colorTheme: 'indigo',
+  },
+  {
+    id: 'track_coding_computation',
+    category: 'coding_computation',
+    title: 'Computational Thinking & Software Craft',
+    description:
+      'Step-by-step algorithms, visual logic, Python fundamentals, clean syntax and systematic debugging.',
+    targetGrades: 'Classes 4–12',
+    level: 'foundation',
+    philosophy: 'chinese_progression',
+    philosophyNote:
+      'Design inspiration: Chinese structured progression — rigorous mathematical foundations, deliberate practice and applied algorithms.',
+    modulesCount: 8,
+    projectsCount: 5,
+    iconName: 'Code',
+    colorTheme: 'blue',
+  },
+  {
+    id: 'track_math_problem_solving',
+    category: 'math_problem_solving',
+    title: 'Applied Mathematics & Mental Models',
+    description:
+      'Combinatorial reasoning, geometric visual proofs, modular arithmetic and Olympiad-level deduction.',
+    targetGrades: 'Classes 4–12',
+    level: 'intermediate',
+    philosophy: 'universal_mastery',
+    philosophyNote:
+      'Continuous mental drills and visual proof construction for real-world mathematical mastery.',
+    modulesCount: 6,
+    projectsCount: 4,
+    iconName: 'Calculator',
+    colorTheme: 'amber',
+  },
+  {
+    id: 'track_robotics_engineering',
+    category: 'robotics_engineering',
+    title: 'Robotics & Physical Computing',
+    description:
+      'Circuits, sensors, actuators, closed-loop logic and microcontroller engineering with Arduino.',
+    targetGrades: 'Classes 6–12',
+    level: 'foundation',
+    philosophy: 'japanese_kaizen',
+    philosophyNote:
+      'Design inspiration: Japanese Monozukuri — precision physical craft, disciplined safety and iterative hardware builds.',
+    modulesCount: 6,
+    projectsCount: 3,
+    iconName: 'Cpu',
+    colorTheme: 'emerald',
+  },
+  {
+    id: 'track_design_production',
+    category: 'design_production',
+    title: 'UI/UX & Creative Digital Production',
+    description:
+      'Design systems, visual hierarchy, ergonomic user interfaces, typography and accessible prototypes.',
+    targetGrades: 'Classes 6–12',
+    level: 'intermediate',
+    philosophy: 'japanese_kaizen',
+    philosophyNote:
+      'Design inspiration: Japanese aesthetic minimalism — purposeful negative space, high contrast and user empathy.',
+    modulesCount: 6,
+    projectsCount: 4,
+    iconName: 'Palette',
+    colorTheme: 'purple',
+  },
+  {
+    id: 'track_communication_collab',
+    category: 'communication_collaboration',
+    title: 'Technical Communication & Debate',
+    description:
+      'Clear structured rhetoric, evidence-based argument construction, peer reviews and project presentations.',
+    targetGrades: 'Classes 5–12',
+    level: 'foundation',
+    philosophy: 'universal_mastery',
+    philosophyNote:
+      'Clarity of thought reflected through disciplined writing, active listening and structured peer critique.',
+    modulesCount: 4,
+    projectsCount: 3,
+    iconName: 'MessageSquare',
+    colorTheme: 'cyan',
+  },
+  {
+    id: 'track_entrepreneurship_fin',
+    category: 'entrepreneurship_finance',
+    title: 'Venture Creation & Financial Literacy',
+    description:
+      'Unit economics, budgeting, customer validation interviews, pricing models and business prototypes.',
+    targetGrades: 'Classes 7–12',
+    level: 'intermediate',
+    philosophy: 'chinese_progression',
+    philosophyNote:
+      'Design inspiration: Pragmatic execution — early revenue focus, frugal prototyping and rapid customer feedback loops.',
+    modulesCount: 5,
+    projectsCount: 3,
+    iconName: 'TrendingUp',
+    colorTheme: 'rose',
+  },
+  {
+    id: 'track_digital_vocational',
+    category: 'digital_vocational',
+    title: 'Modern Digital Tools & Cloud Workflows',
+    description:
+      'Spreadsheets, relational data tables, cloud storage, API integrations and cybersecurity hygiene.',
+    targetGrades: 'Classes 6–12',
+    level: 'foundation',
+    philosophy: 'universal_mastery',
+    philosophyNote:
+      'Practical vocational digital fluency required in modern academic and professional research environments.',
+    modulesCount: 5,
+    projectsCount: 3,
+    iconName: 'Cloud',
+    colorTheme: 'blue',
+  },
+]
+
+export const SEED_SKILL_PROJECTS: SkillProject[] = [
+  {
+    id: 'proj_ai_assistant',
+    trackId: 'track_ai_automation',
+    title: 'Build a Socratic Study Helper with Grounded Prompts',
+    brief:
+      'Design, test, and document a multi-turn AI prompt that guides a student to understand Grade 4 fractions without giving away direct answers.',
+    realWorldContext:
+      'AI systems in education must teach through Socratic questioning rather than writing student homework for them.',
+    deliverables: [
+      'System prompt with explicit pedagogical guardrails',
+      'Test transcript demonstrating 3 student misconceptions successfully resolved',
+      'One-page edge-case analysis report',
+    ],
+    rubricCriteria: [
+      { criterion: 'Socratic Guardrails', weightPercentage: 35, masteryDescription: 'Never reveals answers prematurely; prompts with guiding questions' },
+      { criterion: 'Clarity of Instruction', weightPercentage: 35, masteryDescription: 'Clear, concise and age-appropriate vocabulary' },
+      { criterion: 'Edge-Case Handling', weightPercentage: 30, masteryDescription: 'Detects off-topic queries or frustration and gently resets focus' },
+    ],
+    estimatedHours: 4,
+    difficulty: 'easy',
+    status: 'verified',
+  },
+  {
+    id: 'proj_coding_maze',
+    trackId: 'track_coding_computation',
+    title: 'Interactive 2D Grid Maze Game in JavaScript',
+    brief:
+      'Program a functional browser maze where a player character navigates using arrow keys, collects energy stars, and avoids algorithmic obstacle walls.',
+    realWorldContext:
+      'Grid coordinate arrays and event-driven game loops are the foundational building blocks of graphical applications.',
+    deliverables: [
+      'Clean HTML5/JS canvas game loop script',
+      'Deterministic 10x10 matrix maze layout',
+      'Collision detection and win-condition handlers',
+    ],
+    rubricCriteria: [
+      { criterion: 'Algorithmic Cleanliness', weightPercentage: 40, masteryDescription: 'Modular functions, zero global leaks, descriptive variable naming' },
+      { criterion: 'Smooth Collision Logic', weightPercentage: 30, masteryDescription: 'Character never clips through boundary walls or diagonal gaps' },
+      { criterion: 'User Experience & Feedback', weightPercentage: 30, masteryDescription: 'Clear score counter, restart button, and visual celebration' },
+    ],
+    estimatedHours: 6,
+    difficulty: 'medium',
+    status: 'verified',
+  },
+  {
+    id: 'proj_robotics_sensor',
+    trackId: 'track_robotics_engineering',
+    title: 'Soil Moisture Smart Irrigation Alert Circuit',
+    brief:
+      'Construct a breadboard circuit using a resistive moisture probe and an LED/buzzer to alert gardeners when plant soil falls below 20% moisture.',
+    realWorldContext:
+      'Precision agriculture in India relies on low-cost IoT soil moisture probes to prevent groundwater depletion.',
+    deliverables: [
+      'Wiring schematic diagram showing resistor voltage divider',
+      'Annotated Arduino/ESP32 sketch with threshold calibration',
+      '1-minute demonstration video or photographic log',
+    ],
+    rubricCriteria: [
+      { criterion: 'Circuit Safety & Wiring', weightPercentage: 30, masteryDescription: 'Correct resistor values, zero short-circuit risks' },
+      { criterion: 'Sensor Calibration Accuracy', weightPercentage: 40, masteryDescription: 'Accurately distinguishes between dry, moist, and saturated soil' },
+      { criterion: 'Documentation Rigor', weightPercentage: 30, masteryDescription: 'Clear pin-out diagram and bill of materials' },
+    ],
+    estimatedHours: 5,
+    difficulty: 'medium',
+    status: 'verified',
+  },
+  {
+    id: 'proj_design_flashcard',
+    trackId: 'track_design_production',
+    title: 'Accessible School Flashcard Interface Design',
+    brief:
+      'Design a 3-screen mobile flashcard application in Figma or pen-and-paper wireframes adhering to WCAG AA color contrast standards.',
+    realWorldContext:
+      'Educational software must be legible under direct sunlight and accessible to learners with visual impairments.',
+    deliverables: [
+      'Deck selection screen wireframe',
+      'Active flashcard study screen with tap-to-flip state',
+      'Contrast ratio audit matrix for primary color tokens',
+    ],
+    rubricCriteria: [
+      { criterion: 'Accessibility Compliance', weightPercentage: 40, masteryDescription: 'All body text passes 4.5:1 contrast against background' },
+      { criterion: 'Interaction Ergonomics', weightPercentage: 30, masteryDescription: 'Primary flip and next buttons are easily reachable with one thumb' },
+      { criterion: 'Visual Cohesion', weightPercentage: 30, masteryDescription: 'Consistent typography scale, border radii, and iconography' },
+    ],
+    estimatedHours: 4,
+    difficulty: 'easy',
+    status: 'verified',
+  },
+]
+
+// ============================================================================
+// 12. DOMAIN 3 — ACADEMIC LEARNING LESSONS (CONCEPT → WORKED EXAMPLES → TEST)
+// ============================================================================
+
+export const SEED_ACADEMIC_LESSONS: AcademicLesson[] = [
+  {
+    id: 'less_g4_m6_l1',
+    chapterId: 'chap_g4_math_c6',
+    topicId: 'top_g4_m6_1',
+    lessonNumber: 1,
+    title: 'Understanding Multiples: What Happens When We Multiply Whole Numbers',
+    readingTimeMinutes: 8,
+    conceptBreakdown: [
+      {
+        heading: 'What is a Multiple?',
+        body: 'A multiple of a number is the product obtained when that number is multiplied by any whole number (1, 2, 3, 4...). For example, the multiples of 7 are 7, 14, 21, 28, 35...',
+      },
+      {
+        heading: 'Visualizing on the Number Line',
+        body: 'Imagine starting at 0 and hopping forward by 6 steps each time. You will land on 6, 12, 18, 24, 30... Every spot where you land is a multiple of 6!',
+      },
+      {
+        heading: 'Fundamental Properties of Multiples',
+        body: '1. Every number is a multiple of 1.\n2. Every number is a multiple of itself.\n3. The smallest non-zero multiple of a number is the number itself.\n4. A number has an infinite number of multiples.',
+      },
+    ],
+    workedExamples: [
+      {
+        problemText: 'Find the 4th multiple of 7.',
+        stepByStepSolution: [
+          'Step 1: Identify the base number, which is 7.',
+          'Step 2: To find the 4th multiple, multiply 7 by 4.',
+          'Step 3: 7 × 4 = 28.',
+        ],
+        finalAnswer: 'The 4th multiple of 7 is 28.',
+      },
+      {
+        problemText: 'Is 45 a multiple of 6? Explain why or why not.',
+        stepByStepSolution: [
+          'Step 1: Divide 45 by 6: 45 ÷ 6 = 7 with a remainder of 3.',
+          'Step 2: If a number is a multiple of 6, the remainder must be 0.',
+          'Step 3: Since there is a remainder of 3, 45 is not divisible by 6.',
+        ],
+        finalAnswer: 'No, 45 is not a multiple of 6 because 6 × 7 = 42 and 6 × 8 = 48.',
+      },
+    ],
+    revisionNotes: [
+      'To check if X is a multiple of Y, divide X by Y. If remainder is 0, then YES!',
+      'Multiples never end (they are infinite). Factors, on the other hand, are finite.',
+      'Even numbers are all multiples of 2.',
+    ],
+    keyFormulasOrRules: ['nth multiple of a number k = k × n'],
+    linkedBlueprintId: 'bp_free_g4_math',
+    status: 'verified',
+  },
+  {
+    id: 'less_g4_m6_l2',
+    chapterId: 'chap_g4_math_c6',
+    topicId: 'top_g4_m6_2',
+    lessonNumber: 2,
+    title: 'Common Multiples & Lowest Common Multiple (LCM) Basics',
+    readingTimeMinutes: 10,
+    conceptBreakdown: [
+      {
+        heading: 'What are Common Multiples?',
+        body: 'A number that is a multiple of two or more numbers is called their common multiple. For example, 12 is in the 3-times table AND in the 4-times table, so 12 is a common multiple of 3 and 4.',
+      },
+      {
+        heading: 'Finding the Lowest Common Multiple (LCM)',
+        body: 'The smallest non-zero common multiple of two numbers is called the Lowest Common Multiple (LCM). For 4 and 6: Multiples of 4 are 4, 8, 12, 16... Multiples of 6 are 6, 12, 18... The smallest shared number is 12!',
+      },
+    ],
+    workedExamples: [
+      {
+        problemText: 'Find the first two common multiples of 2 and 5.',
+        stepByStepSolution: [
+          'Step 1: List multiples of 2: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20...',
+          'Step 2: List multiples of 5: 5, 10, 15, 20, 25...',
+          'Step 3: Find shared numbers in both lists: 10 and 20.',
+        ],
+        finalAnswer: 'The first two common multiples of 2 and 5 are 10 and 20.',
+      },
+    ],
+    revisionNotes: [
+      'Multiples of 10 are always common multiples of 2 and 5.',
+      'The LCM is always greater than or equal to the larger number.',
+    ],
+    linkedBlueprintId: 'bp_free_g4_math',
+    status: 'verified',
+  },
+  {
+    id: 'less_g4_s5_l1',
+    chapterId: 'chap_g4_sci_u5',
+    topicId: 'top_g4_s5_1',
+    lessonNumber: 1,
+    title: 'Forces in Our World: Contact Forces vs Non-Contact Forces',
+    readingTimeMinutes: 8,
+    conceptBreakdown: [
+      {
+        heading: 'What is a Force?',
+        body: 'A force is a push or pull upon an object resulting from its interaction with another object. Forces can make stationary things move, moving things stop, or change their direction.',
+      },
+      {
+        heading: 'Contact Forces',
+        body: 'Forces that act only when two interacting objects are physically touching each other. Examples: Muscular force (pushing a swing), Frictional force (brakes stopping a bicycle).',
+      },
+      {
+        heading: 'Non-Contact Forces',
+        body: 'Forces that can act over a distance without physical contact. Examples: Gravitational force (apple falling from tree), Magnetic force (magnet pulling iron pins).',
+      },
+    ],
+    workedExamples: [
+      {
+        problemText: 'Why does a rolling ball on grass gradually slow down and stop?',
+        stepByStepSolution: [
+          'Step 1: The surface of the ball rubs against the grass.',
+          'Step 2: A contact force called friction acts in the opposite direction of the ball’s motion.',
+          'Step 3: This continuous resistance removes kinetic energy until the ball stops.',
+        ],
+        finalAnswer: 'The ball stops because of frictional force acting against its movement.',
+      },
+    ],
+    revisionNotes: [
+      'Gravity always pulls downward toward the center of the Earth.',
+      'Smooth surfaces have less friction than rough surfaces.',
+    ],
+    linkedBlueprintId: 'bp_free_g4_sci',
+    status: 'verified',
+  },
+  {
+    id: 'less_g4_e8_l1',
+    chapterId: 'chap_g4_eng_c8',
+    topicId: 'top_g4_e8_1',
+    lessonNumber: 1,
+    title: 'The Pied Piper of Hamelin: Story Structure, Themes & Adverbs',
+    readingTimeMinutes: 9,
+    conceptBreakdown: [
+      {
+        heading: 'Plot Overview',
+        body: 'The town of Hamelin was overrun with rats. A mysterious piper dressed in pied (colorful) clothes offered to rid the town of rats using his magical flute music. When the Mayor broke his promise to pay him, the piper used his music again with profound consequences.',
+      },
+      {
+        heading: 'Grammar Focus: Adverbs of Manner',
+        body: 'Adverbs describe HOW an action is done. In the sentence "The Piper walked merrily through Hamelin", "merrily" is an adverb describing the verb "walked". Most adverbs of manner end in "-ly".',
+      },
+    ],
+    workedExamples: [
+      {
+        problemText: 'Find the adverb: "The children followed the sweet music joyfully."',
+        stepByStepSolution: [
+          'Step 1: Identify the action verb: "followed".',
+          'Step 2: Ask: "How did they follow?"',
+          'Step 3: The word "joyfully" tells us how they followed.',
+        ],
+        finalAnswer: 'The adverb is "joyfully".',
+      },
+    ],
+    revisionNotes: [
+      'Adverb of manner: tells HOW (slowly, quickly, happily).',
+      'Past tense of irregular verb "blow" is "blew".',
+    ],
+    linkedBlueprintId: 'bp_free_g4_eng',
+    status: 'verified',
+  },
+]
+
+// ============================================================================
+// 13. COMPETITIVE EXAM BATCHES (VALIDATED & PROVISIONAL PIPELINES)
+// ============================================================================
+
+export const SEED_COMPETITIVE_EXAMS: CompetitiveExamBatch[] = [
+  {
+    id: 'exam_jee',
+    examCode: 'JEE',
+    name: 'Joint Entrance Examination (Main & Advanced)',
+    category: 'engineering_medical',
+    targetStage: 'Classes 11–12 & Aspirants',
+    verifiedStatus: 'verified',
+    sampleTestsAvailable: 12,
+    expectedLaunchBatch: 'Batch 2026-27 Active',
+  },
+  {
+    id: 'exam_neet',
+    examCode: 'NEET',
+    name: 'National Eligibility cum Entrance Test (UG Medical)',
+    category: 'engineering_medical',
+    targetStage: 'Classes 11–12 & Aspirants',
+    verifiedStatus: 'verified',
+    sampleTestsAvailable: 10,
+    expectedLaunchBatch: 'Batch 2026-27 Active',
+  },
+  {
+    id: 'exam_cuet',
+    examCode: 'CUET',
+    name: 'Common University Entrance Test (UG)',
+    category: 'graduate_state',
+    targetStage: 'Class 12 Passing Out',
+    verifiedStatus: 'provisional',
+    sampleTestsAvailable: 6,
+    expectedLaunchBatch: 'March 2027 Pipeline',
+  },
+  {
+    id: 'exam_upsc',
+    examCode: 'UPSC',
+    name: 'UPSC Civil Services (Prelims GS & CSAT)',
+    category: 'civil_services',
+    targetStage: 'Graduates & Final Year',
+    verifiedStatus: 'provisional',
+    sampleTestsAvailable: 8,
+    expectedLaunchBatch: 'April 2027 Pipeline',
+  },
+  {
+    id: 'exam_state_psc',
+    examCode: 'STATE_PSC',
+    name: 'State Public Service Commissions (State PSCs & JKSSB)',
+    category: 'graduate_state',
+    targetStage: 'State Civil & Administrative Roles',
+    verifiedStatus: 'provisional',
+    sampleTestsAvailable: 8,
+    expectedLaunchBatch: 'May 2027 Pipeline',
+  },
+  {
+    id: 'exam_ssc',
+    examCode: 'SSC',
+    name: 'Staff Selection Commission (CGL & CHSL)',
+    category: 'banking_ssc',
+    targetStage: 'Tier 1 & Tier 2 Quantitative & Reasoning',
+    verifiedStatus: 'provisional',
+    sampleTestsAvailable: 6,
+    expectedLaunchBatch: 'June 2027 Pipeline',
+  },
+  {
+    id: 'exam_banking',
+    examCode: 'BANKING',
+    name: 'Banking PO & Clerk (IBPS & SBI)',
+    category: 'banking_ssc',
+    targetStage: 'Graduates & Numerical Reasoning',
+    verifiedStatus: 'provisional',
+    sampleTestsAvailable: 6,
+    expectedLaunchBatch: 'June 2027 Pipeline',
+  },
+  {
+    id: 'exam_gate_net',
+    examCode: 'GATE',
+    name: 'GATE & UGC-NET Entrance & Fellowships',
+    category: 'graduate_state',
+    targetStage: 'Technical Research & Lecturer Eligibility',
+    verifiedStatus: 'provisional',
+    sampleTestsAvailable: 4,
+    expectedLaunchBatch: 'Late 2027 Pipeline',
+  },
+]
+
+// ============================================================================
+// 14. SHARED TRI-DOMAIN LEARNER PROGRESS & PERSONALISED GROWTH PLAN
+// ============================================================================
+
+export const SEED_LEARNER_TRI_DOMAIN_PROGRESS: LearnerTriDomainProgress = {
+  learnerId: 'learner_demo_01',
+  learnerName: 'Aarav Sharma',
+  assessmentStats: {
+    totalAttempted: 6,
+    accuracyPercentage: 85,
+    weakTopicsCount: 2,
+    passCreditsEarned: 40,
+  },
+  academicStats: {
+    lessonsCompleted: 4,
+    chaptersCovered: 3,
+    revisionReadyCount: 2,
+  },
+  skillStats: {
+    projectsCompleted: 2,
+    competenciesMastered: 3,
+    activeProjectsCount: 1,
+  },
+  growthRecommendations: [
+    {
+      id: 'growth_rec_01',
+      identifiedGapTopicId: 'top_g4_m6_2',
+      gapDescription: 'Weakness identified in properties of 6-times table and Common Multiples',
+      recommendedLessonId: 'less_g4_m6_l2',
+      recommendedLessonTitle: 'Common Multiples & Lowest Common Multiple (LCM) Basics',
+      recommendedProjectId: 'proj_coding_maze',
+      recommendedProjectTitle: 'Interactive 2D Grid Maze Game (Grid Multiples & Step Intervals)',
+      reassessmentBlueprintId: 'bp_free_g4_math',
+    },
+    {
+      id: 'growth_rec_02',
+      identifiedGapTopicId: 'top_g4_s5_1',
+      gapDescription: 'Need reinforcement on distinguishing Contact vs Non-Contact forces in real machines',
+      recommendedLessonId: 'less_g4_s5_l1',
+      recommendedLessonTitle: 'Forces in Our World: Contact Forces vs Non-Contact Forces',
+      recommendedProjectId: 'proj_robotics_sensor',
+      recommendedProjectTitle: 'Soil Moisture Smart Irrigation Alert Circuit (Physical Resistance)',
+      reassessmentBlueprintId: 'bp_free_g4_sci',
+    },
+  ],
+}
+

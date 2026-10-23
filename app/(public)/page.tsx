@@ -35,19 +35,35 @@ import {
   Layers,
   GraduationCap,
   Check,
+  Code,
+  Cpu,
+  Palette,
+  MessageSquare,
+  TrendingUp,
+  Cloud,
+  FileText,
+  Briefcase,
+  Wrench,
+  Activity,
+  ExternalLink,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { AdmissionsAssistantWidget } from '@/components/public/admissions-assistant-modal'
 import {
   SEED_BOARDS,
   SEED_CLASSES,
   SEED_SUBJECTS,
   SEED_GRADE4_SUBJECTS,
+  SEED_CHAPTERS,
   SEED_BLUEPRINTS,
   SEED_AUTHORIZED_QUESTIONS,
   SEED_CONFIDENTIAL_SOLUTIONS,
+  SEED_SKILL_TRACKS,
+  SEED_SKILL_PROJECTS,
+  SEED_ACADEMIC_LESSONS,
+  SEED_COMPETITIVE_EXAMS,
+  SEED_LEARNER_TRI_DOMAIN_PROGRESS,
   getPipelineCoverageReport,
   evaluateAssessmentAttempt,
 } from '@/packages/core/src'
@@ -56,9 +72,13 @@ import type {
   AssessmentBlueprint,
   AssessmentResult,
   SubmittedAnswer,
+  LearningDomain,
+  SkillTrack,
+  SkillProject,
+  AcademicLesson,
 } from '@/packages/core/src'
 
-// Subject styling configuration matching the bright reference design
+// Subject styling tokens for bright, natural aesthetic
 const SUBJECT_CONFIGS: Record<
   string,
   {
@@ -75,7 +95,7 @@ const SUBJECT_CONFIGS: Record<
     border: 'border-amber-200/80',
     accent: '#D97706',
     lightAccent: 'bg-amber-100 text-amber-900',
-    icon: <Calculator className="w-6 h-6 text-amber-600" />,
+    icon: <Calculator className="w-5 h-5 text-amber-600" />,
     displayName: 'Mathematics',
   },
   science: {
@@ -83,7 +103,7 @@ const SUBJECT_CONFIGS: Record<
     border: 'border-emerald-200/80',
     accent: '#059669',
     lightAccent: 'bg-emerald-100 text-emerald-900',
-    icon: <FlaskConical className="w-6 h-6 text-emerald-600" />,
+    icon: <FlaskConical className="w-5 h-5 text-emerald-600" />,
     displayName: 'Science',
   },
   english: {
@@ -91,7 +111,7 @@ const SUBJECT_CONFIGS: Record<
     border: 'border-blue-200/80',
     accent: '#2563EB',
     lightAccent: 'bg-blue-100 text-blue-900',
-    icon: <BookOpen className="w-6 h-6 text-blue-600" />,
+    icon: <BookOpen className="w-5 h-5 text-blue-600" />,
     displayName: 'English',
   },
   hindi: {
@@ -99,7 +119,7 @@ const SUBJECT_CONFIGS: Record<
     border: 'border-rose-200/80',
     accent: '#E11D48',
     lightAccent: 'bg-rose-100 text-rose-900',
-    icon: <span className="text-xl font-bold text-rose-600 leading-none">अ</span>,
+    icon: <span className="text-lg font-bold text-rose-600 leading-none">अ</span>,
     displayName: 'Hindi',
   },
   social_science: {
@@ -107,7 +127,7 @@ const SUBJECT_CONFIGS: Record<
     border: 'border-purple-200/80',
     accent: '#7C3AED',
     lightAccent: 'bg-purple-100 text-purple-900',
-    icon: <Compass className="w-6 h-6 text-purple-600" />,
+    icon: <Compass className="w-5 h-5 text-purple-600" />,
     displayName: 'Social Science',
   },
   aptitude: {
@@ -115,13 +135,16 @@ const SUBJECT_CONFIGS: Record<
     border: 'border-indigo-200/80',
     accent: '#4F46E5',
     lightAccent: 'bg-indigo-100 text-indigo-900',
-    icon: <Brain className="w-6 h-6 text-indigo-600" />,
+    icon: <Brain className="w-5 h-5 text-indigo-600" />,
     displayName: 'Analytical Skills',
   },
 }
 
-export default function BrightUnifiedAssessmentPage() {
-  // Navigation & Filter State
+export default function ThreeDomainUnifiedPlatformPage() {
+  // Top-Level Three-Domain Navigation State
+  const [activeDomain, setActiveDomain] = useState<LearningDomain>('assessment')
+
+  // Domain 1: Assessment Filters
   const [selectedBoardId, setSelectedBoardId] = useState<string>('board_cbse')
   const [selectedClassId, setSelectedClassId] = useState<string>('class_g4')
   const [isClassModalOpen, setIsClassModalOpen] = useState<boolean>(false)
@@ -138,6 +161,18 @@ export default function BrightUnifiedAssessmentPage() {
   const [activeTab, setActiveTab] = useState<'explanation' | 'hint' | 'related'>('explanation')
   const [assessmentResult, setAssessmentResult] = useState<AssessmentResult | null>(null)
 
+  // Domain 2: Skill Development State
+  const [selectedSkillLevel, setSelectedSkillLevel] = useState<'all' | 'foundation' | 'intermediate' | 'advanced'>('all')
+  const [activeProjectModal, setActiveProjectModal] = useState<SkillProject | null>(null)
+  const [projectSubmissionUrl, setProjectSubmissionUrl] = useState<string>('')
+  const [projectSubmissionSuccess, setProjectSubmissionSuccess] = useState<boolean>(false)
+
+  // Domain 3: Academic Learning State
+  const [activeLessonModal, setActiveLessonModal] = useState<AcademicLesson | null>(null)
+
+  // Shared Learner Intelligence State
+  const [showGrowthPlanModal, setShowGrowthPlanModal] = useState<boolean>(false)
+
   // Load completed tests from localStorage on client mount
   useEffect(() => {
     try {
@@ -146,7 +181,7 @@ export default function BrightUnifiedAssessmentPage() {
         setCompletedFreeSubjects(JSON.parse(stored))
       }
     } catch {
-      // Fallback for non-browser or sandbox environments
+      // ignore
     }
   }, [])
 
@@ -176,7 +211,13 @@ export default function BrightUnifiedAssessmentPage() {
   // Real pipeline audit report (60k roadmap vs actual published counts)
   const pipelineReport = useMemo(() => getPipelineCoverageReport(), [])
 
-  // Handle starting a free test
+  // Filter skill tracks by level
+  const filteredSkillTracks = useMemo(() => {
+    if (selectedSkillLevel === 'all') return SEED_SKILL_TRACKS
+    return SEED_SKILL_TRACKS.filter((t) => t.level === selectedSkillLevel)
+  }, [selectedSkillLevel])
+
+  // Start free assessment test
   const handleStartFreeTest = (subjectCode: string) => {
     let blueprintId = 'bp_free_g4_math'
     let questionPrefix = 'q_g4_m6_'
@@ -215,11 +256,9 @@ export default function BrightUnifiedAssessmentPage() {
 
     setActiveTestBlueprint(blueprint)
     setActiveQuestions(questions)
-    // If math test, start directly on Question 7 (index 4 or the matching question) to match reference screenshot!
     const q7Index = questions.findIndex((q) => q.id === 'q_g4_m6_07')
     setCurrentQuestionIndex(q7Index >= 0 ? q7Index : 0)
 
-    // Pre-populate Option B (18) for Question 7 if present, exactly matching reference image!
     if (q7Index >= 0) {
       setUserSelectedAnswers({ q_g4_m6_07: 'opt_7b' })
     } else {
@@ -260,7 +299,6 @@ export default function BrightUnifiedAssessmentPage() {
 
     setAssessmentResult(result)
 
-    // Mark subject free practice as completed
     const subjectKey = activeTestBlueprint.subjectId.replace('subj_g4_', '')
     const updated = { ...completedFreeSubjects, [subjectKey]: true }
     setCompletedFreeSubjects(updated)
@@ -291,9 +329,8 @@ export default function BrightUnifiedAssessmentPage() {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col">
         {/* Top Sticky Test Header */}
-        <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 shadow-xs">
+        <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 shadow-2xs">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            {/* Brand & Breadcrumb */}
             <div className="flex items-center gap-3">
               <span className="font-extrabold text-lg tracking-tight text-slate-900">
                 Talent<span className="text-[#0080FF]">Xcel</span>
@@ -304,7 +341,6 @@ export default function BrightUnifiedAssessmentPage() {
               </span>
             </div>
 
-            {/* Timer, Question Tracker & Exit Button */}
             <div className="flex items-center gap-3 sm:gap-5">
               <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-lg text-slate-700 text-xs sm:text-sm font-semibold">
                 <Clock className="w-3.5 h-3.5 text-slate-500" />
@@ -343,11 +379,9 @@ export default function BrightUnifiedAssessmentPage() {
                   Official Server-Validated Evaluation • No Sign-Up Required
                 </p>
 
-                {/* Score & Badges */}
                 <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <Badge className="bg-emerald-600 text-white text-sm px-3 py-1 font-bold">
-                    Score: {assessmentResult.scoreObtained} / {assessmentResult.maxMarks} Marks (
-                    {assessmentResult.percentage}%)
+                    Score: {assessmentResult.scoreObtained} / {assessmentResult.maxMarks} Marks ({assessmentResult.percentage}%)
                   </Badge>
                   <Badge className="bg-blue-600 text-white text-sm px-3 py-1 font-bold">
                     ✓ {assessmentResult.correctCount} Correct • ✕ {assessmentResult.incorrectCount} Incorrect
@@ -360,31 +394,42 @@ export default function BrightUnifiedAssessmentPage() {
                 </div>
               </div>
 
-              {/* Free-to-Paid Transparent Progression */}
+              {/* Free-to-Paid Progression */}
               <div className="my-6 p-5 bg-gradient-to-br from-blue-50/60 to-indigo-50/60 rounded-xl border border-blue-200/80 space-y-3">
                 <div className="flex items-center gap-2 text-blue-900 font-bold">
                   <Sparkles className="w-5 h-5 text-blue-600" />
-                  <span>Next Steps for Your Learning Journey</span>
+                  <span>Next Steps Across TalentXcel Domains</span>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                  You have completed your free diagnostic questions for this subject. All 5 school subjects
-                  and Analytical Skills offer independent free practice!
+                  Your assessment score has been recorded in your local profile. You can address any identified gaps in <strong>Academic Learning</strong> or build a practical project in <strong>Skill Development</strong>!
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  <Button
+                    onClick={() => {
+                      exitAssessmentEngine()
+                      setActiveDomain('academic')
+                    }}
+                    className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs py-2.5 shadow-xs"
+                  >
+                    Read Lesson in Academic →
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      exitAssessmentEngine()
+                      setActiveDomain('skills')
+                    }}
+                    variant="outline"
+                    className="border-indigo-300 text-indigo-700 hover:bg-indigo-50 font-bold text-xs py-2.5"
+                  >
+                    Build Practical Skill Project →
+                  </Button>
                   <Button
                     onClick={exitAssessmentEngine}
-                    className="w-full bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs sm:text-sm py-2.5 shadow-xs"
+                    variant="outline"
+                    className="border-slate-300 text-slate-700 hover:bg-slate-50 font-bold text-xs py-2.5"
                   >
-                    Try Another Free Subject →
+                    Try Another Free Test
                   </Button>
-                  <Link href="/register" className="w-full">
-                    <Button
-                      variant="outline"
-                      className="w-full border-blue-300 text-blue-700 hover:bg-blue-50 font-bold text-xs sm:text-sm py-2.5"
-                    >
-                      Save Progress & ₹20 Credits
-                    </Button>
-                  </Link>
                 </div>
               </div>
 
@@ -416,7 +461,6 @@ export default function BrightUnifiedAssessmentPage() {
                         )}
                       </div>
 
-                      {/* Explanation Steps */}
                       <div className="text-xs sm:text-sm text-slate-700 space-y-1 pt-1">
                         <p className="font-semibold text-slate-900">Step by step explanation:</p>
                         {ev.solutionSteps.map((step, sIdx) => (
@@ -447,12 +491,10 @@ export default function BrightUnifiedAssessmentPage() {
               </div>
             </div>
           ) : (
-            /* ACTIVE TWO-COLUMN QUESTION & EXPLANATION SPLIT (MATCHES TABLET REFERENCE SCREENSHOT) */
+            /* ACTIVE SPLIT-SCREEN QUESTION & EXPLANATION */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Column: Question Card & Options (7 Columns on large screens) */}
               <div className="lg:col-span-7 space-y-4">
                 <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
-                  {/* Question Number & Text */}
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                       Question {currentQuestionIndex + 1}
@@ -462,13 +504,11 @@ export default function BrightUnifiedAssessmentPage() {
                     </h2>
                   </div>
 
-                  {/* Options List */}
                   <div className="space-y-3">
                     {currentQ.options.map((opt) => {
                       const isSelected = selectedOptId === opt.id
                       const isCorrect = currentSolution?.correctOptionIds.includes(opt.id)
 
-                      // Soft pastel styling matching reference image
                       let optClass = 'bg-white border-slate-200 text-slate-800 hover:border-blue-400'
                       if (isSelected) {
                         if (isCorrect) {
@@ -509,7 +549,6 @@ export default function BrightUnifiedAssessmentPage() {
                     })}
                   </div>
 
-                  {/* Correct Feedback Banner (Matching Reference Image) */}
                   {selectedOptId && (
                     <div
                       className={`p-4 rounded-xl border flex items-start gap-3 text-xs sm:text-sm ${
@@ -540,7 +579,6 @@ export default function BrightUnifiedAssessmentPage() {
                     </div>
                   )}
 
-                  {/* Bottom Navigation Buttons */}
                   <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                     <Button
                       variant="outline"
@@ -602,10 +640,9 @@ export default function BrightUnifiedAssessmentPage() {
                 </div>
               </div>
 
-              {/* Right Column: Step-by-Step Explanation & Key Point Card (5 Columns on large screens) */}
+              {/* Right Column: Step-by-Step Explanation */}
               <div className="lg:col-span-5 space-y-4">
                 <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
-                  {/* Tabs: Explanation | Hint | Related */}
                   <div className="flex items-center border-b border-slate-200 pb-2 gap-4 text-xs font-bold">
                     <button
                       onClick={() => setActiveTab('explanation')}
@@ -639,7 +676,6 @@ export default function BrightUnifiedAssessmentPage() {
                     </button>
                   </div>
 
-                  {/* Tab Body */}
                   {activeTab === 'explanation' && (
                     <div className="space-y-4">
                       <div>
@@ -659,7 +695,6 @@ export default function BrightUnifiedAssessmentPage() {
                         </div>
                       </div>
 
-                      {/* Key Point Card (Amber Callout matching screenshot) */}
                       {currentSolution?.keyPoint && (
                         <div className="p-4 bg-amber-50/80 rounded-xl border border-amber-200/90 space-y-1">
                           <div className="flex items-center gap-1.5 text-amber-900 font-bold text-xs uppercase tracking-wide">
@@ -707,16 +742,15 @@ export default function BrightUnifiedAssessmentPage() {
   }
 
   // =========================================================================
-  // VIEW: MAIN LEARNER DASHBOARD (BRIGHT, NATURAL, CLEAN UI)
+  // VIEW: MAIN THREE-DOMAIN UNIFIED PLATFORM
   // =========================================================================
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex flex-col">
       {/* ---------------------------------------------------------------------
-          TOP NAVIGATION BAR (CLEAN WHITE WITH TALENTXCEL LOGO)
+          PRIMARY NAVIGATION: TALENTXCEL BRAND + TOP DOMAINS TABS
       ---------------------------------------------------------------------- */}
-      <header className="sticky top-0 z-30 bg-white border-b border-slate-200/80 shadow-2xs">
+      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          {/* Logo & Sub-tag */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex flex-col">
               <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-none">
@@ -727,63 +761,83 @@ export default function BrightUnifiedAssessmentPage() {
               </span>
             </Link>
 
-            {/* Main Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1 text-xs font-semibold">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0080FF] text-white font-bold shadow-xs">
-                <Home className="w-3.5 h-3.5" />
-                <span>Home</span>
-              </button>
+            {/* THREE PRIMARY DOMAINS SWITCHER BUTTONS */}
+            <nav className="hidden lg:flex items-center gap-1.5 text-xs font-bold">
               <button
-                onClick={() => handleStartFreeTest('math')}
-                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                onClick={() => setActiveDomain('assessment')}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all ${
+                  activeDomain === 'assessment'
+                    ? 'bg-[#0080FF] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
               >
-                My Learning
+                <Target className="w-3.5 h-3.5" />
+                <span>Assessment & Intelligence</span>
+                <span className={`text-[9px] px-1.5 py-0.2 rounded-full ${
+                  activeDomain === 'assessment' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                }`}>
+                  Free
+                </span>
               </button>
+
               <button
-                onClick={() => handleStartFreeTest('math')}
-                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                onClick={() => setActiveDomain('skills')}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all ${
+                  activeDomain === 'skills'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
               >
-                Tests
+                <Cpu className="w-3.5 h-3.5" />
+                <span>Skill Development</span>
+                <span className={`text-[9px] px-1.5 py-0.2 rounded-full ${
+                  activeDomain === 'skills' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                }`}>
+                  Projects
+                </span>
               </button>
-              <a
-                href="#subjects-section"
-                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+
+              <button
+                onClick={() => setActiveDomain('academic')}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all ${
+                  activeDomain === 'academic'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
               >
-                Subjects
-              </a>
-              <a
-                href="#progress-section"
-                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                Results
-              </a>
-              <Link
-                href="/admissions"
-                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                Plans
-              </Link>
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Academic Learning</span>
+                <span className={`text-[9px] px-1.5 py-0.2 rounded-full ${
+                  activeDomain === 'academic' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                }`}>
+                  Lessons
+                </span>
+              </button>
             </nav>
           </div>
 
-          {/* Search Bar, Notifications & User Avatar */}
+          {/* Right Actions: Shared Intelligence, Search & Profile */}
           <div className="flex items-center gap-3">
-            <div className="relative hidden sm:block w-48 md:w-64">
+            {/* Shared Intelligence / Growth Plan Button */}
+            <Button
+              onClick={() => setShowGrowthPlanModal(true)}
+              variant="outline"
+              size="sm"
+              className="text-xs font-bold border-blue-200 text-blue-700 hover:bg-blue-50 hidden sm:flex items-center gap-1.5"
+            >
+              <Activity className="w-3.5 h-3.5 text-[#0080FF]" />
+              <span>Learner Growth Plan</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            </Button>
+
+            <div className="relative hidden md:block w-48">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search for subjects, tests..."
+                placeholder="Search all 3 domains..."
                 className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-100 border border-transparent rounded-lg text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0080FF] focus:outline-hidden transition-all"
               />
             </div>
-
-            <button
-              aria-label="Notifications"
-              className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 relative"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="w-2 h-2 rounded-full bg-[#0080FF] absolute top-1.5 right-1.5" />
-            </button>
 
             <Link href="/login">
               <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:ring-2 hover:ring-[#0080FF]/30 transition-all">
@@ -795,475 +849,585 @@ export default function BrightUnifiedAssessmentPage() {
       </header>
 
       {/* ---------------------------------------------------------------------
-          SUB-HEADER: BREADCRUMB & CLASS / BOARD SELECTOR
+          PROMINENT THREE-DOMAIN SELECTOR BAR (MOBILE & DESKTOP EMPHASIS)
       ---------------------------------------------------------------------- */}
-      <div className="bg-white border-b border-slate-200/80 px-4 py-2.5 shadow-2xs">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 font-medium text-slate-700">
-            <span className="font-bold text-slate-900">Grade IV</span>
-            <span className="text-slate-300">•</span>
-            <span>Mayoor School, Noida</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-500">Periodic Test 2 (CBSE 2026-27 Aligned)</span>
+      <div className="bg-white border-b border-slate-200/80 px-4 py-3 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+          {/* Domain Description Pill */}
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-slate-400 uppercase tracking-wider text-[11px]">
+              Active Learning Domain:
+            </span>
+            <span className="font-bold text-slate-900 text-sm">
+              {activeDomain === 'assessment' && '1. Assessment & Intelligence — Test skills. Measure ability. Identify gaps.'}
+              {activeDomain === 'skills' && '2. Skill Development — Learn by doing, building and mastering.'}
+              {activeDomain === 'academic' && '3. Academic Learning — Understand the syllabus. Learn every topic.'}
+            </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold text-[11px] py-0.5">
-              Free Practice Live (No Sign-Up)
-            </Badge>
+          {/* Segmented Switcher for Tablets & Mobile */}
+          <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 w-full md:w-auto justify-between">
             <button
-              onClick={() => setIsClassModalOpen(true)}
-              className="text-[#0080FF] hover:underline font-bold text-xs flex items-center gap-0.5"
+              onClick={() => setActiveDomain('assessment')}
+              className={`flex-1 md:flex-initial px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${
+                activeDomain === 'assessment' ? 'bg-[#0080FF] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
             >
-              Change <ChevronRight className="w-3.5 h-3.5" />
+              Assess
+            </button>
+            <button
+              onClick={() => setActiveDomain('skills')}
+              className={`flex-1 md:flex-initial px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${
+                activeDomain === 'skills' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Develop Skills
+            </button>
+            <button
+              onClick={() => setActiveDomain('academic')}
+              className={`flex-1 md:flex-initial px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${
+                activeDomain === 'academic' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Learn Syllabus
             </button>
           </div>
         </div>
       </div>
 
-      {/* Class & Board Selection Modal */}
-      {isClassModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="font-extrabold text-slate-900 text-base">Select Class & Curriculum Board</h3>
-              <button
-                onClick={() => setIsClassModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Board Selector */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-                Curriculum Board
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {SEED_BOARDS.map((board) => (
-                  <button
-                    key={board.id}
-                    onClick={() => setSelectedBoardId(board.id)}
-                    className={`p-2.5 rounded-xl border text-left text-xs font-bold transition-all ${
-                      selectedBoardId === board.id
-                        ? 'border-[#0080FF] bg-blue-50/60 text-[#0080FF]'
-                        : 'border-slate-200 text-slate-700 hover:border-slate-300'
-                    }`}
-                  >
-                    <div>{board.code}</div>
-                    <span className="text-[10px] font-normal text-slate-400 capitalize">
-                      {board.status}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Class Selector (Classes 3 to 12) */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-                Academic Grade / Class
-              </label>
-              <div className="grid grid-cols-5 gap-2">
-                {SEED_CLASSES.map((cls) => (
-                  <button
-                    key={cls.id}
-                    onClick={() => setSelectedClassId(cls.id)}
-                    className={`py-2 rounded-xl border text-center text-xs font-bold transition-all ${
-                      selectedClassId === cls.id
-                        ? 'border-[#0080FF] bg-blue-50/60 text-[#0080FF]'
-                        : 'border-slate-200 text-slate-700 hover:border-slate-300'
-                    }`}
-                  >
-                    {cls.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <Button
-                onClick={() => setIsClassModalOpen(false)}
-                className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs"
-              >
-                Save & Apply
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ---------------------------------------------------------------------
-          MAIN CONTENT AREA
+          MAIN DOMAIN BODY CONTENT
       ---------------------------------------------------------------------- */}
       <main className="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8 flex-1">
         {/* ===================================================================
-            SECTION 1: HERO / WELCOME BANNER (MATCHING REFERENCE IMAGE)
+            DOMAIN 1: ASSESSMENT & INTELLIGENCE
         ==================================================================== */}
-        <section className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md">
-          {/* Subtle background decoration */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none flex items-center justify-center">
-            <Sparkles className="w-72 h-72 text-white" />
-          </div>
-
-          <div className="relative z-10 max-w-2xl space-y-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-200">
-              Welcome • Grade 4 Assessment Platform
-            </span>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-              Keep Learning, <br />
-              <span className="text-cyan-200">Keep Growing</span>
-            </h1>
-            <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-              Syllabus-aligned practice tests, step-by-step explanations and instant evaluation for school
-              and competitive exams. Start free with zero sign-up required.
-            </p>
-
-            {/* Quick Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Button
-                onClick={() => handleStartFreeTest('math')}
-                className="bg-white hover:bg-slate-100 text-blue-700 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-xs"
-              >
-                Continue Practice →
-              </Button>
-              <a
-                href="#upcoming-tests-section"
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white/90 hover:text-white px-3 py-2"
-              >
-                <span>View Scheduled Tests</span>
-                <ChevronRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================================================================
-            SECTION 2: SUBJECT CARDS (SOFT PASTELS MATCHING REFERENCE IMAGE)
-        ==================================================================== */}
-        <section id="subjects-section" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Academic Subjects</h2>
-              <p className="text-xs text-slate-500">
-                Grade IV • 5 Free Questions Per Subject • Tracked Independently
-              </p>
-            </div>
-            <Badge variant="outline" className="text-xs text-slate-600 hidden sm:inline-flex">
-              5 Free School Tests Available
-            </Badge>
-          </div>
-
-          {/* 5 Distinct Subject Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {SEED_GRADE4_SUBJECTS.map((subject) => {
-              const cfg = SUBJECT_CONFIGS[subject.code] || SUBJECT_CONFIGS.math
-              const isCompleted = !!completedFreeSubjects[subject.code]
-
-              return (
-                <div
-                  key={subject.id}
-                  className={`rounded-2xl border p-5 transition-all shadow-2xs hover:shadow-md flex flex-col justify-between ${cfg.bg} ${cfg.border}`}
-                >
-                  <div className="space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center">
-                      {cfg.icon}
-                    </div>
-
-                    <div>
-                      <h3 className="font-extrabold text-base text-slate-900">{subject.name}</h3>
-                      <p className="text-[11px] font-medium text-slate-500 mt-0.5">
-                        Practice • Tests • Revision
-                      </p>
-                    </div>
-
-                    <div className="text-[11px] text-slate-600 line-clamp-2">
-                      {subject.description}
-                    </div>
-                  </div>
-
-                  <div className="pt-4 mt-2 border-t border-slate-200/50 space-y-2.5">
-                    <div className="flex items-center justify-between text-[11px] font-bold">
-                      <span className="text-slate-500">5 Free Questions</span>
-                      {isCompleted ? (
-                        <span className="text-emerald-700 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" /> Completed
-                        </span>
-                      ) : (
-                        <span className="text-amber-700">Available</span>
-                      )}
-                    </div>
-
-                    <Button
-                      onClick={() => handleStartFreeTest(subject.code)}
-                      size="sm"
-                      className="w-full bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs py-2 shadow-xs"
-                    >
-                      {isCompleted ? 'Practice Again' : 'Start Free Practice'}
-                    </Button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* ===================================================================
-            SECTION 3: ANALYTICAL SKILLS & APTITUDE TRACK (INDEPENDENT TRACK)
-        ==================================================================== */}
-        <section className="bg-gradient-to-br from-indigo-50/70 via-white to-cyan-50/70 rounded-2xl border border-indigo-200/80 p-6 shadow-xs">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="space-y-1.5 max-w-xl">
-              <div className="flex items-center gap-2">
-                <Badge className="bg-indigo-600 text-white font-bold text-[10px] uppercase tracking-wide">
-                  Independent Track
-                </Badge>
-                <span className="text-xs font-semibold text-indigo-700">
-                  Classes 4–12 & Olympiad Readiness
+        {activeDomain === 'assessment' && (
+          <div className="space-y-8">
+            {/* Assessment Hero Banner */}
+            <section className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md">
+              <div className="relative z-10 max-w-2xl space-y-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-200">
+                  Domain 1 • Assessment & Intelligence
                 </span>
-              </div>
-              <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
-                Analytical Reasoning & Aptitude Drills
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Number series patterns, coding-decoding, odd-one-out, clock angles, and deductive reasoning.
-                Includes 8 free diagnostic questions with zero sign-up required.
-              </p>
-            </div>
+                <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                  Test Skills. Measure Ability. <br />
+                  <span className="text-cyan-200">Identify Exact Gaps.</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                  Classes 4–12 school assessments, independent analytical reasoning drills, and competitive exam readiness. 5 free questions per subject with zero login required.
+                </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-              <div className="text-right hidden sm:block">
-                <span className="block text-xs font-bold text-indigo-950">8 Free Questions</span>
-                <span className="block text-[11px] text-slate-500">No account needed</span>
-              </div>
-              <Button
-                onClick={() => handleStartFreeTest('aptitude')}
-                className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-5 py-2.5 shadow-xs"
-              >
-                Start Free Analytical Practice →
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================================================================
-            SECTION 4: TWO-COLUMN SECTION (UPCOMING TESTS & PROGRESS)
-        ==================================================================== */}
-        <div id="upcoming-tests-section" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Scheduled / Available Tests (7 Columns) */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">Upcoming Tests</h3>
-                <p className="text-xs text-slate-500">Scheduled school & curriculum periodic tests</p>
-              </div>
-              <button
-                onClick={() => handleStartFreeTest('math')}
-                className="text-xs font-bold text-[#0080FF] hover:underline"
-              >
-                View All &gt;
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {/* Test 1: Mathematics Ch 6 Multiples */}
-              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-                    <Calculator className="w-5 h-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase">17 Nov 2026</span>
-                    <h4 className="font-bold text-sm text-slate-900">Mathematics — Ch - 6 Multiples</h4>
-                    <span className="text-xs text-slate-500">Grade IV • Mayoor School PT 2</span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <Button
+                    onClick={() => handleStartFreeTest('math')}
+                    className="bg-white hover:bg-slate-100 text-blue-700 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-xs"
+                  >
+                    Start Free Math Diagnostic →
+                  </Button>
+                  <Button
+                    onClick={() => handleStartFreeTest('aptitude')}
+                    variant="outline"
+                    className="border-white/40 text-white hover:bg-white/10 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl"
+                  >
+                    Take Analytical Reasoning Drill (8 Free)
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => handleStartFreeTest('math')}
-                  size="sm"
-                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
-                >
-                  Start
-                </Button>
               </div>
+            </section>
 
-              {/* Test 2: Science Unit 5 Force & Magnetism */}
-              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-                    <FlaskConical className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase">19 Nov 2026</span>
-                    <h4 className="font-bold text-sm text-slate-900">
-                      Science — Unit 5 Force & Magnetism
-                    </h4>
-                    <span className="text-xs text-slate-500">Grade IV • Contact vs Non-Contact Forces</span>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => handleStartFreeTest('science')}
-                  size="sm"
-                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
-                >
-                  Start
-                </Button>
-              </div>
-
-              {/* Test 3: English Ch 8 Pied Piper */}
-              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                    <BookOpen className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase">23 Nov 2026</span>
-                    <h4 className="font-bold text-sm text-slate-900">
-                      English — Ch - 8 The Pied Piper of Hamelin
-                    </h4>
-                    <span className="text-xs text-slate-500">Grade IV • Narrative & Grammar</span>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => handleStartFreeTest('english')}
-                  size="sm"
-                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
-                >
-                  Start
-                </Button>
-              </div>
-
-              {/* Test 4: Hindi पाठ 11 प्यारा भारत */}
-              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
-                    <span className="text-base font-bold text-rose-600">अ</span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase">25 Nov 2026</span>
-                    <h4 className="font-bold text-sm text-slate-900">Hindi — पाठ 11 प्यारा भारत</h4>
-                    <span className="text-xs text-slate-500">Grade IV • कविता भावार्थ एवं व्याकरण</span>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => handleStartFreeTest('hindi')}
-                  size="sm"
-                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
-                >
-                  Start
-                </Button>
-              </div>
-
-              {/* Test 5: Social Science Ch 8 Agriculture */}
-              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-                    <Compass className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase">27 Nov 2026</span>
-                    <h4 className="font-bold text-sm text-slate-900">
-                      Social Science — Ch - 8 Our Agriculture
-                    </h4>
-                    <span className="text-xs text-slate-500">Grade IV • Kharif, Rabi & Irrigation</span>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => handleStartFreeTest('social_science')}
-                  size="sm"
-                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
-                >
-                  Start
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Your Progress & Recommended (5 Columns) */}
-          <div id="progress-section" className="lg:col-span-5 space-y-6">
-            {/* Progress Card (Matching Donut 60% from Reference Screenshot) */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            {/* School Subjects (5 Free Questions Per Subject) */}
+            <section className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-slate-900 text-sm">Your Progress</h3>
-                <span className="text-xs font-semibold text-slate-500">Class 4 Term 2</span>
-              </div>
-
-              <div className="flex items-center gap-6">
-                {/* Circular Donut Indicator */}
-                <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      className="text-slate-100"
-                      strokeWidth="3.5"
-                      stroke="currentColor"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className="text-emerald-500"
-                      strokeDasharray="60, 100"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div className="absolute text-center">
-                    <span className="text-xl font-extrabold text-slate-900">60%</span>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-xs font-bold text-slate-900">Tests Completed</span>
-                  <div className="text-2xl font-black text-slate-900">6 / 10</div>
-                  <p className="text-[11px] text-slate-500 leading-tight">
-                    Great pace! You are on track for your upcoming school periodic tests.
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-slate-900">Grade IV School Subject Tests</h2>
+                  <p className="text-xs text-slate-500">
+                    5 Free Questions per Subject • Tracked Independently • No Sign-Up
                   </p>
                 </div>
+                <Badge variant="outline" className="text-xs text-slate-600">
+                  CBSE 2026-27 Aligned
+                </Badge>
               </div>
-            </div>
 
-            {/* Recommended For You Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
-              <h3 className="font-bold text-slate-900 text-sm">Recommended for You</h3>
-              <div className="space-y-2 text-xs">
-                <button
-                  onClick={() => handleStartFreeTest('math')}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
-                >
-                  <span>Division — Practice Test</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                </button>
-                <button
-                  onClick={() => handleStartFreeTest('science')}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
-                >
-                  <span>Friction — Quick Quiz</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                </button>
-                <button
-                  onClick={() => handleStartFreeTest('english')}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
-                >
-                  <span>The Pied Piper — Literature Reading</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                </button>
-                <button
-                  onClick={() => handleStartFreeTest('hindi')}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
-                >
-                  <span>पर्यायवाची एवं विलोम — त्वरित अभ्यास</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {SEED_GRADE4_SUBJECTS.map((subject) => {
+                  const cfg = SUBJECT_CONFIGS[subject.code] || SUBJECT_CONFIGS.math
+                  const isCompleted = !!completedFreeSubjects[subject.code]
+
+                  return (
+                    <div
+                      key={subject.id}
+                      className={`rounded-2xl border p-5 transition-all shadow-2xs hover:shadow-md flex flex-col justify-between ${cfg.bg} ${cfg.border}`}
+                    >
+                      <div className="space-y-3">
+                        <div className="w-11 h-11 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center">
+                          {cfg.icon}
+                        </div>
+                        <div>
+                          <h3 className="font-extrabold text-base text-slate-900">{subject.name}</h3>
+                          <p className="text-[11px] font-medium text-slate-500 mt-0.5">
+                            Practice • Tests • Revision
+                          </p>
+                        </div>
+                        <div className="text-[11px] text-slate-600 line-clamp-2">
+                          {subject.description}
+                        </div>
+                      </div>
+
+                      <div className="pt-4 mt-2 border-t border-slate-200/50 space-y-2.5">
+                        <div className="flex items-center justify-between text-[11px] font-bold">
+                          <span className="text-slate-500">5 Free Questions</span>
+                          {isCompleted ? (
+                            <span className="text-emerald-700 font-bold flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> Completed
+                            </span>
+                          ) : (
+                            <span className="text-amber-700">Available</span>
+                          )}
+                        </div>
+
+                        <Button
+                          onClick={() => handleStartFreeTest(subject.code)}
+                          size="sm"
+                          className="w-full bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs py-2 shadow-xs"
+                        >
+                          {isCompleted ? 'Practice Again' : 'Start Free Practice'}
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
-            </div>
+            </section>
+
+            {/* Independent Analytical Reasoning Drill Card */}
+            <section className="bg-gradient-to-br from-indigo-50/70 via-white to-cyan-50/70 rounded-2xl border border-indigo-200/80 p-6 shadow-xs">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="space-y-1.5 max-w-xl">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-indigo-600 text-white font-bold text-[10px] uppercase tracking-wide">
+                      Independent Track
+                    </Badge>
+                    <span className="text-xs font-semibold text-indigo-700">
+                      Logical Reasoning & Numerical Aptitude
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                    Analytical Reasoning & Pattern Drills
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Number series, alphabet codes, odd-one-out, clock angles, and deductive logic. Includes 8 free diagnostic questions without mandatory registration.
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => handleStartFreeTest('aptitude')}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-5 py-2.5 shadow-xs shrink-0"
+                >
+                  Start Free Analytical Practice (8 Questions) →
+                </Button>
+              </div>
+            </section>
+
+            {/* Competitive Examinations Batch Pipelines */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900">Competitive Examination Pipelines</h3>
+                  <p className="text-xs text-slate-500">
+                    National & state entrance examinations introduced in validated batches
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-xs text-slate-600">
+                  {SEED_COMPETITIVE_EXAMS.filter((e) => e.verifiedStatus === 'verified').length} Active Batches
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {SEED_COMPETITIVE_EXAMS.map((exam) => (
+                  <div
+                    key={exam.id}
+                    className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all shadow-2xs space-y-2.5 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-extrabold text-sm text-slate-900">{exam.examCode}</span>
+                        {exam.verifiedStatus === 'verified' ? (
+                          <Badge className="bg-emerald-100 text-emerald-800 text-[10px] py-0 px-2 font-bold">
+                            Active
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-slate-500 text-[10px] py-0 px-2">
+                            Pipeline
+                          </Badge>
+                        )}
+                      </div>
+                      <h4 className="text-xs font-semibold text-slate-700 mt-1 leading-snug">{exam.name}</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5">{exam.targetStage}</p>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                      <span className="text-slate-500">{exam.sampleTestsAvailable} Sample Tests</span>
+                      <span className="font-bold text-[#0080FF]">{exam.expectedLaunchBatch}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
-        </div>
+        )}
 
         {/* ===================================================================
-            SECTION 5: VERIFIABLE QUESTION PIPELINE AUDIT SUMMARY
+            DOMAIN 2: SKILL DEVELOPMENT (JAPANESE & CHINESE INSPIRATIONS)
+        ==================================================================== */}
+        {activeDomain === 'skills' && (
+          <div className="space-y-8">
+            {/* Skill Development Hero Banner */}
+            <section className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-800 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md">
+              <div className="relative z-10 max-w-2xl space-y-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-200">
+                  Domain 2 • Skill Development
+                </span>
+                <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                  Learn by Doing, Building <br />
+                  <span className="text-cyan-200">and Mastering.</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-indigo-100 leading-relaxed">
+                  Inspired by Japanese craftsmanship (continuous refinement, precision, discipline) and Chinese structured progression (rigorous technical foundations, applied mathematics, sustained practical projects).
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2 pt-2 text-xs">
+                  <span className="font-bold text-indigo-200">Filter Pathway:</span>
+                  {(['all', 'foundation', 'intermediate', 'advanced'] as const).map((lvl) => (
+                    <button
+                      key={lvl}
+                      onClick={() => setSelectedSkillLevel(lvl)}
+                      className={`px-3 py-1.5 rounded-lg font-bold capitalize transition-all ${
+                        selectedSkillLevel === lvl
+                          ? 'bg-white text-indigo-900 shadow-xs'
+                          : 'bg-white/10 text-white hover:bg-white/20'
+                      }`}
+                    >
+                      {lvl === 'all' ? 'All Pathways' : lvl}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* 8 Skill Category Tracks Grid */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-slate-900">Practical Skill Tracks</h2>
+                  <p className="text-xs text-slate-500">
+                    Age-appropriate foundations for Classes 4–12 through advanced engineering pathways
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-xs text-slate-600">
+                  {filteredSkillTracks.length} Available Tracks
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                {filteredSkillTracks.map((track) => (
+                  <div
+                    key={track.id}
+                    className="p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 transition-all shadow-2xs flex flex-col justify-between space-y-4"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                          {track.category === 'ai_automation' && <Sparkles className="w-5 h-5" />}
+                          {track.category === 'coding_computation' && <Code className="w-5 h-5" />}
+                          {track.category === 'math_problem_solving' && <Calculator className="w-5 h-5" />}
+                          {track.category === 'robotics_engineering' && <Cpu className="w-5 h-5" />}
+                          {track.category === 'design_production' && <Palette className="w-5 h-5" />}
+                          {track.category === 'communication_collaboration' && <MessageSquare className="w-5 h-5" />}
+                          {track.category === 'entrepreneurship_finance' && <TrendingUp className="w-5 h-5" />}
+                          {track.category === 'digital_vocational' && <Cloud className="w-5 h-5" />}
+                        </div>
+                        <Badge variant="outline" className="text-[10px] uppercase font-bold text-slate-600">
+                          {track.level}
+                        </Badge>
+                      </div>
+
+                      <div>
+                        <h3 className="font-extrabold text-base text-slate-900 leading-snug">{track.title}</h3>
+                        <p className="text-[11px] font-semibold text-indigo-700 mt-0.5">{track.targetGrades}</p>
+                      </div>
+
+                      <p className="text-xs text-slate-600 leading-relaxed">{track.description}</p>
+
+                      <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-[11px] text-slate-600 italic">
+                        {track.philosophyNote}
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+                        <span>{track.modulesCount} Modules</span>
+                        <span>{track.projectsCount} Projects</span>
+                      </div>
+
+                      <Button
+                        onClick={() => {
+                          const project = SEED_SKILL_PROJECTS.find((p) => p.trackId === track.id) || SEED_SKILL_PROJECTS[0]
+                          setActiveProjectModal(project)
+                          setProjectSubmissionSuccess(false)
+                        }}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 shadow-xs"
+                      >
+                        Explore Project Workshop →
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Featured Hands-On Projects with Rubrics */}
+            <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">Featured Capstone Projects with Clear Rubrics</h3>
+                <p className="text-xs text-slate-500">
+                  Deliverable-driven projects evaluated on craftsmanship, utility and logical cleanliness
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {SEED_SKILL_PROJECTS.map((proj) => (
+                  <div
+                    key={proj.id}
+                    className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white transition-all space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <Badge className="bg-indigo-100 text-indigo-800 text-[10px] font-bold">
+                        {proj.estimatedHours} Hours Project
+                      </Badge>
+                      <span className="text-xs text-slate-500 capitalize">Level: {proj.difficulty}</span>
+                    </div>
+
+                    <h4 className="font-extrabold text-sm text-slate-900">{proj.title}</h4>
+                    <p className="text-xs text-slate-600">{proj.brief}</p>
+
+                    <div className="pt-2">
+                      <Button
+                        onClick={() => {
+                          setActiveProjectModal(proj)
+                          setProjectSubmissionSuccess(false)
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs font-bold text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+                      >
+                        Open Project Brief & Rubric →
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* ===================================================================
+            DOMAIN 3: ACADEMIC LEARNING (SYLLABUS LESSONS → TEST)
+        ==================================================================== */}
+        {activeDomain === 'academic' && (
+          <div className="space-y-8">
+            {/* Academic Learning Hero Banner */}
+            <section className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-800 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md">
+              <div className="relative z-10 max-w-2xl space-y-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-200">
+                  Domain 3 • Academic Learning
+                </span>
+                <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                  Understand the Syllabus. <br />
+                  <span className="text-cyan-200">Learn Every Topic.</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+                  Board and class-wise structured chapters, concept breakdowns, worked mathematical examples, and revision summaries. Every lesson directly connects to the Assessment domain so students can measure what they learned.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <Button
+                    onClick={() => setActiveLessonModal(SEED_ACADEMIC_LESSONS[0])}
+                    className="bg-white hover:bg-slate-100 text-emerald-800 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-xs"
+                  >
+                    Start Lesson 1: Understanding Multiples →
+                  </Button>
+                  <Button
+                    onClick={() => setActiveLessonModal(SEED_ACADEMIC_LESSONS[2])}
+                    variant="outline"
+                    className="border-white/40 text-white hover:bg-white/10 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl"
+                  >
+                    Read Science: Forces in Our World
+                  </Button>
+                </div>
+              </div>
+            </section>
+
+            {/* Academic Lesson Catalog Grid */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-slate-900">Curriculum Syllabus Lessons</h2>
+                  <p className="text-xs text-slate-500">
+                    Grade IV CBSE & Verified Board Modules • Linked to Practice Diagnostics
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-xs text-slate-600">
+                  {SEED_ACADEMIC_LESSONS.length} Verified Lessons
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {SEED_ACADEMIC_LESSONS.map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    className="p-6 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 transition-all shadow-2xs space-y-4 flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Badge className="bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                          Lesson {lesson.lessonNumber} • {lesson.readingTimeMinutes} Mins Read
+                        </Badge>
+                        <span className="text-xs text-slate-400 font-medium">CBSE Verified</span>
+                      </div>
+
+                      <h3 className="font-extrabold text-base text-slate-900 leading-snug">{lesson.title}</h3>
+
+                      <div className="space-y-2 text-xs text-slate-600">
+                        <p className="font-semibold text-slate-800">Concept Highlights:</p>
+                        <ul className="list-disc list-inside space-y-1">
+                          {lesson.conceptBreakdown.map((c, i) => (
+                            <li key={i} className="line-clamp-1">
+                              <strong>{c.heading}:</strong> {c.body}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                      <Button
+                        onClick={() => setActiveLessonModal(lesson)}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs font-bold text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                      >
+                        Read Full Lesson →
+                      </Button>
+
+                      {lesson.linkedBlueprintId && (
+                        <Button
+                          onClick={() => {
+                            if (lesson.id.includes('m6')) handleStartFreeTest('math')
+                            else if (lesson.id.includes('s5')) handleStartFreeTest('science')
+                            else if (lesson.id.includes('e8')) handleStartFreeTest('english')
+                          }}
+                          size="sm"
+                          className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs"
+                        >
+                          Practise Connected Test
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* ===================================================================
+            SHARED LEARNER INTELLIGENCE: TRI-DOMAIN PROGRESS SECTION
+        ==================================================================== */}
+        <section className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-slate-900 text-white text-[10px] font-bold">Unified Profile</Badge>
+                <h3 className="font-extrabold text-lg text-slate-900">
+                  Shared Learner Intelligence: {SEED_LEARNER_TRI_DOMAIN_PROGRESS.learnerName}
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Connecting assessment results with targeted academic lessons and hands-on skill projects
+              </p>
+            </div>
+
+            <Button
+              onClick={() => setShowGrowthPlanModal(true)}
+              size="sm"
+              className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs"
+            >
+              View Personalised Growth Plan
+            </Button>
+          </div>
+
+          {/* Three Distinct Progress Pillars (Never collapsed into one misleading score) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Pillar 1: Assessment Ability */}
+            <div className="p-5 rounded-2xl bg-blue-50/50 border border-blue-200/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-blue-900 uppercase">1. Assessment Ability</span>
+                <Target className="w-4 h-4 text-blue-600" />
+              </div>
+              <div className="text-2xl font-black text-slate-900">
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.assessmentStats.accuracyPercentage}%
+              </div>
+              <p className="text-xs text-slate-600">
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.assessmentStats.totalAttempted} diagnostic tests completed •{' '}
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.assessmentStats.weakTopicsCount} weak topics identified
+              </p>
+              <span className="inline-block text-[11px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md mt-1">
+                ★ ₹{SEED_LEARNER_TRI_DOMAIN_PROGRESS.assessmentStats.passCreditsEarned} Pass Credits Earned
+              </span>
+            </div>
+
+            {/* Pillar 2: Academic Syllabus Knowledge */}
+            <div className="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-900 uppercase">2. Academic Knowledge</span>
+                <BookOpen className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div className="text-2xl font-black text-slate-900">
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.academicStats.lessonsCompleted} Lessons
+              </div>
+              <p className="text-xs text-slate-600">
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.academicStats.chaptersCovered} curriculum chapters read •{' '}
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.academicStats.revisionReadyCount} chapters ready for mock exam
+              </p>
+              <span className="inline-block text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md mt-1">
+                ✓ Syllabus Coverage On Track
+              </span>
+            </div>
+
+            {/* Pillar 3: Skill Craftsmanship */}
+            <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-200/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-indigo-900 uppercase">3. Skill Craftsmanship</span>
+                <Cpu className="w-4 h-4 text-indigo-600" />
+              </div>
+              <div className="text-2xl font-black text-slate-900">
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.skillStats.projectsCompleted} Projects
+              </div>
+              <p className="text-xs text-slate-600">
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.skillStats.competenciesMastered} competencies verified •{' '}
+                {SEED_LEARNER_TRI_DOMAIN_PROGRESS.skillStats.activeProjectsCount} active project in workshop
+              </p>
+              <span className="inline-block text-[11px] font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-md mt-1">
+                Kaizen Craftsmanship Level 1
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* ===================================================================
+            SECTION 5: OPERATIONAL PIPELINE AUDIT SUMMARY
         ==================================================================== */}
         <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
@@ -1282,94 +1446,301 @@ export default function BrightUnifiedAssessmentPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
             <div className="p-3 bg-slate-50 rounded-xl">
-              <span className="text-[11px] font-bold text-slate-500 block uppercase">
-                Published & Live
-              </span>
-              <span className="text-xl sm:text-2xl font-black text-[#0080FF]">
-                {pipelineReport.actualPublishedCount}
-              </span>
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">Published & Live</span>
+              <span className="text-xl sm:text-2xl font-black text-[#0080FF]">{pipelineReport.actualPublishedCount}</span>
               <span className="text-[10px] text-slate-400 block">Verified questions</span>
             </div>
-
             <div className="p-3 bg-slate-50 rounded-xl">
-              <span className="text-[11px] font-bold text-slate-500 block uppercase">
-                Content Target
-              </span>
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">Content Target</span>
               <span className="text-xl sm:text-2xl font-black text-slate-900">60,000</span>
               <span className="text-[10px] text-slate-400 block">Roadmap pipeline</span>
             </div>
-
             <div className="p-3 bg-slate-50 rounded-xl">
-              <span className="text-[11px] font-bold text-slate-500 block uppercase">
-                In Editorial Review
-              </span>
-              <span className="text-xl sm:text-2xl font-black text-amber-600">
-                {pipelineReport.actualInReviewCount}
-              </span>
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">In Editorial Review</span>
+              <span className="text-xl sm:text-2xl font-black text-amber-600">{pipelineReport.actualInReviewCount}</span>
               <span className="text-[10px] text-slate-400 block">Quality checks</span>
             </div>
-
             <div className="p-3 bg-slate-50 rounded-xl">
-              <span className="text-[11px] font-bold text-slate-500 block uppercase">
-                Duplicates Rejected
-              </span>
-              <span className="text-xl sm:text-2xl font-black text-rose-600">
-                {pipelineReport.duplicateRejectedCount}
-              </span>
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">Duplicates Rejected</span>
+              <span className="text-xl sm:text-2xl font-black text-rose-600">{pipelineReport.duplicateRejectedCount}</span>
               <span className="text-[10px] text-slate-400 block">Fingerprint hash</span>
             </div>
           </div>
         </section>
+      </main>
 
-        {/* ===================================================================
-            SECTION 6: BOTTOM VALUE PROPOSITION BAR (MATCHING REFERENCE IMAGE)
-        ==================================================================== */}
-        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
-            <div className="space-y-1.5 p-2">
-              <Laptop className="w-5 h-5 text-blue-600 mx-auto" />
-              <h5 className="font-bold text-xs text-slate-900">All Devices</h5>
-              <p className="text-[10px] text-slate-500">Phone, Tablet, Laptop, TV</p>
+      {/* ---------------------------------------------------------------------
+          MODAL: ACADEMIC LESSON READER (DOMAIN 3)
+      ---------------------------------------------------------------------- */}
+      {activeLessonModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8 space-y-6">
+            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+              <div>
+                <Badge className="bg-emerald-100 text-emerald-800 text-xs font-bold mb-1">
+                  Lesson {activeLessonModal.lessonNumber} • {activeLessonModal.readingTimeMinutes} Minutes
+                </Badge>
+                <h3 className="font-extrabold text-xl text-slate-900">{activeLessonModal.title}</h3>
+              </div>
+              <button
+                onClick={() => setActiveLessonModal(null)}
+                className="text-slate-400 hover:text-slate-600 text-xl font-bold"
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="space-y-1.5 p-2">
-              <Smartphone className="w-5 h-5 text-emerald-600 mx-auto" />
-              <h5 className="font-bold text-xs text-slate-900">Installable PWA</h5>
-              <p className="text-[10px] text-slate-500">Like a native app</p>
+            {/* Concept Breakdown */}
+            <div className="space-y-4">
+              <h4 className="font-bold text-sm text-slate-900 uppercase tracking-wide">Concept Explanation</h4>
+              {activeLessonModal.conceptBreakdown.map((concept, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+                  <h5 className="font-bold text-sm text-slate-900">{concept.heading}</h5>
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                    {concept.body}
+                  </p>
+                </div>
+              ))}
             </div>
 
-            <div className="space-y-1.5 p-2">
-              <RotateCcw className="w-5 h-5 text-amber-600 mx-auto" />
-              <h5 className="font-bold text-xs text-slate-900">Offline Practice</h5>
-              <p className="text-[10px] text-slate-500">Where supported</p>
+            {/* Worked Examples */}
+            <div className="space-y-3">
+              <h4 className="font-bold text-sm text-slate-900 uppercase tracking-wide">Worked Examples</h4>
+              {activeLessonModal.workedExamples.map((ex, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200/80 space-y-2">
+                  <p className="font-bold text-xs sm:text-sm text-emerald-950">Problem: {ex.problemText}</p>
+                  <div className="text-xs text-slate-700 space-y-1">
+                    {ex.stepByStepSolution.map((s, sIdx) => (
+                      <p key={sIdx}>• {s}</p>
+                    ))}
+                  </div>
+                  <p className="text-xs font-bold text-emerald-800 pt-1">Answer: {ex.finalAnswer}</p>
+                </div>
+              ))}
             </div>
 
-            <div className="space-y-1.5 p-2">
-              <Sparkles className="w-5 h-5 text-purple-600 mx-auto" />
-              <h5 className="font-bold text-xs text-slate-900">AI Tutor</h5>
-              <p className="text-[10px] text-slate-500">Instant explanations</p>
+            {/* Revision Notes */}
+            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200/80 space-y-1 text-xs">
+              <span className="font-bold text-amber-900 uppercase">Key Revision Takeaways</span>
+              <ul className="list-disc list-inside text-amber-950 space-y-1 pt-1">
+                {activeLessonModal.revisionNotes.map((note, idx) => (
+                  <li key={idx}>{note}</li>
+                ))}
+              </ul>
             </div>
 
-            <div className="space-y-1.5 p-2">
-              <ShieldCheck className="w-5 h-5 text-blue-600 mx-auto" />
-              <h5 className="font-bold text-xs text-slate-900">Secure Payments</h5>
-              <p className="text-[10px] text-slate-500">₹20 per test pass</p>
-            </div>
-
-            <div className="space-y-1.5 p-2">
-              <BarChart3 className="w-5 h-5 text-emerald-600 mx-auto" />
-              <h5 className="font-bold text-xs text-slate-900">Deep Insights</h5>
-              <p className="text-[10px] text-slate-500">Students & Parents</p>
-            </div>
-
-            <div className="space-y-1.5 p-2 col-span-2 md:col-span-2 lg:col-span-1">
-              <GraduationCap className="w-5 h-5 text-indigo-600 mx-auto" />
-              <h5 className="font-bold text-xs text-slate-900">Scales Seamlessly</h5>
-              <p className="text-[10px] text-slate-500">School to JEE & NEET</p>
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setActiveLessonModal(null)}
+                className="text-xs font-semibold"
+              >
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  const lesson = activeLessonModal
+                  setActiveLessonModal(null)
+                  if (lesson.id.includes('m6')) handleStartFreeTest('math')
+                  else if (lesson.id.includes('s5')) handleStartFreeTest('science')
+                  else if (lesson.id.includes('e8')) handleStartFreeTest('english')
+                }}
+                className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs"
+              >
+                Take Connected Practice Test →
+              </Button>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      )}
+
+      {/* ---------------------------------------------------------------------
+          MODAL: SKILL PROJECT WORKSHOP BRIEF & RUBRICS (DOMAIN 2)
+      ---------------------------------------------------------------------- */}
+      {activeProjectModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8 space-y-6">
+            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+              <div>
+                <Badge className="bg-indigo-100 text-indigo-800 text-xs font-bold mb-1">
+                  Capstone Project • {activeProjectModal.estimatedHours} Hours
+                </Badge>
+                <h3 className="font-extrabold text-xl text-slate-900">{activeProjectModal.title}</h3>
+              </div>
+              <button
+                onClick={() => setActiveProjectModal(null)}
+                className="text-slate-400 hover:text-slate-600 text-xl font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-bold text-xs uppercase text-slate-400">Project Mission Brief</h4>
+                <p className="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">{activeProjectModal.brief}</p>
+              </div>
+
+              <div className="p-3.5 bg-indigo-50/60 rounded-xl border border-indigo-200/70 text-xs text-indigo-950">
+                <strong>Real-World Relevance:</strong> {activeProjectModal.realWorldContext}
+              </div>
+
+              <div>
+                <h4 className="font-bold text-xs uppercase text-slate-400 mb-2">Required Deliverables</h4>
+                <div className="space-y-1 text-xs text-slate-700">
+                  {activeProjectModal.deliverables.map((deliv, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>{deliv}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-xs uppercase text-slate-400 mb-2">Mastery Rubric</h4>
+                <div className="space-y-2">
+                  {activeProjectModal.rubricCriteria.map((rubric, idx) => (
+                    <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                      <div className="flex items-center justify-between font-bold text-slate-900">
+                        <span>{rubric.criterion}</span>
+                        <Badge variant="outline">{rubric.weightPercentage}%</Badge>
+                      </div>
+                      <p className="text-slate-600">{rubric.masteryDescription}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Submission Workspace Simulator */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                <span className="font-bold text-xs text-slate-800">Submit Project URL / Portfolio Proof</span>
+                <input
+                  type="text"
+                  placeholder="https://github.com/... or Figma link or Google Drive proof"
+                  value={projectSubmissionUrl}
+                  onChange={(e) => setProjectSubmissionUrl(e.target.value)}
+                  className="w-full text-xs p-2.5 rounded-lg border border-slate-300 bg-white"
+                />
+                <Button
+                  onClick={() => setProjectSubmissionSuccess(true)}
+                  disabled={!projectSubmissionUrl.trim()}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs w-full"
+                >
+                  Submit for Rubric Evaluation & Portfolio Badge
+                </Button>
+
+                {projectSubmissionSuccess && (
+                  <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-xs text-emerald-900 font-bold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Project evidence submitted! Verified and added to your shared learner portfolio.</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex justify-end">
+              <Button variant="outline" onClick={() => setActiveProjectModal(null)} className="text-xs font-semibold">
+                Done
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------------------------------------------------------------
+          MODAL: PERSONALISED GROWTH PLAN (TRI-DOMAIN CONNECTIVITY)
+      ---------------------------------------------------------------------- */}
+      {showGrowthPlanModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8 space-y-6">
+            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+              <div>
+                <Badge className="bg-blue-100 text-blue-800 text-xs font-bold mb-1">
+                  Tri-Domain Growth Plan
+                </Badge>
+                <h3 className="font-extrabold text-xl text-slate-900">
+                  Continuous Improvement Cycle (Kaizen)
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowGrowthPlanModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-xl font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-600">
+              Assessment results detect exact conceptual gaps. Academic lessons build understanding, Skill projects apply that knowledge, and re-assessments measure improvement.
+            </p>
+
+            <div className="space-y-4">
+              {SEED_LEARNER_TRI_DOMAIN_PROGRESS.growthRecommendations.map((rec, idx) => (
+                <div key={rec.id} className="p-5 rounded-2xl border border-blue-200 bg-blue-50/40 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                    <h4 className="font-extrabold text-sm text-slate-900">
+                      Recommendation for {rec.gapDescription}
+                    </h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    {/* Step A: Assess Gap */}
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
+                      <span className="text-[10px] font-bold text-rose-600 uppercase">1. Assessed Gap</span>
+                      <p className="font-bold text-slate-800">Properties of Multiples</p>
+                      <p className="text-[11px] text-slate-500">Diagnostic accuracy &lt; 60%</p>
+                    </div>
+
+                    {/* Step B: Academic Lesson */}
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
+                      <span className="text-[10px] font-bold text-emerald-600 uppercase">2. Academic Lesson</span>
+                      <p className="font-bold text-slate-800">{rec.recommendedLessonTitle}</p>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setShowGrowthPlanModal(false)
+                          setActiveDomain('academic')
+                          setActiveLessonModal(SEED_ACADEMIC_LESSONS[1])
+                        }}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] py-1 h-auto mt-1 w-full"
+                      >
+                        Read Lesson →
+                      </Button>
+                    </div>
+
+                    {/* Step C: Skill Project */}
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
+                      <span className="text-[10px] font-bold text-indigo-600 uppercase">3. Skill Project</span>
+                      <p className="font-bold text-slate-800">{rec.recommendedProjectTitle}</p>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setShowGrowthPlanModal(false)
+                          setActiveDomain('skills')
+                          setActiveProjectModal(SEED_SKILL_PROJECTS[1])
+                        }}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] py-1 h-auto mt-1 w-full"
+                      >
+                        Build Project →
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex justify-end">
+              <Button variant="outline" onClick={() => setShowGrowthPlanModal(false)} className="text-xs font-semibold">
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ---------------------------------------------------------------------
           FOOTER
@@ -1380,10 +1751,10 @@ export default function BrightUnifiedAssessmentPage() {
             TalentXcel — Universal Learning, Assessment & Skills Platform
           </p>
           <p>
-            Aligned with National Education Policy (NEP 2020), CBSE, CISCE/ICSE, and International Baccalaureate.
+            Three Distinct Domains: Assessment & Intelligence · Skill Development · Academic Learning
           </p>
           <p className="text-[11px] text-slate-400">
-            © 2026 TalentXcel. All rights reserved. Free practice is provided without authentication or payment requirements.
+            © 2026 TalentXcel. Free practice and educational materials are provided without mandatory authentication.
           </p>
         </div>
       </footer>
