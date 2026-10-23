@@ -20,7 +20,8 @@ import {
   ArrowUpRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { MathQuestion, MathClassTaxonomy, MathBankSummary } from '@talentxcel/core'
+import type { MathQuestion, MathClassTaxonomy, MathBankSummary, BoardCode } from '@talentxcel/core'
+import { getBoardAlignmentForClass } from '@talentxcel/core'
 
 interface MathQuestionBankClientProps {
   initialClass: number
@@ -40,7 +41,11 @@ export function MathQuestionBankClient({
   userEmail,
 }: MathQuestionBankClientProps) {
   const [selectedClass, setSelectedClass] = useState<number>(initialClass)
+  const [selectedBoard, setSelectedBoard] = useState<BoardCode>('CBSE')
+  const [showBoardModal, setShowBoardModal] = useState<boolean>(false)
+
   const currentClassTaxonomy = taxonomy.find((c) => c.classNumber === selectedClass) || taxonomy[0]
+  const currentBoardAlignment = getBoardAlignmentForClass(selectedClass)
 
   const [selectedChapterId, setSelectedChapterId] = useState<string>(
     currentClassTaxonomy.chapters[0]?.id || ''
@@ -315,6 +320,63 @@ export function MathQuestionBankClient({
         ) : (
           /* When Authenticated: The Full Interactive Mathematics Practice Studio */
           <div className="space-y-6">
+            {/* Board & Curriculum Alignment Selector */}
+            <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 whitespace-nowrap">
+                  Board:
+                </span>
+                <button
+                  onClick={() => setSelectedBoard('CBSE')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                    selectedBoard === 'CBSE'
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span>CBSE</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedBoard === 'CBSE' ? 'bg-blue-500 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+                    100% Verified
+                  </span>
+                </button>
+                <button
+                  onClick={() => setSelectedBoard('CISCE')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                    selectedBoard === 'CISCE'
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span>ICSE / CISCE</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedBoard === 'CISCE' ? 'bg-blue-500 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                    ~88% Aligned
+                  </span>
+                </button>
+                <button
+                  onClick={() => setSelectedBoard('IB')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                    selectedBoard === 'IB'
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span>IB (MYP/DP)</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedBoard === 'IB' ? 'bg-blue-500 text-white' : 'bg-indigo-100 text-indigo-800'}`}>
+                    ~82% Aligned
+                  </span>
+                </button>
+              </div>
+
+              {/* View Board Comparison Details CTA */}
+              <button
+                onClick={() => setShowBoardModal(true)}
+                className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 self-start md:self-auto px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span>View {currentClassTaxonomy.className} Board Mapping Details</span>
+              </button>
+            </div>
+
             {/* Class Selector Tabs */}
             <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-1.5 overflow-x-auto no-scrollbar">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">
@@ -608,6 +670,131 @@ export function MathQuestionBankClient({
                     ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Board Alignment Comparison Modal */}
+        {showBoardModal && currentBoardAlignment && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6">
+              <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-2">
+                    <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Curriculum Board Mapping Engine</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                    {currentBoardAlignment.className} Board Alignment: CBSE, ICSE &amp; IB
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                    {currentBoardAlignment.comparativeSummary}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowBoardModal(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold shrink-0 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* 3 Board Comparison Columns */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* CBSE Card */}
+                <div className="p-5 rounded-2xl border border-blue-200 bg-blue-50/40 space-y-3 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-black text-slate-900">CBSE</span>
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-600 text-white">
+                        {currentBoardAlignment.cbse.coveragePercentage}% Verified
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-blue-700 block mt-1">
+                      {currentBoardAlignment.cbse.framework}
+                    </span>
+                    <div className="mt-3 space-y-1.5">
+                      <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
+                        Core Topics Mapped:
+                      </span>
+                      <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                        {currentBoardAlignment.cbse.keyTopicsOverlap.slice(0, 5).map((topic, i) => (
+                          <li key={i} className="line-clamp-1">{topic}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-blue-200/60 text-[11px] text-slate-600 italic">
+                    {currentBoardAlignment.cbse.boardSpecificNotes}
+                  </div>
+                </div>
+
+                {/* ICSE Card */}
+                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-black text-slate-900">ICSE / CISCE</span>
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        ~{currentBoardAlignment.icse.coveragePercentage}% Aligned
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-slate-600 block mt-1">
+                      {currentBoardAlignment.icse.framework}
+                    </span>
+                    <div className="mt-3 space-y-1.5">
+                      <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
+                        Core Topics Mapped:
+                      </span>
+                      <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                        {currentBoardAlignment.icse.keyTopicsOverlap.slice(0, 5).map((topic, i) => (
+                          <li key={i} className="line-clamp-1">{topic}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-slate-200/80 text-[11px] text-slate-600 italic">
+                    {currentBoardAlignment.icse.boardSpecificNotes}
+                  </div>
+                </div>
+
+                {/* IB Card */}
+                <div className="p-5 rounded-2xl border border-indigo-200 bg-indigo-50/40 space-y-3 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-black text-slate-900">IB (MYP / DP)</span>
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                        ~{currentBoardAlignment.ib.coveragePercentage}% Aligned
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-indigo-700 block mt-1">
+                      {currentBoardAlignment.ib.framework}
+                    </span>
+                    <div className="mt-3 space-y-1.5">
+                      <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
+                        Core Topics Mapped:
+                      </span>
+                      <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                        {currentBoardAlignment.ib.keyTopicsOverlap.slice(0, 5).map((topic, i) => (
+                          <li key={i} className="line-clamp-1">{topic}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-indigo-200/60 text-[11px] text-slate-600 italic">
+                    {currentBoardAlignment.ib.boardSpecificNotes}
+                  </div>
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <div className="flex justify-end pt-2">
+                <Button
+                  onClick={() => setShowBoardModal(false)}
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs h-9 px-5 rounded-xl"
+                >
+                  Close Mapping
+                </Button>
               </div>
             </div>
           </div>

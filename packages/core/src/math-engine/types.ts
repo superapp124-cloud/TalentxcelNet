@@ -6,11 +6,13 @@ export interface MathQuestionOption {
   text: string
 }
 
+export type BoardCode = 'CBSE' | 'CISCE' | 'IB' | 'STATE'
+
 export interface MathQuestion {
   id: string
   classNumber: number // 4, 5, 6, 7, 8, 9, 10, 11, 12
   subjectCode: 'math'
-  boardCode: 'CBSE' | 'CISCE' | 'IB' | 'STATE'
+  boardCode: BoardCode
   chapterId: string
   chapterNumber: number
   chapterTitle: string
