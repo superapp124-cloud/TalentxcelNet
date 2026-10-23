@@ -59,6 +59,12 @@ CREATE TABLE IF NOT EXISTS profiles (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Reconcile columns if profiles table already existed from earlier schema
+DO $$ BEGIN
+    ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role user_role NOT NULL DEFAULT 'guardian';
+EXCEPTION WHEN others THEN NULL;
+END $$;
+
 CREATE TABLE IF NOT EXISTS learner_profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     guardian_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -209,6 +215,28 @@ CREATE TABLE IF NOT EXISTS questions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Reconcile columns if questions table already existed from earlier schema
+DO $$ BEGIN
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS topic_id UUID REFERENCES topics(id) ON DELETE CASCADE;
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS question_type question_type_enum NOT NULL DEFAULT 'single_choice';
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS options JSONB NOT NULL DEFAULT '[]'::jsonb;
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS media_path TEXT;
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS marks NUMERIC(4, 2) NOT NULL DEFAULT 2.00;
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS negative_marking_ratio NUMERIC(3, 2) NOT NULL DEFAULT 0.00;
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS difficulty difficulty_level_enum NOT NULL DEFAULT 'easy';
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'en';
+    ALTER TABLE questions ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'published';
+    
+    -- Make legacy columns nullable if they pre-existed
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'questions' AND column_name = 'assessment_id'
+    ) THEN
+        ALTER TABLE questions ALTER COLUMN assessment_id DROP NOT NULL;
+    END IF;
+EXCEPTION WHEN others THEN NULL;
+END $$;
+
 /**
  * CONFIDENTIAL QUESTION SOLUTIONS TABLE
  * STRICT SECURITY: Never accessible directly via Client API or RLS!
@@ -290,6 +318,48 @@ CREATE TABLE IF NOT EXISTS orders (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Reconcile columns if orders table already existed from earlier schema
+DO $$ BEGIN
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES profiles(id) ON DELETE CASCADE;
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS product_id UUID REFERENCES products(id) ON DELETE RESTRICT;
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS amount_inr NUMERIC(10, 2);
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS provider_order_id TEXT UNIQUE;
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS provider_payment_id TEXT UNIQUE;
+    
+    -- Make legacy columns nullable if they pre-existed
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'orders' AND column_name = 'programme_id'
+    ) THEN
+        ALTER TABLE orders ALTER COLUMN programme_id DROP NOT NULL;
+    END IF;
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'orders' AND column_name = 'learner_id'
+    ) THEN
+        ALTER TABLE orders ALTER COLUMN learner_id DROP NOT NULL;
+    END IF;
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'orders' AND column_name = 'total_amount'
+    ) THEN
+        ALTER TABLE orders ALTER COLUMN total_amount DROP NOT NULL;
+    END IF;
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'orders' AND column_name = 'subtotal'
+    ) THEN
+        ALTER TABLE orders ALTER COLUMN subtotal DROP NOT NULL;
+    END IF;
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'orders' AND column_name = 'order_number'
+    ) THEN
+        ALTER TABLE orders ALTER COLUMN order_number DROP NOT NULL;
+    END IF;
+EXCEPTION WHEN others THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS payment_events (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
