@@ -21,12 +21,13 @@ export default async function MathQuestionBankPage() {
     const { headers, cookies } = await import('next/headers')
     const headerList = await headers()
     const cookieStore = await cookies()
-    const isLocalHost = headerList.get('host')?.includes('localhost') || headerList.get('host')?.includes('127.0.0.1')
-    const isPreview = isLocalHost && (headerList.get('referer')?.includes('preview=1') || cookieStore.get('preview_mode')?.value === '1')
-    isE2EAudit =
+    const isLocalHost = Boolean(headerList.get('host')?.includes('localhost') || headerList.get('host')?.includes('127.0.0.1'))
+    const isPreview = Boolean(isLocalHost && (headerList.get('referer')?.includes('preview=1') || cookieStore.get('preview_mode')?.value === '1'))
+    isE2EAudit = Boolean(
       headerList.get('x-e2e-audit') === '1' ||
       cookieStore.get('e2e_audit')?.value === '1' ||
       isPreview
+    )
 
     if (!isE2EAudit) {
       const supabase = await createClient()

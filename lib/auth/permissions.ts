@@ -19,7 +19,6 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
 export const SUPER_ADMIN_EMAILS = [
   'arsh.wani@gmail.com',
   'talentxcelservices@gmail.com',
-  'talentxcelservices@gmail.ocm',
   'admin@talentxcel.net',
 ]
 

@@ -59,7 +59,8 @@ describe('Role Hierarchy', () => {
       expect(isSuperAdminEmail('arsh.wani@gmail.com')).toBe(true)
       expect(isSuperAdminEmail('ARSH.WANI@GMAIL.COM')).toBe(true)
       expect(isSuperAdminEmail('talentxcelservices@gmail.com')).toBe(true)
-      expect(isSuperAdminEmail('talentxcelservices@gmail.ocm')).toBe(true)
+      expect(isSuperAdminEmail('admin@talentxcel.net')).toBe(true)
+      expect(isSuperAdminEmail('talentxcelservices@gmail.ocm')).toBe(false)
       expect(isSuperAdminEmail('random.student@example.com')).toBe(false)
 
       // isAdmin elevated check
