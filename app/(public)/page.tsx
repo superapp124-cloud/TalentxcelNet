@@ -1,296 +1,63 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
-  Brain,
+  Tv,
+  Laptop,
+  Tablet,
+  Smartphone,
+  Layers,
+  Search,
+  Bell,
+  Home,
+  BookOpen,
+  FileText,
+  Award,
+  User,
+  Settings,
+  Sparkles,
   Calculator,
   FlaskConical,
-  BookOpen,
-  Languages,
   Compass,
-  Atom,
-  Award,
+  Play,
+  Calendar,
+  ChevronRight,
   Clock,
   CheckCircle2,
-  AlertCircle,
-  ChevronRight,
-  ChevronLeft,
+  Check,
+  Wifi,
+  Cloud,
+  Bot,
+  ShieldCheck,
+  BarChart3,
+  Globe2,
   RotateCcw,
-  Sparkles,
-  Layers,
+  GraduationCap,
   PieChart,
   Target,
-  ArrowRight,
-  ShieldCheck,
-  Check,
-  HelpCircle,
-  Flag,
-  TrendingUp,
-  Database,
+  Maximize2,
   ExternalLink,
-  Zap,
-  BookmarkCheck,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Logo } from '@/components/brand/logo'
-import {
-  SEED_BOARDS,
-  SEED_CLASSES,
-  SEED_SUBJECTS,
-  SEED_CHAPTERS,
-  SEED_TOPICS,
-  SEED_BLUEPRINTS,
-  SEED_AUTHORIZED_QUESTIONS,
-  SEED_CONFIDENTIAL_SOLUTIONS,
-  APTITUDE_TRACKS,
-  getPipelineCoverageReport,
-  buildLearnerAnalyticsSummary,
-  evaluateAssessmentAttempt,
-  type AuthorizedQuestion,
-  type AssessmentBlueprint,
-  type AssessmentResult,
-  type SubmittedAnswer,
-  type AptitudeCategory,
-} from '@talentxcel/core'
+import { Button } from '@/components/ui/button'
 
-type ActiveView = 'catalog' | 'active_test' | 'test_result' | 'analytics' | 'pipeline'
+type SurfaceMode = 'showcase' | 'tv' | 'desktop' | 'tablet' | 'mobile'
 
-export default function AssessmentPlatformPage() {
-  // Navigation & Category state
-  const [activeCategory, setActiveCategory] = useState<'academic' | 'aptitude'>('academic')
-  const [selectedBoardCode, setSelectedBoardCode] = useState<string>('CBSE')
-  const [selectedClassNumber, setSelectedClassNumber] = useState<number>(4)
-  const [selectedAssessmentMode, setSelectedAssessmentMode] = useState<
-    'diagnostic' | 'topic_practice' | 'mock_exam' | 'revision'
-  >('diagnostic')
-  const [expandedChapterId, setExpandedChapterId] = useState<string | null>('chap_g4_math_c6')
+export default function UnifiedPlatformPage() {
+  const [activeSurface, setActiveSurface] = useState<SurfaceMode>('showcase')
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(6) // Question 7 (index 6) matching screenshot
+  const [selectedOptionId, setSelectedOptionId] = useState<string>('opt_7b') // Option B (18) selected in green!
+  const [activeTabletTab, setActiveTabletTab] = useState<'explanation' | 'hint' | 'related'>('explanation')
+  const [timeRemainingSeconds, setTimeRemainingSeconds] = useState<number>(504) // 08:24 matching screenshot
 
-  // Working Assessment Test State
-  const [activeView, setActiveView] = useState<ActiveView>('catalog')
-  const [currentBlueprint, setCurrentBlueprint] = useState<AssessmentBlueprint>(SEED_BLUEPRINTS[0])
-  const [testQuestions, setTestQuestions] = useState<AuthorizedQuestion[]>(
-    SEED_AUTHORIZED_QUESTIONS.filter((q) => q.id.startsWith('q_g4_m6_'))
-  )
-  const [currentQuestionIdx, setCurrentQuestionIdx] = useState<number>(6) // Default to Q7 matching screenshot!
-  const [userAnswers, setUserAnswers] = useState<Record<string, string>>({
-    q_g4_m6_07: 'opt_7b', // Q7 Option B selected to match screenshot
-  })
-  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(new Set())
-  const [timeRemainingSeconds, setTimeRemainingSeconds] = useState<number>(504) // 8m 24s
-  const [currentResult, setCurrentResult] = useState<AssessmentResult | null>(null)
-
-  // Real Learner Attempts History & Wallet
-  const [completedAttempts, setCompletedAttempts] = useState<AssessmentResult[]>([])
-  const [walletCredits, setWalletCredits] = useState<number>(60) // ₹60 initial pass credits
-
-  // Active question and options
-  const currentQuestion = testQuestions[currentQuestionIdx] || testQuestions[0]
-
-  // Filtered classes by board
-  const availableClasses = useMemo(() => {
-    return SEED_CLASSES.filter((c) => {
-      if (selectedBoardCode === 'CBSE') return true
-      return c.gradeNumber >= 4 && c.gradeNumber <= 10
-    })
-  }, [selectedBoardCode])
-
-  // Filtered subjects by selected class
-  const classSubjects = useMemo(() => {
-    // If selected class has defined subjects, return them; otherwise provide standard core curriculum subjects
-    const direct = SEED_SUBJECTS.filter((s) => {
-      const cls = SEED_CLASSES.find((c) => c.id === s.classId)
-      return cls?.gradeNumber === selectedClassNumber
-    })
-    if (direct.length > 0) return direct
-
-    // Fallback template for grades without custom seed
-    return [
-      {
-        id: `subj_gen_math_${selectedClassNumber}`,
-        classId: `class_g${selectedClassNumber}`,
-        code: 'math',
-        name: 'Mathematics',
-        colorTheme: 'amber' as const,
-        iconName: 'Calculator',
-        totalTests: 15,
-        completedTests: 0,
-        status: 'provisional' as const,
-        description: `Class ${selectedClassNumber} Mathematics Curriculum Standards`,
-      },
-      {
-        id: `subj_gen_sci_${selectedClassNumber}`,
-        classId: `class_g${selectedClassNumber}`,
-        code: 'science',
-        name: 'Science',
-        colorTheme: 'emerald' as const,
-        iconName: 'FlaskConical',
-        totalTests: 12,
-        completedTests: 0,
-        status: 'provisional' as const,
-        description: `Class ${selectedClassNumber} Experimental & Theoretical Science`,
-      },
-      {
-        id: `subj_gen_eng_${selectedClassNumber}`,
-        classId: `class_g${selectedClassNumber}`,
-        code: 'english',
-        name: 'English Language & Lit',
-        colorTheme: 'blue' as const,
-        iconName: 'BookOpen',
-        totalTests: 10,
-        completedTests: 0,
-        status: 'provisional' as const,
-        description: `Class ${selectedClassNumber} Reading, Grammar & Writing`,
-      },
-      {
-        id: `subj_gen_sst_${selectedClassNumber}`,
-        classId: `class_g${selectedClassNumber}`,
-        code: 'social_science',
-        name: 'Social Studies',
-        colorTheme: 'purple' as const,
-        iconName: 'Compass',
-        totalTests: 10,
-        completedTests: 0,
-        status: 'provisional' as const,
-        description: `Class ${selectedClassNumber} History, Geography, Civics & Economics`,
-      },
-    ]
-  }, [selectedClassNumber])
-
-  // Timer countdown effect for active test
+  // Timer simulation
   useEffect(() => {
-    if (activeView !== 'active_test' || timeRemainingSeconds <= 0) return
     const timer = setInterval(() => {
-      setTimeRemainingSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          handleAutoSubmit()
-          return 0
-        }
-        return prev - 1
-      })
+      setTimeRemainingSeconds((prev) => (prev > 0 ? prev - 1 : 504))
     }, 1000)
     return () => clearInterval(timer)
-  }, [activeView, timeRemainingSeconds])
-
-  // Keyboard accessibility: 1-4 for options, arrows for navigation, F for flag
-  useEffect(() => {
-    if (activeView !== 'active_test') return
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!currentQuestion) return
-      // Keys 1 to 4 select options
-      if (['1', '2', '3', '4'].includes(e.key)) {
-        const optIndex = parseInt(e.key, 10) - 1
-        if (currentQuestion.options[optIndex]) {
-          handleSelectOption(currentQuestion.id, currentQuestion.options[optIndex].id)
-        }
-      } else if (e.key === 'ArrowRight') {
-        if (currentQuestionIdx < testQuestions.length - 1) {
-          setCurrentQuestionIdx((prev) => prev + 1)
-        }
-      } else if (e.key === 'ArrowLeft') {
-        if (currentQuestionIdx > 0) {
-          setCurrentQuestionIdx((prev) => prev - 1)
-        }
-      } else if (e.key.toLowerCase() === 'f') {
-        toggleFlagQuestion(currentQuestion.id)
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [activeView, currentQuestion, currentQuestionIdx, testQuestions.length])
-
-  // Start an assessment
-  const handleStartTest = (blueprint: AssessmentBlueprint) => {
-    setCurrentBlueprint(blueprint)
-    let questionsForTest: AuthorizedQuestion[] = []
-
-    if (blueprint.category === 'aptitude') {
-      questionsForTest = SEED_AUTHORIZED_QUESTIONS.filter((q) => q.id.startsWith('q_apt_'))
-    } else if (blueprint.id === 'bp_g10_sci_c1') {
-      questionsForTest = SEED_AUTHORIZED_QUESTIONS.filter((q) => q.id.startsWith('q_g10_'))
-    } else {
-      questionsForTest = SEED_AUTHORIZED_QUESTIONS.filter((q) => q.id.startsWith('q_g4_m6_'))
-    }
-
-    if (questionsForTest.length === 0) {
-      questionsForTest = SEED_AUTHORIZED_QUESTIONS.slice(0, 5)
-    }
-
-    setTestQuestions(questionsForTest)
-    setCurrentQuestionIdx(0)
-    setUserAnswers({})
-    setFlaggedQuestions(new Set())
-    setTimeRemainingSeconds(blueprint.durationMinutes * 60)
-    setActiveView('active_test')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  // Answer selection
-  const handleSelectOption = (questionId: string, optionId: string) => {
-    setUserAnswers((prev) => ({
-      ...prev,
-      [questionId]: optionId,
-    }))
-  }
-
-  const toggleFlagQuestion = (questionId: string) => {
-    setFlaggedQuestions((prev) => {
-      const next = new Set(prev)
-      if (next.has(questionId)) next.delete(questionId)
-      else next.add(questionId)
-      return next
-    })
-  }
-
-  // Submit test and trigger server-authoritative scoring
-  const handleSubmitTest = () => {
-    const submittedAnswers: SubmittedAnswer[] = testQuestions.map((q) => {
-      const selected = userAnswers[q.id]
-      return {
-        questionId: q.id,
-        selectedOptionIds: selected ? [selected] : [],
-        timeSpentSeconds: 30, // tracked time
-      }
-    })
-
-    const topicsMap = new Map<string, string>()
-    for (const t of SEED_TOPICS) {
-      topicsMap.set(t.id, t.title)
-    }
-
-    const result = evaluateAssessmentAttempt({
-      attemptId: `att_${Date.now()}`,
-      blueprint: currentBlueprint,
-      learnerId: 'learner_current',
-      questions: testQuestions,
-      solutions: SEED_CONFIDENTIAL_SOLUTIONS,
-      submittedAnswers,
-      topicsMap,
-    })
-
-    setCurrentResult(result)
-    setCompletedAttempts((prev) => [result, ...prev])
-    if (result.passed && result.earnedPassCredits > 0) {
-      setWalletCredits((prev) => prev + result.earnedPassCredits)
-    }
-    setActiveView('test_result')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const handleAutoSubmit = useCallback(() => {
-    handleSubmitTest()
-  }, [testQuestions, userAnswers, currentBlueprint])
-
-  // Pipeline coverage report
-  const pipelineReport = useMemo(() => getPipelineCoverageReport(), [])
-
-  // Analytics summary from real attempts
-  const analyticsSummary = useMemo(() => {
-    return buildLearnerAnalyticsSummary('learner_current', 'Aarav Sharma', completedAttempts)
-  }, [completedAttempts])
+  }, [])
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -299,28 +66,93 @@ export default function AssessmentPlatformPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* TOP NOTIFICATION / WALLET STATUS BAR */}
-      <div className="bg-[#0B132B] border-b border-white/[0.08] px-4 py-2.5 text-xs">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold text-slate-200">TALENTXCEL UNIVERSAL ASSESSMENT PLATFORM</span>
-            <span className="text-slate-400 hidden sm:inline">•</span>
-            <span className="text-slate-400 hidden sm:inline">
-              Classes 4–12 & Foundation • CBSE / ICSE Aligned • Server-Authoritative Scoring
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full text-emerald-300 font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Pass Reward: ₹20 / Test</span>
-              <span className="mx-1 text-emerald-500">•</span>
-              <span>Ledger Balance: ₹{walletCredits}</span>
+    <div className="min-h-screen bg-[#070B14] text-white flex flex-col font-sans selection:bg-[#00D2FF]/30 selection:text-cyan-200">
+      {/* =========================================================================
+          TOP PERSISTENT CONTROL BAR: MULTI-SURFACE SELECTOR
+      ========================================================================== */}
+      <div className="sticky top-0 z-50 bg-[#0B132B]/95 backdrop-blur-xl border-b border-white/[0.08] px-4 py-2.5 shadow-xl">
+        <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+          {/* Logo & Platform Tag */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 font-black text-base tracking-tight text-white">
+              <span>Talent<span className="text-[#0080FF]">Xcel</span></span>
+              <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest hidden sm:inline">
+                • Universal Platform
+              </span>
             </div>
+            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] py-0 px-2">
+              All Surfaces Live
+            </Badge>
+          </div>
+
+          {/* Interactive Surface Switcher Pills */}
+          <div className="flex items-center gap-1 bg-[#1C2541] p-1 rounded-xl border border-white/[0.1]">
+            <button
+              onClick={() => setActiveSurface('showcase')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                activeSurface === 'showcase'
+                  ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
+                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Full Showcase View (Reference)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSurface('tv')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                activeSurface === 'tv'
+                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
+                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Tv className="w-3.5 h-3.5" />
+              <span>TV Experience</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSurface('desktop')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                activeSurface === 'desktop'
+                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
+                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Laptop className="w-3.5 h-3.5" />
+              <span>Laptop / Desktop</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSurface('tablet')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                activeSurface === 'tablet'
+                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
+                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Tablet className="w-3.5 h-3.5" />
+              <span>Tablet Split-Screen</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSurface('mobile')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                activeSurface === 'mobile'
+                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
+                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Mobile Phone</span>
+            </button>
+          </div>
+
+          {/* Quick Links */}
+          <div className="flex items-center gap-3">
             <Link
               href="/academy"
-              className="text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1 font-medium transition-colors"
+              className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold"
             >
               <span>Academy Programmes</span>
               <ExternalLink className="w-3 h-3" />
@@ -329,1084 +161,1147 @@ export default function AssessmentPlatformPage() {
         </div>
       </div>
 
-      {/* MAIN CONTAINER */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* ========================================================================= */}
-        {/* VIEW 1: ACTIVE TEST JOURNEY SCREEN */}
-        {/* ========================================================================= */}
-        {activeView === 'active_test' && currentQuestion && (
-          <div className="space-y-6">
-            {/* Test Header */}
-            <div className="bg-[#0B132B] border border-white/[0.1] rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Badge variant="outline" className="border-cyan-500/40 text-cyan-300 bg-cyan-950/40 text-xs">
-                    {currentBlueprint.category === 'academic' ? 'Curriculum Periodic Test' : 'Aptitude & Reasoning'}
-                  </Badge>
-                  <span className="text-xs text-slate-400">Total Marks: {currentBlueprint.totalMarks}</span>
-                  <span className="text-xs text-slate-400">• Pass Criteria: {currentBlueprint.passingPercentage}%</span>
-                </div>
-                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  {currentBlueprint.title}
-                </h1>
-              </div>
+      {/* =========================================================================
+          MODE 1: FULL MULTI-SURFACE SHOWCASE CANVAS (MATCHES ATTACHED IMAGE 100%)
+      ========================================================================== */}
+      {activeSurface === 'showcase' && (
+        <main className="flex-1 w-full max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between space-y-12 animate-in fade-in duration-300">
+          {/* =====================================================================
+              TOP SECTION: THE TELEVISION EXPERIENCE (10-FOOT REMOTE UI)
+          ====================================================================== */}
+          <div className="relative group">
+            {/* Television Hardware Frame */}
+            <div className="relative rounded-[32px] border-[12px] border-[#181E2E] bg-[#070B14] p-5 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden">
+              {/* Stand highlight reflection at bottom */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.02] to-transparent pointer-events-none" />
 
-              {/* Timer & Controls */}
-              <div className="flex items-center gap-4">
-                <div
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-mono font-bold text-lg ${
-                    timeRemainingSeconds < 120
-                      ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 animate-pulse'
-                      : 'bg-white/[0.05] border-white/[0.1] text-cyan-300'
-                  }`}
-                >
-                  <Clock className="w-5 h-5 text-cyan-400" />
-                  <span>{formatTimer(timeRemainingSeconds)}</span>
-                </div>
-
-                <Button
-                  onClick={handleSubmitTest}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-900/40"
-                >
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Submit Test
-                </Button>
-              </div>
-            </div>
-
-            {/* Assessment Layout: Split Question & Question Palette */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Question Main Panel (Left / Center) */}
-              <div className="lg:col-span-8 space-y-6">
-                <Card className="bg-[#0B132B] border-white/[0.1] text-slate-100 shadow-xl">
-                  <CardHeader className="pb-3 border-b border-white/[0.06] flex flex-row items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-cyan-400">
-                        Question {currentQuestionIdx + 1} of {testQuestions.length}
-                      </span>
-                      <Badge variant="outline" className="text-xs border-white/20 text-slate-300">
-                        {currentQuestion.difficulty.toUpperCase()}
-                      </Badge>
-                      <span className="text-xs text-slate-400">+{currentQuestion.marks} marks</span>
-                    </div>
-
-                    <button
-                      onClick={() => toggleFlagQuestion(currentQuestion.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                        flaggedQuestions.has(currentQuestion.id)
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                          : 'bg-white/[0.05] text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <Flag className="w-3.5 h-3.5" />
-                      <span>{flaggedQuestions.has(currentQuestion.id) ? 'Flagged' : 'Flag for Review'}</span>
-                    </button>
-                  </CardHeader>
-
-                  <CardContent className="pt-6 space-y-6">
-                    {/* Question Text */}
-                    <div className="text-lg sm:text-xl font-medium text-white leading-relaxed">
-                      {currentQuestion.questionText}
-                    </div>
-
-                    {/* Options (A, B, C, D) */}
-                    <div className="space-y-3">
-                      {currentQuestion.options.map((opt, idx) => {
-                        const isSelected = userAnswers[currentQuestion.id] === opt.id
-                        return (
-                          <button
-                            key={opt.id}
-                            onClick={() => handleSelectOption(currentQuestion.id, opt.id)}
-                            className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between group ${
-                              isSelected
-                                ? 'bg-cyan-500/15 border-cyan-400 text-white shadow-lg shadow-cyan-950/50'
-                                : 'bg-[#070B14]/70 border-white/[0.08] text-slate-200 hover:border-white/30 hover:bg-white/[0.03]'
-                            }`}
-                          >
-                            <div className="flex items-center gap-4">
-                              <span
-                                className={`flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm transition-colors ${
-                                  isSelected
-                                    ? 'bg-cyan-500 text-slate-950'
-                                    : 'bg-white/[0.06] text-slate-300 group-hover:bg-white/[0.1]'
-                                }`}
-                              >
-                                {opt.label || String.fromCharCode(65 + idx)}
-                              </span>
-                              <span className="text-base font-normal">{opt.text}</span>
-                            </div>
-
-                            <div
-                              className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
-                                isSelected ? 'border-cyan-400 bg-cyan-400 text-slate-950' : 'border-white/20'
-                              }`}
-                            >
-                              {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    {/* Keyboard Help Notice */}
-                    <div className="text-xs text-slate-400 bg-white/[0.03] p-3 rounded-lg border border-white/[0.05] flex items-center justify-between">
-                      <span>Pro-tip: Press keys 1–4 to pick options, ← / → to navigate, F to flag.</span>
-                      <span className="text-cyan-400 font-mono">CONFIDENTIAL ANSWER KEY IS LOCKED ON SERVER</span>
-                    </div>
-
-                    {/* Bottom Question Navigation Controls */}
-                    <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
-                      <Button
-                        variant="outline"
-                        disabled={currentQuestionIdx === 0}
-                        onClick={() => setCurrentQuestionIdx((prev) => Math.max(0, prev - 1))}
-                        className="border-white/20 text-slate-300 hover:bg-white/[0.08]"
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-1" />
-                        Previous
-                      </Button>
-
-                      <div className="flex items-center gap-2">
-                        {userAnswers[currentQuestion.id] && (
-                          <Button
-                            variant="ghost"
-                            onClick={() => {
-                              setUserAnswers((prev) => {
-                                const next = { ...prev }
-                                delete next[currentQuestion.id]
-                                return next
-                              })
-                            }}
-                            className="text-xs text-slate-400 hover:text-rose-400"
-                          >
-                            Clear Selection
-                          </Button>
-                        )}
-
-                        {currentQuestionIdx < testQuestions.length - 1 ? (
-                          <Button
-                            onClick={() => setCurrentQuestionIdx((prev) => prev + 1)}
-                            className="bg-cyan-600 hover:bg-cyan-500 text-white"
-                          >
-                            Save & Next
-                            <ChevronRight className="w-4 h-4 ml-1" />
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={handleSubmitTest}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold"
-                          >
-                            Finish Assessment
-                            <CheckCircle2 className="w-4 h-4 ml-1.5" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Question Palette & Quick Navigation (Right Panel) */}
-              <div className="lg:col-span-4 space-y-6">
-                <Card className="bg-[#0B132B] border-white/[0.1] text-slate-100 shadow-xl">
-                  <CardHeader className="pb-3 border-b border-white/[0.06]">
-                    <CardTitle className="text-base font-semibold text-white flex items-center justify-between">
-                      <span>Question Palette</span>
-                      <span className="text-xs text-slate-400 font-normal">
-                        {Object.keys(userAnswers).length} of {testQuestions.length} answered
-                      </span>
-                    </CardTitle>
-                  </CardHeader>
-
-                  <CardContent className="pt-4 space-y-5">
-                    {/* Grid of question buttons */}
-                    <div className="grid grid-cols-5 gap-2.5">
-                      {testQuestions.map((q, idx) => {
-                        const isCurrent = idx === currentQuestionIdx
-                        const isAnswered = Boolean(userAnswers[q.id])
-                        const isFlagged = flaggedQuestions.has(q.id)
-
-                        let bgClass = 'bg-[#070B14] border-white/[0.1] text-slate-400'
-                        if (isCurrent) {
-                          bgClass = 'bg-cyan-500 text-slate-950 font-bold border-cyan-400 ring-2 ring-cyan-400/50'
-                        } else if (isAnswered) {
-                          bgClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-semibold'
-                        } else if (isFlagged) {
-                          bgClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                        }
-
-                        return (
-                          <button
-                            key={q.id}
-                            onClick={() => setCurrentQuestionIdx(idx)}
-                            className={`h-11 rounded-xl border flex flex-col items-center justify-center relative transition-transform hover:scale-105 ${bgClass}`}
-                          >
-                            <span className="text-sm">{idx + 1}</span>
-                            {isFlagged && (
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 absolute top-1 right-1" />
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    {/* Legend */}
-                    <div className="pt-3 border-t border-white/[0.06] grid grid-cols-2 gap-2 text-xs text-slate-300">
-                      <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50" />
-                        <span>Answered ({Object.keys(userAnswers).length})</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-amber-500/30 border border-amber-500/50" />
-                        <span>Flagged ({flaggedQuestions.size})</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-cyan-500" />
-                        <span>Current</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-[#070B14] border border-white/20" />
-                        <span>Unattempted ({testQuestions.length - Object.keys(userAnswers).length})</span>
-                      </div>
-                    </div>
-
-                    {/* Exit assessment option */}
-                    <div className="pt-3 border-t border-white/[0.06]">
-                      <Button
-                        variant="ghost"
-                        onClick={() => setActiveView('catalog')}
-                        className="w-full text-slate-400 hover:text-rose-300 text-xs"
-                      >
-                        Exit Assessment & Return to Catalog
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* VIEW 2: SERVER-VALIDATED SCORE & EXPLANATION REVIEW SCREEN */}
-        {/* ========================================================================= */}
-        {activeView === 'test_result' && currentResult && (
-          <div className="space-y-8 animate-in fade-in duration-300">
-            {/* Scorecard Hero */}
-            <div
-              className={`rounded-3xl p-6 sm:p-8 border shadow-2xl relative overflow-hidden ${
-                currentResult.passed
-                  ? 'bg-gradient-to-br from-emerald-950/40 via-[#0B132B] to-[#070B14] border-emerald-500/30'
-                  : 'bg-gradient-to-br from-rose-950/40 via-[#0B132B] to-[#070B14] border-rose-500/30'
-              }`}
-            >
-              <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <Badge
-                      className={`text-xs px-3 py-1 font-semibold ${
-                        currentResult.passed
-                          ? 'bg-emerald-500 text-slate-950'
-                          : 'bg-rose-500 text-white'
-                      }`}
-                    >
-                      {currentResult.passed ? 'PASSED & CERTIFIED' : 'ATTEMPT COMPLETED • REVISION RECOMMENDED'}
-                    </Badge>
-                    <span className="text-xs text-slate-400">Attempt ID: {currentResult.attemptId}</span>
-                  </div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-                    {currentResult.blueprintTitle}
-                  </h1>
-                  <p className="text-sm text-slate-300 max-w-xl">
-                    Evaluation completed by server-side authoritative evaluator. Official pass score criteria:{' '}
-                    {currentBlueprint.passingPercentage}%.
-                  </p>
-                </div>
-
-                {/* Score & Reward Badge */}
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <div className="text-4xl sm:text-5xl font-black text-white">
-                      {currentResult.scoreObtained}{' '}
-                      <span className="text-lg font-medium text-slate-400">/ {currentResult.maxMarks}</span>
-                    </div>
-                    <div className="text-sm font-semibold text-cyan-400 mt-1">
-                      {currentResult.percentage}% Score • {currentResult.accuracyPercentage}% Accuracy
-                    </div>
-                  </div>
-
-                  {currentResult.earnedPassCredits > 0 && (
-                    <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl text-center space-y-1">
-                      <Sparkles className="w-6 h-6 text-emerald-400 mx-auto" />
-                      <div className="text-lg font-bold text-emerald-300">
-                        +₹{currentResult.earnedPassCredits}
-                      </div>
-                      <div className="text-[11px] text-emerald-400 font-medium">Pass Credit Earned</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Stats Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-white/[0.08]">
-                <div className="bg-white/[0.03] p-3 rounded-xl border border-white/[0.05]">
-                  <div className="text-xs text-slate-400">Correct Answers</div>
-                  <div className="text-xl font-bold text-emerald-400 mt-0.5">
-                    {currentResult.correctCount} / {currentResult.totalQuestions}
-                  </div>
-                </div>
-                <div className="bg-white/[0.03] p-3 rounded-xl border border-white/[0.05]">
-                  <div className="text-xs text-slate-400">Incorrect Answers</div>
-                  <div className="text-xl font-bold text-rose-400 mt-0.5">
-                    {currentResult.incorrectCount}
-                  </div>
-                </div>
-                <div className="bg-white/[0.03] p-3 rounded-xl border border-white/[0.05]">
-                  <div className="text-xs text-slate-400">Time Taken</div>
-                  <div className="text-xl font-bold text-cyan-300 mt-0.5">
-                    {Math.floor(currentResult.totalTimeSpentSeconds / 60)}m {currentResult.totalTimeSpentSeconds % 60}s
-                  </div>
-                </div>
-                <div className="bg-white/[0.03] p-3 rounded-xl border border-white/[0.05]">
-                  <div className="text-xs text-slate-400">Accuracy Rate</div>
-                  <div className="text-xl font-bold text-amber-300 mt-0.5">
-                    {currentResult.accuracyPercentage}%
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Diagnostic Insights: Weak Topics & Revision Trigger */}
-            {currentResult.weakTopics.length > 0 && (
-              <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-amber-400" />
-                    <h3 className="font-bold text-amber-200">Identified Areas Requiring Revision</h3>
-                  </div>
-                  <Button
-                    onClick={() => handleStartTest(currentBlueprint)}
-                    className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs"
-                  >
-                    Start Targeted Revision Drill
-                    <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                  </Button>
-                </div>
-                <p className="text-xs text-amber-300/80">
-                  Performance on the following topics was below the 60% mastery threshold:
-                </p>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {currentResult.weakTopics.map((w) => (
-                    <Badge
-                      key={w.topicId}
-                      variant="outline"
-                      className="border-amber-500/40 bg-amber-500/10 text-amber-300 text-xs px-2.5 py-1"
-                    >
-                      {w.topicName} ({w.accuracy}% accuracy)
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Detailed Question-by-Question Solution Review (Permitted Post-Submission) */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-cyan-400" />
-                  <span>Authorized Solutions & Step-by-Step Explanations</span>
-                </h2>
-                <Button
-                  variant="outline"
-                  onClick={() => setActiveView('catalog')}
-                  className="border-white/20 text-slate-300 hover:bg-white/[0.08]"
-                >
-                  Return to Curriculum Catalog
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                {currentResult.evaluations.map((evalItem, idx) => {
-                  const q = testQuestions.find((item) => item.id === evalItem.questionId)
-                  if (!q) return null
-
-                  return (
-                    <Card
-                      key={evalItem.questionId}
-                      className={`bg-[#0B132B] border text-slate-100 ${
-                        evalItem.isCorrect ? 'border-emerald-500/30' : 'border-rose-500/30'
-                      }`}
-                    >
-                      <CardHeader className="pb-3 border-b border-white/[0.06] flex flex-row items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">Q{idx + 1}.</span>
-                          <span className="text-sm text-slate-300">{q.questionText}</span>
-                        </div>
-                        <Badge
-                          className={`text-xs ${
-                            evalItem.isCorrect
-                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                              : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                          }`}
-                        >
-                          {evalItem.isCorrect ? 'Correct (+2)' : 'Incorrect (0)'}
-                        </Badge>
-                      </CardHeader>
-
-                      <CardContent className="pt-4 space-y-4">
-                        {/* Options comparison */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                          {q.options.map((opt) => {
-                            const isUserChoice = evalItem.userAnswer.includes(opt.id)
-                            const isCorrectChoice = evalItem.correctAnswer.includes(opt.id)
-
-                            let optBorder = 'border-white/[0.08] bg-[#070B14]'
-                            if (isCorrectChoice) {
-                              optBorder = 'border-emerald-500/60 bg-emerald-950/30 text-emerald-200'
-                            } else if (isUserChoice && !evalItem.isCorrect) {
-                              optBorder = 'border-rose-500/60 bg-rose-950/30 text-rose-200'
-                            }
-
-                            return (
-                              <div
-                                key={opt.id}
-                                className={`p-2.5 rounded-lg border flex items-center justify-between ${optBorder}`}
-                              >
-                                <span className="font-medium">
-                                  {opt.label}. {opt.text}
-                                </span>
-                                {isCorrectChoice && (
-                                  <Badge className="bg-emerald-500 text-slate-950 text-[10px]">
-                                    Correct Answer
-                                  </Badge>
-                                )}
-                                {isUserChoice && !isCorrectChoice && (
-                                  <Badge className="bg-rose-500 text-white text-[10px]">Your Answer</Badge>
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-
-                        {/* Step by step explanation */}
-                        <div className="bg-[#070B14] p-4 rounded-xl border border-white/[0.06] space-y-2 text-sm">
-                          <div className="font-semibold text-cyan-300 flex items-center gap-1.5">
-                            <Sparkles className="w-4 h-4 text-cyan-400" />
-                            <span>Step-by-Step Solution:</span>
-                          </div>
-                          <p className="text-slate-300">{evalItem.explanation}</p>
-                          {evalItem.keyPoint && (
-                            <div className="text-xs font-medium text-amber-300 bg-amber-500/10 p-2 rounded border border-amber-500/20 mt-2">
-                              {evalItem.keyPoint}
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* VIEW 3: PRIMARY CURRICULUM BROWSER & ASSESSMENT CATALOG */}
-        {/* ========================================================================= */}
-        {activeView === 'catalog' && (
-          <div className="space-y-10">
-            {/* HERO SELECTOR: THE FIRST SCREEN */}
-            <div className="bg-gradient-to-b from-[#0B132B] to-[#070B14] border border-white/[0.1] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <Badge variant="outline" className="border-cyan-500/40 text-cyan-300 bg-cyan-950/40 mb-2">
-                    Universal Learner Engine
-                  </Badge>
-                  <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                    Assessment & Skills Platform
-                  </h1>
-                  <p className="text-sm text-slate-300 mt-1 max-w-2xl">
-                    Choose your curriculum board and class to access diagnostic assessments, chapter practice,
-                    analytical reasoning, and server-validated certification.
-                  </p>
-                </div>
-
-                {/* Primary Category Switch: Academic vs Aptitude */}
-                <div className="flex p-1 bg-black/40 rounded-2xl border border-white/[0.08]">
-                  <button
-                    onClick={() => setActiveCategory('academic')}
-                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                      activeCategory === 'academic'
-                        ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-950'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    <span>School Curriculum</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveCategory('aptitude')}
-                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                      activeCategory === 'aptitude'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Brain className="w-4 h-4" />
-                    <span>Reasoning & Aptitude</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 1. CURRICULUM BOARD SELECTION */}
-              {activeCategory === 'academic' && (
-                <div className="space-y-3 pt-2">
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    1. Select Curriculum Board
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {SEED_BOARDS.map((b) => {
-                      const isSelected = selectedBoardCode === b.code
-                      return (
-                        <button
-                          key={b.id}
-                          onClick={() => setSelectedBoardCode(b.code)}
-                          className={`p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between ${
-                            isSelected
-                              ? 'bg-cyan-500/10 border-cyan-400 text-white ring-1 ring-cyan-400/50'
-                              : 'bg-white/[0.03] border-white/[0.08] text-slate-300 hover:border-white/20 hover:bg-white/[0.05]'
-                          }`}
-                        >
-                          <div>
-                            <div className="font-bold text-base flex items-center gap-2">
-                              <span>{b.code}</span>
-                              <Badge
-                                className={`text-[10px] px-1.5 py-0 ${
-                                  b.status === 'verified'
-                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                                    : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                                }`}
-                              >
-                                {b.status === 'verified' ? 'Verified' : 'Provisional'}
-                              </Badge>
-                            </div>
-                            <div className="text-xs text-slate-400 truncate max-w-[220px]">{b.name}</div>
-                          </div>
-                          <span className="text-xs font-mono text-cyan-400">{b.curriculumVersion}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* 2. CLASS SELECTOR (CLASSES 4 THROUGH 12 + CLASS 3) */}
-              {activeCategory === 'academic' && (
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                      2. Select Class (Classes 4–12 & Foundation)
-                    </div>
-                    <span className="text-xs text-cyan-400">
-                      Currently Selected: Class {selectedClassNumber}
+              {/* TV Top Header Bar */}
+              <div className="flex items-center justify-between pb-5 border-b border-white/[0.08] relative z-10">
+                <div className="flex items-center gap-8">
+                  <div className="space-y-0.5">
+                    <span className="text-2xl font-black tracking-tight text-white flex items-center gap-0.5">
+                      Talent<span className="text-[#0080FF]">Xcel</span>
+                    </span>
+                    <span className="text-[10px] tracking-widest uppercase text-neutral-400 block font-medium">
+                      Learn • Practise • Grow
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-                    {availableClasses.map((cls) => {
-                      const isSelected = selectedClassNumber === cls.gradeNumber
-                      return (
-                        <button
-                          key={cls.id}
-                          onClick={() => setSelectedClassNumber(cls.gradeNumber)}
-                          className={`px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all border ${
-                            isSelected
-                              ? 'bg-cyan-500 text-slate-950 border-cyan-400 shadow-md shadow-cyan-950'
-                              : 'bg-white/[0.03] border-white/[0.08] text-slate-300 hover:bg-white/[0.08]'
-                          }`}
-                        >
-                          {cls.name}
-                          {cls.gradeNumber === 4 && (
-                            <span className="ml-1.5 text-[10px] bg-emerald-950/60 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                              PT-2
-                            </span>
-                          )}
-                        </button>
-                      )
-                    })}
+                  {/* Glowing TV Navigation Pills */}
+                  <nav className="hidden md:flex items-center gap-2">
+                    <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#0080FF] text-white font-bold text-sm shadow-[0_0_20px_rgba(0,128,255,0.45)] ring-2 ring-white/20">
+                      <Home className="h-4 w-4" />
+                      <span>Home</span>
+                    </button>
+                    {['My Learning', 'Tests', 'Subjects', 'Results', 'Plans', 'Profile'].map((item) => (
+                      <button
+                        key={item}
+                        className="px-4 py-2 rounded-full text-sm font-semibold text-neutral-300 hover:text-white hover:bg-white/5 transition-all"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button className="p-2.5 rounded-full bg-white/[0.06] text-neutral-300 hover:text-white">
+                    <Search className="h-4 w-4" />
+                  </button>
+                  <button className="p-2.5 rounded-full bg-white/[0.06] text-neutral-300 hover:text-white relative">
+                    <Bell className="h-4 w-4" />
+                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500" />
+                  </button>
+                  <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-[#0080FF] to-cyan-400 flex items-center justify-center font-black text-white text-sm shadow-md">
+                    A
                   </div>
                 </div>
-              )}
+              </div>
 
-              {/* 3. ASSESSMENT MODE SELECTION */}
-              <div className="space-y-3 pt-2">
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  {activeCategory === 'academic' ? '3. Select Assessment Mode' : 'Select Drill Mode'}
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {[
-                    { id: 'diagnostic', label: 'Diagnostic Test', desc: 'Identify baseline & weak areas' },
-                    { id: 'topic_practice', label: 'Topic Practice', desc: 'Step-by-step topic drills' },
-                    { id: 'mock_exam', label: 'Mock Exam Simulator', desc: 'Full-length timed evaluation' },
-                    { id: 'revision', label: 'Targeted Revision', desc: 'Weak-topic remediation' },
-                  ].map((mode) => (
-                    <button
-                      key={mode.id}
-                      onClick={() => setSelectedAssessmentMode(mode.id as any)}
-                      className={`p-3 rounded-xl border text-left transition-all ${
-                        selectedAssessmentMode === mode.id
-                          ? 'bg-cyan-500/15 border-cyan-400 text-white'
-                          : 'bg-white/[0.02] border-white/[0.06] text-slate-300 hover:bg-white/[0.05]'
-                      }`}
+              {/* TV Main Body: 9 Cols Left + 3 Cols Right Quick Access */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 my-6 relative z-10 items-start">
+                {/* Left 9 Columns */}
+                <div className="lg:col-span-9 space-y-6">
+                  {/* Hero Banner with Student Graphic & Upcoming Test Card */}
+                  <div className="relative rounded-3xl bg-gradient-to-r from-[#0C1636] via-[#0E2A68] to-[#124294] p-6 sm:p-8 overflow-hidden border border-[#2A365D] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                    {/* Background Doodles & Subtle Graphics */}
+                    <div className="absolute right-32 top-4 opacity-20 pointer-events-none text-cyan-300 text-6xl font-serif">
+                      ✧
+                    </div>
+                    <div className="absolute right-72 bottom-4 opacity-15 pointer-events-none text-amber-300 text-4xl">
+                      ✏
+                    </div>
+
+                    <div className="space-y-4 max-w-md z-10">
+                      <div className="space-y-1">
+                        <span className="text-xs font-bold text-cyan-300 uppercase tracking-widest">
+                          Welcome
+                        </span>
+                        <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+                          Keep Learning,<br />
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-[#00D2FF]">
+                            Keep Growing
+                          </span>
+                        </h1>
+                      </div>
+                      <p className="text-xs sm:text-sm text-neutral-200/90 leading-relaxed font-normal">
+                        Syllabus-aligned practice tests, explanations and personalised learning for school and competitive exams.
+                      </p>
+                      <div className="pt-1">
+                        <button
+                          onClick={() => setActiveSurface('tablet')}
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-[#0B132B] font-black text-sm shadow-xl hover:bg-neutral-100 transition-all hover:scale-105"
+                        >
+                          <Play className="h-4 w-4 fill-[#0B132B]" />
+                          <span>Continue Practice</span>
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      {/* 3 Quick Pill Tabs Under Button */}
+                      <div className="flex items-center gap-2 pt-2 text-[11px] font-semibold text-neutral-300">
+                        <span className="bg-black/30 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
+                          <BarChart3 className="w-3 h-3 text-cyan-400" /> My Progress
+                        </span>
+                        <span className="bg-black/30 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
+                          <Calendar className="w-3 h-3 text-amber-400" /> Upcoming Tests
+                        </span>
+                        <span className="bg-black/30 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-purple-400" /> Recommended
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Upcoming Test Card (Matching Screenshot) */}
+                    <div className="w-full md:w-80 rounded-2xl bg-[#0B132B]/95 backdrop-blur-md p-5 border border-cyan-400/30 shadow-2xl space-y-3 z-10">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-extrabold text-cyan-300 flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5" /> Upcoming Test
+                        </span>
+                        <span className="text-[11px] text-neutral-400 hover:text-white cursor-pointer">
+                          View All &gt;
+                        </span>
+                      </div>
+
+                      <div className="flex items-start gap-3 pt-1">
+                        <div className="p-3 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 shrink-0">
+                          <Calculator className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <h4 className="font-extrabold text-sm text-white">Mathematics</h4>
+                          <p className="text-xs text-amber-400 font-semibold">Ch - 6 Multiples</p>
+                          <p className="text-[11px] text-neutral-400">Grade IV • Mayoor School (PT 2)</p>
+                          <p className="text-[11px] text-neutral-300 font-medium mt-1">🗓 17 Nov 2026</p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => setActiveSurface('tablet')}
+                        className="w-full py-2.5 rounded-xl bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all mt-2"
+                      >
+                        <span>Start Practice</span>
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 5 Vibrant Subject Cards Row (Exact colors & progress) */}
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
+                    {/* Card 1: Mathematics (Amber) */}
+                    <div
+                      onClick={() => setActiveSurface('tablet')}
+                      className="rounded-2xl bg-[#0E172E] p-4 border border-amber-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
                     >
-                      <div className="font-semibold text-sm">{mode.label}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">{mode.desc}</div>
-                    </button>
-                  ))}
+                      <div className="space-y-1.5">
+                        <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400 w-fit">
+                          <Calculator className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-extrabold text-sm text-white group-hover:text-amber-300 transition-colors">
+                          Mathematics
+                        </h4>
+                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
+                      </div>
+                      <div className="space-y-1 pt-2 border-t border-white/5">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Progress</span>
+                          <span className="font-semibold text-white">3/10 tests</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                          <div className="h-full rounded-full bg-amber-400 w-[30%]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 2: Science (Green) */}
+                    <div
+                      onClick={() => setActiveSurface('tablet')}
+                      className="rounded-2xl bg-[#0E172E] p-4 border border-emerald-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 w-fit">
+                          <FlaskConical className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-extrabold text-sm text-white group-hover:text-emerald-300 transition-colors">
+                          Science
+                        </h4>
+                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
+                      </div>
+                      <div className="space-y-1 pt-2 border-t border-white/5">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Progress</span>
+                          <span className="font-semibold text-white">2/8 tests</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                          <div className="h-full rounded-full bg-emerald-400 w-[25%]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 3: English (Blue) */}
+                    <div
+                      onClick={() => setActiveSurface('tablet')}
+                      className="rounded-2xl bg-[#0E172E] p-4 border border-blue-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="p-2.5 rounded-xl bg-blue-500/15 text-blue-400 w-fit">
+                          <BookOpen className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-extrabold text-sm text-white group-hover:text-blue-300 transition-colors">
+                          English
+                        </h4>
+                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
+                      </div>
+                      <div className="space-y-1 pt-2 border-t border-white/5">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Progress</span>
+                          <span className="font-semibold text-white">4/10 tests</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                          <div className="h-full rounded-full bg-blue-400 w-[40%]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 4: Hindi (Pink) */}
+                    <div
+                      onClick={() => setActiveSurface('tablet')}
+                      className="rounded-2xl bg-[#0E172E] p-4 border border-rose-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="p-2.5 rounded-xl bg-rose-500/15 text-rose-400 w-fit font-bold text-base flex items-center justify-center">
+                          अ
+                        </div>
+                        <h4 className="font-extrabold text-sm text-white group-hover:text-rose-300 transition-colors">
+                          Hindi
+                        </h4>
+                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
+                      </div>
+                      <div className="space-y-1 pt-2 border-t border-white/5">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Progress</span>
+                          <span className="font-semibold text-white">1/8 tests</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                          <div className="h-full rounded-full bg-rose-400 w-[12%]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 5: Social Science (Purple) */}
+                    <div
+                      onClick={() => setActiveSurface('tablet')}
+                      className="rounded-2xl bg-[#0E172E] p-4 border border-purple-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="p-2.5 rounded-xl bg-purple-500/15 text-purple-400 w-fit">
+                          <Compass className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-extrabold text-sm text-white group-hover:text-purple-300 transition-colors">
+                          Social Science
+                        </h4>
+                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
+                      </div>
+                      <div className="space-y-1 pt-2 border-t border-white/5">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Progress</span>
+                          <span className="font-semibold text-white">2/6 tests</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-purple-400 w-[33%]" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right 3 Columns: Quick Access Sidebar */}
+                <div className="lg:col-span-3 space-y-4">
+                  <div className="rounded-2xl bg-[#0E172E] border border-white/[0.08] p-5 space-y-3 shadow-xl">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                      <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                        Quick Access
+                      </span>
+                      <div className="flex items-center gap-1 text-xs font-bold text-cyan-300 bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-500/30">
+                        <GraduationCap className="w-3.5 h-3.5" />
+                        <span>Class 4</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 pt-1">
+                      {/* Selected School Tests */}
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0080FF] text-white font-bold text-xs shadow-md">
+                        <FileText className="h-4 w-4" />
+                        <span>School Tests</span>
+                      </div>
+
+                      {[
+                        { label: 'Competitive Exams', icon: Award },
+                        { label: 'Skill Development', icon: Layers },
+                        { label: 'AI Tutor (SI)', icon: Bot },
+                        { label: 'Settings', icon: Settings },
+                      ].map((item) => (
+                        <div
+                          key={item.label}
+                          className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 font-semibold text-xs transition-all cursor-pointer"
+                        >
+                          <item.icon className="h-4 w-4 text-neutral-400" />
+                          <span>{item.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* TV Remote Navigation Footer Hint */}
+              <div className="pt-4 border-t border-white/[0.08] text-center text-xs text-neutral-400 flex items-center justify-center gap-2">
+                <span>Use arrow keys on your remote</span>
+                <span>•</span>
+                <span>Press OK to select</span>
+                <span>•</span>
+                <span>Press Back to go to previous screen</span>
+              </div>
+            </div>
+
+            {/* TV Stand Base */}
+            <div className="w-48 h-3 bg-[#111624] mx-auto rounded-b-lg border-x-2 border-b-2 border-[#1E2738]" />
+
+            {/* Yellow Label Badge Matching Screenshot */}
+            <div className="absolute -bottom-4 right-8 bg-[#FACC15] text-slate-950 px-4 py-2 rounded-2xl shadow-2xl z-20 max-w-xs">
+              <div className="font-extrabold text-sm tracking-tight">TV Experience</div>
+              <div className="text-[11px] font-medium leading-snug">
+                Large, clear interface with full remote control navigation.
+              </div>
+            </div>
+          </div>
+
+          {/* =====================================================================
+              BOTTOM MULTI-DEVICE GRID: LAPTOP + TABLET + MOBILE + TEST PHONE
+          ====================================================================== */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-4">
+            {/* ===================================================================
+                DEVICE 2: LAPTOP / DESKTOP (LEFT 5 COLS)
+            ==================================================================== */}
+            <div className="lg:col-span-5 relative group">
+              {/* Laptop Screen Bezel */}
+              <div className="rounded-2xl border-[10px] border-[#22283A] bg-[#F8FAFC] text-slate-900 shadow-2xl overflow-hidden text-xs">
+                {/* Laptop Top Search & Profile Bar */}
+                <div className="bg-white px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 w-48 text-[11px]">
+                    <Search className="w-3.5 h-3.5" />
+                    <span className="truncate">Search for subjects, chapters...</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-4 h-4 text-slate-400" />
+                    <div className="w-6 h-6 rounded-full bg-[#0080FF] text-white flex items-center justify-center font-bold text-[10px]">
+                      A
+                    </div>
+                  </div>
+                </div>
+
+                {/* Laptop Main Body: Sidebar + Content */}
+                <div className="flex min-h-[340px]">
+                  {/* Left Sidebar */}
+                  <div className="w-36 bg-[#0B132B] text-slate-300 p-3 space-y-1 shrink-0 text-[11px]">
+                    <div className="font-black text-white text-xs mb-3 flex items-center gap-1">
+                      Talent<span className="text-[#0080FF]">Xcel</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#0080FF] text-white font-bold">
+                      <Home className="w-3.5 h-3.5" /> <span>Home</span>
+                    </div>
+                    {['My Learning', 'Tests', 'Subjects', 'Results', 'Plans', 'AI Tutor (SI)', 'Profile'].map(
+                      (item) => (
+                        <div
+                          key={item}
+                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white"
+                        >
+                          <span>{item}</span>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  {/* Dashboard Content */}
+                  <div className="flex-1 p-3.5 space-y-3 bg-[#F8FAFC]">
+                    {/* Header line */}
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200 text-[11px]">
+                      <span className="font-bold text-slate-700">
+                        Grade IV • Mayoor School, Noida • Periodic Test 2
+                      </span>
+                      <span className="text-[#0080FF] font-semibold cursor-pointer">Change &gt;</span>
+                    </div>
+
+                    {/* 5 Pastel Subject Cards Row */}
+                    <div className="grid grid-cols-5 gap-1.5 text-center">
+                      <div className="bg-amber-50 border border-amber-200 p-1.5 rounded-lg text-[10px]">
+                        <Calculator className="w-3.5 h-3.5 mx-auto text-amber-600 mb-0.5" />
+                        <div className="font-bold text-slate-800">Maths</div>
+                        <div className="text-slate-500 text-[9px]">3/10 tests</div>
+                      </div>
+                      <div className="bg-emerald-50 border border-emerald-200 p-1.5 rounded-lg text-[10px]">
+                        <FlaskConical className="w-3.5 h-3.5 mx-auto text-emerald-600 mb-0.5" />
+                        <div className="font-bold text-slate-800">Science</div>
+                        <div className="text-slate-500 text-[9px]">3/8 tests</div>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 p-1.5 rounded-lg text-[10px]">
+                        <BookOpen className="w-3.5 h-3.5 mx-auto text-blue-600 mb-0.5" />
+                        <div className="font-bold text-slate-800">English</div>
+                        <div className="text-slate-500 text-[9px]">4/10 tests</div>
+                      </div>
+                      <div className="bg-rose-50 border border-rose-200 p-1.5 rounded-lg text-[10px]">
+                        <span className="font-bold text-rose-600 block text-xs">अ</span>
+                        <div className="font-bold text-slate-800">Hindi</div>
+                        <div className="text-slate-500 text-[9px]">1/8 tests</div>
+                      </div>
+                      <div className="bg-purple-50 border border-purple-200 p-1.5 rounded-lg text-[10px]">
+                        <Compass className="w-3.5 h-3.5 mx-auto text-purple-600 mb-0.5" />
+                        <div className="font-bold text-slate-800">Social Sci</div>
+                        <div className="text-slate-500 text-[9px]">2/6 tests</div>
+                      </div>
+                    </div>
+
+                    {/* Split: Upcoming Tests & Progress */}
+                    <div className="grid grid-cols-12 gap-3 pt-1">
+                      {/* Upcoming Tests (7 cols) */}
+                      <div className="col-span-7 bg-white p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+                        <div className="flex justify-between items-center text-[11px] font-bold text-slate-800">
+                          <span>Upcoming Tests</span>
+                          <span className="text-[#0080FF] text-[10px]">View All</span>
+                        </div>
+
+                        {[
+                          { date: '17 Nov 2026', title: 'Mathematics Ch - 6 Multiples', code: 'math' },
+                          { date: '19 Nov 2026', title: 'Science Unit 5 - Force & Magnetism', code: 'science' },
+                          { date: '23 Nov 2026', title: 'English Ch - 8 The Pied Piper', code: 'english' },
+                          { date: '25 Nov 2026', title: 'Hindi पाठ 11 - प्यारा भारत', code: 'hindi' },
+                          { date: '27 Nov 2026', title: 'Social Science Ch - 8 Our Agriculture', code: 'sst' },
+                        ].map((t) => (
+                          <div
+                            key={t.date}
+                            className="flex items-center justify-between p-1.5 rounded bg-slate-50 border border-slate-100 text-[10px]"
+                          >
+                            <div className="truncate mr-1">
+                              <span className="text-slate-400 block text-[9px]">{t.date}</span>
+                              <span className="font-semibold text-slate-800 truncate block">{t.title}</span>
+                            </div>
+                            <button
+                              onClick={() => setActiveSurface('tablet')}
+                              className="px-2 py-0.5 bg-[#0080FF] text-white rounded font-bold text-[9px]"
+                            >
+                              Start
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Your Progress Gauge & Recommended (5 cols) */}
+                      <div className="col-span-5 space-y-2">
+                        <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-center">
+                          <span className="text-[10px] font-bold text-slate-700 block">Your Progress</span>
+                          <div className="w-12 h-12 rounded-full border-4 border-emerald-500 mx-auto my-1 flex items-center justify-center font-black text-xs text-slate-800">
+                            60%
+                          </div>
+                          <span className="text-[9px] text-slate-500 block">Tests Completed 6/10</span>
+                        </div>
+
+                        <div className="bg-white p-2 rounded-xl border border-slate-200 text-[9px] space-y-1">
+                          <span className="font-bold text-slate-700 block">Recommended for You</span>
+                          <div className="text-slate-600 truncate hover:text-[#0080FF] cursor-pointer">
+                            • Division - Practice Test &gt;
+                          </div>
+                          <div className="text-slate-600 truncate hover:text-[#0080FF] cursor-pointer">
+                            • Friction - Quick Quiz &gt;
+                          </div>
+                          <div className="text-slate-600 truncate hover:text-[#0080FF] cursor-pointer">
+                            • The Pied Piper - Reading &gt;
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Laptop Keyboard Base */}
+              <div className="w-[102%] -ml-[1%] h-3 bg-[#1E2536] rounded-b-xl border-x border-b border-slate-700 shadow-md" />
+
+              {/* Yellow Label Badge */}
+              <div className="absolute -bottom-6 left-4 bg-[#FACC15] text-slate-950 px-4 py-2 rounded-2xl shadow-2xl z-20 max-w-xs">
+                <div className="font-extrabold text-sm tracking-tight">Laptop / Desktop</div>
+                <div className="text-[11px] font-medium leading-snug">
+                  Full dashboard with detailed learning tools, analysis and management.
                 </div>
               </div>
             </div>
 
-            {/* ===================================================================== */}
-            {/* SUBJECT-WISE & CHAPTER-WISE PRACTICE (FOR ACADEMIC CATEGORY) */}
-            {/* ===================================================================== */}
-            {activeCategory === 'academic' && (
-              <div className="space-y-6" id="curriculum-browser">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                      <span>Subject Tracks for Class {selectedClassNumber}</span>
-                      <Badge variant="outline" className="border-white/20 text-slate-300 text-xs">
-                        {selectedBoardCode} Curriculum
-                      </Badge>
-                    </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Verified periodic test syllabi aligned with Mayoor School and national boards.
-                    </p>
+            {/* ===================================================================
+                DEVICE 3: TABLET SPLIT-SCREEN (CENTER 4 COLS)
+            ==================================================================== */}
+            <div className="lg:col-span-4 relative group">
+              {/* Tablet Frame */}
+              <div className="rounded-[28px] border-[10px] border-[#1C2234] bg-white text-slate-900 p-4 shadow-2xl overflow-hidden min-h-[460px] flex flex-col justify-between">
+                {/* Tablet Top Bar */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                  <div className="flex items-center gap-1.5 font-black text-slate-900 text-xs">
+                    <span>Talent<span className="text-[#0080FF]">Xcel</span></span>
+                    <span className="text-slate-400 font-normal">|</span>
+                    <span className="text-slate-500 font-medium text-[11px]">
+                      Mathematics &gt; Ch - 6 Multiples
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-mono font-bold text-[10px] text-slate-700">
+                      ⏱ {formatTimer(timeRemainingSeconds)}
+                    </span>
+                    <span className="font-bold text-slate-600 text-[10px]">7 / 10</span>
+                    <span className="text-slate-400 hover:text-slate-600 font-bold text-[10px] cursor-pointer">
+                      Exit
+                    </span>
                   </div>
                 </div>
 
-                {/* 5 Vibrant Subject Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {classSubjects.map((subj) => {
-                    // Match theme colors
-                    let borderClass = 'border-amber-500/30 hover:border-amber-400'
-                    let bgAccent = 'bg-amber-500/10 text-amber-400'
-                    let btnClass = 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold'
+                {/* Tablet Two-Column Split Area */}
+                <div className="grid grid-cols-2 gap-3.5 my-3 flex-1 items-start text-xs">
+                  {/* Left Column: Question 7 Matching Screenshot */}
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-[10px] font-bold text-[#0080FF] uppercase block">Question 7</span>
+                      <h4 className="font-bold text-slate-900 text-xs leading-snug mt-0.5">
+                        Which of the following numbers is a multiple of 6?
+                      </h4>
+                    </div>
 
-                    if (subj.colorTheme === 'emerald') {
-                      borderClass = 'border-emerald-500/30 hover:border-emerald-400'
-                      bgAccent = 'bg-emerald-500/10 text-emerald-400'
-                      btnClass = 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold'
-                    } else if (subj.colorTheme === 'blue') {
-                      borderClass = 'border-blue-500/30 hover:border-blue-400'
-                      bgAccent = 'bg-blue-500/10 text-blue-400'
-                      btnClass = 'bg-blue-500 hover:bg-blue-400 text-white font-semibold'
-                    } else if (subj.colorTheme === 'pink') {
-                      borderClass = 'border-pink-500/30 hover:border-pink-400'
-                      bgAccent = 'bg-pink-500/10 text-pink-400'
-                      btnClass = 'bg-pink-500 hover:bg-pink-400 text-white font-semibold'
-                    } else if (subj.colorTheme === 'purple') {
-                      borderClass = 'border-purple-500/30 hover:border-purple-400'
-                      bgAccent = 'bg-purple-500/10 text-purple-400'
-                      btnClass = 'bg-purple-500 hover:bg-purple-400 text-white font-semibold'
-                    } else if (subj.colorTheme === 'cyan') {
-                      borderClass = 'border-cyan-500/30 hover:border-cyan-400'
-                      bgAccent = 'bg-cyan-500/10 text-cyan-400'
-                      btnClass = 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold'
-                    }
-
-                    return (
-                      <Card
-                        key={subj.id}
-                        className={`bg-[#0B132B] border transition-all duration-200 text-slate-100 shadow-xl ${borderClass}`}
-                      >
-                        <CardHeader className="pb-3 flex flex-row items-start justify-between">
-                          <div className="space-y-1">
-                            <Badge
-                              variant="outline"
-                              className={`text-[11px] ${
-                                subj.status === 'verified'
-                                  ? 'border-emerald-500/40 text-emerald-300'
-                                  : 'border-amber-500/40 text-amber-300'
-                              }`}
-                            >
-                              {subj.status === 'verified' ? 'Verified Syllabus' : 'Provisional'}
-                            </Badge>
-                            <CardTitle className="text-xl font-bold text-white mt-1">
-                              {subj.name}
-                            </CardTitle>
-                          </div>
-                          <div className={`p-3 rounded-2xl ${bgAccent}`}>
-                            {subj.code === 'math' && <Calculator className="w-6 h-6" />}
-                            {subj.code === 'science' && <FlaskConical className="w-6 h-6" />}
-                            {subj.code === 'english' && <BookOpen className="w-6 h-6" />}
-                            {subj.code === 'hindi' && <Languages className="w-6 h-6" />}
-                            {subj.code === 'social_science' && <Compass className="w-6 h-6" />}
-                            {subj.code === 'physics' && <Atom className="w-6 h-6" />}
-                          </div>
-                        </CardHeader>
-
-                        <CardContent className="space-y-4 pt-1">
-                          <p className="text-xs text-slate-300 line-clamp-2">{subj.description}</p>
-
-                          <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-white/[0.06]">
-                            <span>{subj.totalTests} Diagnostic Tests</span>
-                            <span className="text-emerald-400 font-medium">Earn ₹20 per pass</span>
-                          </div>
-
-                          <Button
-                            onClick={() => {
-                              const bp =
-                                SEED_BLUEPRINTS.find((b) => b.subjectId === subj.id) || SEED_BLUEPRINTS[0]
-                              handleStartTest(bp)
-                            }}
-                            className={`w-full ${btnClass}`}
+                    {/* Options list */}
+                    <div className="space-y-1.5">
+                      {[
+                        { id: 'opt_7a', label: 'A', text: '14' },
+                        { id: 'opt_7b', label: 'B', text: '18' },
+                        { id: 'opt_7c', label: 'C', text: '20' },
+                        { id: 'opt_7d', label: 'D', text: '22' },
+                      ].map((opt) => {
+                        const isSelected = selectedOptionId === opt.id
+                        return (
+                          <div
+                            key={opt.id}
+                            onClick={() => setSelectedOptionId(opt.id)}
+                            className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-between text-[11px] ${
+                              isSelected
+                                ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-bold shadow-sm'
+                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
+                            }`}
                           >
-                            Start Assessment
-                            <ChevronRight className="w-4 h-4 ml-1" />
-                          </Button>
-                        </CardContent>
-                      </Card>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] ${
+                                  isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'
+                                }`}
+                              >
+                                {opt.label}
+                              </span>
+                              <span>{opt.text}</span>
+                            </div>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[3]" />}
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    {/* Green Correct Feedback Callout */}
+                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] space-y-0.5">
+                      <div className="font-bold flex items-center gap-1 text-emerald-700">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Correct!
+                      </div>
+                      <p>6 × 3 = 18, so 18 is a multiple of 6.</p>
+                    </div>
+
+                    {/* Navigation Buttons */}
+                    <div className="flex justify-between pt-1">
+                      <button className="px-3 py-1 rounded-lg border border-slate-200 text-slate-600 text-[10px] font-bold">
+                        Previous
+                      </button>
+                      <button className="px-4 py-1 rounded-lg bg-[#0080FF] text-white text-[10px] font-bold shadow-sm">
+                        Next
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Step-by-Step Explanation & Key Point */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2.5">
+                    {/* Tabs */}
+                    <div className="flex items-center gap-1.5 border-b border-slate-200 pb-1.5 text-[10px] font-bold">
+                      <button
+                        onClick={() => setActiveTabletTab('explanation')}
+                        className={`px-2 py-0.5 rounded ${
+                          activeTabletTab === 'explanation'
+                            ? 'bg-[#0080FF] text-white'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        Explanation
+                      </button>
+                      <button
+                        onClick={() => setActiveTabletTab('hint')}
+                        className={`px-2 py-0.5 rounded ${
+                          activeTabletTab === 'hint'
+                            ? 'bg-[#0080FF] text-white'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        Hint
+                      </button>
+                      <button
+                        onClick={() => setActiveTabletTab('related')}
+                        className={`px-2 py-0.5 rounded ${
+                          activeTabletTab === 'related'
+                            ? 'bg-[#0080FF] text-white'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        Related
+                      </button>
+                    </div>
+
+                    {/* Step by step */}
+                    <div className="space-y-1.5 text-[10px] text-slate-700">
+                      <h5 className="font-bold text-slate-900 text-[11px]">Step by step explanation</h5>
+                      <p>Multiples of 6 are numbers obtained by multiplying 6 by whole numbers.</p>
+                      <div className="space-y-0.5 font-mono p-2 rounded bg-white border border-slate-200 text-slate-800 text-[9px]">
+                        <div>6 × 1 = 6</div>
+                        <div>6 × 2 = 12</div>
+                        <div className="font-bold text-emerald-600">6 × 3 = 18</div>
+                        <div>6 × 4 = 24</div>
+                      </div>
+                      <p>So, 18 is a multiple of 6.</p>
+                    </div>
+
+                    {/* Yellow Key Point Box Matching Screenshot */}
+                    <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[10px] space-y-0.5">
+                      <div className="font-bold text-amber-800 flex items-center gap-1 text-[10px]">
+                        <Sparkles className="w-3 h-3 text-amber-600" /> Key Point
+                      </div>
+                      <p className="text-[9px] leading-tight">
+                        A number is a multiple of 6 if it appears in the 6-times table: 6, 12, 18, 24, 30 ...
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Yellow Label Badge */}
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-[#FACC15] text-slate-950 px-4 py-2 rounded-2xl shadow-2xl z-20 max-w-xs whitespace-nowrap">
+                <div className="font-extrabold text-sm tracking-tight">Tablet</div>
+                <div className="text-[11px] font-medium leading-snug">
+                  Two-column layout with practice on one side and explanations on the other.
+                </div>
+              </div>
+            </div>
+
+            {/* ===================================================================
+                DEVICE 4: MOBILE PHONE (RIGHT 3 COLS SPLIT INTO 2 PHONES)
+            ==================================================================== */}
+            <div className="lg:col-span-3 flex items-end gap-4 relative">
+              {/* Phone 1: Mobile App Home Screen */}
+              <div className="w-1/2 rounded-[32px] border-[8px] border-[#1C2234] bg-white text-slate-900 p-2.5 shadow-2xl overflow-hidden min-h-[420px] flex flex-col justify-between text-xs">
+                {/* Mobile Top Notch & Greeting */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-[9px] text-slate-400">
+                    <span>10:24</span>
+                    <span className="font-bold text-slate-800">Class IV ▾</span>
+                    <Bell className="w-3 h-3" />
+                  </div>
+
+                  <div className="pt-1">
+                    <h5 className="font-extrabold text-[11px] text-slate-900">Good Morning Arshid</h5>
+                  </div>
+
+                  {/* Mobile Learning Progress */}
+                  <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div>
+                      <span className="text-[8px] text-slate-400 block font-semibold">Your Learning Progress</span>
+                      <span className="text-[9px] font-bold text-slate-800">6/10 tests completed</span>
+                    </div>
+                    <div className="w-7 h-7 rounded-full border-2 border-emerald-500 flex items-center justify-center font-bold text-[9px] text-slate-800">
+                      60%
+                    </div>
+                  </div>
+
+                  {/* Continue Practice Card */}
+                  <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 space-y-1">
+                    <span className="text-[8px] font-bold text-amber-700 block uppercase">Continue Practice</span>
+                    <div className="flex items-center justify-between">
+                      <div className="text-[9px] font-bold text-slate-900">Mathematics Ch - 6</div>
+                      <button
+                        onClick={() => setActiveSurface('tablet')}
+                        className="px-2 py-0.5 bg-[#0080FF] text-white rounded font-bold text-[8px]"
+                      >
+                        Start
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* All Subjects Grid */}
+                  <div className="space-y-1 pt-1">
+                    <span className="text-[8px] font-bold text-slate-400 block uppercase">All Subjects</span>
+                    <div className="grid grid-cols-3 gap-1 text-center">
+                      <div className="p-1 rounded bg-amber-50 border border-amber-200">
+                        <Calculator className="w-3 h-3 mx-auto text-amber-600" />
+                        <span className="text-[8px] font-bold text-slate-800">Maths</span>
+                      </div>
+                      <div className="p-1 rounded bg-emerald-50 border border-emerald-200">
+                        <FlaskConical className="w-3 h-3 mx-auto text-emerald-600" />
+                        <span className="text-[8px] font-bold text-slate-800">Science</span>
+                      </div>
+                      <div className="p-1 rounded bg-blue-50 border border-blue-200">
+                        <BookOpen className="w-3 h-3 mx-auto text-blue-600" />
+                        <span className="text-[8px] font-bold text-slate-800">English</span>
+                      </div>
+                      <div className="p-1 rounded bg-rose-50 border border-rose-200">
+                        <span className="text-[9px] font-bold text-rose-600">अ</span>
+                        <span className="text-[8px] font-bold text-slate-800 block">Hindi</span>
+                      </div>
+                      <div className="p-1 rounded bg-purple-50 border border-purple-200">
+                        <Compass className="w-3 h-3 mx-auto text-purple-600" />
+                        <span className="text-[8px] font-bold text-slate-800">SST</span>
+                      </div>
+                      <div className="p-1 rounded bg-slate-100 border border-slate-200 flex items-center justify-center">
+                        <span className="text-[8px] font-bold text-slate-500">More</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Bottom Tab Bar */}
+                <div className="pt-2 border-t border-slate-200 flex justify-between text-[8px] text-slate-400 font-bold">
+                  <div className="text-[#0080FF] flex flex-col items-center">
+                    <Home className="w-3 h-3" />
+                    <span>Home</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <FileText className="w-3 h-3" />
+                    <span>Tests</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Bot className="w-3 h-3" />
+                    <span>AI Tutor</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <BarChart3 className="w-3 h-3" />
+                    <span>Results</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <User className="w-3 h-3" />
+                    <span>Profile</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Phone 2: Practice Test Focused Screen */}
+              <div className="w-1/2 rounded-[32px] border-[8px] border-[#1C2234] bg-white text-slate-900 p-2.5 shadow-2xl overflow-hidden min-h-[420px] flex flex-col justify-between text-xs">
+                {/* Test Screen Header */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-[9px] font-bold text-slate-600 border-b border-slate-100 pb-1.5">
+                    <span className="bg-slate-100 px-1.5 py-0.5 rounded font-mono">⏱ 08:24</span>
+                    <span>7 / 10</span>
+                    <span className="text-slate-400">Exit</span>
+                  </div>
+
+                  <div>
+                    <h5 className="font-bold text-[10px] text-slate-900 leading-tight">
+                      Which of the following is a multiple of 6?
+                    </h5>
+                  </div>
+
+                  {/* Options */}
+                  <div className="space-y-1 text-[9px]">
+                    <div className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+                      <span>A  14</span>
+                    </div>
+                    <div className="p-1.5 rounded-lg border border-emerald-500 bg-emerald-50 font-bold text-emerald-950 flex items-center justify-between">
+                      <span>B  18</span>
+                      <Check className="w-3 h-3 text-emerald-600" />
+                    </div>
+                    <div className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+                      <span>C  20</span>
+                    </div>
+                    <div className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+                      <span>D  22</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Test Nav Buttons */}
+                <div className="flex justify-between pt-2 border-t border-slate-100">
+                  <button className="px-2.5 py-1 rounded border border-slate-200 text-slate-600 font-bold text-[8px]">
+                    Previous
+                  </button>
+                  <button className="px-3.5 py-1 rounded bg-[#0080FF] text-white font-bold text-[8px]">
+                    Next
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Phone Yellow Badge */}
+              <div className="absolute -bottom-6 left-0 bg-[#FACC15] text-slate-950 px-3 py-1.5 rounded-2xl shadow-2xl z-20 max-w-[170px]">
+                <div className="font-extrabold text-xs tracking-tight">Mobile Phone</div>
+                <div className="text-[9px] font-medium leading-snug">
+                  Touch-friendly, native-app feel with bottom navigation.
+                </div>
+              </div>
+
+              {/* Practice Test Yellow Badge */}
+              <div className="absolute -bottom-6 right-0 bg-[#FACC15] text-slate-950 px-3 py-1.5 rounded-2xl shadow-2xl z-20 max-w-[160px]">
+                <div className="font-extrabold text-xs tracking-tight">Practice Test</div>
+                <div className="text-[9px] font-medium leading-snug">
+                  Clean, focused interface for students.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* =====================================================================
+              BOTTOM FULL-WIDTH FEATURE RIBBON STRIP (MATCHES SCREENSHOT EXACTLY)
+          ====================================================================== */}
+          <div className="mt-12 pt-6 border-t border-white/[0.08]">
+            <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4 shadow-xl">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center text-xs">
+                <div className="flex flex-col items-center gap-1.5">
+                  <Tv className="w-5 h-5 text-cyan-400" />
+                  <span className="font-bold text-white text-[11px]">Works on all devices</span>
+                  <span className="text-[10px] text-slate-400">(Phone, Tablet, Laptop, TV)</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-1.5">
+                  <Wifi className="w-5 h-5 text-blue-400" />
+                  <span className="font-bold text-white text-[11px]">Installable PWA</span>
+                  <span className="text-[10px] text-slate-400">(Like a native app)</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-1.5">
+                  <Cloud className="w-5 h-5 text-indigo-400" />
+                  <span className="font-bold text-white text-[11px]">Offline practice</span>
+                  <span className="text-[10px] text-slate-400">(Where supported)</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-1.5">
+                  <Bot className="w-5 h-5 text-purple-400" />
+                  <span className="font-bold text-white text-[11px]">AI Tutor (SI)</span>
+                  <span className="text-[10px] text-slate-400">Instant explanations</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-1.5">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                  <span className="font-bold text-white text-[11px]">Safe & secure payments</span>
+                  <span className="text-[10px] text-slate-400">(₹20 per test, subscriptions)</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-1.5">
+                  <BarChart3 className="w-5 h-5 text-amber-400" />
+                  <span className="font-bold text-white text-[11px]">Progress & insights</span>
+                  <span className="text-[10px] text-slate-400">(For students and parents)</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-1.5">
+                  <Globe2 className="w-5 h-5 text-cyan-300" />
+                  <span className="font-bold text-white text-[11px]">Scales from school tests</span>
+                  <span className="text-[10px] text-slate-400">to JEE, NEET, UPSC and more</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* =========================================================================
+          MODE 2: FULLSCREEN TV EXPERIENCE ZOOM
+      ========================================================================== */}
+      {activeSurface === 'tv' && (
+        <main className="flex-1 max-w-[1440px] w-full mx-auto p-6 lg:p-10 flex flex-col justify-between animate-in fade-in">
+          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+            <span className="font-bold text-cyan-400 text-sm">TV 10-Foot Remote Navigation Mode</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setActiveSurface('showcase')}
+              className="border-white/20 text-white text-xs"
+            >
+              Return to Multi-Device Showcase
+            </Button>
+          </div>
+
+          {/* Fullscreen TV View */}
+          <div className="space-y-6 my-6">
+            <div className="rounded-3xl bg-gradient-to-r from-[#0C1636] via-[#0E2A68] to-[#124294] p-8 border border-[#2A365D] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="space-y-4 max-w-lg">
+                <span className="text-xs font-bold text-cyan-300 uppercase tracking-widest">Welcome</span>
+                <h1 className="text-4xl font-black text-white leading-tight">
+                  Keep Learning,<br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-[#00D2FF]">
+                    Keep Growing
+                  </span>
+                </h1>
+                <p className="text-sm text-neutral-200">
+                  Syllabus-aligned practice tests, explanations and personalised learning for school and competitive exams.
+                </p>
+                <button
+                  onClick={() => setActiveSurface('tablet')}
+                  className="px-6 py-3 rounded-full bg-white text-[#0B132B] font-black text-sm shadow-xl hover:scale-105 transition-all"
+                >
+                  Continue Practice &gt;
+                </button>
+              </div>
+
+              <div className="w-80 rounded-2xl bg-[#0B132B]/95 p-5 border border-cyan-400/30 shadow-2xl space-y-3">
+                <span className="font-bold text-cyan-300 text-xs">Upcoming Test</span>
+                <h4 className="font-extrabold text-sm text-white">Mathematics Ch - 6 Multiples</h4>
+                <p className="text-xs text-neutral-400">Grade IV • Mayoor School (PT 2)</p>
+                <button
+                  onClick={() => setActiveSurface('tablet')}
+                  className="w-full py-2 bg-[#0080FF] text-white font-bold rounded-xl text-xs"
+                >
+                  Start Practice
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* =========================================================================
+          MODE 3: FULLSCREEN LAPTOP / DESKTOP ZOOM
+      ========================================================================== */}
+      {activeSurface === 'desktop' && (
+        <main className="flex-1 max-w-6xl w-full mx-auto p-6 space-y-6 animate-in fade-in">
+          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+            <span className="font-bold text-cyan-400 text-sm">Laptop / Desktop Dashboard Mode</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setActiveSurface('showcase')}
+              className="border-white/20 text-white text-xs"
+            >
+              Return to Multi-Device Showcase
+            </Button>
+          </div>
+
+          <div className="bg-white text-slate-900 rounded-3xl p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+              <div>
+                <h3 className="font-extrabold text-xl text-slate-900">
+                  Grade IV • Mayoor School, Noida • Periodic Test 2
+                </h3>
+                <p className="text-xs text-slate-500">Student: Arshid • Roll #07</p>
+              </div>
+              <button
+                onClick={() => setActiveSurface('tablet')}
+                className="px-5 py-2.5 rounded-xl bg-[#0080FF] text-white font-bold text-xs"
+              >
+                Launch Assessment &gt;
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              {[
+                { title: 'Mathematics', tests: '3/10', color: 'bg-amber-50 border-amber-200 text-amber-700' },
+                { title: 'Science', tests: '3/8', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+                { title: 'English', tests: '4/10', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+                { title: 'Hindi', tests: '1/8', color: 'bg-rose-50 border-rose-200 text-rose-700' },
+                { title: 'Social Science', tests: '2/6', color: 'bg-purple-50 border-purple-200 text-purple-700' },
+              ].map((s) => (
+                <div key={s.title} className={`p-4 rounded-2xl border ${s.color}`}>
+                  <div className="font-bold text-sm">{s.title}</div>
+                  <div className="text-xs mt-1">{s.tests} completed</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* =========================================================================
+          MODE 4: FULLSCREEN TABLET SPLIT-SCREEN ZOOM
+      ========================================================================== */}
+      {activeSurface === 'tablet' && (
+        <main className="flex-1 max-w-5xl w-full mx-auto p-6 space-y-6 animate-in fade-in">
+          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+            <span className="font-bold text-cyan-400 text-sm">Tablet Two-Column Practice Mode</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setActiveSurface('showcase')}
+              className="border-white/20 text-white text-xs"
+            >
+              Return to Multi-Device Showcase
+            </Button>
+          </div>
+
+          <div className="rounded-3xl bg-white text-slate-900 p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+              <div>
+                <span className="text-xs font-bold text-[#0080FF] uppercase">Mathematics &gt; Ch - 6 Multiples</span>
+                <h3 className="font-black text-xl text-slate-900 mt-1">Periodic Test 2 Diagnostic</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="bg-slate-100 px-3 py-1 rounded-lg border border-slate-200 font-mono font-bold text-slate-800 text-sm">
+                  ⏱ {formatTimer(timeRemainingSeconds)}
+                </span>
+                <span className="font-bold text-slate-700">7 / 10</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Question */}
+              <div className="space-y-4">
+                <span className="text-xs font-bold text-[#0080FF] uppercase">Question 7</span>
+                <h4 className="font-bold text-slate-900 text-lg">
+                  Which of the following numbers is a multiple of 6?
+                </h4>
+
+                <div className="space-y-2 pt-2">
+                  {[
+                    { id: 'opt_7a', label: 'A', text: '14' },
+                    { id: 'opt_7b', label: 'B', text: '18' },
+                    { id: 'opt_7c', label: 'C', text: '20' },
+                    { id: 'opt_7d', label: 'D', text: '22' },
+                  ].map((opt) => {
+                    const isSelected = selectedOptionId === opt.id
+                    return (
+                      <div
+                        key={opt.id}
+                        onClick={() => setSelectedOptionId(opt.id)}
+                        className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-bold shadow-md'
+                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
+                              isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'
+                            }`}
+                          >
+                            {opt.label}
+                          </span>
+                          <span className="text-sm">{opt.text}</span>
+                        </div>
+                        {isSelected && <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />}
+                      </div>
                     )
                   })}
                 </div>
 
-                {/* Chapter & Topic Deep Dive: Grade IV Mayoor School PT-2 Example */}
-                {selectedClassNumber === 4 && (
-                  <div className="bg-[#0B132B] border border-white/[0.1] rounded-2xl p-6 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <BookmarkCheck className="w-5 h-5 text-cyan-400" />
-                        <h3 className="font-bold text-lg text-white">
-                          Mayoor School Grade IV Periodic Test 2 Chapters
-                        </h3>
-                      </div>
-                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs">
-                        100% Verified Mapping
-                      </Badge>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {SEED_CHAPTERS.filter((ch) => ch.subjectId.includes('g4')).map((chap) => {
-                        const isExpanded = expandedChapterId === chap.id
-                        return (
-                          <div
-                            key={chap.id}
-                            className={`p-4 rounded-xl border transition-all ${
-                              isExpanded
-                                ? 'bg-cyan-500/10 border-cyan-400/60'
-                                : 'bg-[#070B14] border-white/[0.08] hover:border-white/20'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h4 className="font-bold text-white text-base">{chap.title}</h4>
-                                <p className="text-xs text-slate-300 mt-1">{chap.description}</p>
-                              </div>
-                              <Button
-                                size="sm"
-                                onClick={() => handleStartTest(SEED_BLUEPRINTS[0])}
-                                className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs"
-                              >
-                                Practice Test
-                              </Button>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs space-y-1">
+                  <div className="font-bold flex items-center gap-1.5 text-emerald-700">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Correct!
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* ===================================================================== */}
-            {/* ANALYTICAL REASONING & APTITUDE SECTION */}
-            {/* ===================================================================== */}
-            {(activeCategory === 'aptitude' || activeCategory === 'academic') && (
-              <div className="space-y-6" id="aptitude">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-xs">
-                        Critical Cognitive Foundation
-                      </Badge>
-                      <span className="text-xs text-slate-400">Independent Assessment Track</span>
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-1">
-                      Analytical Reasoning & Aptitude
-                    </h2>
-                    <p className="text-xs text-slate-400">
-                      Logical deduction, spatial patterns, quantitative agility and critical thinking for
-                      Olympiads, NTSE & real problem solving.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {APTITUDE_TRACKS.map((track) => (
-                    <Card
-                      key={track.id}
-                      className="bg-[#0B132B] border border-indigo-500/30 hover:border-indigo-400 transition-all text-slate-100 shadow-xl"
-                    >
-                      <CardHeader className="pb-3 flex flex-row items-start justify-between">
-                        <div>
-                          <Badge variant="outline" className="text-[10px] border-indigo-400/40 text-indigo-300">
-                            {track.targetAges}
-                          </Badge>
-                          <CardTitle className="text-lg font-bold text-white mt-1">
-                            {track.title}
-                          </CardTitle>
-                        </div>
-                        <div className="p-2.5 rounded-2xl bg-indigo-500/10 text-indigo-400">
-                          {track.id === 'logical_reasoning' && <Brain className="w-5 h-5" />}
-                          {track.id === 'quantitative_aptitude' && <Calculator className="w-5 h-5" />}
-                          {track.id === 'verbal_reasoning' && <BookOpen className="w-5 h-5" />}
-                          {track.id === 'non_verbal_patterns' && <Layers className="w-5 h-5" />}
-                          {track.id === 'data_interpretation' && <PieChart className="w-5 h-5" />}
-                          {track.id === 'critical_thinking' && <Target className="w-5 h-5" />}
-                        </div>
-                      </CardHeader>
-
-                      <CardContent className="space-y-4 pt-1">
-                        <p className="text-xs text-slate-300">{track.shortDescription}</p>
-
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {track.sampleTopics.map((st) => (
-                            <span
-                              key={st}
-                              className="text-[10px] bg-white/[0.04] text-slate-300 px-2 py-0.5 rounded border border-white/[0.06]"
-                            >
-                              {st}
-                            </span>
-                          ))}
-                        </div>
-
-                        <Button
-                          onClick={() => {
-                            const bp =
-                              SEED_BLUEPRINTS.find((b) => b.aptitudeSubcategory === track.id) ||
-                              SEED_BLUEPRINTS[3]
-                            handleStartTest(bp)
-                          }}
-                          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs"
-                        >
-                          Start Aptitude Drill
-                          <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  <p>6 × 3 = 18, so 18 is a multiple of 6.</p>
                 </div>
               </div>
-            )}
 
-            {/* ===================================================================== */}
-            {/* REAL LEARNER ANALYTICS & HISTORICAL PROGRESS */}
-            {/* ===================================================================== */}
-            <div className="space-y-6 pt-4" id="analytics">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-cyan-400" />
-                    <span>Real Learning Analytics</span>
-                  </h2>
-                  <p className="text-xs text-slate-400">
-                    Live telemetry aggregated from actual completed attempts (no hardcoded metrics).
+              {/* Explanation */}
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 space-y-4">
+                <div className="flex items-center gap-2 border-b border-slate-200 pb-2 font-bold text-xs">
+                  <button className="px-3 py-1 rounded bg-[#0080FF] text-white">Explanation</button>
+                  <button className="px-3 py-1 rounded text-slate-500">Hint</button>
+                  <button className="px-3 py-1 rounded text-slate-500">Related</button>
+                </div>
+
+                <div className="space-y-2 text-xs text-slate-700">
+                  <h5 className="font-bold text-slate-900 text-sm">Step by step explanation</h5>
+                  <p>Multiples of 6 are numbers obtained by multiplying 6 by whole numbers.</p>
+                  <div className="space-y-1 font-mono p-3 rounded-xl bg-white border border-slate-200 text-slate-800">
+                    <div>6 × 1 = 6</div>
+                    <div>6 × 2 = 12</div>
+                    <div className="font-bold text-emerald-600">6 × 3 = 18</div>
+                    <div>6 × 4 = 24</div>
+                  </div>
+                  <p>So, 18 is a multiple of 6.</p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs space-y-1">
+                  <div className="font-bold text-amber-800 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-600" /> Key Point
+                  </div>
+                  <p className="text-[11px] leading-relaxed">
+                    A number is a multiple of 6 if it appears in the 6-times table: 6, 12, 18, 24, 30 ...
                   </p>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="bg-[#0B132B] border border-white/[0.08] p-4 rounded-2xl">
-                  <div className="text-xs text-slate-400">Total Attempts</div>
-                  <div className="text-2xl font-extrabold text-white mt-1">
-                    {analyticsSummary.totalAttempts}
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-1">
-                    {analyticsSummary.totalQuestionsAttempted} questions evaluated
-                  </div>
-                </div>
-
-                <div className="bg-[#0B132B] border border-white/[0.08] p-4 rounded-2xl">
-                  <div className="text-xs text-slate-400">Overall Accuracy</div>
-                  <div className="text-2xl font-extrabold text-cyan-400 mt-1">
-                    {analyticsSummary.overallAccuracyPercentage}%
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-1">Server-verified accuracy</div>
-                </div>
-
-                <div className="bg-[#0B132B] border border-white/[0.08] p-4 rounded-2xl">
-                  <div className="text-xs text-slate-400">Avg Time / Question</div>
-                  <div className="text-2xl font-extrabold text-amber-300 mt-1">
-                    {analyticsSummary.averageTimePerQuestionSeconds}s
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-1">Pacing metrics</div>
-                </div>
-
-                <div className="bg-[#0B132B] border border-white/[0.08] p-4 rounded-2xl">
-                  <div className="text-xs text-slate-400">Pass Credits Earned</div>
-                  <div className="text-2xl font-extrabold text-emerald-400 mt-1">
-                    ₹{walletCredits}
-                  </div>
-                  <div className="text-[11px] text-emerald-400/80 mt-1">Append-only ledger</div>
-                </div>
-              </div>
-
-              {/* Historical Attempts Table */}
-              {completedAttempts.length > 0 && (
-                <div className="bg-[#0B132B] border border-white/[0.08] rounded-2xl p-5 space-y-3">
-                  <h3 className="text-sm font-bold text-white">Recent Verified Attempts</h3>
-                  <div className="divide-y divide-white/[0.06]">
-                    {completedAttempts.map((att) => (
-                      <div
-                        key={att.attemptId}
-                        className="py-3 flex flex-wrap items-center justify-between gap-3 text-xs"
-                      >
-                        <div>
-                          <div className="font-semibold text-white">{att.blueprintTitle}</div>
-                          <div className="text-slate-400">{att.evaluatedAt}</div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span
-                            className={`font-bold ${att.passed ? 'text-emerald-400' : 'text-rose-400'}`}
-                          >
-                            {att.scoreObtained} / {att.maxMarks} ({att.percentage}%)
-                          </span>
-                          <Badge
-                            className={
-                              att.passed ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
-                            }
-                          >
-                            {att.passed ? 'PASSED' : 'REVISION'}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* ===================================================================== */}
-            {/* OPERATIONAL 60,000-QUESTION BANK PIPELINE & GOVERNANCE REPORT */}
-            {/* ===================================================================== */}
-            <div className="space-y-6 pt-4 border-t border-white/[0.08]" id="pipeline">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Database className="w-5 h-5 text-cyan-400" />
-                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                      60,000-Question Content Pipeline
-                    </h2>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Strict content governance: SHA-256 duplicate detection, review lifecycle, and verified syllabus
-                    matrix.
-                  </p>
-                </div>
-                <Badge variant="outline" className="border-cyan-500/40 text-cyan-300 bg-cyan-950/40 text-xs">
-                  Target: 60,000 Questions • Distinct & Validated
-                </Badge>
-              </div>
-
-              {/* Pipeline Stat Counters */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="bg-[#0B132B] border border-white/[0.08] p-4 rounded-2xl">
-                  <div className="text-xs text-slate-400">Target Questions</div>
-                  <div className="text-2xl font-extrabold text-white mt-1">60,000</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">Total curriculum target</div>
-                </div>
-
-                <div className="bg-[#0B132B] border border-emerald-500/30 p-4 rounded-2xl">
-                  <div className="text-xs text-emerald-400">Published & Validated</div>
-                  <div className="text-2xl font-extrabold text-emerald-300 mt-1">
-                    {pipelineReport.actualPublishedCount}
-                  </div>
-                  <div className="text-[11px] text-emerald-500/80 mt-0.5">Accurate, unpadded count</div>
-                </div>
-
-                <div className="bg-[#0B132B] border border-amber-500/30 p-4 rounded-2xl">
-                  <div className="text-xs text-amber-400">In Editorial Review</div>
-                  <div className="text-2xl font-extrabold text-amber-300 mt-1">
-                    {pipelineReport.actualInReviewCount.toLocaleString()}
-                  </div>
-                  <div className="text-[11px] text-amber-500/80 mt-0.5">Double-blind checked</div>
-                </div>
-
-                <div className="bg-[#0B132B] border border-rose-500/30 p-4 rounded-2xl">
-                  <div className="text-xs text-rose-400">Duplicates Rejected</div>
-                  <div className="text-2xl font-extrabold text-rose-300 mt-1">
-                    {pipelineReport.duplicateRejectedCount}
-                  </div>
-                  <div className="text-[11px] text-rose-400/80 mt-0.5">SHA-256 fingerprint rejected</div>
-                </div>
-              </div>
-
-              {/* Board & Class Coverage Matrix Table */}
-              <div className="bg-[#0B132B] border border-white/[0.08] rounded-2xl p-5 overflow-x-auto space-y-4">
-                <h3 className="text-sm font-bold text-white">Board & Class Coverage Status Matrix</h3>
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="border-b border-white/[0.08] text-slate-400 uppercase tracking-wider">
-                    <tr>
-                      <th className="pb-3 font-semibold">Board / System</th>
-                      <th className="pb-3 font-semibold">Syllabus Status</th>
-                      <th className="pb-3 font-semibold">Published</th>
-                      <th className="pb-3 font-semibold">In Review</th>
-                      <th className="pb-3 font-semibold">Pipeline Target</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/[0.04]">
-                    {pipelineReport.boardBreakdown.map((row) => (
-                      <tr key={row.boardCode} className="hover:bg-white/[0.02]">
-                        <td className="py-3 font-medium text-white">{row.boardName}</td>
-                        <td className="py-3">
-                          <Badge
-                            className={`text-[10px] ${
-                              row.status === 'verified'
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                                : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                            }`}
-                          >
-                            {row.status === 'verified' ? 'Verified' : 'Provisional'}
-                          </Badge>
-                        </td>
-                        <td className="py-3 font-mono text-emerald-400">{row.publishedCount}</td>
-                        <td className="py-3 font-mono text-amber-400">{row.inReviewCount}</td>
-                        <td className="py-3 font-mono text-slate-400">{row.targetCount.toLocaleString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* SECONDARY LANDING PAGE CALLOUT TO TALENTXCEL ACADEMY */}
-            <div className="bg-gradient-to-r from-blue-950/40 via-[#0B132B] to-[#070B14] border border-blue-500/30 rounded-3xl p-6 sm:p-8 flex flex-wrap items-center justify-between gap-6">
-              <div className="space-y-1">
-                <Badge variant="outline" className="border-blue-400/40 text-blue-300 text-xs">
-                  TalentXcel Academy Secondary Portal
-                </Badge>
-                <h3 className="text-xl sm:text-2xl font-bold text-white">
-                  Looking for Career Education Programmes?
-                </h3>
-                <p className="text-sm text-slate-300 max-w-xl">
-                  Explore practical career programmes in AI Development & Automation, Healthcare Tech, and Startup
-                  Incubation.
-                </p>
-              </div>
-
-              <Link href="/academy">
-                <Button className="bg-blue-600 hover:bg-blue-500 text-white font-semibold">
-                  Visit TalentXcel Academy
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
             </div>
           </div>
-        )}
-      </div>
+        </main>
+      )}
+
+      {/* =========================================================================
+          MODE 5: FULLSCREEN MOBILE PHONE ZOOM
+      ========================================================================== */}
+      {activeSurface === 'mobile' && (
+        <main className="flex-1 max-w-sm w-full mx-auto p-6 space-y-6 animate-in fade-in">
+          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+            <span className="font-bold text-cyan-400 text-sm">Mobile App View</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setActiveSurface('showcase')}
+              className="border-white/20 text-white text-xs"
+            >
+              Back to Showcase
+            </Button>
+          </div>
+
+          <div className="rounded-[40px] border-[10px] border-[#1C2234] bg-white text-slate-900 p-4 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center text-xs text-slate-500 pt-1">
+              <span>10:24</span>
+              <span className="font-bold text-slate-800">Class IV ▾</span>
+              <Bell className="w-4 h-4" />
+            </div>
+
+            <div>
+              <h4 className="font-black text-sm text-slate-900">Good Morning Arshid</h4>
+              <p className="text-[10px] text-slate-500">Mayoor School Noida</p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold block">Your Learning Progress</span>
+                <span className="text-xs font-bold text-slate-800">6/10 tests completed</span>
+              </div>
+              <div className="w-9 h-9 rounded-full border-2 border-emerald-500 flex items-center justify-center font-bold text-xs text-slate-800">
+                60%
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
+              <span className="text-[10px] font-bold text-amber-700 uppercase block">Continue Practice</span>
+              <h5 className="font-bold text-xs text-slate-900">Mathematics Ch - 6 Multiples</h5>
+              <button
+                onClick={() => setActiveSurface('tablet')}
+                className="w-full py-2 bg-[#0080FF] text-white rounded-xl font-bold text-xs"
+              >
+                Start Practice
+              </button>
+            </div>
+          </div>
+        </main>
+      )}
     </div>
   )
 }
