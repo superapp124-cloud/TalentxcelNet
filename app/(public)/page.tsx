@@ -1,63 +1,171 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import {
-  Tv,
-  Laptop,
-  Tablet,
-  Smartphone,
-  Layers,
   Search,
   Bell,
   Home,
   BookOpen,
-  FileText,
-  Award,
-  User,
-  Settings,
-  Sparkles,
   Calculator,
   FlaskConical,
   Compass,
-  Play,
-  Calendar,
-  ChevronRight,
+  Languages,
+  Brain,
+  Award,
+  Sparkles,
+  Lightbulb,
   Clock,
   CheckCircle2,
-  Check,
-  Wifi,
-  Cloud,
-  Bot,
+  XCircle,
+  ChevronRight,
+  ChevronLeft,
+  ArrowRight,
+  RotateCcw,
   ShieldCheck,
   BarChart3,
-  Globe2,
-  RotateCcw,
-  GraduationCap,
   PieChart,
   Target,
-  Maximize2,
-  ExternalLink,
+  Smartphone,
+  Tablet,
+  Laptop,
+  Tv,
+  HelpCircle,
+  LogOut,
+  Layers,
+  GraduationCap,
+  Check,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { AdmissionsAssistantWidget } from '@/components/public/admissions-assistant-modal'
+import {
+  SEED_BOARDS,
+  SEED_CLASSES,
+  SEED_SUBJECTS,
+  SEED_GRADE4_SUBJECTS,
+  SEED_BLUEPRINTS,
+  SEED_AUTHORIZED_QUESTIONS,
+  SEED_CONFIDENTIAL_SOLUTIONS,
+  getPipelineCoverageReport,
+  evaluateAssessmentAttempt,
+} from '@/packages/core/src'
+import type {
+  AuthorizedQuestion,
+  AssessmentBlueprint,
+  AssessmentResult,
+  SubmittedAnswer,
+} from '@/packages/core/src'
 
-type SurfaceMode = 'showcase' | 'tv' | 'desktop' | 'tablet' | 'mobile'
+// Subject styling configuration matching the bright reference design
+const SUBJECT_CONFIGS: Record<
+  string,
+  {
+    bg: string
+    border: string
+    accent: string
+    lightAccent: string
+    icon: React.ReactNode
+    displayName: string
+  }
+> = {
+  math: {
+    bg: 'bg-amber-50/70 hover:bg-amber-50',
+    border: 'border-amber-200/80',
+    accent: '#D97706',
+    lightAccent: 'bg-amber-100 text-amber-900',
+    icon: <Calculator className="w-6 h-6 text-amber-600" />,
+    displayName: 'Mathematics',
+  },
+  science: {
+    bg: 'bg-emerald-50/70 hover:bg-emerald-50',
+    border: 'border-emerald-200/80',
+    accent: '#059669',
+    lightAccent: 'bg-emerald-100 text-emerald-900',
+    icon: <FlaskConical className="w-6 h-6 text-emerald-600" />,
+    displayName: 'Science',
+  },
+  english: {
+    bg: 'bg-blue-50/70 hover:bg-blue-50',
+    border: 'border-blue-200/80',
+    accent: '#2563EB',
+    lightAccent: 'bg-blue-100 text-blue-900',
+    icon: <BookOpen className="w-6 h-6 text-blue-600" />,
+    displayName: 'English',
+  },
+  hindi: {
+    bg: 'bg-rose-50/70 hover:bg-rose-50',
+    border: 'border-rose-200/80',
+    accent: '#E11D48',
+    lightAccent: 'bg-rose-100 text-rose-900',
+    icon: <span className="text-xl font-bold text-rose-600 leading-none">अ</span>,
+    displayName: 'Hindi',
+  },
+  social_science: {
+    bg: 'bg-purple-50/70 hover:bg-purple-50',
+    border: 'border-purple-200/80',
+    accent: '#7C3AED',
+    lightAccent: 'bg-purple-100 text-purple-900',
+    icon: <Compass className="w-6 h-6 text-purple-600" />,
+    displayName: 'Social Science',
+  },
+  aptitude: {
+    bg: 'bg-indigo-50/70 hover:bg-indigo-50',
+    border: 'border-indigo-200/80',
+    accent: '#4F46E5',
+    lightAccent: 'bg-indigo-100 text-indigo-900',
+    icon: <Brain className="w-6 h-6 text-indigo-600" />,
+    displayName: 'Analytical Skills',
+  },
+}
 
-export default function UnifiedPlatformPage() {
-  const [activeSurface, setActiveSurface] = useState<SurfaceMode>('showcase')
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(6) // Question 7 (index 6) matching screenshot
-  const [selectedOptionId, setSelectedOptionId] = useState<string>('opt_7b') // Option B (18) selected in green!
-  const [activeTabletTab, setActiveTabletTab] = useState<'explanation' | 'hint' | 'related'>('explanation')
-  const [timeRemainingSeconds, setTimeRemainingSeconds] = useState<number>(504) // 08:24 matching screenshot
+export default function BrightUnifiedAssessmentPage() {
+  // Navigation & Filter State
+  const [selectedBoardId, setSelectedBoardId] = useState<string>('board_cbse')
+  const [selectedClassId, setSelectedClassId] = useState<string>('class_g4')
+  const [isClassModalOpen, setIsClassModalOpen] = useState<boolean>(false)
 
-  // Timer simulation
+  // Tracking independent completed free attempts across subjects (localStorage backed)
+  const [completedFreeSubjects, setCompletedFreeSubjects] = useState<Record<string, boolean>>({})
+
+  // Active Assessment Engine State
+  const [activeTestBlueprint, setActiveTestBlueprint] = useState<AssessmentBlueprint | null>(null)
+  const [activeQuestions, setActiveQuestions] = useState<AuthorizedQuestion[]>([])
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
+  const [userSelectedAnswers, setUserSelectedAnswers] = useState<Record<string, string>>({})
+  const [timeRemainingSeconds, setTimeRemainingSeconds] = useState<number>(600)
+  const [activeTab, setActiveTab] = useState<'explanation' | 'hint' | 'related'>('explanation')
+  const [assessmentResult, setAssessmentResult] = useState<AssessmentResult | null>(null)
+
+  // Load completed tests from localStorage on client mount
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemainingSeconds((prev) => (prev > 0 ? prev - 1 : 504))
-    }, 1000)
-    return () => clearInterval(timer)
+    try {
+      const stored = localStorage.getItem('talentxcel_free_subjects_completed')
+      if (stored) {
+        setCompletedFreeSubjects(JSON.parse(stored))
+      }
+    } catch {
+      // Fallback for non-browser or sandbox environments
+    }
   }, [])
+
+  // Timer countdown when test is running
+  useEffect(() => {
+    if (!activeTestBlueprint || assessmentResult) return
+
+    const timer = setInterval(() => {
+      setTimeRemainingSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [activeTestBlueprint, assessmentResult])
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -65,1243 +173,1223 @@ export default function UnifiedPlatformPage() {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
 
-  return (
-    <div className="min-h-screen bg-[#070B14] text-white flex flex-col font-sans selection:bg-[#00D2FF]/30 selection:text-cyan-200">
-      {/* =========================================================================
-          TOP PERSISTENT CONTROL BAR: MULTI-SURFACE SELECTOR
-      ========================================================================== */}
-      <div className="sticky top-0 z-50 bg-[#0B132B]/95 backdrop-blur-xl border-b border-white/[0.08] px-4 py-2.5 shadow-xl">
-        <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
-          {/* Logo & Platform Tag */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 font-black text-base tracking-tight text-white">
-              <span>Talent<span className="text-[#0080FF]">Xcel</span></span>
-              <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest hidden sm:inline">
-                • Universal Platform
+  // Real pipeline audit report (60k roadmap vs actual published counts)
+  const pipelineReport = useMemo(() => getPipelineCoverageReport(), [])
+
+  // Handle starting a free test
+  const handleStartFreeTest = (subjectCode: string) => {
+    let blueprintId = 'bp_free_g4_math'
+    let questionPrefix = 'q_g4_m6_'
+
+    if (subjectCode === 'math') {
+      blueprintId = 'bp_free_g4_math'
+      questionPrefix = 'q_g4_m6_'
+    } else if (subjectCode === 'science') {
+      blueprintId = 'bp_free_g4_sci'
+      questionPrefix = 'q_g4_sci_'
+    } else if (subjectCode === 'english') {
+      blueprintId = 'bp_free_g4_eng'
+      questionPrefix = 'q_g4_eng_'
+    } else if (subjectCode === 'hindi') {
+      blueprintId = 'bp_free_g4_hin'
+      questionPrefix = 'q_g4_hin_'
+    } else if (subjectCode === 'social_science') {
+      blueprintId = 'bp_free_g4_sst'
+      questionPrefix = 'q_g4_sst_'
+    } else if (subjectCode === 'aptitude') {
+      blueprintId = 'bp_free_aptitude'
+      questionPrefix = 'q_apt_0'
+    }
+
+    const blueprint = SEED_BLUEPRINTS.find((b) => b.id === blueprintId) || SEED_BLUEPRINTS[0]
+    let questions = SEED_AUTHORIZED_QUESTIONS.filter((q) => q.id.startsWith(questionPrefix))
+
+    // For Math: Include Question 7 from reference image in the 5 questions!
+    if (subjectCode === 'math') {
+      const q7 = SEED_AUTHORIZED_QUESTIONS.find((q) => q.id === 'q_g4_m6_07')
+      const first4 = questions.filter((q) => q.id !== 'q_g4_m6_07').slice(0, 4)
+      questions = q7 ? [...first4, q7] : questions.slice(0, 5)
+    } else {
+      questions = questions.slice(0, blueprint.totalQuestions)
+    }
+
+    setActiveTestBlueprint(blueprint)
+    setActiveQuestions(questions)
+    // If math test, start directly on Question 7 (index 4 or the matching question) to match reference screenshot!
+    const q7Index = questions.findIndex((q) => q.id === 'q_g4_m6_07')
+    setCurrentQuestionIndex(q7Index >= 0 ? q7Index : 0)
+
+    // Pre-populate Option B (18) for Question 7 if present, exactly matching reference image!
+    if (q7Index >= 0) {
+      setUserSelectedAnswers({ q_g4_m6_07: 'opt_7b' })
+    } else {
+      setUserSelectedAnswers({})
+    }
+
+    setTimeRemainingSeconds(blueprint.durationMinutes * 60)
+    setAssessmentResult(null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Handle selecting an option
+  const handleSelectOption = (questionId: string, optionId: string) => {
+    setUserSelectedAnswers((prev) => ({
+      ...prev,
+      [questionId]: optionId,
+    }))
+  }
+
+  // Submit test and evaluate
+  const handleSubmitAssessment = () => {
+    if (!activeTestBlueprint) return
+
+    const submittedAnswers: SubmittedAnswer[] = activeQuestions.map((q) => ({
+      questionId: q.id,
+      selectedOptionIds: userSelectedAnswers[q.id] ? [userSelectedAnswers[q.id]] : [],
+      timeSpentSeconds: 30,
+    }))
+
+    const result = evaluateAssessmentAttempt({
+      attemptId: `att_free_${Date.now()}`,
+      blueprint: activeTestBlueprint,
+      learnerId: 'anonymous_learner',
+      questions: activeQuestions,
+      solutions: SEED_CONFIDENTIAL_SOLUTIONS,
+      submittedAnswers,
+    })
+
+    setAssessmentResult(result)
+
+    // Mark subject free practice as completed
+    const subjectKey = activeTestBlueprint.subjectId.replace('subj_g4_', '')
+    const updated = { ...completedFreeSubjects, [subjectKey]: true }
+    setCompletedFreeSubjects(updated)
+    try {
+      localStorage.setItem('talentxcel_free_subjects_completed', JSON.stringify(updated))
+    } catch {
+      // ignore
+    }
+  }
+
+  const exitAssessmentEngine = () => {
+    setActiveTestBlueprint(null)
+    setActiveQuestions([])
+    setAssessmentResult(null)
+    setUserSelectedAnswers({})
+  }
+
+  const currentQ = activeQuestions[currentQuestionIndex]
+  const currentSolution = currentQ ? SEED_CONFIDENTIAL_SOLUTIONS.get(currentQ.id) : null
+  const selectedOptId = currentQ ? userSelectedAnswers[currentQ.id] : undefined
+  const isSelectedOptCorrect =
+    currentSolution && selectedOptId ? currentSolution.correctOptionIds.includes(selectedOptId) : false
+
+  // =========================================================================
+  // VIEW: LIVE ASSESSMENT ENGINE (SPLIT-SCREEN TABLET / DESKTOP RESPONSIVE)
+  // =========================================================================
+  if (activeTestBlueprint && currentQ) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col">
+        {/* Top Sticky Test Header */}
+        <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 shadow-xs">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            {/* Brand & Breadcrumb */}
+            <div className="flex items-center gap-3">
+              <span className="font-extrabold text-lg tracking-tight text-slate-900">
+                Talent<span className="text-[#0080FF]">Xcel</span>
+              </span>
+              <span className="text-slate-300">|</span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-700 truncate max-w-[200px] sm:max-w-md">
+                {activeTestBlueprint.title}
               </span>
             </div>
-            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] py-0 px-2">
-              All Surfaces Live
-            </Badge>
+
+            {/* Timer, Question Tracker & Exit Button */}
+            <div className="flex items-center gap-3 sm:gap-5">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-lg text-slate-700 text-xs sm:text-sm font-semibold">
+                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                <span>{formatTimer(timeRemainingSeconds)}</span>
+              </div>
+
+              <div className="text-xs sm:text-sm font-bold text-slate-800">
+                {currentQuestionIndex + 1} / {activeQuestions.length}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exitAssessmentEngine}
+                className="text-xs font-semibold text-slate-600 hover:text-slate-900 border-slate-200"
+              >
+                Exit
+              </Button>
+            </div>
           </div>
+        </header>
 
-          {/* Interactive Surface Switcher Pills */}
-          <div className="flex items-center gap-1 bg-[#1C2541] p-1 rounded-xl border border-white/[0.1]">
-            <button
-              onClick={() => setActiveSurface('showcase')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                activeSurface === 'showcase'
-                  ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
-                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Full Showcase View (Reference)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveSurface('tv')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                activeSurface === 'tv'
-                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
-                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Tv className="w-3.5 h-3.5" />
-              <span>TV Experience</span>
-            </button>
-
-            <button
-              onClick={() => setActiveSurface('desktop')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                activeSurface === 'desktop'
-                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
-                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Laptop className="w-3.5 h-3.5" />
-              <span>Laptop / Desktop</span>
-            </button>
-
-            <button
-              onClick={() => setActiveSurface('tablet')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                activeSurface === 'tablet'
-                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
-                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Tablet className="w-3.5 h-3.5" />
-              <span>Tablet Split-Screen</span>
-            </button>
-
-            <button
-              onClick={() => setActiveSurface('mobile')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                activeSurface === 'mobile'
-                  ? 'bg-[#0080FF] text-white font-bold shadow-md'
-                  : 'text-neutral-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Mobile Phone</span>
-            </button>
-          </div>
-
-          {/* Quick Links */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/academy"
-              className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold"
-            >
-              <span>Academy Programmes</span>
-              <ExternalLink className="w-3 h-3" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* =========================================================================
-          MODE 1: FULL MULTI-SURFACE SHOWCASE CANVAS (MATCHES ATTACHED IMAGE 100%)
-      ========================================================================== */}
-      {activeSurface === 'showcase' && (
-        <main className="flex-1 w-full max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between space-y-12 animate-in fade-in duration-300">
-          {/* =====================================================================
-              TOP SECTION: THE TELEVISION EXPERIENCE (10-FOOT REMOTE UI)
-          ====================================================================== */}
-          <div className="relative group">
-            {/* Television Hardware Frame */}
-            <div className="relative rounded-[32px] border-[12px] border-[#181E2E] bg-[#070B14] p-5 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden">
-              {/* Stand highlight reflection at bottom */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.02] to-transparent pointer-events-none" />
-
-              {/* TV Top Header Bar */}
-              <div className="flex items-center justify-between pb-5 border-b border-white/[0.08] relative z-10">
-                <div className="flex items-center gap-8">
-                  <div className="space-y-0.5">
-                    <span className="text-2xl font-black tracking-tight text-white flex items-center gap-0.5">
-                      Talent<span className="text-[#0080FF]">Xcel</span>
-                    </span>
-                    <span className="text-[10px] tracking-widest uppercase text-neutral-400 block font-medium">
-                      Learn • Practise • Grow
-                    </span>
-                  </div>
-
-                  {/* Glowing TV Navigation Pills */}
-                  <nav className="hidden md:flex items-center gap-2">
-                    <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#0080FF] text-white font-bold text-sm shadow-[0_0_20px_rgba(0,128,255,0.45)] ring-2 ring-white/20">
-                      <Home className="h-4 w-4" />
-                      <span>Home</span>
-                    </button>
-                    {['My Learning', 'Tests', 'Subjects', 'Results', 'Plans', 'Profile'].map((item) => (
-                      <button
-                        key={item}
-                        className="px-4 py-2 rounded-full text-sm font-semibold text-neutral-300 hover:text-white hover:bg-white/5 transition-all"
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </nav>
+        {/* Assessment Body or Post-Submit Scorecard */}
+        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+          {assessmentResult ? (
+            /* SCORECARD & EVALUATION VIEW */
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+              <div className="text-center space-y-3 pb-6 border-b border-slate-100">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 mb-1">
+                  <Award className="w-8 h-8" />
                 </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                  {assessmentResult.passed ? 'Assessment Completed!' : 'Diagnostic Completed'}
+                </h2>
+                <p className="text-sm text-slate-600">
+                  Official Server-Validated Evaluation • No Sign-Up Required
+                </p>
 
-                <div className="flex items-center gap-3">
-                  <button className="p-2.5 rounded-full bg-white/[0.06] text-neutral-300 hover:text-white">
-                    <Search className="h-4 w-4" />
-                  </button>
-                  <button className="p-2.5 rounded-full bg-white/[0.06] text-neutral-300 hover:text-white relative">
-                    <Bell className="h-4 w-4" />
-                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500" />
-                  </button>
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-[#0080FF] to-cyan-400 flex items-center justify-center font-black text-white text-sm shadow-md">
-                    A
-                  </div>
+                {/* Score & Badges */}
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <Badge className="bg-emerald-600 text-white text-sm px-3 py-1 font-bold">
+                    Score: {assessmentResult.scoreObtained} / {assessmentResult.maxMarks} Marks (
+                    {assessmentResult.percentage}%)
+                  </Badge>
+                  <Badge className="bg-blue-600 text-white text-sm px-3 py-1 font-bold">
+                    ✓ {assessmentResult.correctCount} Correct • ✕ {assessmentResult.incorrectCount} Incorrect
+                  </Badge>
+                  {assessmentResult.earnedPassCredits > 0 && (
+                    <Badge className="bg-amber-500 text-slate-950 text-sm px-3 py-1 font-bold">
+                      ★ ₹{assessmentResult.earnedPassCredits} Pass Credits Earned!
+                    </Badge>
+                  )}
                 </div>
               </div>
 
-              {/* TV Main Body: 9 Cols Left + 3 Cols Right Quick Access */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 my-6 relative z-10 items-start">
-                {/* Left 9 Columns */}
-                <div className="lg:col-span-9 space-y-6">
-                  {/* Hero Banner with Student Graphic & Upcoming Test Card */}
-                  <div className="relative rounded-3xl bg-gradient-to-r from-[#0C1636] via-[#0E2A68] to-[#124294] p-6 sm:p-8 overflow-hidden border border-[#2A365D] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-                    {/* Background Doodles & Subtle Graphics */}
-                    <div className="absolute right-32 top-4 opacity-20 pointer-events-none text-cyan-300 text-6xl font-serif">
-                      ✧
-                    </div>
-                    <div className="absolute right-72 bottom-4 opacity-15 pointer-events-none text-amber-300 text-4xl">
-                      ✏
-                    </div>
+              {/* Free-to-Paid Transparent Progression */}
+              <div className="my-6 p-5 bg-gradient-to-br from-blue-50/60 to-indigo-50/60 rounded-xl border border-blue-200/80 space-y-3">
+                <div className="flex items-center gap-2 text-blue-900 font-bold">
+                  <Sparkles className="w-5 h-5 text-blue-600" />
+                  <span>Next Steps for Your Learning Journey</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                  You have completed your free diagnostic questions for this subject. All 5 school subjects
+                  and Analytical Skills offer independent free practice!
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <Button
+                    onClick={exitAssessmentEngine}
+                    className="w-full bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs sm:text-sm py-2.5 shadow-xs"
+                  >
+                    Try Another Free Subject →
+                  </Button>
+                  <Link href="/register" className="w-full">
+                    <Button
+                      variant="outline"
+                      className="w-full border-blue-300 text-blue-700 hover:bg-blue-50 font-bold text-xs sm:text-sm py-2.5"
+                    >
+                      Save Progress & ₹20 Credits
+                    </Button>
+                  </Link>
+                </div>
+              </div>
 
-                    <div className="space-y-4 max-w-md z-10">
-                      <div className="space-y-1">
-                        <span className="text-xs font-bold text-cyan-300 uppercase tracking-widest">
-                          Welcome
-                        </span>
-                        <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                          Keep Learning,<br />
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-[#00D2FF]">
-                            Keep Growing
+              {/* Step-by-Step Question Review */}
+              <div className="space-y-4 pt-2">
+                <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                  <span>Question-Wise Step-by-Step Solutions</span>
+                  <Badge variant="outline" className="text-xs">
+                    {assessmentResult.evaluations.length} Questions
+                  </Badge>
+                </h3>
+
+                <div className="space-y-4">
+                  {assessmentResult.evaluations.map((ev, idx) => (
+                    <div
+                      key={ev.questionId}
+                      className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sm text-slate-800">Question {idx + 1}</span>
+                        {ev.isCorrect ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Correct (+{ev.marksAwarded})
                           </span>
-                        </h1>
-                      </div>
-                      <p className="text-xs sm:text-sm text-neutral-200/90 leading-relaxed font-normal">
-                        Syllabus-aligned practice tests, explanations and personalised learning for school and competitive exams.
-                      </p>
-                      <div className="pt-1">
-                        <button
-                          onClick={() => setActiveSurface('tablet')}
-                          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-[#0B132B] font-black text-sm shadow-xl hover:bg-neutral-100 transition-all hover:scale-105"
-                        >
-                          <Play className="h-4 w-4 fill-[#0B132B]" />
-                          <span>Continue Practice</span>
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-100 px-2.5 py-0.5 rounded-full">
+                            <XCircle className="w-3.5 h-3.5" /> Incorrect (0 marks)
+                          </span>
+                        )}
                       </div>
 
-                      {/* 3 Quick Pill Tabs Under Button */}
-                      <div className="flex items-center gap-2 pt-2 text-[11px] font-semibold text-neutral-300">
-                        <span className="bg-black/30 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
-                          <BarChart3 className="w-3 h-3 text-cyan-400" /> My Progress
-                        </span>
-                        <span className="bg-black/30 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
-                          <Calendar className="w-3 h-3 text-amber-400" /> Upcoming Tests
-                        </span>
-                        <span className="bg-black/30 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
-                          <Sparkles className="w-3 h-3 text-purple-400" /> Recommended
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Upcoming Test Card (Matching Screenshot) */}
-                    <div className="w-full md:w-80 rounded-2xl bg-[#0B132B]/95 backdrop-blur-md p-5 border border-cyan-400/30 shadow-2xl space-y-3 z-10">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-extrabold text-cyan-300 flex items-center gap-1.5">
-                          <Calendar className="h-3.5 w-3.5" /> Upcoming Test
-                        </span>
-                        <span className="text-[11px] text-neutral-400 hover:text-white cursor-pointer">
-                          View All &gt;
-                        </span>
-                      </div>
-
-                      <div className="flex items-start gap-3 pt-1">
-                        <div className="p-3 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 shrink-0">
-                          <Calculator className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h4 className="font-extrabold text-sm text-white">Mathematics</h4>
-                          <p className="text-xs text-amber-400 font-semibold">Ch - 6 Multiples</p>
-                          <p className="text-[11px] text-neutral-400">Grade IV • Mayoor School (PT 2)</p>
-                          <p className="text-[11px] text-neutral-300 font-medium mt-1">🗓 17 Nov 2026</p>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => setActiveSurface('tablet')}
-                        className="w-full py-2.5 rounded-xl bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all mt-2"
-                      >
-                        <span>Start Practice</span>
-                        <ChevronRight className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 5 Vibrant Subject Cards Row (Exact colors & progress) */}
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
-                    {/* Card 1: Mathematics (Amber) */}
-                    <div
-                      onClick={() => setActiveSurface('tablet')}
-                      className="rounded-2xl bg-[#0E172E] p-4 border border-amber-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400 w-fit">
-                          <Calculator className="h-5 w-5" />
-                        </div>
-                        <h4 className="font-extrabold text-sm text-white group-hover:text-amber-300 transition-colors">
-                          Mathematics
-                        </h4>
-                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
-                      </div>
-                      <div className="space-y-1 pt-2 border-t border-white/5">
-                        <div className="flex justify-between text-[10px] text-neutral-400">
-                          <span>Progress</span>
-                          <span className="font-semibold text-white">3/10 tests</span>
-                        </div>
-                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                          <div className="h-full rounded-full bg-amber-400 w-[30%]" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 2: Science (Green) */}
-                    <div
-                      onClick={() => setActiveSurface('tablet')}
-                      className="rounded-2xl bg-[#0E172E] p-4 border border-emerald-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 w-fit">
-                          <FlaskConical className="h-5 w-5" />
-                        </div>
-                        <h4 className="font-extrabold text-sm text-white group-hover:text-emerald-300 transition-colors">
-                          Science
-                        </h4>
-                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
-                      </div>
-                      <div className="space-y-1 pt-2 border-t border-white/5">
-                        <div className="flex justify-between text-[10px] text-neutral-400">
-                          <span>Progress</span>
-                          <span className="font-semibold text-white">2/8 tests</span>
-                        </div>
-                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                          <div className="h-full rounded-full bg-emerald-400 w-[25%]" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 3: English (Blue) */}
-                    <div
-                      onClick={() => setActiveSurface('tablet')}
-                      className="rounded-2xl bg-[#0E172E] p-4 border border-blue-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="p-2.5 rounded-xl bg-blue-500/15 text-blue-400 w-fit">
-                          <BookOpen className="h-5 w-5" />
-                        </div>
-                        <h4 className="font-extrabold text-sm text-white group-hover:text-blue-300 transition-colors">
-                          English
-                        </h4>
-                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
-                      </div>
-                      <div className="space-y-1 pt-2 border-t border-white/5">
-                        <div className="flex justify-between text-[10px] text-neutral-400">
-                          <span>Progress</span>
-                          <span className="font-semibold text-white">4/10 tests</span>
-                        </div>
-                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                          <div className="h-full rounded-full bg-blue-400 w-[40%]" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 4: Hindi (Pink) */}
-                    <div
-                      onClick={() => setActiveSurface('tablet')}
-                      className="rounded-2xl bg-[#0E172E] p-4 border border-rose-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="p-2.5 rounded-xl bg-rose-500/15 text-rose-400 w-fit font-bold text-base flex items-center justify-center">
-                          अ
-                        </div>
-                        <h4 className="font-extrabold text-sm text-white group-hover:text-rose-300 transition-colors">
-                          Hindi
-                        </h4>
-                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
-                      </div>
-                      <div className="space-y-1 pt-2 border-t border-white/5">
-                        <div className="flex justify-between text-[10px] text-neutral-400">
-                          <span>Progress</span>
-                          <span className="font-semibold text-white">1/8 tests</span>
-                        </div>
-                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                          <div className="h-full rounded-full bg-rose-400 w-[12%]" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 5: Social Science (Purple) */}
-                    <div
-                      onClick={() => setActiveSurface('tablet')}
-                      className="rounded-2xl bg-[#0E172E] p-4 border border-purple-500/40 shadow-lg hover:scale-[1.03] transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="p-2.5 rounded-xl bg-purple-500/15 text-purple-400 w-fit">
-                          <Compass className="h-5 w-5" />
-                        </div>
-                        <h4 className="font-extrabold text-sm text-white group-hover:text-purple-300 transition-colors">
-                          Social Science
-                        </h4>
-                        <p className="text-[11px] text-neutral-400 font-medium">Practice • Tests • Revision</p>
-                      </div>
-                      <div className="space-y-1 pt-2 border-t border-white/5">
-                        <div className="flex justify-between text-[10px] text-neutral-400">
-                          <span>Progress</span>
-                          <span className="font-semibold text-white">2/6 tests</span>
-                        </div>
-                        <div className="h-1.5 w-full rounded-full bg-purple-400 w-[33%]" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right 3 Columns: Quick Access Sidebar */}
-                <div className="lg:col-span-3 space-y-4">
-                  <div className="rounded-2xl bg-[#0E172E] border border-white/[0.08] p-5 space-y-3 shadow-xl">
-                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                      <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-                        Quick Access
-                      </span>
-                      <div className="flex items-center gap-1 text-xs font-bold text-cyan-300 bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-500/30">
-                        <GraduationCap className="w-3.5 h-3.5" />
-                        <span>Class 4</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 pt-1">
-                      {/* Selected School Tests */}
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0080FF] text-white font-bold text-xs shadow-md">
-                        <FileText className="h-4 w-4" />
-                        <span>School Tests</span>
-                      </div>
-
-                      {[
-                        { label: 'Competitive Exams', icon: Award },
-                        { label: 'Skill Development', icon: Layers },
-                        { label: 'AI Tutor (SI)', icon: Bot },
-                        { label: 'Settings', icon: Settings },
-                      ].map((item) => (
-                        <div
-                          key={item.label}
-                          className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 font-semibold text-xs transition-all cursor-pointer"
-                        >
-                          <item.icon className="h-4 w-4 text-neutral-400" />
-                          <span>{item.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* TV Remote Navigation Footer Hint */}
-              <div className="pt-4 border-t border-white/[0.08] text-center text-xs text-neutral-400 flex items-center justify-center gap-2">
-                <span>Use arrow keys on your remote</span>
-                <span>•</span>
-                <span>Press OK to select</span>
-                <span>•</span>
-                <span>Press Back to go to previous screen</span>
-              </div>
-            </div>
-
-            {/* TV Stand Base */}
-            <div className="w-48 h-3 bg-[#111624] mx-auto rounded-b-lg border-x-2 border-b-2 border-[#1E2738]" />
-
-            {/* Yellow Label Badge Matching Screenshot */}
-            <div className="absolute -bottom-4 right-8 bg-[#FACC15] text-slate-950 px-4 py-2 rounded-2xl shadow-2xl z-20 max-w-xs">
-              <div className="font-extrabold text-sm tracking-tight">TV Experience</div>
-              <div className="text-[11px] font-medium leading-snug">
-                Large, clear interface with full remote control navigation.
-              </div>
-            </div>
-          </div>
-
-          {/* =====================================================================
-              BOTTOM MULTI-DEVICE GRID: LAPTOP + TABLET + MOBILE + TEST PHONE
-          ====================================================================== */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-4">
-            {/* ===================================================================
-                DEVICE 2: LAPTOP / DESKTOP (LEFT 5 COLS)
-            ==================================================================== */}
-            <div className="lg:col-span-5 relative group">
-              {/* Laptop Screen Bezel */}
-              <div className="rounded-2xl border-[10px] border-[#22283A] bg-[#F8FAFC] text-slate-900 shadow-2xl overflow-hidden text-xs">
-                {/* Laptop Top Search & Profile Bar */}
-                <div className="bg-white px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 w-48 text-[11px]">
-                    <Search className="w-3.5 h-3.5" />
-                    <span className="truncate">Search for subjects, chapters...</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400" />
-                    <div className="w-6 h-6 rounded-full bg-[#0080FF] text-white flex items-center justify-center font-bold text-[10px]">
-                      A
-                    </div>
-                  </div>
-                </div>
-
-                {/* Laptop Main Body: Sidebar + Content */}
-                <div className="flex min-h-[340px]">
-                  {/* Left Sidebar */}
-                  <div className="w-36 bg-[#0B132B] text-slate-300 p-3 space-y-1 shrink-0 text-[11px]">
-                    <div className="font-black text-white text-xs mb-3 flex items-center gap-1">
-                      Talent<span className="text-[#0080FF]">Xcel</span>
-                    </div>
-                    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#0080FF] text-white font-bold">
-                      <Home className="w-3.5 h-3.5" /> <span>Home</span>
-                    </div>
-                    {['My Learning', 'Tests', 'Subjects', 'Results', 'Plans', 'AI Tutor (SI)', 'Profile'].map(
-                      (item) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white"
-                        >
-                          <span>{item}</span>
-                        </div>
-                      )
-                    )}
-                  </div>
-
-                  {/* Dashboard Content */}
-                  <div className="flex-1 p-3.5 space-y-3 bg-[#F8FAFC]">
-                    {/* Header line */}
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-200 text-[11px]">
-                      <span className="font-bold text-slate-700">
-                        Grade IV • Mayoor School, Noida • Periodic Test 2
-                      </span>
-                      <span className="text-[#0080FF] font-semibold cursor-pointer">Change &gt;</span>
-                    </div>
-
-                    {/* 5 Pastel Subject Cards Row */}
-                    <div className="grid grid-cols-5 gap-1.5 text-center">
-                      <div className="bg-amber-50 border border-amber-200 p-1.5 rounded-lg text-[10px]">
-                        <Calculator className="w-3.5 h-3.5 mx-auto text-amber-600 mb-0.5" />
-                        <div className="font-bold text-slate-800">Maths</div>
-                        <div className="text-slate-500 text-[9px]">3/10 tests</div>
-                      </div>
-                      <div className="bg-emerald-50 border border-emerald-200 p-1.5 rounded-lg text-[10px]">
-                        <FlaskConical className="w-3.5 h-3.5 mx-auto text-emerald-600 mb-0.5" />
-                        <div className="font-bold text-slate-800">Science</div>
-                        <div className="text-slate-500 text-[9px]">3/8 tests</div>
-                      </div>
-                      <div className="bg-blue-50 border border-blue-200 p-1.5 rounded-lg text-[10px]">
-                        <BookOpen className="w-3.5 h-3.5 mx-auto text-blue-600 mb-0.5" />
-                        <div className="font-bold text-slate-800">English</div>
-                        <div className="text-slate-500 text-[9px]">4/10 tests</div>
-                      </div>
-                      <div className="bg-rose-50 border border-rose-200 p-1.5 rounded-lg text-[10px]">
-                        <span className="font-bold text-rose-600 block text-xs">अ</span>
-                        <div className="font-bold text-slate-800">Hindi</div>
-                        <div className="text-slate-500 text-[9px]">1/8 tests</div>
-                      </div>
-                      <div className="bg-purple-50 border border-purple-200 p-1.5 rounded-lg text-[10px]">
-                        <Compass className="w-3.5 h-3.5 mx-auto text-purple-600 mb-0.5" />
-                        <div className="font-bold text-slate-800">Social Sci</div>
-                        <div className="text-slate-500 text-[9px]">2/6 tests</div>
-                      </div>
-                    </div>
-
-                    {/* Split: Upcoming Tests & Progress */}
-                    <div className="grid grid-cols-12 gap-3 pt-1">
-                      {/* Upcoming Tests (7 cols) */}
-                      <div className="col-span-7 bg-white p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-                        <div className="flex justify-between items-center text-[11px] font-bold text-slate-800">
-                          <span>Upcoming Tests</span>
-                          <span className="text-[#0080FF] text-[10px]">View All</span>
-                        </div>
-
-                        {[
-                          { date: '17 Nov 2026', title: 'Mathematics Ch - 6 Multiples', code: 'math' },
-                          { date: '19 Nov 2026', title: 'Science Unit 5 - Force & Magnetism', code: 'science' },
-                          { date: '23 Nov 2026', title: 'English Ch - 8 The Pied Piper', code: 'english' },
-                          { date: '25 Nov 2026', title: 'Hindi पाठ 11 - प्यारा भारत', code: 'hindi' },
-                          { date: '27 Nov 2026', title: 'Social Science Ch - 8 Our Agriculture', code: 'sst' },
-                        ].map((t) => (
-                          <div
-                            key={t.date}
-                            className="flex items-center justify-between p-1.5 rounded bg-slate-50 border border-slate-100 text-[10px]"
-                          >
-                            <div className="truncate mr-1">
-                              <span className="text-slate-400 block text-[9px]">{t.date}</span>
-                              <span className="font-semibold text-slate-800 truncate block">{t.title}</span>
-                            </div>
-                            <button
-                              onClick={() => setActiveSurface('tablet')}
-                              className="px-2 py-0.5 bg-[#0080FF] text-white rounded font-bold text-[9px]"
-                            >
-                              Start
-                            </button>
-                          </div>
+                      {/* Explanation Steps */}
+                      <div className="text-xs sm:text-sm text-slate-700 space-y-1 pt-1">
+                        <p className="font-semibold text-slate-900">Step by step explanation:</p>
+                        {ev.solutionSteps.map((step, sIdx) => (
+                          <p key={sIdx} className="text-slate-600">
+                            • {step}
+                          </p>
                         ))}
                       </div>
 
-                      {/* Your Progress Gauge & Recommended (5 cols) */}
-                      <div className="col-span-5 space-y-2">
-                        <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-center">
-                          <span className="text-[10px] font-bold text-slate-700 block">Your Progress</span>
-                          <div className="w-12 h-12 rounded-full border-4 border-emerald-500 mx-auto my-1 flex items-center justify-center font-black text-xs text-slate-800">
-                            60%
-                          </div>
-                          <span className="text-[9px] text-slate-500 block">Tests Completed 6/10</span>
+                      {ev.keyPoint && (
+                        <div className="bg-amber-50 border border-amber-200/80 p-3 rounded-lg text-xs text-amber-950 font-medium">
+                          <strong>Key Point:</strong> {ev.keyPoint}
                         </div>
-
-                        <div className="bg-white p-2 rounded-xl border border-slate-200 text-[9px] space-y-1">
-                          <span className="font-bold text-slate-700 block">Recommended for You</span>
-                          <div className="text-slate-600 truncate hover:text-[#0080FF] cursor-pointer">
-                            • Division - Practice Test &gt;
-                          </div>
-                          <div className="text-slate-600 truncate hover:text-[#0080FF] cursor-pointer">
-                            • Friction - Quick Quiz &gt;
-                          </div>
-                          <div className="text-slate-600 truncate hover:text-[#0080FF] cursor-pointer">
-                            • The Pied Piper - Reading &gt;
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Laptop Keyboard Base */}
-              <div className="w-[102%] -ml-[1%] h-3 bg-[#1E2536] rounded-b-xl border-x border-b border-slate-700 shadow-md" />
-
-              {/* Yellow Label Badge */}
-              <div className="absolute -bottom-6 left-4 bg-[#FACC15] text-slate-950 px-4 py-2 rounded-2xl shadow-2xl z-20 max-w-xs">
-                <div className="font-extrabold text-sm tracking-tight">Laptop / Desktop</div>
-                <div className="text-[11px] font-medium leading-snug">
-                  Full dashboard with detailed learning tools, analysis and management.
-                </div>
+              <div className="pt-6 mt-6 border-t border-slate-100 flex justify-center">
+                <Button
+                  onClick={exitAssessmentEngine}
+                  variant="outline"
+                  className="font-semibold text-slate-700"
+                >
+                  Return to Dashboard
+                </Button>
               </div>
             </div>
-
-            {/* ===================================================================
-                DEVICE 3: TABLET SPLIT-SCREEN (CENTER 4 COLS)
-            ==================================================================== */}
-            <div className="lg:col-span-4 relative group">
-              {/* Tablet Frame */}
-              <div className="rounded-[28px] border-[10px] border-[#1C2234] bg-white text-slate-900 p-4 shadow-2xl overflow-hidden min-h-[460px] flex flex-col justify-between">
-                {/* Tablet Top Bar */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
-                  <div className="flex items-center gap-1.5 font-black text-slate-900 text-xs">
-                    <span>Talent<span className="text-[#0080FF]">Xcel</span></span>
-                    <span className="text-slate-400 font-normal">|</span>
-                    <span className="text-slate-500 font-medium text-[11px]">
-                      Mathematics &gt; Ch - 6 Multiples
+          ) : (
+            /* ACTIVE TWO-COLUMN QUESTION & EXPLANATION SPLIT (MATCHES TABLET REFERENCE SCREENSHOT) */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Question Card & Options (7 Columns on large screens) */}
+              <div className="lg:col-span-7 space-y-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+                  {/* Question Number & Text */}
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Question {currentQuestionIndex + 1}
                     </span>
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900 mt-1 leading-snug">
+                      {currentQ.questionText}
+                    </h2>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-mono font-bold text-[10px] text-slate-700">
-                      ⏱ {formatTimer(timeRemainingSeconds)}
-                    </span>
-                    <span className="font-bold text-slate-600 text-[10px]">7 / 10</span>
-                    <span className="text-slate-400 hover:text-slate-600 font-bold text-[10px] cursor-pointer">
-                      Exit
-                    </span>
-                  </div>
-                </div>
 
-                {/* Tablet Two-Column Split Area */}
-                <div className="grid grid-cols-2 gap-3.5 my-3 flex-1 items-start text-xs">
-                  {/* Left Column: Question 7 Matching Screenshot */}
+                  {/* Options List */}
                   <div className="space-y-3">
-                    <div>
-                      <span className="text-[10px] font-bold text-[#0080FF] uppercase block">Question 7</span>
-                      <h4 className="font-bold text-slate-900 text-xs leading-snug mt-0.5">
-                        Which of the following numbers is a multiple of 6?
-                      </h4>
-                    </div>
+                    {currentQ.options.map((opt) => {
+                      const isSelected = selectedOptId === opt.id
+                      const isCorrect = currentSolution?.correctOptionIds.includes(opt.id)
 
-                    {/* Options list */}
-                    <div className="space-y-1.5">
-                      {[
-                        { id: 'opt_7a', label: 'A', text: '14' },
-                        { id: 'opt_7b', label: 'B', text: '18' },
-                        { id: 'opt_7c', label: 'C', text: '20' },
-                        { id: 'opt_7d', label: 'D', text: '22' },
-                      ].map((opt) => {
-                        const isSelected = selectedOptionId === opt.id
+                      // Soft pastel styling matching reference image
+                      let optClass = 'bg-white border-slate-200 text-slate-800 hover:border-blue-400'
+                      if (isSelected) {
+                        if (isCorrect) {
+                          optClass = 'bg-emerald-50 border-emerald-500 text-emerald-950 font-medium'
+                        } else {
+                          optClass = 'bg-blue-50 border-blue-500 text-blue-950 font-medium'
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleSelectOption(currentQ.id, opt.id)}
+                          className={`w-full flex items-center justify-between p-3.5 sm:p-4 rounded-xl border text-left text-sm transition-all shadow-2xs ${optClass}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
+                                isSelected && isCorrect
+                                  ? 'bg-emerald-600 text-white'
+                                  : isSelected
+                                  ? 'bg-[#0080FF] text-white'
+                                  : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              {opt.label}
+                            </span>
+                            <span>{opt.text}</span>
+                          </div>
+
+                          {isSelected && isCorrect && (
+                            <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            </div>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Correct Feedback Banner (Matching Reference Image) */}
+                  {selectedOptId && (
+                    <div
+                      className={`p-4 rounded-xl border flex items-start gap-3 text-xs sm:text-sm ${
+                        isSelectedOptCorrect
+                          ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                          : 'bg-rose-50 border-rose-200 text-rose-900'
+                      }`}
+                    >
+                      {isSelectedOptCorrect ? (
+                        <>
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-bold text-emerald-950">Correct!</p>
+                            <p className="text-emerald-800 mt-0.5">{currentSolution?.explanation}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-bold text-rose-950">Not quite right</p>
+                            <p className="text-rose-800 mt-0.5">
+                              Check the step-by-step explanation card on the right to understand why!
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Bottom Navigation Buttons */}
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={currentQuestionIndex === 0}
+                      onClick={() => setCurrentQuestionIndex((prev) => Math.max(0, prev - 1))}
+                      className="font-semibold text-slate-700 border-slate-200"
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-1" />
+                      Previous
+                    </Button>
+
+                    <div className="flex items-center gap-1.5 hidden sm:flex">
+                      {activeQuestions.map((q, idx) => {
+                        const isAnswered = !!userSelectedAnswers[q.id]
+                        const isCurrent = idx === currentQuestionIndex
                         return (
-                          <div
-                            key={opt.id}
-                            onClick={() => setSelectedOptionId(opt.id)}
-                            className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-between text-[11px] ${
-                              isSelected
-                                ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-bold shadow-sm'
-                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
+                          <button
+                            key={q.id}
+                            onClick={() => setCurrentQuestionIndex(idx)}
+                            className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                              isCurrent
+                                ? 'bg-slate-900 text-white'
+                                : isAnswered
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                             }`}
                           >
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] ${
-                                  isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'
-                                }`}
-                              >
-                                {opt.label}
-                              </span>
-                              <span>{opt.text}</span>
-                            </div>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[3]" />}
-                          </div>
+                            {idx + 1}
+                          </button>
                         )
                       })}
                     </div>
 
-                    {/* Green Correct Feedback Callout */}
-                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] space-y-0.5">
-                      <div className="font-bold flex items-center gap-1 text-emerald-700">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Correct!
-                      </div>
-                      <p>6 × 3 = 18, so 18 is a multiple of 6.</p>
-                    </div>
-
-                    {/* Navigation Buttons */}
-                    <div className="flex justify-between pt-1">
-                      <button className="px-3 py-1 rounded-lg border border-slate-200 text-slate-600 text-[10px] font-bold">
-                        Previous
-                      </button>
-                      <button className="px-4 py-1 rounded-lg bg-[#0080FF] text-white text-[10px] font-bold shadow-sm">
+                    {currentQuestionIndex < activeQuestions.length - 1 ? (
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          setCurrentQuestionIndex((prev) =>
+                            Math.min(activeQuestions.length - 1, prev + 1)
+                          )
+                        }
+                        className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold"
+                      >
                         Next
-                      </button>
-                    </div>
+                        <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={handleSubmitAssessment}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                      >
+                        Submit Test
+                        <CheckCircle2 className="w-4 h-4 ml-1" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Step-by-Step Explanation & Key Point Card (5 Columns on large screens) */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
+                  {/* Tabs: Explanation | Hint | Related */}
+                  <div className="flex items-center border-b border-slate-200 pb-2 gap-4 text-xs font-bold">
+                    <button
+                      onClick={() => setActiveTab('explanation')}
+                      className={`pb-1 border-b-2 transition-all ${
+                        activeTab === 'explanation'
+                          ? 'border-[#0080FF] text-[#0080FF]'
+                          : 'border-transparent text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      Explanation
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('hint')}
+                      className={`pb-1 border-b-2 transition-all ${
+                        activeTab === 'hint'
+                          ? 'border-[#0080FF] text-[#0080FF]'
+                          : 'border-transparent text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      Hint
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('related')}
+                      className={`pb-1 border-b-2 transition-all ${
+                        activeTab === 'related'
+                          ? 'border-[#0080FF] text-[#0080FF]'
+                          : 'border-transparent text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      Related
+                    </button>
                   </div>
 
-                  {/* Right Column: Step-by-Step Explanation & Key Point */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2.5">
-                    {/* Tabs */}
-                    <div className="flex items-center gap-1.5 border-b border-slate-200 pb-1.5 text-[10px] font-bold">
-                      <button
-                        onClick={() => setActiveTabletTab('explanation')}
-                        className={`px-2 py-0.5 rounded ${
-                          activeTabletTab === 'explanation'
-                            ? 'bg-[#0080FF] text-white'
-                            : 'text-slate-500 hover:text-slate-800'
-                        }`}
-                      >
-                        Explanation
-                      </button>
-                      <button
-                        onClick={() => setActiveTabletTab('hint')}
-                        className={`px-2 py-0.5 rounded ${
-                          activeTabletTab === 'hint'
-                            ? 'bg-[#0080FF] text-white'
-                            : 'text-slate-500 hover:text-slate-800'
-                        }`}
-                      >
-                        Hint
-                      </button>
-                      <button
-                        onClick={() => setActiveTabletTab('related')}
-                        className={`px-2 py-0.5 rounded ${
-                          activeTabletTab === 'related'
-                            ? 'bg-[#0080FF] text-white'
-                            : 'text-slate-500 hover:text-slate-800'
-                        }`}
-                      >
-                        Related
-                      </button>
-                    </div>
-
-                    {/* Step by step */}
-                    <div className="space-y-1.5 text-[10px] text-slate-700">
-                      <h5 className="font-bold text-slate-900 text-[11px]">Step by step explanation</h5>
-                      <p>Multiples of 6 are numbers obtained by multiplying 6 by whole numbers.</p>
-                      <div className="space-y-0.5 font-mono p-2 rounded bg-white border border-slate-200 text-slate-800 text-[9px]">
-                        <div>6 × 1 = 6</div>
-                        <div>6 × 2 = 12</div>
-                        <div className="font-bold text-emerald-600">6 × 3 = 18</div>
-                        <div>6 × 4 = 24</div>
+                  {/* Tab Body */}
+                  {activeTab === 'explanation' && (
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">Step by step explanation</h4>
+                        <div className="mt-2 space-y-1.5 text-xs sm:text-sm text-slate-700">
+                          {currentSolution ? (
+                            currentSolution.solutionSteps.map((step, idx) => (
+                              <p key={idx} className="leading-relaxed">
+                                {step}
+                              </p>
+                            ))
+                          ) : (
+                            <p className="text-slate-500 italic">
+                              Select an answer to reveal step-by-step guidance.
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <p>So, 18 is a multiple of 6.</p>
-                    </div>
 
-                    {/* Yellow Key Point Box Matching Screenshot */}
-                    <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[10px] space-y-0.5">
-                      <div className="font-bold text-amber-800 flex items-center gap-1 text-[10px]">
-                        <Sparkles className="w-3 h-3 text-amber-600" /> Key Point
-                      </div>
-                      <p className="text-[9px] leading-tight">
-                        A number is a multiple of 6 if it appears in the 6-times table: 6, 12, 18, 24, 30 ...
+                      {/* Key Point Card (Amber Callout matching screenshot) */}
+                      {currentSolution?.keyPoint && (
+                        <div className="p-4 bg-amber-50/80 rounded-xl border border-amber-200/90 space-y-1">
+                          <div className="flex items-center gap-1.5 text-amber-900 font-bold text-xs uppercase tracking-wide">
+                            <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
+                            <span>Key Point</span>
+                          </div>
+                          <p className="text-xs sm:text-sm text-amber-950 leading-relaxed font-medium">
+                            {currentSolution.keyPoint}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {activeTab === 'hint' && (
+                    <div className="p-4 bg-blue-50/60 rounded-xl border border-blue-200/70 text-xs sm:text-sm text-blue-950 space-y-2">
+                      <p className="font-bold flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-blue-600" />
+                        <span>Socratic Hint:</span>
+                      </p>
+                      <p>
+                        To verify if a number is a multiple, check if dividing it leaves no remainder,
+                        or recall its basic multiplication table factors.
                       </p>
                     </div>
-                  </div>
-                </div>
-              </div>
+                  )}
 
-              {/* Yellow Label Badge */}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-[#FACC15] text-slate-950 px-4 py-2 rounded-2xl shadow-2xl z-20 max-w-xs whitespace-nowrap">
-                <div className="font-extrabold text-sm tracking-tight">Tablet</div>
-                <div className="text-[11px] font-medium leading-snug">
-                  Two-column layout with practice on one side and explanations on the other.
-                </div>
-              </div>
-            </div>
-
-            {/* ===================================================================
-                DEVICE 4: MOBILE PHONE (RIGHT 3 COLS SPLIT INTO 2 PHONES)
-            ==================================================================== */}
-            <div className="lg:col-span-3 flex items-end gap-4 relative">
-              {/* Phone 1: Mobile App Home Screen */}
-              <div className="w-1/2 rounded-[32px] border-[8px] border-[#1C2234] bg-white text-slate-900 p-2.5 shadow-2xl overflow-hidden min-h-[420px] flex flex-col justify-between text-xs">
-                {/* Mobile Top Notch & Greeting */}
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-[9px] text-slate-400">
-                    <span>10:24</span>
-                    <span className="font-bold text-slate-800">Class IV ▾</span>
-                    <Bell className="w-3 h-3" />
-                  </div>
-
-                  <div className="pt-1">
-                    <h5 className="font-extrabold text-[11px] text-slate-900">Good Morning Arshid</h5>
-                  </div>
-
-                  {/* Mobile Learning Progress */}
-                  <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <div>
-                      <span className="text-[8px] text-slate-400 block font-semibold">Your Learning Progress</span>
-                      <span className="text-[9px] font-bold text-slate-800">6/10 tests completed</span>
+                  {activeTab === 'related' && (
+                    <div className="space-y-2 text-xs">
+                      <p className="font-bold text-slate-800">Related Syllabus Topics:</p>
+                      <ul className="list-disc list-inside text-slate-600 space-y-1">
+                        <li>Multiplication Tables and Properties</li>
+                        <li>Finding Common Multiples</li>
+                        <li>Lowest Common Multiple (LCM)</li>
+                      </ul>
                     </div>
-                    <div className="w-7 h-7 rounded-full border-2 border-emerald-500 flex items-center justify-center font-bold text-[9px] text-slate-800">
-                      60%
-                    </div>
-                  </div>
-
-                  {/* Continue Practice Card */}
-                  <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 space-y-1">
-                    <span className="text-[8px] font-bold text-amber-700 block uppercase">Continue Practice</span>
-                    <div className="flex items-center justify-between">
-                      <div className="text-[9px] font-bold text-slate-900">Mathematics Ch - 6</div>
-                      <button
-                        onClick={() => setActiveSurface('tablet')}
-                        className="px-2 py-0.5 bg-[#0080FF] text-white rounded font-bold text-[8px]"
-                      >
-                        Start
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* All Subjects Grid */}
-                  <div className="space-y-1 pt-1">
-                    <span className="text-[8px] font-bold text-slate-400 block uppercase">All Subjects</span>
-                    <div className="grid grid-cols-3 gap-1 text-center">
-                      <div className="p-1 rounded bg-amber-50 border border-amber-200">
-                        <Calculator className="w-3 h-3 mx-auto text-amber-600" />
-                        <span className="text-[8px] font-bold text-slate-800">Maths</span>
-                      </div>
-                      <div className="p-1 rounded bg-emerald-50 border border-emerald-200">
-                        <FlaskConical className="w-3 h-3 mx-auto text-emerald-600" />
-                        <span className="text-[8px] font-bold text-slate-800">Science</span>
-                      </div>
-                      <div className="p-1 rounded bg-blue-50 border border-blue-200">
-                        <BookOpen className="w-3 h-3 mx-auto text-blue-600" />
-                        <span className="text-[8px] font-bold text-slate-800">English</span>
-                      </div>
-                      <div className="p-1 rounded bg-rose-50 border border-rose-200">
-                        <span className="text-[9px] font-bold text-rose-600">अ</span>
-                        <span className="text-[8px] font-bold text-slate-800 block">Hindi</span>
-                      </div>
-                      <div className="p-1 rounded bg-purple-50 border border-purple-200">
-                        <Compass className="w-3 h-3 mx-auto text-purple-600" />
-                        <span className="text-[8px] font-bold text-slate-800">SST</span>
-                      </div>
-                      <div className="p-1 rounded bg-slate-100 border border-slate-200 flex items-center justify-center">
-                        <span className="text-[8px] font-bold text-slate-500">More</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mobile Bottom Tab Bar */}
-                <div className="pt-2 border-t border-slate-200 flex justify-between text-[8px] text-slate-400 font-bold">
-                  <div className="text-[#0080FF] flex flex-col items-center">
-                    <Home className="w-3 h-3" />
-                    <span>Home</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <FileText className="w-3 h-3" />
-                    <span>Tests</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <Bot className="w-3 h-3" />
-                    <span>AI Tutor</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <BarChart3 className="w-3 h-3" />
-                    <span>Results</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <User className="w-3 h-3" />
-                    <span>Profile</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Phone 2: Practice Test Focused Screen */}
-              <div className="w-1/2 rounded-[32px] border-[8px] border-[#1C2234] bg-white text-slate-900 p-2.5 shadow-2xl overflow-hidden min-h-[420px] flex flex-col justify-between text-xs">
-                {/* Test Screen Header */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-[9px] font-bold text-slate-600 border-b border-slate-100 pb-1.5">
-                    <span className="bg-slate-100 px-1.5 py-0.5 rounded font-mono">⏱ 08:24</span>
-                    <span>7 / 10</span>
-                    <span className="text-slate-400">Exit</span>
-                  </div>
-
-                  <div>
-                    <h5 className="font-bold text-[10px] text-slate-900 leading-tight">
-                      Which of the following is a multiple of 6?
-                    </h5>
-                  </div>
-
-                  {/* Options */}
-                  <div className="space-y-1 text-[9px]">
-                    <div className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
-                      <span>A  14</span>
-                    </div>
-                    <div className="p-1.5 rounded-lg border border-emerald-500 bg-emerald-50 font-bold text-emerald-950 flex items-center justify-between">
-                      <span>B  18</span>
-                      <Check className="w-3 h-3 text-emerald-600" />
-                    </div>
-                    <div className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
-                      <span>C  20</span>
-                    </div>
-                    <div className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
-                      <span>D  22</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Test Nav Buttons */}
-                <div className="flex justify-between pt-2 border-t border-slate-100">
-                  <button className="px-2.5 py-1 rounded border border-slate-200 text-slate-600 font-bold text-[8px]">
-                    Previous
-                  </button>
-                  <button className="px-3.5 py-1 rounded bg-[#0080FF] text-white font-bold text-[8px]">
-                    Next
-                  </button>
-                </div>
-              </div>
-
-              {/* Mobile Phone Yellow Badge */}
-              <div className="absolute -bottom-6 left-0 bg-[#FACC15] text-slate-950 px-3 py-1.5 rounded-2xl shadow-2xl z-20 max-w-[170px]">
-                <div className="font-extrabold text-xs tracking-tight">Mobile Phone</div>
-                <div className="text-[9px] font-medium leading-snug">
-                  Touch-friendly, native-app feel with bottom navigation.
-                </div>
-              </div>
-
-              {/* Practice Test Yellow Badge */}
-              <div className="absolute -bottom-6 right-0 bg-[#FACC15] text-slate-950 px-3 py-1.5 rounded-2xl shadow-2xl z-20 max-w-[160px]">
-                <div className="font-extrabold text-xs tracking-tight">Practice Test</div>
-                <div className="text-[9px] font-medium leading-snug">
-                  Clean, focused interface for students.
+                  )}
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* =====================================================================
-              BOTTOM FULL-WIDTH FEATURE RIBBON STRIP (MATCHES SCREENSHOT EXACTLY)
-          ====================================================================== */}
-          <div className="mt-12 pt-6 border-t border-white/[0.08]">
-            <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4 shadow-xl">
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center text-xs">
-                <div className="flex flex-col items-center gap-1.5">
-                  <Tv className="w-5 h-5 text-cyan-400" />
-                  <span className="font-bold text-white text-[11px]">Works on all devices</span>
-                  <span className="text-[10px] text-slate-400">(Phone, Tablet, Laptop, TV)</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5">
-                  <Wifi className="w-5 h-5 text-blue-400" />
-                  <span className="font-bold text-white text-[11px]">Installable PWA</span>
-                  <span className="text-[10px] text-slate-400">(Like a native app)</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5">
-                  <Cloud className="w-5 h-5 text-indigo-400" />
-                  <span className="font-bold text-white text-[11px]">Offline practice</span>
-                  <span className="text-[10px] text-slate-400">(Where supported)</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5">
-                  <Bot className="w-5 h-5 text-purple-400" />
-                  <span className="font-bold text-white text-[11px]">AI Tutor (SI)</span>
-                  <span className="text-[10px] text-slate-400">Instant explanations</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                  <span className="font-bold text-white text-[11px]">Safe & secure payments</span>
-                  <span className="text-[10px] text-slate-400">(₹20 per test, subscriptions)</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5">
-                  <BarChart3 className="w-5 h-5 text-amber-400" />
-                  <span className="font-bold text-white text-[11px]">Progress & insights</span>
-                  <span className="text-[10px] text-slate-400">(For students and parents)</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5">
-                  <Globe2 className="w-5 h-5 text-cyan-300" />
-                  <span className="font-bold text-white text-[11px]">Scales from school tests</span>
-                  <span className="text-[10px] text-slate-400">to JEE, NEET, UPSC and more</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </main>
-      )}
+      </div>
+    )
+  }
 
-      {/* =========================================================================
-          MODE 2: FULLSCREEN TV EXPERIENCE ZOOM
-      ========================================================================== */}
-      {activeSurface === 'tv' && (
-        <main className="flex-1 max-w-[1440px] w-full mx-auto p-6 lg:p-10 flex flex-col justify-between animate-in fade-in">
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
-            <span className="font-bold text-cyan-400 text-sm">TV 10-Foot Remote Navigation Mode</span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setActiveSurface('showcase')}
-              className="border-white/20 text-white text-xs"
-            >
-              Return to Multi-Device Showcase
-            </Button>
-          </div>
+  // =========================================================================
+  // VIEW: MAIN LEARNER DASHBOARD (BRIGHT, NATURAL, CLEAN UI)
+  // =========================================================================
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex flex-col">
+      {/* ---------------------------------------------------------------------
+          TOP NAVIGATION BAR (CLEAN WHITE WITH TALENTXCEL LOGO)
+      ---------------------------------------------------------------------- */}
+      <header className="sticky top-0 z-30 bg-white border-b border-slate-200/80 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Logo & Sub-tag */}
+          <div className="flex items-center gap-6">
+            <Link href="/" className="flex flex-col">
+              <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-none">
+                Talent<span className="text-[#0080FF]">Xcel</span>
+              </span>
+              <span className="text-[10px] font-semibold text-slate-400 tracking-wider">
+                Learn • Practise • Grow
+              </span>
+            </Link>
 
-          {/* Fullscreen TV View */}
-          <div className="space-y-6 my-6">
-            <div className="rounded-3xl bg-gradient-to-r from-[#0C1636] via-[#0E2A68] to-[#124294] p-8 border border-[#2A365D] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="space-y-4 max-w-lg">
-                <span className="text-xs font-bold text-cyan-300 uppercase tracking-widest">Welcome</span>
-                <h1 className="text-4xl font-black text-white leading-tight">
-                  Keep Learning,<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-[#00D2FF]">
-                    Keep Growing
-                  </span>
-                </h1>
-                <p className="text-sm text-neutral-200">
-                  Syllabus-aligned practice tests, explanations and personalised learning for school and competitive exams.
-                </p>
-                <button
-                  onClick={() => setActiveSurface('tablet')}
-                  className="px-6 py-3 rounded-full bg-white text-[#0B132B] font-black text-sm shadow-xl hover:scale-105 transition-all"
-                >
-                  Continue Practice &gt;
-                </button>
-              </div>
-
-              <div className="w-80 rounded-2xl bg-[#0B132B]/95 p-5 border border-cyan-400/30 shadow-2xl space-y-3">
-                <span className="font-bold text-cyan-300 text-xs">Upcoming Test</span>
-                <h4 className="font-extrabold text-sm text-white">Mathematics Ch - 6 Multiples</h4>
-                <p className="text-xs text-neutral-400">Grade IV • Mayoor School (PT 2)</p>
-                <button
-                  onClick={() => setActiveSurface('tablet')}
-                  className="w-full py-2 bg-[#0080FF] text-white font-bold rounded-xl text-xs"
-                >
-                  Start Practice
-                </button>
-              </div>
-            </div>
-          </div>
-        </main>
-      )}
-
-      {/* =========================================================================
-          MODE 3: FULLSCREEN LAPTOP / DESKTOP ZOOM
-      ========================================================================== */}
-      {activeSurface === 'desktop' && (
-        <main className="flex-1 max-w-6xl w-full mx-auto p-6 space-y-6 animate-in fade-in">
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
-            <span className="font-bold text-cyan-400 text-sm">Laptop / Desktop Dashboard Mode</span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setActiveSurface('showcase')}
-              className="border-white/20 text-white text-xs"
-            >
-              Return to Multi-Device Showcase
-            </Button>
-          </div>
-
-          <div className="bg-white text-slate-900 rounded-3xl p-6 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-              <div>
-                <h3 className="font-extrabold text-xl text-slate-900">
-                  Grade IV • Mayoor School, Noida • Periodic Test 2
-                </h3>
-                <p className="text-xs text-slate-500">Student: Arshid • Roll #07</p>
-              </div>
+            {/* Main Navigation Links */}
+            <nav className="hidden md:flex items-center gap-1 text-xs font-semibold">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0080FF] text-white font-bold shadow-xs">
+                <Home className="w-3.5 h-3.5" />
+                <span>Home</span>
+              </button>
               <button
-                onClick={() => setActiveSurface('tablet')}
-                className="px-5 py-2.5 rounded-xl bg-[#0080FF] text-white font-bold text-xs"
+                onClick={() => handleStartFreeTest('math')}
+                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
-                Launch Assessment &gt;
+                My Learning
+              </button>
+              <button
+                onClick={() => handleStartFreeTest('math')}
+                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                Tests
+              </button>
+              <a
+                href="#subjects-section"
+                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                Subjects
+              </a>
+              <a
+                href="#progress-section"
+                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                Results
+              </a>
+              <Link
+                href="/admissions"
+                className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                Plans
+              </Link>
+            </nav>
+          </div>
+
+          {/* Search Bar, Notifications & User Avatar */}
+          <div className="flex items-center gap-3">
+            <div className="relative hidden sm:block w-48 md:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search for subjects, tests..."
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-100 border border-transparent rounded-lg text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0080FF] focus:outline-hidden transition-all"
+              />
+            </div>
+
+            <button
+              aria-label="Notifications"
+              className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 relative"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="w-2 h-2 rounded-full bg-[#0080FF] absolute top-1.5 right-1.5" />
+            </button>
+
+            <Link href="/login">
+              <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:ring-2 hover:ring-[#0080FF]/30 transition-all">
+                A
+              </div>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* ---------------------------------------------------------------------
+          SUB-HEADER: BREADCRUMB & CLASS / BOARD SELECTOR
+      ---------------------------------------------------------------------- */}
+      <div className="bg-white border-b border-slate-200/80 px-4 py-2.5 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 font-medium text-slate-700">
+            <span className="font-bold text-slate-900">Grade IV</span>
+            <span className="text-slate-300">•</span>
+            <span>Mayoor School, Noida</span>
+            <span className="text-slate-300">•</span>
+            <span className="text-slate-500">Periodic Test 2 (CBSE 2026-27 Aligned)</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold text-[11px] py-0.5">
+              Free Practice Live (No Sign-Up)
+            </Badge>
+            <button
+              onClick={() => setIsClassModalOpen(true)}
+              className="text-[#0080FF] hover:underline font-bold text-xs flex items-center gap-0.5"
+            >
+              Change <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Class & Board Selection Modal */}
+      {isClassModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="font-extrabold text-slate-900 text-base">Select Class & Curriculum Board</h3>
+              <button
+                onClick={() => setIsClassModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold"
+              >
+                ✕
               </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {[
-                { title: 'Mathematics', tests: '3/10', color: 'bg-amber-50 border-amber-200 text-amber-700' },
-                { title: 'Science', tests: '3/8', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-                { title: 'English', tests: '4/10', color: 'bg-blue-50 border-blue-200 text-blue-700' },
-                { title: 'Hindi', tests: '1/8', color: 'bg-rose-50 border-rose-200 text-rose-700' },
-                { title: 'Social Science', tests: '2/6', color: 'bg-purple-50 border-purple-200 text-purple-700' },
-              ].map((s) => (
-                <div key={s.title} className={`p-4 rounded-2xl border ${s.color}`}>
-                  <div className="font-bold text-sm">{s.title}</div>
-                  <div className="text-xs mt-1">{s.tests} completed</div>
-                </div>
-              ))}
+            {/* Board Selector */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                Curriculum Board
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {SEED_BOARDS.map((board) => (
+                  <button
+                    key={board.id}
+                    onClick={() => setSelectedBoardId(board.id)}
+                    className={`p-2.5 rounded-xl border text-left text-xs font-bold transition-all ${
+                      selectedBoardId === board.id
+                        ? 'border-[#0080FF] bg-blue-50/60 text-[#0080FF]'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <div>{board.code}</div>
+                    <span className="text-[10px] font-normal text-slate-400 capitalize">
+                      {board.status}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Class Selector (Classes 3 to 12) */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                Academic Grade / Class
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {SEED_CLASSES.map((cls) => (
+                  <button
+                    key={cls.id}
+                    onClick={() => setSelectedClassId(cls.id)}
+                    className={`py-2 rounded-xl border text-center text-xs font-bold transition-all ${
+                      selectedClassId === cls.id
+                        ? 'border-[#0080FF] bg-blue-50/60 text-[#0080FF]'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    {cls.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <Button
+                onClick={() => setIsClassModalOpen(false)}
+                className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs"
+              >
+                Save & Apply
+              </Button>
             </div>
           </div>
-        </main>
+        </div>
       )}
 
-      {/* =========================================================================
-          MODE 4: FULLSCREEN TABLET SPLIT-SCREEN ZOOM
-      ========================================================================== */}
-      {activeSurface === 'tablet' && (
-        <main className="flex-1 max-w-5xl w-full mx-auto p-6 space-y-6 animate-in fade-in">
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
-            <span className="font-bold text-cyan-400 text-sm">Tablet Two-Column Practice Mode</span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setActiveSurface('showcase')}
-              className="border-white/20 text-white text-xs"
-            >
-              Return to Multi-Device Showcase
-            </Button>
+      {/* ---------------------------------------------------------------------
+          MAIN CONTENT AREA
+      ---------------------------------------------------------------------- */}
+      <main className="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8 flex-1">
+        {/* ===================================================================
+            SECTION 1: HERO / WELCOME BANNER (MATCHING REFERENCE IMAGE)
+        ==================================================================== */}
+        <section className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md">
+          {/* Subtle background decoration */}
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none flex items-center justify-center">
+            <Sparkles className="w-72 h-72 text-white" />
           </div>
 
-          <div className="rounded-3xl bg-white text-slate-900 p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <div>
-                <span className="text-xs font-bold text-[#0080FF] uppercase">Mathematics &gt; Ch - 6 Multiples</span>
-                <h3 className="font-black text-xl text-slate-900 mt-1">Periodic Test 2 Diagnostic</h3>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="bg-slate-100 px-3 py-1 rounded-lg border border-slate-200 font-mono font-bold text-slate-800 text-sm">
-                  ⏱ {formatTimer(timeRemainingSeconds)}
+          <div className="relative z-10 max-w-2xl space-y-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-200">
+              Welcome • Grade 4 Assessment Platform
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+              Keep Learning, <br />
+              <span className="text-cyan-200">Keep Growing</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+              Syllabus-aligned practice tests, step-by-step explanations and instant evaluation for school
+              and competitive exams. Start free with zero sign-up required.
+            </p>
+
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Button
+                onClick={() => handleStartFreeTest('math')}
+                className="bg-white hover:bg-slate-100 text-blue-700 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-xs"
+              >
+                Continue Practice →
+              </Button>
+              <a
+                href="#upcoming-tests-section"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white/90 hover:text-white px-3 py-2"
+              >
+                <span>View Scheduled Tests</span>
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ===================================================================
+            SECTION 2: SUBJECT CARDS (SOFT PASTELS MATCHING REFERENCE IMAGE)
+        ==================================================================== */}
+        <section id="subjects-section" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Academic Subjects</h2>
+              <p className="text-xs text-slate-500">
+                Grade IV • 5 Free Questions Per Subject • Tracked Independently
+              </p>
+            </div>
+            <Badge variant="outline" className="text-xs text-slate-600 hidden sm:inline-flex">
+              5 Free School Tests Available
+            </Badge>
+          </div>
+
+          {/* 5 Distinct Subject Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {SEED_GRADE4_SUBJECTS.map((subject) => {
+              const cfg = SUBJECT_CONFIGS[subject.code] || SUBJECT_CONFIGS.math
+              const isCompleted = !!completedFreeSubjects[subject.code]
+
+              return (
+                <div
+                  key={subject.id}
+                  className={`rounded-2xl border p-5 transition-all shadow-2xs hover:shadow-md flex flex-col justify-between ${cfg.bg} ${cfg.border}`}
+                >
+                  <div className="space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center">
+                      {cfg.icon}
+                    </div>
+
+                    <div>
+                      <h3 className="font-extrabold text-base text-slate-900">{subject.name}</h3>
+                      <p className="text-[11px] font-medium text-slate-500 mt-0.5">
+                        Practice • Tests • Revision
+                      </p>
+                    </div>
+
+                    <div className="text-[11px] text-slate-600 line-clamp-2">
+                      {subject.description}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 mt-2 border-t border-slate-200/50 space-y-2.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold">
+                      <span className="text-slate-500">5 Free Questions</span>
+                      {isCompleted ? (
+                        <span className="text-emerald-700 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Completed
+                        </span>
+                      ) : (
+                        <span className="text-amber-700">Available</span>
+                      )}
+                    </div>
+
+                    <Button
+                      onClick={() => handleStartFreeTest(subject.code)}
+                      size="sm"
+                      className="w-full bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs py-2 shadow-xs"
+                    >
+                      {isCompleted ? 'Practice Again' : 'Start Free Practice'}
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ===================================================================
+            SECTION 3: ANALYTICAL SKILLS & APTITUDE TRACK (INDEPENDENT TRACK)
+        ==================================================================== */}
+        <section className="bg-gradient-to-br from-indigo-50/70 via-white to-cyan-50/70 rounded-2xl border border-indigo-200/80 p-6 shadow-xs">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1.5 max-w-xl">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-indigo-600 text-white font-bold text-[10px] uppercase tracking-wide">
+                  Independent Track
+                </Badge>
+                <span className="text-xs font-semibold text-indigo-700">
+                  Classes 4–12 & Olympiad Readiness
                 </span>
-                <span className="font-bold text-slate-700">7 / 10</span>
               </div>
+              <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                Analytical Reasoning & Aptitude Drills
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Number series patterns, coding-decoding, odd-one-out, clock angles, and deductive reasoning.
+                Includes 8 free diagnostic questions with zero sign-up required.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Question */}
-              <div className="space-y-4">
-                <span className="text-xs font-bold text-[#0080FF] uppercase">Question 7</span>
-                <h4 className="font-bold text-slate-900 text-lg">
-                  Which of the following numbers is a multiple of 6?
-                </h4>
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+              <div className="text-right hidden sm:block">
+                <span className="block text-xs font-bold text-indigo-950">8 Free Questions</span>
+                <span className="block text-[11px] text-slate-500">No account needed</span>
+              </div>
+              <Button
+                onClick={() => handleStartFreeTest('aptitude')}
+                className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-5 py-2.5 shadow-xs"
+              >
+                Start Free Analytical Practice →
+              </Button>
+            </div>
+          </div>
+        </section>
 
-                <div className="space-y-2 pt-2">
-                  {[
-                    { id: 'opt_7a', label: 'A', text: '14' },
-                    { id: 'opt_7b', label: 'B', text: '18' },
-                    { id: 'opt_7c', label: 'C', text: '20' },
-                    { id: 'opt_7d', label: 'D', text: '22' },
-                  ].map((opt) => {
-                    const isSelected = selectedOptionId === opt.id
-                    return (
-                      <div
-                        key={opt.id}
-                        onClick={() => setSelectedOptionId(opt.id)}
-                        className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                          isSelected
-                            ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-bold shadow-md'
-                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
-                              isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'
-                            }`}
-                          >
-                            {opt.label}
-                          </span>
-                          <span className="text-sm">{opt.text}</span>
-                        </div>
-                        {isSelected && <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />}
-                      </div>
-                    )
-                  })}
-                </div>
+        {/* ===================================================================
+            SECTION 4: TWO-COLUMN SECTION (UPCOMING TESTS & PROGRESS)
+        ==================================================================== */}
+        <div id="upcoming-tests-section" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Scheduled / Available Tests (7 Columns) */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">Upcoming Tests</h3>
+                <p className="text-xs text-slate-500">Scheduled school & curriculum periodic tests</p>
+              </div>
+              <button
+                onClick={() => handleStartFreeTest('math')}
+                className="text-xs font-bold text-[#0080FF] hover:underline"
+              >
+                View All &gt;
+              </button>
+            </div>
 
-                <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs space-y-1">
-                  <div className="font-bold flex items-center gap-1.5 text-emerald-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Correct!
+            <div className="space-y-3">
+              {/* Test 1: Mathematics Ch 6 Multiples */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                    <Calculator className="w-5 h-5 text-amber-600" />
                   </div>
-                  <p>6 × 3 = 18, so 18 is a multiple of 6.</p>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-400 uppercase">17 Nov 2026</span>
+                    <h4 className="font-bold text-sm text-slate-900">Mathematics — Ch - 6 Multiples</h4>
+                    <span className="text-xs text-slate-500">Grade IV • Mayoor School PT 2</span>
+                  </div>
                 </div>
+                <Button
+                  onClick={() => handleStartFreeTest('math')}
+                  size="sm"
+                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
+                >
+                  Start
+                </Button>
               </div>
 
-              {/* Explanation */}
-              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 space-y-4">
-                <div className="flex items-center gap-2 border-b border-slate-200 pb-2 font-bold text-xs">
-                  <button className="px-3 py-1 rounded bg-[#0080FF] text-white">Explanation</button>
-                  <button className="px-3 py-1 rounded text-slate-500">Hint</button>
-                  <button className="px-3 py-1 rounded text-slate-500">Related</button>
+              {/* Test 2: Science Unit 5 Force & Magnetism */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+                    <FlaskConical className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-400 uppercase">19 Nov 2026</span>
+                    <h4 className="font-bold text-sm text-slate-900">
+                      Science — Unit 5 Force & Magnetism
+                    </h4>
+                    <span className="text-xs text-slate-500">Grade IV • Contact vs Non-Contact Forces</span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => handleStartFreeTest('science')}
+                  size="sm"
+                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
+                >
+                  Start
+                </Button>
+              </div>
+
+              {/* Test 3: English Ch 8 Pied Piper */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                    <BookOpen className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-400 uppercase">23 Nov 2026</span>
+                    <h4 className="font-bold text-sm text-slate-900">
+                      English — Ch - 8 The Pied Piper of Hamelin
+                    </h4>
+                    <span className="text-xs text-slate-500">Grade IV • Narrative & Grammar</span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => handleStartFreeTest('english')}
+                  size="sm"
+                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
+                >
+                  Start
+                </Button>
+              </div>
+
+              {/* Test 4: Hindi पाठ 11 प्यारा भारत */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+                    <span className="text-base font-bold text-rose-600">अ</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-400 uppercase">25 Nov 2026</span>
+                    <h4 className="font-bold text-sm text-slate-900">Hindi — पाठ 11 प्यारा भारत</h4>
+                    <span className="text-xs text-slate-500">Grade IV • कविता भावार्थ एवं व्याकरण</span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => handleStartFreeTest('hindi')}
+                  size="sm"
+                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
+                >
+                  Start
+                </Button>
+              </div>
+
+              {/* Test 5: Social Science Ch 8 Agriculture */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex items-center justify-between gap-4 hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+                    <Compass className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-400 uppercase">27 Nov 2026</span>
+                    <h4 className="font-bold text-sm text-slate-900">
+                      Social Science — Ch - 8 Our Agriculture
+                    </h4>
+                    <span className="text-xs text-slate-500">Grade IV • Kharif, Rabi & Irrigation</span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => handleStartFreeTest('social_science')}
+                  size="sm"
+                  className="bg-[#0080FF] hover:bg-[#0070E0] text-white font-bold text-xs px-4"
+                >
+                  Start
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Your Progress & Recommended (5 Columns) */}
+          <div id="progress-section" className="lg:col-span-5 space-y-6">
+            {/* Progress Card (Matching Donut 60% from Reference Screenshot) */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-slate-900 text-sm">Your Progress</h3>
+                <span className="text-xs font-semibold text-slate-500">Class 4 Term 2</span>
+              </div>
+
+              <div className="flex items-center gap-6">
+                {/* Circular Donut Indicator */}
+                <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      className="text-slate-100"
+                      strokeWidth="3.5"
+                      stroke="currentColor"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className="text-emerald-500"
+                      strokeDasharray="60, 100"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      stroke="currentColor"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <div className="absolute text-center">
+                    <span className="text-xl font-extrabold text-slate-900">60%</span>
+                  </div>
                 </div>
 
-                <div className="space-y-2 text-xs text-slate-700">
-                  <h5 className="font-bold text-slate-900 text-sm">Step by step explanation</h5>
-                  <p>Multiples of 6 are numbers obtained by multiplying 6 by whole numbers.</p>
-                  <div className="space-y-1 font-mono p-3 rounded-xl bg-white border border-slate-200 text-slate-800">
-                    <div>6 × 1 = 6</div>
-                    <div>6 × 2 = 12</div>
-                    <div className="font-bold text-emerald-600">6 × 3 = 18</div>
-                    <div>6 × 4 = 24</div>
-                  </div>
-                  <p>So, 18 is a multiple of 6.</p>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs space-y-1">
-                  <div className="font-bold text-amber-800 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-amber-600" /> Key Point
-                  </div>
-                  <p className="text-[11px] leading-relaxed">
-                    A number is a multiple of 6 if it appears in the 6-times table: 6, 12, 18, 24, 30 ...
+                <div className="space-y-1">
+                  <span className="text-xs font-bold text-slate-900">Tests Completed</span>
+                  <div className="text-2xl font-black text-slate-900">6 / 10</div>
+                  <p className="text-[11px] text-slate-500 leading-tight">
+                    Great pace! You are on track for your upcoming school periodic tests.
                   </p>
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      )}
 
-      {/* =========================================================================
-          MODE 5: FULLSCREEN MOBILE PHONE ZOOM
-      ========================================================================== */}
-      {activeSurface === 'mobile' && (
-        <main className="flex-1 max-w-sm w-full mx-auto p-6 space-y-6 animate-in fade-in">
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
-            <span className="font-bold text-cyan-400 text-sm">Mobile App View</span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setActiveSurface('showcase')}
-              className="border-white/20 text-white text-xs"
-            >
-              Back to Showcase
-            </Button>
-          </div>
-
-          <div className="rounded-[40px] border-[10px] border-[#1C2234] bg-white text-slate-900 p-4 shadow-2xl space-y-4">
-            <div className="flex justify-between items-center text-xs text-slate-500 pt-1">
-              <span>10:24</span>
-              <span className="font-bold text-slate-800">Class IV ▾</span>
-              <Bell className="w-4 h-4" />
+            {/* Recommended For You Card */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+              <h3 className="font-bold text-slate-900 text-sm">Recommended for You</h3>
+              <div className="space-y-2 text-xs">
+                <button
+                  onClick={() => handleStartFreeTest('math')}
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
+                >
+                  <span>Division — Practice Test</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+                <button
+                  onClick={() => handleStartFreeTest('science')}
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
+                >
+                  <span>Friction — Quick Quiz</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+                <button
+                  onClick={() => handleStartFreeTest('english')}
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
+                >
+                  <span>The Pied Piper — Literature Reading</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+                <button
+                  onClick={() => handleStartFreeTest('hindi')}
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-left transition-colors font-medium text-slate-700"
+                >
+                  <span>पर्यायवाची एवं विलोम — त्वरित अभ्यास</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              </div>
             </div>
+          </div>
+        </div>
 
+        {/* ===================================================================
+            SECTION 5: VERIFIABLE QUESTION PIPELINE AUDIT SUMMARY
+        ==================================================================== */}
+        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
             <div>
-              <h4 className="font-black text-sm text-slate-900">Good Morning Arshid</h4>
-              <p className="text-[10px] text-slate-500">Mayoor School Noida</p>
+              <h3 className="font-extrabold text-sm text-slate-900">
+                Operational Content Pipeline & Transparency Audit
+              </h3>
+              <p className="text-xs text-slate-500">
+                Targeting 60,000 validated curriculum questions • Reporting actual live verified counts
+              </p>
+            </div>
+            <Badge className="bg-slate-100 text-slate-800 text-xs px-2.5 py-0.5 font-bold">
+              Unpadded Metrics
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div className="p-3 bg-slate-50 rounded-xl">
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">
+                Published & Live
+              </span>
+              <span className="text-xl sm:text-2xl font-black text-[#0080FF]">
+                {pipelineReport.actualPublishedCount}
+              </span>
+              <span className="text-[10px] text-slate-400 block">Verified questions</span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] text-slate-400 font-semibold block">Your Learning Progress</span>
-                <span className="text-xs font-bold text-slate-800">6/10 tests completed</span>
-              </div>
-              <div className="w-9 h-9 rounded-full border-2 border-emerald-500 flex items-center justify-center font-bold text-xs text-slate-800">
-                60%
-              </div>
+            <div className="p-3 bg-slate-50 rounded-xl">
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">
+                Content Target
+              </span>
+              <span className="text-xl sm:text-2xl font-black text-slate-900">60,000</span>
+              <span className="text-[10px] text-slate-400 block">Roadmap pipeline</span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
-              <span className="text-[10px] font-bold text-amber-700 uppercase block">Continue Practice</span>
-              <h5 className="font-bold text-xs text-slate-900">Mathematics Ch - 6 Multiples</h5>
-              <button
-                onClick={() => setActiveSurface('tablet')}
-                className="w-full py-2 bg-[#0080FF] text-white rounded-xl font-bold text-xs"
-              >
-                Start Practice
-              </button>
+            <div className="p-3 bg-slate-50 rounded-xl">
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">
+                In Editorial Review
+              </span>
+              <span className="text-xl sm:text-2xl font-black text-amber-600">
+                {pipelineReport.actualInReviewCount}
+              </span>
+              <span className="text-[10px] text-slate-400 block">Quality checks</span>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl">
+              <span className="text-[11px] font-bold text-slate-500 block uppercase">
+                Duplicates Rejected
+              </span>
+              <span className="text-xl sm:text-2xl font-black text-rose-600">
+                {pipelineReport.duplicateRejectedCount}
+              </span>
+              <span className="text-[10px] text-slate-400 block">Fingerprint hash</span>
             </div>
           </div>
-        </main>
-      )}
+        </section>
+
+        {/* ===================================================================
+            SECTION 6: BOTTOM VALUE PROPOSITION BAR (MATCHING REFERENCE IMAGE)
+        ==================================================================== */}
+        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+            <div className="space-y-1.5 p-2">
+              <Laptop className="w-5 h-5 text-blue-600 mx-auto" />
+              <h5 className="font-bold text-xs text-slate-900">All Devices</h5>
+              <p className="text-[10px] text-slate-500">Phone, Tablet, Laptop, TV</p>
+            </div>
+
+            <div className="space-y-1.5 p-2">
+              <Smartphone className="w-5 h-5 text-emerald-600 mx-auto" />
+              <h5 className="font-bold text-xs text-slate-900">Installable PWA</h5>
+              <p className="text-[10px] text-slate-500">Like a native app</p>
+            </div>
+
+            <div className="space-y-1.5 p-2">
+              <RotateCcw className="w-5 h-5 text-amber-600 mx-auto" />
+              <h5 className="font-bold text-xs text-slate-900">Offline Practice</h5>
+              <p className="text-[10px] text-slate-500">Where supported</p>
+            </div>
+
+            <div className="space-y-1.5 p-2">
+              <Sparkles className="w-5 h-5 text-purple-600 mx-auto" />
+              <h5 className="font-bold text-xs text-slate-900">AI Tutor</h5>
+              <p className="text-[10px] text-slate-500">Instant explanations</p>
+            </div>
+
+            <div className="space-y-1.5 p-2">
+              <ShieldCheck className="w-5 h-5 text-blue-600 mx-auto" />
+              <h5 className="font-bold text-xs text-slate-900">Secure Payments</h5>
+              <p className="text-[10px] text-slate-500">₹20 per test pass</p>
+            </div>
+
+            <div className="space-y-1.5 p-2">
+              <BarChart3 className="w-5 h-5 text-emerald-600 mx-auto" />
+              <h5 className="font-bold text-xs text-slate-900">Deep Insights</h5>
+              <p className="text-[10px] text-slate-500">Students & Parents</p>
+            </div>
+
+            <div className="space-y-1.5 p-2 col-span-2 md:col-span-2 lg:col-span-1">
+              <GraduationCap className="w-5 h-5 text-indigo-600 mx-auto" />
+              <h5 className="font-bold text-xs text-slate-900">Scales Seamlessly</h5>
+              <p className="text-[10px] text-slate-500">School to JEE & NEET</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ---------------------------------------------------------------------
+          FOOTER
+      ---------------------------------------------------------------------- */}
+      <footer className="bg-white border-t border-slate-200 mt-12 py-8 px-4 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto space-y-2">
+          <p className="font-bold text-slate-800">
+            TalentXcel — Universal Learning, Assessment & Skills Platform
+          </p>
+          <p>
+            Aligned with National Education Policy (NEP 2020), CBSE, CISCE/ICSE, and International Baccalaureate.
+          </p>
+          <p className="text-[11px] text-slate-400">
+            © 2026 TalentXcel. All rights reserved. Free practice is provided without authentication or payment requirements.
+          </p>
+        </div>
+      </footer>
+
+      {/* Floating Admissions Assistant Widget */}
+      <AdmissionsAssistantWidget />
     </div>
   )
 }

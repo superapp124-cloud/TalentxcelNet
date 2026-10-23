@@ -377,6 +377,59 @@ export const SEED_CHAPTERS: Chapter[] = [
     totalTopics: 3,
     status: 'verified',
   },
+
+  // Class 4 English
+  {
+    id: 'chap_g4_eng_c8',
+    subjectId: 'subj_g4_eng',
+    chapterNumber: 8,
+    title: 'Ch - 8 The Pied Piper of Hamelin',
+    description: 'Literature narrative, character analysis, adverbs, past tense verbs and vocabulary.',
+    totalTopics: 3,
+    status: 'verified',
+  },
+
+  // Class 4 Hindi
+  {
+    id: 'chap_g4_hin_c11',
+    subjectId: 'subj_g4_hin',
+    chapterNumber: 11,
+    title: 'पाठ 11 प्यारा भारत',
+    description: 'कविता भावार्थ, पठन, पर्यायवाची, विलोम शब्द, व्यक्तिवाचक संज्ञा एवं शुद्ध वर्तनी।',
+    totalTopics: 3,
+    status: 'verified',
+  },
+
+  // Class 4 Social Science
+  {
+    id: 'chap_g4_sst_c8',
+    subjectId: 'subj_g4_sst',
+    chapterNumber: 8,
+    title: 'Ch - 8 Our Agriculture',
+    description: 'Kharif and Rabi crop seasons, staple food grains, cash crops, canals and Green Revolution.',
+    totalTopics: 3,
+    status: 'verified',
+  },
+
+  // Aptitude
+  {
+    id: 'chap_apt_lr',
+    subjectId: 'subj_aptitude',
+    chapterNumber: 1,
+    title: 'Logical Reasoning Drills',
+    description: 'Series patterns, coding-decoding, odd-one-out and syllogistic deductions.',
+    totalTopics: 3,
+    status: 'verified',
+  },
+  {
+    id: 'chap_apt_qa',
+    subjectId: 'subj_aptitude',
+    chapterNumber: 2,
+    title: 'Quantitative Aptitude Drills',
+    description: 'Mental arithmetic, clock angles, speed-distance and percentage problems.',
+    totalTopics: 3,
+    status: 'verified',
+  },
 ]
 
 export const SEED_TOPICS: Topic[] = [
@@ -385,13 +438,114 @@ export const SEED_TOPICS: Topic[] = [
   { id: 'top_g4_m6_3', chapterId: 'chap_g4_math_c6', title: 'Common Multiples & LCM Basics', status: 'verified' },
   { id: 'top_g4_s5_1', chapterId: 'chap_g4_sci_u5', title: 'Contact vs Non-Contact Forces', status: 'verified' },
   { id: 'top_g4_s5_2', chapterId: 'chap_g4_sci_u5', title: 'Magnetic Poles & Attraction', status: 'verified' },
+  { id: 'top_g4_e8_1', chapterId: 'chap_g4_eng_c8', title: 'Comprehension & Story Details', status: 'verified' },
+  { id: 'top_g4_e8_2', chapterId: 'chap_g4_eng_c8', title: 'Grammar: Adverbs & Verb Forms', status: 'verified' },
+  { id: 'top_g4_h11_1', chapterId: 'chap_g4_hin_c11', title: 'कविता भावार्थ एवं पठन', status: 'verified' },
+  { id: 'top_g4_h11_2', chapterId: 'chap_g4_hin_c11', title: 'व्याकरण: पर्यायवाची, विलोम एवं संज्ञा', status: 'verified' },
+  { id: 'top_g4_sst8_1', chapterId: 'chap_g4_sst_c8', title: 'Crops & Agricultural Seasons', status: 'verified' },
+  { id: 'top_g4_sst8_2', chapterId: 'chap_g4_sst_c8', title: 'Irrigation & Modern Farming', status: 'verified' },
   { id: 'top_g10_s1_1', chapterId: 'chap_g10_sci_c1', title: 'Balancing Chemical Equations', status: 'verified' },
   { id: 'top_g10_s1_2', chapterId: 'chap_g10_sci_c1', title: 'Redox Reactions & Corrosion', status: 'verified' },
   { id: 'top_apt_lr_1', chapterId: 'chap_apt_lr', title: 'Number & Letter Series Patterns', status: 'verified' },
   { id: 'top_apt_qa_1', chapterId: 'chap_apt_qa', title: 'Percentages and Fraction Equivalents', status: 'verified' },
+  { id: 'top_apt_patterns', chapterId: 'chap_apt_lr', title: 'Odd-One-Out & Spatial Shapes', status: 'verified' },
+  { id: 'top_apt_deduction', chapterId: 'chap_apt_lr', title: 'Logical Deduction & Compass Direction', status: 'verified' },
 ]
 
 export const SEED_BLUEPRINTS: AssessmentBlueprint[] = [
+  // Free 5-Question Diagnostics for Grade 4
+  {
+    id: 'bp_free_g4_math',
+    title: 'Grade IV Mathematics — Multiples Free Diagnostic Test',
+    subjectId: 'subj_g4_math',
+    chapterId: 'chap_g4_math_c6',
+    durationMinutes: 10,
+    totalQuestions: 5,
+    totalMarks: 10,
+    negativeMarkingRatio: 0.0,
+    passingPercentage: 60,
+    rewardCreditAmount: 20,
+    examType: 'periodic_test',
+    category: 'academic',
+    difficulty: 'easy',
+  },
+  {
+    id: 'bp_free_g4_sci',
+    title: 'Grade IV Science — Force & Magnetism Free Diagnostic Test',
+    subjectId: 'subj_g4_sci',
+    chapterId: 'chap_g4_sci_u5',
+    durationMinutes: 10,
+    totalQuestions: 5,
+    totalMarks: 10,
+    negativeMarkingRatio: 0.0,
+    passingPercentage: 60,
+    rewardCreditAmount: 20,
+    examType: 'periodic_test',
+    category: 'academic',
+    difficulty: 'easy',
+  },
+  {
+    id: 'bp_free_g4_eng',
+    title: 'Grade IV English — The Pied Piper of Hamelin Free Diagnostic',
+    subjectId: 'subj_g4_eng',
+    chapterId: 'chap_g4_eng_c8',
+    durationMinutes: 10,
+    totalQuestions: 5,
+    totalMarks: 10,
+    negativeMarkingRatio: 0.0,
+    passingPercentage: 60,
+    rewardCreditAmount: 20,
+    examType: 'periodic_test',
+    category: 'academic',
+    difficulty: 'easy',
+  },
+  {
+    id: 'bp_free_g4_hin',
+    title: 'Grade IV Hindi — पाठ 11 प्यारा भारत Free Diagnostic Test',
+    subjectId: 'subj_g4_hin',
+    chapterId: 'chap_g4_hin_c11',
+    durationMinutes: 10,
+    totalQuestions: 5,
+    totalMarks: 10,
+    negativeMarkingRatio: 0.0,
+    passingPercentage: 60,
+    rewardCreditAmount: 20,
+    examType: 'periodic_test',
+    category: 'academic',
+    difficulty: 'easy',
+  },
+  {
+    id: 'bp_free_g4_sst',
+    title: 'Grade IV Social Studies — Our Agriculture Free Diagnostic Test',
+    subjectId: 'subj_g4_sst',
+    chapterId: 'chap_g4_sst_c8',
+    durationMinutes: 10,
+    totalQuestions: 5,
+    totalMarks: 10,
+    negativeMarkingRatio: 0.0,
+    passingPercentage: 60,
+    rewardCreditAmount: 20,
+    examType: 'periodic_test',
+    category: 'academic',
+    difficulty: 'easy',
+  },
+  {
+    id: 'bp_free_aptitude',
+    title: 'Analytical Skills & Logical Reasoning Free Drill',
+    subjectId: 'subj_aptitude',
+    durationMinutes: 15,
+    totalQuestions: 8,
+    totalMarks: 16,
+    negativeMarkingRatio: 0.0,
+    passingPercentage: 60,
+    rewardCreditAmount: 20,
+    examType: 'aptitude_drill',
+    category: 'aptitude',
+    aptitudeSubcategory: 'logical_reasoning',
+    difficulty: 'medium',
+  },
+
+  // 10-Question Full Tests
   {
     id: 'bp_g4_math_pt2_c6',
     title: 'Grade IV Mathematics — Ch 6 Multiples Diagnostic Test',
@@ -469,7 +623,7 @@ export const SEED_BLUEPRINTS: AssessmentBlueprint[] = [
   },
 ]
 
-export const SEED_BLUEPRINT_MATH_C6 = SEED_BLUEPRINTS[0]
+export const SEED_BLUEPRINT_MATH_C6 = SEED_BLUEPRINTS.find((b) => b.id === 'bp_g4_math_pt2_c6')!
 
 // ============================================================================
 // 7. AUTHORIZED QUESTIONS (NEVER CONTAIN ANSWERS OR EXPLANATIONS)
@@ -722,6 +876,464 @@ export const SEED_AUTHORIZED_QUESTIONS: AuthorizedQuestion[] = [
       { id: 'opt_qa_1d', label: 'D', text: '280' },
     ],
   },
+
+  // --- GRADE IV SCIENCE (UNIT 5 FORCE & MAGNETISM) ---
+  {
+    id: 'q_g4_sci_01',
+    topicId: 'top_g4_s5_1',
+    questionType: 'single_choice',
+    questionText: 'Which of the following is a non-contact force that pulls ripe fruits down towards the ground?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_s1a', label: 'A', text: 'Frictional force' },
+      { id: 'opt_s1b', label: 'B', text: 'Gravitational force' },
+      { id: 'opt_s1c', label: 'C', text: 'Muscular force' },
+      { id: 'opt_s1d', label: 'D', text: 'Air resistance' },
+    ],
+  },
+  {
+    id: 'q_g4_sci_02',
+    topicId: 'top_g4_s5_1',
+    questionType: 'single_choice',
+    questionText: 'Why does a rolling football slowly slow down and eventually come to a stop on grass?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_s2a', label: 'A', text: 'Friction between the ball and grass opposes its motion' },
+      { id: 'opt_s2b', label: 'B', text: 'The ball runs out of air' },
+      { id: 'opt_s2c', label: 'C', text: 'Gravity pulls it forward' },
+      { id: 'opt_s2d', label: 'D', text: 'Grass acts like a magnet' },
+    ],
+  },
+  {
+    id: 'q_g4_sci_03',
+    topicId: 'top_g4_s5_2',
+    questionType: 'single_choice',
+    questionText: 'What happens when the North pole of one magnet is brought near the North pole of another magnet?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_s3a', label: 'A', text: 'They attract each other firmly' },
+      { id: 'opt_s3b', label: 'B', text: 'They repel (push away from) each other' },
+      { id: 'opt_s3c', label: 'C', text: 'Both magnets become hot' },
+      { id: 'opt_s3d', label: 'D', text: 'Nothing happens' },
+    ],
+  },
+  {
+    id: 'q_g4_sci_04',
+    topicId: 'top_g4_s5_2',
+    questionType: 'single_choice',
+    questionText: 'Which of the following objects will be attracted by a bar magnet?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_s4a', label: 'A', text: 'A plastic pencil box' },
+      { id: 'opt_s4b', label: 'B', text: 'An iron paper clip' },
+      { id: 'opt_s4c', label: 'C', text: 'A wooden ruler' },
+      { id: 'opt_s4d', label: 'D', text: 'A glass marble' },
+    ],
+  },
+  {
+    id: 'q_g4_sci_05',
+    topicId: 'top_g4_s5_1',
+    questionType: 'single_choice',
+    questionText: 'Which of the following is an example of a contact force?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_s5a', label: 'A', text: 'A magnet picking up pins from a desk' },
+      { id: 'opt_s5b', label: 'B', text: 'Muscular force exerted to push a shopping cart' },
+      { id: 'opt_s5c', label: 'C', text: 'Gravity keeping the moon in orbit' },
+      { id: 'opt_s5d', label: 'D', text: 'Static electricity attracting bits of paper' },
+    ],
+  },
+
+  // --- GRADE IV ENGLISH (CH 8 THE PIED PIPER OF HAMELIN) ---
+  {
+    id: 'q_g4_eng_01',
+    topicId: 'top_g4_e8_1',
+    questionType: 'single_choice',
+    questionText: 'Why were the people of the town of Hamelin deeply troubled at the start of the story?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_e1a', label: 'A', text: 'The town was flooded by heavy rains' },
+      { id: 'opt_e1b', label: 'B', text: 'The town was infested with thousands of rats' },
+      { id: 'opt_e1c', label: 'C', text: 'The town was attacked by bandits' },
+      { id: 'opt_e1d', label: 'D', text: 'All the crops dried up in summer' },
+    ],
+  },
+  {
+    id: 'q_g4_eng_02',
+    topicId: 'top_g4_e8_1',
+    questionType: 'single_choice',
+    questionText: 'What instrument did the mysterious stranger play to lead the rats away from Hamelin?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_e2a', label: 'A', text: 'A golden violin' },
+      { id: 'opt_e2b', label: 'B', text: 'A long pipe (flute)' },
+      { id: 'opt_e2c', label: 'C', text: 'A loud wooden drum' },
+      { id: 'opt_e2d', label: 'D', text: 'A silver bell' },
+    ],
+  },
+  {
+    id: 'q_g4_eng_03',
+    topicId: 'top_g4_e8_2',
+    questionType: 'single_choice',
+    questionText: 'Identify the adverb in the sentence: "The Pied Piper walked merrily through the market square."',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_e3a', label: 'A', text: 'walked' },
+      { id: 'opt_e3b', label: 'B', text: 'square' },
+      { id: 'opt_e3c', label: 'C', text: 'merrily' },
+      { id: 'opt_e3d', label: 'D', text: 'market' },
+    ],
+  },
+  {
+    id: 'q_g4_eng_04',
+    topicId: 'top_g4_e8_2',
+    questionType: 'single_choice',
+    questionText: 'What is the past tense form of the verb "blow"?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_e4a', label: 'A', text: 'blowed' },
+      { id: 'opt_e4b', label: 'B', text: 'blowing' },
+      { id: 'opt_e4c', label: 'C', text: 'blew' },
+      { id: 'opt_e4d', label: 'D', text: 'blawn' },
+    ],
+  },
+  {
+    id: 'q_g4_eng_05',
+    topicId: 'top_g4_e8_1',
+    questionType: 'single_choice',
+    questionText: 'In the sentence "The rats followed the sweet tune and vanished", what does "vanished" mean?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_e5a', label: 'A', text: 'Disappeared completely from sight' },
+      { id: 'opt_e5b', label: 'B', text: 'Danced happily in circles' },
+      { id: 'opt_e5c', label: 'C', text: 'Fell asleep under trees' },
+      { id: 'opt_e5d', label: 'D', text: 'Became very large and loud' },
+    ],
+  },
+
+  // --- GRADE IV HINDI (पाठ 11 प्यारा भारत) ---
+  {
+    id: 'q_g4_hin_01',
+    topicId: 'top_g4_h11_1',
+    questionType: 'single_choice',
+    questionText: "कविता 'प्यारा भारत' में कवि ने भारत के मस्तक का मुकुट किसे बताया है?",
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'hi',
+    options: [
+      { id: 'opt_h1a', label: 'A', text: 'हिंद महासागर को' },
+      { id: 'opt_h1b', label: 'B', text: 'विशाल हिमालय पर्वत को' },
+      { id: 'opt_h1c', label: 'C', text: 'गंगा नदी की धारा को' },
+      { id: 'opt_h1d', label: 'D', text: 'घने हरे-भरे जंगलों को' },
+    ],
+  },
+  {
+    id: 'q_g4_hin_02',
+    topicId: 'top_g4_h11_2',
+    questionType: 'single_choice',
+    questionText: "'पर्वत' शब्द का सही पर्यायवाची शब्द निम्नलिखित में से कौन-सा है?",
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'hi',
+    options: [
+      { id: 'opt_h2a', label: 'A', text: 'वारि' },
+      { id: 'opt_h2b', label: 'B', text: 'गिरि' },
+      { id: 'opt_h2c', label: 'C', text: 'अनिल' },
+      { id: 'opt_h2d', label: 'D', text: 'अनल' },
+    ],
+  },
+  {
+    id: 'q_g4_hin_03',
+    topicId: 'top_g4_h11_2',
+    questionType: 'single_choice',
+    questionText: "'अमृत' शब्द का सही विलोम (उलटा अर्थ वाला) शब्द चुनिए:",
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'hi',
+    options: [
+      { id: 'opt_h3a', label: 'A', text: 'सुधा' },
+      { id: 'opt_h3b', label: 'B', text: 'विष' },
+      { id: 'opt_h3c', label: 'C', text: 'पीयूष' },
+      { id: 'opt_h3d', label: 'D', text: 'सोम' },
+    ],
+  },
+  {
+    id: 'q_g4_hin_04',
+    topicId: 'top_g4_h11_2',
+    questionType: 'single_choice',
+    questionText: "'गंगा भारत की सबसे पवित्र नदी मानी जाती है।' — इस वाक्य में व्यक्तिवाचक संज्ञा शब्द कौन-सा है?",
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'hi',
+    options: [
+      { id: 'opt_h4a', label: 'A', text: 'पवित्र' },
+      { id: 'opt_h4b', label: 'B', text: 'नदी' },
+      { id: 'opt_h4c', label: 'C', text: 'गंगा' },
+      { id: 'opt_h4d', label: 'D', text: 'मानी' },
+    ],
+  },
+  {
+    id: 'q_g4_hin_05',
+    topicId: 'top_g4_h11_2',
+    questionType: 'single_choice',
+    questionText: 'निम्नलिखित में से शुद्ध वर्तनी वाला शब्द कौन-सा है?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'hi',
+    options: [
+      { id: 'opt_h5a', label: 'A', text: 'प्रक्रिती' },
+      { id: 'opt_h5b', label: 'B', text: 'प्रकृति' },
+      { id: 'opt_h5c', label: 'C', text: 'प्राकृति' },
+      { id: 'opt_h5d', label: 'D', text: 'प्रक्रिति' },
+    ],
+  },
+
+  // --- GRADE IV SOCIAL STUDIES (CH 8 OUR AGRICULTURE) ---
+  {
+    id: 'q_g4_sst_01',
+    topicId: 'top_g4_sst8_1',
+    questionType: 'single_choice',
+    questionText: 'Which of the following is a Kharif crop that is sown with the arrival of monsoon rains in India?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_sst1a', label: 'A', text: 'Wheat' },
+      { id: 'opt_sst1b', label: 'B', text: 'Rice (Paddy)' },
+      { id: 'opt_sst1c', label: 'C', text: 'Mustard' },
+      { id: 'opt_sst1d', label: 'D', text: 'Barley' },
+    ],
+  },
+  {
+    id: 'q_g4_sst_02',
+    topicId: 'top_g4_sst8_1',
+    questionType: 'single_choice',
+    questionText: 'Which two crops are the primary staple food grains consumed across India?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_sst2a', label: 'A', text: 'Tea and Coffee' },
+      { id: 'opt_sst2b', label: 'B', text: 'Rice and Wheat' },
+      { id: 'opt_sst2c', label: 'C', text: 'Cotton and Jute' },
+      { id: 'opt_sst2d', label: 'D', text: 'Rubber and Spices' },
+    ],
+  },
+  {
+    id: 'q_g4_sst_03',
+    topicId: 'top_g4_sst8_1',
+    questionType: 'single_choice',
+    questionText: 'What is a "cash crop" in Indian agriculture?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_sst3a', label: 'A', text: 'A crop grown primarily to sell in the market for profit' },
+      { id: 'opt_sst3b', label: 'B', text: 'A crop that does not need water to grow' },
+      { id: 'opt_sst3c', label: 'C', text: 'A crop fed only to domestic farm animals' },
+      { id: 'opt_sst3d', label: 'D', text: 'A crop that grows only during heavy snow' },
+    ],
+  },
+  {
+    id: 'q_g4_sst_04',
+    topicId: 'top_g4_sst8_2',
+    questionType: 'single_choice',
+    questionText: 'Which irrigation system is widely used across the fertile northern plains of India?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_sst4a', label: 'A', text: 'Canals and tube-wells' },
+      { id: 'opt_sst4b', label: 'B', text: 'Tank irrigation on rocks only' },
+      { id: 'opt_sst4c', label: 'C', text: 'Hand buckets from distant lakes' },
+      { id: 'opt_sst4d', label: 'D', text: 'Waiting only for winter fog' },
+    ],
+  },
+  {
+    id: 'q_g4_sst_05',
+    topicId: 'top_g4_sst8_2',
+    questionType: 'single_choice',
+    questionText: 'The "Green Revolution" in Indian agriculture brought a dramatic increase in the production of:',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_sst5a', label: 'A', text: 'Silk fabrics and textiles' },
+      { id: 'opt_sst5b', label: 'B', text: 'Food grains such as wheat and rice' },
+      { id: 'opt_sst5c', label: 'C', text: 'Tea leaves in hilly gardens' },
+      { id: 'opt_sst5d', label: 'D', text: 'River fish and seafood' },
+    ],
+  },
+
+  // --- ANALYTICAL SKILLS & APTITUDE (8 QUESTIONS) ---
+  {
+    id: 'q_apt_01',
+    topicId: 'top_apt_lr_1',
+    questionType: 'single_choice',
+    questionText: 'Find the next number in the pattern: 4, 9, 16, 25, 36, ___?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'medium',
+    language: 'en',
+    options: [
+      { id: 'opt_ap1a', label: 'A', text: '42' },
+      { id: 'opt_ap1b', label: 'B', text: '47' },
+      { id: 'opt_ap1c', label: 'C', text: '49' },
+      { id: 'opt_ap1d', label: 'D', text: '54' },
+    ],
+  },
+  {
+    id: 'q_apt_02',
+    topicId: 'top_apt_lr_1',
+    questionType: 'single_choice',
+    questionText: 'If CAT is coded as 24 (C=3 + A=1 + T=20), what is the alphabetical code for DOG?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'medium',
+    language: 'en',
+    options: [
+      { id: 'opt_ap2a', label: 'A', text: '26' },
+      { id: 'opt_ap2b', label: 'B', text: '28' },
+      { id: 'opt_ap2c', label: 'C', text: '22' },
+      { id: 'opt_ap2d', label: 'D', text: '30' },
+    ],
+  },
+  {
+    id: 'q_apt_03',
+    topicId: 'top_apt_patterns',
+    questionType: 'single_choice',
+    questionText: 'Which geometric shape is the odd one out: Circle, Triangle, Square, Sphere?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_ap3a', label: 'A', text: 'Circle' },
+      { id: 'opt_ap3b', label: 'B', text: 'Triangle' },
+      { id: 'opt_ap3c', label: 'C', text: 'Square' },
+      { id: 'opt_ap3d', label: 'D', text: 'Sphere' },
+    ],
+  },
+  {
+    id: 'q_apt_04',
+    topicId: 'top_apt_qa_arithmetic',
+    questionType: 'single_choice',
+    questionText: 'What is the angle formed between the hour hand and minute hand of an analog clock at 3:00?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_ap4a', label: 'A', text: '45°' },
+      { id: 'opt_ap4b', label: 'B', text: '60°' },
+      { id: 'opt_ap4c', label: 'C', text: '90°' },
+      { id: 'opt_ap4d', label: 'D', text: '120°' },
+    ],
+  },
+  {
+    id: 'q_apt_05',
+    topicId: 'top_apt_qa_arithmetic',
+    questionType: 'single_choice',
+    questionText: 'An express train runs at a steady speed of 60 km per hour. How many kilometers will it cover in 3.5 hours?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'medium',
+    language: 'en',
+    options: [
+      { id: 'opt_ap5a', label: 'A', text: '180 km' },
+      { id: 'opt_ap5b', label: 'B', text: '200 km' },
+      { id: 'opt_ap5c', label: 'C', text: '210 km' },
+      { id: 'opt_ap5d', label: 'D', text: '240 km' },
+    ],
+  },
+  {
+    id: 'q_apt_06',
+    topicId: 'top_apt_deduction',
+    questionType: 'single_choice',
+    questionText: 'Given statements: (1) All mammals breathe oxygen through lungs. (2) Whales are mammals. What can be logically concluded?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'medium',
+    language: 'en',
+    options: [
+      { id: 'opt_ap6a', label: 'A', text: 'Whales breathe oxygen through lungs' },
+      { id: 'opt_ap6b', label: 'B', text: 'Whales have gills like fish' },
+      { id: 'opt_ap6c', label: 'C', text: 'Whales do not need to breathe' },
+      { id: 'opt_ap6d', label: 'D', text: 'All sea creatures are mammals' },
+    ],
+  },
+  {
+    id: 'q_apt_07',
+    topicId: 'top_apt_deduction',
+    questionType: 'single_choice',
+    questionText: 'Rohan walks 15 meters facing North, then takes a 90° turn to his right and walks 10 meters. Which direction is he facing now?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_ap7a', label: 'A', text: 'North' },
+      { id: 'opt_ap7b', label: 'B', text: 'South' },
+      { id: 'opt_ap7c', label: 'C', text: 'East' },
+      { id: 'opt_ap7d', label: 'D', text: 'West' },
+    ],
+  },
+  {
+    id: 'q_apt_08',
+    topicId: 'top_apt_qa_arithmetic',
+    questionType: 'single_choice',
+    questionText: 'If 5 student notebooks cost ₹50 in total, what is the cost of 12 such notebooks?',
+    marks: 2,
+    negativeMarkingRatio: 0,
+    difficulty: 'easy',
+    language: 'en',
+    options: [
+      { id: 'opt_ap8a', label: 'A', text: '₹100' },
+      { id: 'opt_ap8b', label: 'B', text: '₹110' },
+      { id: 'opt_ap8c', label: 'C', text: '₹120' },
+      { id: 'opt_ap8d', label: 'D', text: '₹130' },
+    ],
+  },
 ]
 
 // ============================================================================
@@ -927,6 +1539,413 @@ export const SEED_CONFIDENTIAL_SOLUTIONS = new Map<string, ConfidentialQuestionS
       reviewStatus: 'verified',
     },
   ],
+
+  // --- GRADE IV SCIENCE SOLUTIONS ---
+  [
+    'q_g4_sci_01',
+    {
+      questionId: 'q_g4_sci_01',
+      correctOptionIds: ['opt_s1b'],
+      solutionSteps: [
+        'Non-contact forces act across a distance without physical contact.',
+        'Gravitational force is the attractive force exerted by Earth pulling all objects downward toward its center.',
+      ],
+      explanation: 'Gravitational force pulls the fruit down without requiring physical contact.',
+      keyPoint: 'Gravity is a universal non-contact attractive force exerted by the Earth.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sci_02',
+    {
+      questionId: 'q_g4_sci_02',
+      correctOptionIds: ['opt_s2a'],
+      solutionSteps: [
+        'When two surfaces rub against each other, friction is created.',
+        'Frictional force acts in the direction opposite to motion, slowing down the rolling ball.',
+      ],
+      explanation: 'Friction between the surface of the ball and the grass opposes the forward motion.',
+      keyPoint: 'Friction is a contact force that resists relative motion between surfaces.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sci_03',
+    {
+      questionId: 'q_g4_sci_03',
+      correctOptionIds: ['opt_s3b'],
+      solutionSteps: [
+        'Every magnet has two poles: North and South.',
+        'Fundamental law of magnetism: Like poles repel each other, while unlike poles attract.',
+        'North pole facing North pole results in repulsion.',
+      ],
+      explanation: 'Two similar poles (North and North) push each other away (repel).',
+      keyPoint: 'Like magnetic poles repel; unlike magnetic poles attract.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sci_04',
+    {
+      questionId: 'q_g4_sci_04',
+      correctOptionIds: ['opt_s4b'],
+      solutionSteps: [
+        'Magnets attract objects made of magnetic metals such as iron, cobalt, and nickel.',
+        'An iron paper clip is made of iron, so it is attracted.',
+        'Plastic, wood, and glass are non-magnetic materials.',
+      ],
+      explanation: 'An iron paper clip is magnetic and will be attracted by a magnet.',
+      keyPoint: 'Only magnetic materials (like iron and steel) are pulled by magnets.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sci_05',
+    {
+      questionId: 'q_g4_sci_05',
+      correctOptionIds: ['opt_s5b'],
+      solutionSteps: [
+        'A contact force requires direct physical interaction between objects.',
+        'When pushing a cart, muscles in the human body physically push against the cart handles.',
+      ],
+      explanation: 'Pushing a shopping cart requires direct physical contact (muscular force).',
+      keyPoint: 'Contact forces require physical touch; non-contact forces act at a distance.',
+      reviewStatus: 'verified',
+    },
+  ],
+
+  // --- GRADE IV ENGLISH SOLUTIONS ---
+  [
+    'q_g4_eng_01',
+    {
+      questionId: 'q_g4_eng_01',
+      correctOptionIds: ['opt_e1b'],
+      solutionSteps: [
+        'In the story of the Pied Piper of Hamelin, the city was overrun by a massive plague of rats.',
+        'The citizens were desperate because rats were everywhere in homes and food stores.',
+      ],
+      explanation: 'The town of Hamelin was heavily infested with rats.',
+      keyPoint: 'The core plot problem begins with the plague of rats in Hamelin.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_eng_02',
+    {
+      questionId: 'q_g4_eng_02',
+      correctOptionIds: ['opt_e2b'],
+      solutionSteps: [
+        'The stranger was called the "Pied Piper" because he wore colorful clothes and carried a pipe (flute).',
+        'When he blew into his pipe, a magical melody lured all the rats.',
+      ],
+      explanation: 'The Pied Piper used a pipe (flute) to charm the rats away.',
+      keyPoint: 'The musical pipe was the instrument used by the stranger.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_eng_03',
+    {
+      questionId: 'q_g4_eng_03',
+      correctOptionIds: ['opt_e3c'],
+      solutionSteps: [
+        'An adverb modifies a verb, adjective, or another adverb.',
+        'In "walked merrily", "merrily" describes how the Piper walked.',
+      ],
+      explanation: '"Merrily" is an adverb of manner answering "how did he walk?".',
+      keyPoint: 'Adverbs often end in "-ly" and tell us how an action was done.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_eng_04',
+    {
+      questionId: 'q_g4_eng_04',
+      correctOptionIds: ['opt_e4c'],
+      solutionSteps: [
+        'The verb "blow" is an irregular verb.',
+        'Present: blow, Past: blew, Past Participle: blown.',
+      ],
+      explanation: 'The simple past tense of "blow" is "blew".',
+      keyPoint: 'Irregular verbs change vowel sounds rather than adding "-ed".',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_eng_05',
+    {
+      questionId: 'q_g4_eng_05',
+      correctOptionIds: ['opt_e5a'],
+      solutionSteps: [
+        'The word "vanish" means to disappear suddenly or completely from sight.',
+        'Synonyms include: disappeared, dissolved, faded away.',
+      ],
+      explanation: '"Vanished" means disappeared completely from sight.',
+      keyPoint: 'Vocabulary: Vanish means to disappear without leaving a trace.',
+      reviewStatus: 'verified',
+    },
+  ],
+
+  // --- GRADE IV HINDI SOLUTIONS ---
+  [
+    'q_g4_hin_01',
+    {
+      questionId: 'q_g4_hin_01',
+      correctOptionIds: ['opt_h1b'],
+      solutionSteps: [
+        'कविता "प्यारा भारत" में भारत के प्राकृतिक सौंदर्य का वर्णन है।',
+        'उत्तर दिशा में खड़ा विशाल हिमालय भारत माता के सिर पर मुकुट के समान सुशोभित है।',
+      ],
+      explanation: 'कवि ने हिमालय पर्वत को भारत का मुकुट कहा है।',
+      keyPoint: 'हिमालय भारत के उत्तर में प्रहरी व मुकुट के समान स्थित है।',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_hin_02',
+    {
+      questionId: 'q_g4_hin_02',
+      correctOptionIds: ['opt_h2b'],
+      solutionSteps: [
+        'पर्वत के पर्यायवाची: गिरि, शैल, अचल, नग, पहाड़।',
+        'वारि = जल, अनिल = हवा, अनल = आग।',
+      ],
+      explanation: 'पर्वत का पर्यायवाची शब्द "गिरि" है।',
+      keyPoint: 'पर्यायवाची शब्द: पर्वत = गिरि, पहाड़, शैल।',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_hin_03',
+    {
+      questionId: 'q_g4_hin_03',
+      correctOptionIds: ['opt_h3b'],
+      solutionSteps: [
+        'अमृत जीवन देने वाला पेय माना जाता है, जबकि विष प्राण हरने वाला जहर होता है।',
+        'अतः अमृत का सही विलोम शब्द विष है।',
+      ],
+      explanation: 'अमृत का विलोम शब्द "विष" होता है।',
+      keyPoint: 'विलोम शब्द परस्पर विपरीत अर्थ प्रकट करते हैं: अमृत ↔ विष।',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_hin_04',
+    {
+      questionId: 'q_g4_hin_04',
+      correctOptionIds: ['opt_h4c'],
+      solutionSteps: [
+        'व्यक्तिवाचक संज्ञा किसी विशेष व्यक्ति, स्थान या वस्तु के नाम को कहते हैं।',
+        '"गंगा" एक विशेष नदी का नाम है। "नदी" शब्द जातिवाचक संज्ञा है।',
+      ],
+      explanation: '"गंगा" एक विशेष नदी का नाम होने के कारण व्यक्तिवाचक संज्ञा है।',
+      keyPoint: 'व्यक्तिवाचक संज्ञा किसी विशेष नाम का बोध कराती है।',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_hin_05',
+    {
+      questionId: 'q_g4_hin_05',
+      correctOptionIds: ['opt_h5b'],
+      solutionSteps: [
+        'प्रकृति शब्द में प के नीचे र (प्र), क के नीचे ऋ (कृ) और त पर छोटी इ (ति) लगती है।',
+        'शुद्ध रूप: प्रकृति।',
+      ],
+      explanation: 'शुद्ध वर्तनी "प्रकृति" है।',
+      keyPoint: 'वर्तनी शुद्धि: प्र + कृ + ति = प्रकृति।',
+      reviewStatus: 'verified',
+    },
+  ],
+
+  // --- GRADE IV SOCIAL STUDIES SOLUTIONS ---
+  [
+    'q_g4_sst_01',
+    {
+      questionId: 'q_g4_sst_01',
+      correctOptionIds: ['opt_sst1b'],
+      solutionSteps: [
+        'Kharif crops are monsoon crops sown in June–July and harvested in autumn.',
+        'Rice (paddy) requires large amounts of water and warm climate, making it the major Kharif crop.',
+      ],
+      explanation: 'Rice is sown at the beginning of the monsoon season, making it a Kharif crop.',
+      keyPoint: 'Kharif crops: Rice, maize, cotton, groundnut. Rabi crops: Wheat, mustard, gram.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sst_02',
+    {
+      questionId: 'q_g4_sst_02',
+      correctOptionIds: ['opt_sst2b'],
+      solutionSteps: [
+        'Staple food crops form the main part of a population’s daily diet.',
+        'In India, rice and wheat provide the bulk of daily caloric intake.',
+      ],
+      explanation: 'Rice and wheat are the two main staple food crops in India.',
+      keyPoint: 'Food crops satisfy human nutritional needs; rice and wheat dominate Indian agriculture.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sst_03',
+    {
+      questionId: 'q_g4_sst_03',
+      correctOptionIds: ['opt_sst3a'],
+      solutionSteps: [
+        'Crops are divided into food crops (for subsistence/consumption) and cash crops.',
+        'Cash crops are grown primarily to be sold in the market or factories for commercial profit.',
+      ],
+      explanation: 'Cash crops are produced for direct commercial market sale.',
+      keyPoint: 'Examples of Indian cash crops: Sugarcane, cotton, jute, tea, and coffee.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sst_04',
+    {
+      questionId: 'q_g4_sst_04',
+      correctOptionIds: ['opt_sst4a'],
+      solutionSteps: [
+        'The northern plains have soft alluvial soil, perennial Himalayan rivers, and ample underground water.',
+        'Hence, canal networks and electric/diesel tube-wells are the dominant irrigation systems.',
+      ],
+      explanation: 'Canals and tube-wells supply water across the plains of Punjab, Haryana, and UP.',
+      keyPoint: 'Northern plains rely on perennial canals and deep tube-wells for crop irrigation.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_g4_sst_05',
+    {
+      questionId: 'q_g4_sst_05',
+      correctOptionIds: ['opt_sst5b'],
+      solutionSteps: [
+        'The Green Revolution began in India in the late 1960s under MS Swaminathan and Norman Borlaug.',
+        'It introduced High Yielding Variety (HYV) seeds, chemical fertilizers, and assured irrigation.',
+        'It led to self-sufficiency in wheat and rice production.',
+      ],
+      explanation: 'The Green Revolution brought a massive leap in food grain (wheat and rice) output.',
+      keyPoint: 'Green Revolution turned India into a self-sufficient food grain producing country.',
+      reviewStatus: 'verified',
+    },
+  ],
+
+  // --- ANALYTICAL SKILLS SOLUTIONS ---
+  [
+    'q_apt_01',
+    {
+      questionId: 'q_apt_01',
+      correctOptionIds: ['opt_ap1c'],
+      solutionSteps: [
+        'Notice the terms: 4 = 2², 9 = 3², 16 = 4², 25 = 5², 36 = 6².',
+        'The next term must be 7² = 49.',
+      ],
+      explanation: 'The series consists of consecutive perfect squares. 7² = 49.',
+      keyPoint: 'Square series pattern: n² for n = 2, 3, 4, 5, 6, 7.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_apt_02',
+    {
+      questionId: 'q_apt_02',
+      correctOptionIds: ['opt_ap2a'],
+      solutionSteps: [
+        'C(3) + A(1) + T(20) = 24.',
+        'For DOG: D(4) + O(15) + G(7) = 4 + 15 + 7 = 26.',
+      ],
+      explanation: 'Sum of the alphabetical positions of letters: 4 + 15 + 7 = 26.',
+      keyPoint: 'Coding-decoding by summing alphabetical letter numerical positions.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_apt_03',
+    {
+      questionId: 'q_apt_03',
+      correctOptionIds: ['opt_ap3d'],
+      solutionSteps: [
+        'Circle, Triangle, and Square are 2-dimensional (flat plane) geometric figures.',
+        'Sphere is a 3-dimensional solid shape.',
+      ],
+      explanation: 'Sphere is a 3D solid, whereas Circle, Triangle, and Square are 2D planes.',
+      keyPoint: 'Geometric classification: 2D plane figures vs 3D solid figures.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_apt_04',
+    {
+      questionId: 'q_apt_04',
+      correctOptionIds: ['opt_ap4c'],
+      solutionSteps: [
+        'A full circle clock face has 360° divided into 12 hours (30° per hour).',
+        'At 3:00, the hour hand points at 3 and the minute hand points at 12.',
+        'Difference = 3 hours × 30° = 90° (a right angle).',
+      ],
+      explanation: 'At 3:00, the hands are at right angles to each other (90°).',
+      keyPoint: 'Each hour interval on a clock face equals 30 degrees (360° ÷ 12).',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_apt_05',
+    {
+      questionId: 'q_apt_05',
+      correctOptionIds: ['opt_ap5c'],
+      solutionSteps: [
+        'Distance = Speed × Time.',
+        'Distance = 60 km/h × 3.5 h = 210 km.',
+      ],
+      explanation: '60 km/h × 3.5 hours = 210 kilometers.',
+      keyPoint: 'Distance = Speed × Time. 60 × 3 = 180; 60 × 0.5 = 30; 180 + 30 = 210.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_apt_06',
+    {
+      questionId: 'q_apt_06',
+      correctOptionIds: ['opt_ap6a'],
+      solutionSteps: [
+        'Major premise: All mammals breathe oxygen through lungs.',
+        'Minor premise: Whales are mammals.',
+        'Conclusion: Whales must breathe oxygen through lungs.',
+      ],
+      explanation: 'By deductive logic, since all mammals breathe via lungs, whales must too.',
+      keyPoint: 'Deductive syllogism: Universal property transfers to all category members.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_apt_07',
+    {
+      questionId: 'q_apt_07',
+      correctOptionIds: ['opt_ap7c'],
+      solutionSteps: [
+        'Facing North, your right hand points toward the East.',
+        'A 90° right turn from North puts you directly facing East.',
+      ],
+      explanation: 'Turning 90 degrees right from North points toward the East.',
+      keyPoint: 'Direction compass: North + 90° right (clockwise) = East.',
+      reviewStatus: 'verified',
+    },
+  ],
+  [
+    'q_apt_08',
+    {
+      questionId: 'q_apt_08',
+      correctOptionIds: ['opt_ap8c'],
+      solutionSteps: [
+        'Unitary method: Cost of 1 notebook = ₹50 ÷ 5 = ₹10.',
+        'Cost of 12 notebooks = 12 × ₹10 = ₹120.',
+      ],
+      explanation: 'Each notebook costs ₹10, so 12 notebooks cost ₹120.',
+      keyPoint: 'Unitary method: find single unit price first, then multiply.',
+      reviewStatus: 'verified',
+    },
+  ],
 ])
 
 // ============================================================================
@@ -968,6 +1987,10 @@ export function getPipelineCoverageReport(): PipelineCoverageReport {
     (s) => s.reviewStatus === 'verified'
   )
 
+  const grade4Count = SEED_AUTHORIZED_QUESTIONS.filter(
+    (q) => q.id.startsWith('q_g4_')
+  ).length
+
   return {
     targetTotalQuestions: 60000,
     actualPublishedCount: SEED_AUTHORIZED_QUESTIONS.length,
@@ -980,7 +2003,7 @@ export function getPipelineCoverageReport(): PipelineCoverageReport {
         boardCode: 'CBSE',
         boardName: 'Central Board of Secondary Education',
         status: 'verified',
-        publishedCount: 12,
+        publishedCount: grade4Count + 2, // Grade 4 + Class 10 Science
         inReviewCount: 820,
         targetCount: 30000,
       },
@@ -1003,7 +2026,7 @@ export function getPipelineCoverageReport(): PipelineCoverageReport {
     ],
     classBreakdown: [
       { gradeNumber: 3, className: 'Class 3', status: 'verified', publishedCount: 0, targetCount: 2500 },
-      { gradeNumber: 4, className: 'Class 4', status: 'verified', publishedCount: 10, targetCount: 4000 },
+      { gradeNumber: 4, className: 'Class 4', status: 'verified', publishedCount: grade4Count, targetCount: 4000 },
       { gradeNumber: 5, className: 'Class 5', status: 'verified', publishedCount: 0, targetCount: 4500 },
       { gradeNumber: 6, className: 'Class 6', status: 'verified', publishedCount: 0, targetCount: 5000 },
       { gradeNumber: 7, className: 'Class 7', status: 'verified', publishedCount: 0, targetCount: 5500 },
@@ -1015,14 +2038,14 @@ export function getPipelineCoverageReport(): PipelineCoverageReport {
     ],
     subjectBreakdown: [
       { subjectCode: 'math', subjectName: 'Mathematics', publishedCount: 10, verifiedCount: 10 },
-      { subjectCode: 'science', subjectName: 'Science', publishedCount: 2, verifiedCount: 2 },
-      { subjectCode: 'english', subjectName: 'English', publishedCount: 0, verifiedCount: 0 },
-      { subjectCode: 'hindi', subjectName: 'Hindi', publishedCount: 0, verifiedCount: 0 },
-      { subjectCode: 'social_science', subjectName: 'Social Studies', publishedCount: 0, verifiedCount: 0 },
+      { subjectCode: 'science', subjectName: 'Science', publishedCount: 7, verifiedCount: 7 },
+      { subjectCode: 'english', subjectName: 'English', publishedCount: 5, verifiedCount: 5 },
+      { subjectCode: 'hindi', subjectName: 'Hindi', publishedCount: 5, verifiedCount: 5 },
+      { subjectCode: 'social_science', subjectName: 'Social Studies', publishedCount: 5, verifiedCount: 5 },
     ],
     aptitudeBreakdown: [
-      { subcategory: 'logical_reasoning', title: 'Logical Reasoning', publishedCount: 2, verifiedCount: 2 },
-      { subcategory: 'quantitative_aptitude', title: 'Quantitative Aptitude', publishedCount: 1, verifiedCount: 1 },
+      { subcategory: 'logical_reasoning', title: 'Logical Reasoning', publishedCount: 6, verifiedCount: 6 },
+      { subcategory: 'quantitative_aptitude', title: 'Quantitative Aptitude', publishedCount: 5, verifiedCount: 5 },
       { subcategory: 'verbal_reasoning', title: 'Verbal Reasoning', publishedCount: 0, verifiedCount: 0 },
       { subcategory: 'non_verbal_patterns', title: 'Non-Verbal Patterns', publishedCount: 0, verifiedCount: 0 },
       { subcategory: 'data_interpretation', title: 'Data Interpretation', publishedCount: 0, verifiedCount: 0 },

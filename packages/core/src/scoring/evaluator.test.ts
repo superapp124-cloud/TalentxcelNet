@@ -167,4 +167,89 @@ describe('TalentXcel Core - Security & Server-Authoritative Scoring', () => {
     expect(summary.overallAccuracyPercentage).toBe(100)
     expect(summary.totalPassCreditsEarned).toBe(20)
   })
+
+  it('evaluates free Grade 4 Science diagnostic (5 questions) with zero login requirement', () => {
+    const sciQuestions = SEED_AUTHORIZED_QUESTIONS.filter((q) => q.id.startsWith('q_g4_sci_'))
+    expect(sciQuestions.length).toBe(5)
+
+    const answers: SubmittedAnswer[] = sciQuestions.map((q) => ({
+      questionId: q.id,
+      selectedOptionIds: SEED_CONFIDENTIAL_SOLUTIONS.get(q.id)!.correctOptionIds,
+      timeSpentSeconds: 15,
+    }))
+
+    const blueprint = {
+      id: 'bp_free_g4_sci',
+      title: 'Grade IV Science Free Diagnostic',
+      subjectId: 'subj_g4_sci',
+      difficulty: 'easy' as const,
+      durationMinutes: 10,
+      totalQuestions: 5,
+      totalMarks: 10,
+      passingPercentage: 60,
+      negativeMarkingRatio: 0,
+      rewardCreditAmount: 20,
+      examType: 'periodic_test' as const,
+      category: 'academic' as const,
+    }
+
+    const result = evaluateAssessmentAttempt({
+      attemptId: 'att_free_sci',
+      blueprint,
+      learnerId: 'anon_learner',
+      questions: sciQuestions,
+      solutions: SEED_CONFIDENTIAL_SOLUTIONS,
+      submittedAnswers: answers,
+    })
+
+    expect(result.scoreObtained).toBe(10)
+    expect(result.maxMarks).toBe(10)
+    expect(result.correctCount).toBe(5)
+    expect(result.passed).toBe(true)
+    expect(result.earnedPassCredits).toBe(20)
+  })
+
+  it('evaluates free Analytical Skills & Reasoning drill (8 questions) with step-by-step solutions', () => {
+    const aptQuestions = SEED_AUTHORIZED_QUESTIONS.filter((q) => q.id.startsWith('q_apt_0'))
+    expect(aptQuestions.length).toBe(8)
+
+    const answers: SubmittedAnswer[] = aptQuestions.map((q, idx) => ({
+      questionId: q.id,
+      selectedOptionIds: idx === 0 ? ['opt_wrong'] : SEED_CONFIDENTIAL_SOLUTIONS.get(q.id)!.correctOptionIds,
+      timeSpentSeconds: 20,
+    }))
+
+    const blueprint = {
+      id: 'bp_free_aptitude',
+      title: 'Analytical Skills Free Drill',
+      subjectId: 'subj_aptitude',
+      difficulty: 'medium' as const,
+      durationMinutes: 15,
+      totalQuestions: 8,
+      totalMarks: 16,
+      passingPercentage: 60,
+      negativeMarkingRatio: 0,
+      rewardCreditAmount: 20,
+      examType: 'aptitude_drill' as const,
+      category: 'aptitude' as const,
+    }
+
+    const result = evaluateAssessmentAttempt({
+      attemptId: 'att_free_apt',
+      blueprint,
+      learnerId: 'anon_learner',
+      questions: aptQuestions,
+      solutions: SEED_CONFIDENTIAL_SOLUTIONS,
+      submittedAnswers: answers,
+    })
+
+    expect(result.scoreObtained).toBe(14) // 7 correct * 2 marks = 14
+    expect(result.correctCount).toBe(7)
+    expect(result.incorrectCount).toBe(1)
+    expect(result.passed).toBe(true) // 87.5% > 60%
+    expect(result.evaluations.length).toBe(8)
+    // Check that confidential solutions are provided in result for learner review
+    expect(result.evaluations[0].solutionSteps.length).toBeGreaterThan(0)
+    expect(result.evaluations[0].keyPoint).toBeDefined()
+  })
 })
