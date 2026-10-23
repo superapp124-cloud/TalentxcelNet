@@ -215,19 +215,19 @@ export function RazorpayCheckoutModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-auto max-h-[92vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div className="flex items-center justify-between px-5 py-3 bg-slate-50 border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
               TX
             </div>
             <div>
-              <h3 className="text-base font-semibold text-slate-900">
+              <h3 className="text-sm font-bold text-slate-900">
                 {isSuccess ? 'Payment Successful' : 'Secure Checkout'}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-[10px] text-slate-500">
                 {isSuccess ? 'Entitlement Activated' : 'Razorpay 256-Bit SSL Encrypted'}
               </p>
             </div>
@@ -236,24 +236,24 @@ export function RazorpayCheckoutModal({
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Success View */}
         {isSuccess ? (
-          <div className="p-6 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-10 h-10" />
+          <div className="p-5 text-center space-y-3 overflow-y-auto">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-7 h-7" />
             </div>
             <div>
-              <h4 className="text-xl font-bold text-slate-900">Access Unlocked!</h4>
-              <p className="text-sm text-slate-600 mt-1">
+              <h4 className="text-lg font-bold text-slate-900">Access Unlocked!</h4>
+              <p className="text-xs text-slate-600 mt-0.5">
                 Your payment of <span className="font-semibold text-slate-900">₹{summary.totalPayableRupees}</span> was verified.
               </p>
             </div>
 
-            <div className="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl text-left space-y-2 text-xs text-emerald-950">
+            <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl text-left space-y-1.5 text-xs text-emerald-950">
               <div className="flex justify-between">
                 <span className="text-slate-600">Product:</span>
                 <span className="font-medium text-slate-900">{product.title}</span>
@@ -266,70 +266,52 @@ export function RazorpayCheckoutModal({
                 <span className="text-slate-600">Validity:</span>
                 <span className="font-medium text-slate-900">{product.validityDays} Days</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Attempts / Inclusions:</span>
-                <span className="font-medium text-slate-900">
-                  {product.attemptsAllowed === -1
-                    ? 'Unlimited Attempts'
-                    : `${product.attemptsAllowed ?? 1} Attempt(s)`}
-                </span>
-              </div>
             </div>
 
             <Button
               onClick={onClose}
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm"
+              className="w-full h-9 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs"
             >
               Start Learning Now
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
             </Button>
           </div>
         ) : (
           /* Checkout View */
-          <div className="p-6 space-y-5">
+          <div className="p-4 sm:p-5 space-y-3.5 overflow-y-auto">
             {/* Product Card */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
                   {product.domain} Domain
                 </span>
                 {product.badge && (
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px]">
+                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[9px] font-bold">
                     {product.badge}
                   </Badge>
                 )}
               </div>
-              <h4 className="text-base font-bold text-slate-900">{product.title}</h4>
-              <p className="text-xs text-slate-600">{product.tagline}</p>
-
-              {/* Inclusions */}
-              <ul className="pt-2 border-t border-slate-200/80 space-y-1 text-xs text-slate-600">
-                {product.inclusions.slice(0, 3).map((inc, i) => (
-                  <li key={i} className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                    <span>{inc}</span>
-                  </li>
-                ))}
-              </ul>
+              <h4 className="text-sm font-bold text-slate-900">{product.title}</h4>
+              <p className="text-[11px] text-slate-600 line-clamp-2">{product.tagline}</p>
             </div>
 
             {/* Learner Info */}
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Email (for receipt & access credentials)
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Email (for receipt &amp; access credentials)
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="learner@example.com"
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Phone (optional, for SMS updates)
                 </label>
                 <input
@@ -337,13 +319,13 @@ export function RazorpayCheckoutModal({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               {/* Coupon */}
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Coupon Code
                 </label>
                 <div className="flex gap-2">
@@ -352,19 +334,19 @@ export function RazorpayCheckoutModal({
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     placeholder="e.g. FIRST10"
-                    className="flex-1 px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-lg uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg uppercase focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleApplyCoupon}
-                    className="text-xs h-9 px-3"
+                    className="text-xs h-8 px-3 rounded-lg"
                   >
                     Apply
                   </Button>
                 </div>
                 {appliedCoupon && (
-                  <p className="text-[11px] text-emerald-600 mt-1 font-medium">
+                  <p className="text-[10px] text-emerald-600 mt-0.5 font-bold">
                     ✓ Coupon {appliedCoupon} applied (10% savings)!
                   </p>
                 )}
@@ -372,30 +354,30 @@ export function RazorpayCheckoutModal({
             </div>
 
             {/* Transparent GST & Price Breakdown */}
-            <div className="p-3.5 bg-blue-50/50 rounded-xl border border-blue-100 text-xs space-y-1.5 text-slate-700">
-              <div className="flex justify-between">
+            <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-xs space-y-1 text-slate-700">
+              <div className="flex justify-between text-[11px]">
                 <span>Base Price:</span>
-                <span className="font-medium">₹{summary.basePriceRupees}</span>
+                <span className="font-semibold">₹{summary.basePriceRupees}</span>
               </div>
               {summary.discountRupees > 0 && (
-                <div className="flex justify-between text-emerald-600">
+                <div className="flex justify-between text-emerald-600 text-[11px]">
                   <span>Promo Discount:</span>
                   <span>-₹{summary.discountRupees}</span>
                 </div>
               )}
-              <div className="flex justify-between text-slate-500">
+              <div className="flex justify-between text-slate-500 text-[11px]">
                 <span>GST (18% inclusive of 9% CGST + 9% SGST):</span>
                 <span>₹{summary.gstAmountRupees}</span>
               </div>
-              <div className="pt-2 border-t border-blue-200 flex justify-between text-sm font-bold text-slate-900">
+              <div className="pt-1.5 border-t border-blue-200 flex justify-between text-xs font-bold text-slate-900">
                 <span>Total Payable:</span>
                 <span className="text-blue-700">₹{summary.totalPayableRupees}</span>
               </div>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-xs">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="flex items-center gap-2 p-2.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-xs">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
@@ -404,7 +386,7 @@ export function RazorpayCheckoutModal({
             <Button
               onClick={handleInitiatePayment}
               disabled={loading}
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm flex items-center justify-center gap-2"
+              className="w-full h-9.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

@@ -69,22 +69,22 @@ export default function PlansPricingPage() {
         </div>
       </div>
 
-      {/* Header */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 text-center space-y-3">
-        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1 text-xs">
-          Universal Learning & Assessment Platform
+      {/* Compact Header */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-4 text-center space-y-2">
+        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-2.5 py-0.5 text-[11px] font-bold">
+          Universal Learning &amp; Assessment Platform
         </Badge>
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
           Transparent, Fair Pricing for Every Learner
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
+        <p className="text-xs text-slate-600 max-w-xl mx-auto">
           Start with free assessments without signup. Upgrade transparently when you are ready to unlock comprehensive question packs, evaluated skill tracks, or board-aligned classes.
         </p>
 
         {/* Active Entitlement Notice */}
         {activeEntitlement && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl max-w-xl mx-auto text-left flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl max-w-lg mx-auto text-left flex items-start gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <div className="text-xs text-emerald-900">
               <p className="font-semibold text-emerald-950">Active Entitlement Verified!</p>
               <p className="mt-0.5">
@@ -94,20 +94,20 @@ export default function PlansPricingPage() {
                 </span>
                 . Valid until {new Date(activeEntitlement.validUntil).toLocaleDateString()}.
               </p>
-              <Link href="/" className="inline-block mt-2 font-semibold text-emerald-700 underline">
-                Return to Dashboard & Launch Assessment →
+              <Link href="/" className="inline-block mt-1 font-semibold text-emerald-700 underline">
+                Return to Dashboard &amp; Launch Assessment →
               </Link>
             </div>
           </div>
         )}
 
         {/* Domain Filter Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-6">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 pt-3">
           <button
             onClick={() => setSelectedDomain('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               selectedDomain === 'all'
-                ? 'bg-slate-900 text-white shadow-sm'
+                ? 'bg-slate-900 text-white shadow-2xs'
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
           >

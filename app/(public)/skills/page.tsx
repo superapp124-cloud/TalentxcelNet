@@ -116,87 +116,88 @@ export default function SkillsPage() {
       {/* Platform Navigation */}
       <SiteHeader onOpenGrowthPlan={() => setIsGrowthPlanOpen(true)} />
 
-      {/* Hero Header */}
-      <section className="bg-white border-b border-slate-200/80 pt-8 pb-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-3 max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold tracking-wide">
+      {/* Compact Hero Header with Student Image */}
+      <section className="bg-white border-b border-slate-200/80 pt-4 sm:pt-5 pb-4 sm:pb-5 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-bold tracking-wide">
                 <Code className="w-3.5 h-3.5" />
                 <span>Domain 2: Skill Development</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
-                <span>Japanese Craftsmanship &amp; Chinese Progression</span>
+                <span>Hands-on Capstones &amp; Projects</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 Learn by Doing, Building and{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">
                   Mastering Real Skills.
                 </span>
               </h1>
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                Sell structured learning outcomes, real capstone projects and evaluated submissions—not just access to a video catalogue. Master AI, code, robotics, design, debate and venture building from ₹999/month.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Structured learning outcomes, practical capstone projects, and evaluated submissions. Master AI, code, robotics, design, debate and venture building from ₹999/month.
               </p>
             </div>
 
-            {/* Quick Action Box */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 shrink-0 max-w-sm w-full shadow-2xs space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Featured Capstone</span>
-                <Badge className="bg-indigo-100 text-indigo-800 border-indigo-200 text-[11px] font-bold">
-                  Open Workshop
-                </Badge>
+            {/* Student Image Thumbnail & Quick Capstone Action */}
+            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-2.5 shrink-0 max-w-md w-full shadow-2xs">
+              <img
+                src="/images/kids-skills-coding.jpg"
+                alt="Students learning hands-on coding"
+                className="w-20 h-20 rounded-lg object-cover shrink-0 border border-slate-200"
+              />
+              <div className="space-y-1 min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Featured Capstone</span>
+                  <Badge className="bg-indigo-100 text-indigo-800 text-[9px] font-bold">AI Helper</Badge>
+                </div>
+                <h4 className="text-xs font-bold text-slate-900 truncate">Socratic Study Assistant</h4>
+                <Button
+                  onClick={() => handleOpenProject('proj_ai_assistant')}
+                  size="sm"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] h-7 px-3 rounded-lg flex items-center gap-1 w-full justify-center"
+                >
+                  <span>Open Workshop</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Button>
               </div>
-              <h3 className="text-sm font-bold text-slate-900">
-                Socratic AI Study Assistant
-              </h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Build a prompt engine with pedagogical guardrails to teach Grade 4 fractions without revealing answers.
-              </p>
-              <Button
-                onClick={() => handleOpenProject('proj_ai_assistant')}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-9.5 rounded-xl shadow-xs flex items-center justify-center gap-1.5"
-              >
-                <span>Open Workshop &amp; Rubric</span>
-                <ArrowRight className="w-4 h-4" />
-              </Button>
             </div>
           </div>
 
           {/* Navigation Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-4 border-t border-slate-100 scrollbar-none text-xs font-bold">
+          <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-slate-100 scrollbar-none text-xs font-bold">
             <button
               onClick={() => setActiveTab('tracks')}
-              className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'tracks'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              <Layers className="w-4 h-4" />
-              <span>8 First-Class Skill Tracks</span>
+              <Layers className="w-3.5 h-3.5" />
+              <span>8 Skill Tracks</span>
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'projects'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              <Briefcase className="w-4 h-4" />
-              <span>Evaluated Capstone Projects</span>
+              <Briefcase className="w-3.5 h-3.5" />
+              <span>Capstone Projects</span>
             </button>
             <button
               onClick={() => setActiveTab('plans')}
-              className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'plans'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              <CreditCard className="w-4 h-4" />
+              <CreditCard className="w-3.5 h-3.5" />
               <span>Skill Studio Plans</span>
-              <span className="text-[10px] bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full font-black">From ₹999/mo</span>
+              <span className="text-[10px] bg-amber-400 text-amber-950 px-1 py-0.2 rounded-full font-bold">From ₹999/mo</span>
             </button>
           </div>
         </div>
