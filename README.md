@@ -1,95 +1,78 @@
-# TalentXcel.net — AI-First Education Platform
+# TalentXcel — Universal Learning, Assessment & Skills Platform
+### Greenfield Architecture · Multi-Surface Hybrid · Controlled OTA · Adaptive 10-Foot TV · Day-1 Revenue
 
-**Production-oriented, AI-first education and skills development platform for TalentXcel Academy.**
+Production-oriented, AI-first universal learning and assessment platform delivering a unified experience across:
+- **Television (Android TV & Google TV 10-Foot UI)** with remote D-pad navigation.
+- **Laptop & Desktop** with full multi-column academic workspace.
+- **Tablet** with two-column split-screen layout (questions on left, step-by-step explanations on right).
+- **Mobile Phone & Installable PWA** with touch-first navigation and offline practice.
 
-## Quick Start
+---
+
+## 1. Quick Start
 
 ### Prerequisites
-- Node.js 22+
-- pnpm 11+
-- A Supabase project (https://wvuvriewskvvievacida.supabase.co)
+- Node.js 22+ (tested on Node v25.6.1)
+- pnpm 11+ (tested on pnpm v11.16.0)
 
-### Setup
+### Development Setup
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/superapp124-cloud/TalentxcelNet.git
-   cd TalentxcelNet
-   ```
-
-2. Install dependencies:
+1. **Install workspace dependencies**:
    ```bash
    pnpm install
    ```
 
-3. Configure environment variables:
+2. **Build shared domain packages**:
    ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your Supabase keys and other config
+   pnpm build:packages
    ```
 
-4. Run the development server:
+3. **Start the Multi-Surface Learning App (Vite SPA)**:
    ```bash
-   pnpm dev
+   pnpm dev:app
+   ```
+   Open [http://localhost:5173](http://localhost:5173). Use the top Device Switcher bar to toggle between **TV Experience**, **Laptop / Desktop**, **Tablet Split-UI**, and **Mobile Phone**.
+
+4. **Run Automated Tests**:
+   ```bash
+   pnpm test:core   # Unit tests for scoring, question-key isolation & ledger math
+   pnpm test        # Full workspace test suite (76 tests)
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000)
+5. **Build for Production**:
+   ```bash
+   pnpm build:app   # Production bundle in apps/app/dist/
+   ```
 
-## Documentation
+---
 
-- [Architecture](docs/architecture.md)
-- [Database Schema](docs/database-schema.md)
-- [Deployment Guide](docs/deployment.md)
-- [AI Configuration](docs/ai-configuration.md)
-- [Security Notes](docs/security.md)
-- [Testing Guide](docs/testing.md)
+## 2. Monorepo Structure
 
-## Domains
-
-| Domain | Purpose |
-|--------|---------|
-| `talentxcel.net` | Public website, programme catalogue, admissions |
-| `academy.talentxcel.net` | Learner portal, courses, LMS |
-| `ai.talentxcel.net` | Super AI copilot, intelligent tutoring, code evaluation & learning workbench |
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 + shadcn/ui patterns |
-| Database | Supabase PostgreSQL + RLS |
-| Auth | Supabase Auth |
-| Forms | React Hook Form + Zod |
-| State | TanStack Query + Zustand |
-| AI | OpenAI-compatible (provider-agnostic) |
-| Payments | Razorpay (sandbox mode) |
-| Testing | Vitest + Playwright |
-
-## Scripts
-
-```bash
-pnpm dev          # Development server
-pnpm build        # Production build
-pnpm lint         # ESLint
-pnpm type-check   # TypeScript check
-pnpm test         # Unit/integration tests
-pnpm test:e2e     # End-to-end tests
+```text
+talentxcel/
+├── apps/
+│   └── app/               # Universal React 19 + Vite SPA (TV, Desktop, Tablet, Mobile)
+├── packages/
+│   ├── core/              # Domain models, scoring engine, Mayoor School PT-2 seed data
+│   └── ui/                # Navy & Electric Cobalt design tokens, focus indicators
+├── supabase/
+│   ├── migrations/
+│   │   └── 0001_initial_schema.sql  # 3NF schema, strict question-solution RLS, submit RPC
+│   └── seed.sql           # Grade III & IV Mayoor School PT-2 syllabus questions & products
+├── docs/
+│   ├── ARCHITECTURE.md    # Multi-surface design system & device adaptation
+│   ├── DATABASE.md        # Schema dictionary & question-solution isolation
+│   ├── SECURITY.md        # Threat model & server-authoritative scoring
+│   └── TESTING.md         # Automated test plan & acceptance criteria
+├── pnpm-workspace.yaml
+├── tsconfig.base.json
+└── README.md
 ```
 
-## Important Notes
+---
 
-- TalentXcel Academy issues **platform completion certificates only** — these are not regulated qualifications
-- Never expose `SUPABASE_SERVICE_ROLE_KEY` or payment secrets in browser code
-- Payments are in **sandbox mode** until production credentials are provided
-- All AI features require API key configuration in `.env.local`
-- See [Security Notes](docs/security.md) before deploying to production
+## 3. Security & Anti-Leak Design
 
-## Deployment
-
-See [docs/deployment.md](docs/deployment.md) for full instructions including Vercel setup, environment variables, and domain configuration.
-
-## License
-
-Proprietary. All rights reserved.
+- **Strict Question-Key Separation**: The `questions` table holds only learner-authorized fields (`question_text`, `options`, `marks`). The confidential answer keys and step-by-step solutions are stored in `question_solutions` and locked by Row Level Security (`USING (false)`), inaccessible to client queries.
+- **Server-Authoritative Evaluation**: Scoring is executed via the `submit_assessment_attempt` database RPC running as `SECURITY DEFINER` with fixed `search_path = public, pg_temp`. Prevents client-side score tampering and concurrent double-submissions.
+- **Append-Only Credit Ledger**: The ₹20 pass-credit reward is managed through an immutable ledger (`credit_ledger`), guaranteeing mathematical integrity via row summation.
