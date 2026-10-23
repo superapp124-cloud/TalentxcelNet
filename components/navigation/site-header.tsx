@@ -140,7 +140,7 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
             <Button
               size="sm"
               variant="outline"
-              className="text-xs font-semibold text-slate-700 border-slate-200 hover:bg-slate-50 h-8.5 rounded-xl"
+              className="text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border-slate-300 shadow-2xs h-8.5 px-3.5 rounded-xl transition-all"
             >
               Sign In
             </Button>
@@ -149,17 +149,18 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
           <Link href="/assessment">
             <Button
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-8.5 rounded-xl shadow-xs hidden sm:flex"
+              className="bg-[#245BFF] hover:bg-[#1D4ED8] text-white text-xs font-bold h-8.5 px-3.5 rounded-xl shadow-xs hidden sm:flex transition-all"
             >
               Free Practice
             </Button>
           </Link>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button with Accessible States */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="lg:hidden p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

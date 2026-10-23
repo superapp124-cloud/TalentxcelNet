@@ -129,7 +129,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased overflow-x-hidden w-full max-w-full min-w-0`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
