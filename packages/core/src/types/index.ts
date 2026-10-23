@@ -458,3 +458,78 @@ export interface LearnerTriDomainProgress {
   growthRecommendations: PersonalisedGrowthRecommendation[]
 }
 
+// ============================================================================
+// 15. COMMERCE, ENTITLEMENTS & FUNNEL TYPES (DAY-1 REVENUE & SCALE)
+// ============================================================================
+
+export type ProductDomain = 'assessment' | 'skill' | 'academic'
+export type BillingCycle = 'one_time' | 'monthly' | 'annual'
+
+export interface CommercialProduct {
+  id: string
+  slug: string
+  domain: ProductDomain
+  title: string
+  tagline: string
+  basePriceRupees: number
+  billingCycle: BillingCycle
+  currency: 'INR'
+  taxRatePercent: number // 18% GST
+  inclusions: string[]
+  features: string[]
+  targetAudience: string
+  attemptsAllowed?: number // -1 for unlimited
+  validityDays: number
+  popular?: boolean
+  badge?: string
+  targetGradeLevel?: number
+  skillLevel?: 'foundation' | 'intermediate' | 'advanced' | 'professional' | 'intensive'
+}
+
+export interface CommercialOrderSummary {
+  productId: string
+  title: string
+  domain: ProductDomain
+  basePriceRupees: number
+  billingCycle: BillingCycle
+  discountRupees: number
+  taxableAmountRupees: number
+  gstAmountRupees: number
+  totalPayableRupees: number
+  totalPayablePaise: number
+  currency: 'INR'
+}
+
+export interface LearnerEntitlement {
+  id: string
+  userId: string
+  productId: string
+  domain: ProductDomain
+  unlockedTargetId?: string
+  attemptsRemaining: number
+  validUntil: string
+  isActive: boolean
+  grantedAt: string
+}
+
+export type FunnelEventName =
+  | 'landing_view'
+  | 'domain_selected'
+  | 'free_test_started'
+  | 'free_test_completed'
+  | 'plan_viewed'
+  | 'checkout_initiated'
+  | 'payment_succeeded'
+  | 'payment_failed'
+  | 'entitlement_activated'
+
+export interface FunnelAnalyticsEvent {
+  id: string
+  eventName: FunnelEventName
+  domain?: ProductDomain
+  userId?: string
+  sessionId: string
+  metadata?: Record<string, unknown>
+  timestamp: string
+}
+

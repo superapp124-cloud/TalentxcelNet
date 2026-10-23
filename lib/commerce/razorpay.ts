@@ -59,8 +59,52 @@ export function verifyWebhookSignature(
     .update(webhookBody)
     .digest('hex')
 
-  return crypto.timingSafeEqual(
-    Buffer.from(expectedSignature),
-    Buffer.from(receivedSignature)
-  )
+  const expectedBuffer = Buffer.from(expectedSignature)
+  const receivedBuffer = Buffer.from(receivedSignature)
+
+  if (expectedBuffer.length !== receivedBuffer.length) {
+    return false
+  }
+
+  return crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+}
+
+/**
+ * Verifies Razorpay client checkout response signature server-side
+ * Standard HMAC SHA256 of `${orderId}|${paymentId}`
+ */
+export function verifyPaymentSignature(
+  orderId: string,
+  paymentId: string,
+  signature: string,
+  secret?: string
+): boolean {
+  const keySecret = secret || process.env.RAZORPAY_KEY_SECRET
+  if (!keySecret) {
+    // Development sandbox/mock fallback mode
+    if (process.env.PAYMENT_MODE === 'sandbox_mock' || !process.env.RAZORPAY_KEY_ID) {
+      return Boolean(signature && signature.length >= 8)
+    }
+    return false
+  }
+
+  try {
+    const payload = `${orderId}|${paymentId}`
+    const expectedSignature = crypto
+      .createHmac('sha256', keySecret)
+      .update(payload)
+      .digest('hex')
+
+    const expectedBuffer = Buffer.from(expectedSignature)
+    const receivedBuffer = Buffer.from(signature)
+
+    if (expectedBuffer.length !== receivedBuffer.length) {
+      return false
+    }
+
+    return crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+  } catch (err) {
+    console.error('[Razorpay] Signature verification error:', err)
+    return false
+  }
 }
