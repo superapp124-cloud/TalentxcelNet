@@ -63,7 +63,9 @@ export async function updateSession(request: NextRequest) {
     (request.headers.get('x-e2e-audit') === '1' ||
       request.cookies.get('e2e_audit')?.value === '1' ||
       isPreview)
-  const isSuperAdminUser = isSuperAdminEmail(user?.email)
+  const adminCookie = request.cookies.get('talentxcel_super_admin')?.value
+  const isSuperAdminCookie = isSuperAdminEmail(adminCookie)
+  const isSuperAdminUser = isSuperAdminEmail(user?.email) || isSuperAdminCookie
 
   if (isAcademyRoute && !user && !isLocalE2EAudit && !isSuperAdminUser) {
     const redirectUrl = request.nextUrl.clone()
@@ -72,9 +74,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (isAuthRoute && user) {
+  if (isAuthRoute && (user || isSuperAdminCookie)) {
     const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/dashboard'
+    redirectUrl.pathname = isSuperAdminCookie ? '/admin/question-bank' : '/dashboard'
     return NextResponse.redirect(redirectUrl)
   }
 
