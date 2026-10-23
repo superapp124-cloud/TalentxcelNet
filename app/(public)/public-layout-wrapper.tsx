@@ -8,16 +8,22 @@ import { AdmissionsAssistantWidget } from '@/components/public/admissions-assist
 
 export function PublicLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isHomePage = pathname === '/'
+  const isPlatformRoute =
+    pathname === '/' ||
+    pathname.startsWith('/assessment') ||
+    pathname.startsWith('/skills') ||
+    pathname.startsWith('/academic') ||
+    pathname.startsWith('/plans')
 
-  // When on the primary learner assessment platform homepage ('/'),
-  // do NOT render the marketing navbar or marketing footer, preventing duplicate headers
-  if (isHomePage) {
+  // When on primary learner platform routes ('/', '/assessment', '/skills', '/academic', '/plans'),
+  // do NOT render legacy marketing navbar or footer, ensuring a clean, distraction-free learning experience
+  if (isPlatformRoute) {
     return (
       <div className="flex min-h-screen flex-col overflow-x-hidden w-full max-w-full bg-[#F8FAFC]">
         <main className="flex-1" id="main-content">
           {children}
         </main>
+        <AdmissionsAssistantWidget />
       </div>
     )
   }
