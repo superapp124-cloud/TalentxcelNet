@@ -23,6 +23,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, '.'),
+      '@talentxcel/core': resolve(__dirname, 'packages/core/src'),
+      '@talentxcel/ui': resolve(__dirname, 'packages/ui/src'),
     },
   },
 })

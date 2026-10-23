@@ -14,6 +14,7 @@ import {
   X,
   ShieldCheck,
   Search,
+  Calculator,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -57,6 +58,14 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
       badge: 'From ₹20',
       icon: <CreditCard className="w-4 h-4 text-amber-600" />,
       active: pathname.startsWith('/plans'),
+    },
+    {
+      href: '/dashboard/question-bank',
+      label: 'Maths Question Bank',
+      shortLabel: 'Maths Bank',
+      badge: '36.5k Qs',
+      icon: <Calculator className="w-4 h-4 text-blue-600" />,
+      active: pathname.startsWith('/dashboard/question-bank'),
     },
   ]
 

@@ -237,6 +237,14 @@ export default function AssessmentPage() {
               <span>Assessment Packs</span>
               <span className="text-[10px] bg-amber-400 text-amber-950 px-1 py-0.2 rounded-full font-bold">From ₹20</span>
             </button>
+            <Link
+              href="/dashboard/question-bank"
+              className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition-all flex items-center gap-1.5 whitespace-nowrap ml-auto"
+            >
+              <Calculator className="w-3.5 h-3.5 text-blue-600" />
+              <span>Maths Bank (36,490 Qs)</span>
+              <span className="text-[9px] bg-blue-600 text-white px-1.5 py-0.2 rounded-full font-bold">🔒 Login</span>
+            </Link>
           </div>
         </div>
       </section>

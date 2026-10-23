@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { LayoutDashboard, BookOpen, Award, Settings, LogOut, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, BookOpen, Award, Settings, LogOut, MessageSquare, Calculator } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/brand/logo'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Maths Question Bank', href: '/dashboard/question-bank', icon: Calculator },
   { label: 'My Courses', href: '/courses/ai-development', icon: BookOpen },
   { label: 'Certificates', href: '/verify/TXCERT-2026-DEMO01', icon: Award },
   { label: 'Settings', href: '/dashboard', icon: Settings },
