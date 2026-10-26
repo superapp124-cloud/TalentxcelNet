@@ -13,6 +13,7 @@ import {
   Cpu,
   Code,
   Wrench,
+  Clock,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -74,6 +75,64 @@ export function TrackCurriculumModal({
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
               {track.description}
             </p>
+
+            {/* Eastern Pedagogical Heritage (Japanese / Chinese Discipline & Daily Drill) */}
+            {track.easternHeritage && (
+              <div className="bg-gradient-to-br from-amber-50/90 via-orange-50/50 to-indigo-50/70 border border-amber-200/80 rounded-2xl p-4 space-y-3 text-xs shadow-2xs">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/60 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">
+                      {track.easternHeritage.tradition === 'japanese'
+                        ? '🇯🇵'
+                        : track.easternHeritage.tradition === 'chinese'
+                        ? '🇨🇳'
+                        : '🌏'}
+                    </span>
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 block">
+                        {track.easternHeritage.tradition === 'japanese'
+                          ? 'Japanese Mastery Discipline'
+                          : track.easternHeritage.tradition === 'chinese'
+                          ? 'Chinese Rigorous Progression'
+                          : 'Pan-Asian Youth Mastery'}
+                      </span>
+                      <span className="text-xs sm:text-sm font-extrabold text-slate-900">
+                        {track.easternHeritage.originalName}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[10px] font-bold">
+                    Classes 4–9 Focus
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
+                      Core Craft Discipline
+                    </span>
+                    <p className="text-xs text-slate-700 leading-snug">
+                      {track.easternHeritage.keyDiscipline}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1 bg-white/80 border border-amber-200 rounded-xl p-2.5">
+                    <div className="flex items-center gap-1.5 text-amber-950 font-bold text-[11px]">
+                      <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span>Daily 15-Minute Deliberate Drill</span>
+                    </div>
+                    <p className="text-[11px] text-slate-700 leading-snug">
+                      {track.easternHeritage.dailyDeliberateDrill}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-slate-500 italic pt-0.5 border-t border-amber-200/40">
+                  Target: {track.easternHeritage.gradeTargetNote}
+                </div>
+              </div>
+            )}
 
             <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3.5 space-y-1 text-xs">
               <div className="flex items-center gap-1.5 font-bold text-indigo-900">

@@ -30,6 +30,15 @@ export interface ClassSkillProject {
   status: 'verified' | 'active'
 }
 
+export interface EasternSkillHeritage {
+  tradition: 'japanese' | 'chinese' | 'pan_asian'
+  originalName: string // e.g. "そろばん & 暗算 (Soroban & Anzan)", "奥数 (Aoshu Olympiad Math)", "ものづくり (Monozukuri)"
+  englishConcept: string
+  keyDiscipline: string
+  dailyDeliberateDrill: string
+  gradeTargetNote: string
+}
+
 export interface ClassSkillTrackMeta {
   id: string
   category: string
@@ -42,6 +51,7 @@ export interface ClassSkillTrackMeta {
   description: string
   philosophy: 'japanese_kaizen' | 'chinese_progression' | 'universal_mastery'
   philosophyNote: string
+  easternHeritage?: EasternSkillHeritage
   iconName: string
   colorTheme: string
   tools: string[]

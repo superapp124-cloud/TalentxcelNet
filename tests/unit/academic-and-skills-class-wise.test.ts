@@ -168,4 +168,57 @@ describe('Class-Wise 8 Skill Development Tracks (Classes 4–12)', () => {
     const prices = SKILL_STUDIO_PLANS.map((p) => p.basePriceRupees)
     expect(prices).toEqual([999, 2499, 4999])
   })
+
+  it('embeds authentic Japanese & Chinese skill heritage and daily drills for youth up to Class 9', () => {
+    // Test youth classes 4 through 9
+    for (let c = 4; c <= 9; c++) {
+      const tracks = getClassSkillTracks(c)
+      expect(tracks.length).toBe(8)
+
+      for (const track of tracks) {
+        expect(track.easternHeritage, `Track ${track.id} in Class ${c} must have easternHeritage`).toBeDefined()
+        const heritage = track.easternHeritage!
+        expect(['japanese', 'chinese', 'pan_asian']).toContain(heritage.tradition)
+        expect(heritage.originalName.length).toBeGreaterThan(4)
+        expect(heritage.englishConcept.length).toBeGreaterThan(4)
+        expect(heritage.keyDiscipline.length).toBeGreaterThan(15)
+        expect(heritage.dailyDeliberateDrill.length).toBeGreaterThan(15)
+        expect(heritage.gradeTargetNote).toContain('4–9')
+      }
+
+      // Verify specific pedagogical tradition mapping
+      const ai = tracks.find((t) => t.id === 'track_ai_automation')!
+      expect(ai.easternHeritage?.tradition).toBe('japanese')
+      expect(ai.easternHeritage?.originalName).toContain('改善 (Kaizen)')
+
+      const coding = tracks.find((t) => t.id === 'track_coding_computation')!
+      expect(coding.easternHeritage?.tradition).toBe('chinese')
+      expect(coding.easternHeritage?.originalName).toContain('信息学奥赛')
+
+      const math = tracks.find((t) => t.id === 'track_math_problem_solving')!
+      expect(math.easternHeritage?.originalName).toContain('そろばん')
+      expect(math.easternHeritage?.originalName).toContain('奥数')
+
+      const robotics = tracks.find((t) => t.id === 'track_robotics_engineering')!
+      expect(robotics.easternHeritage?.tradition).toBe('japanese')
+      expect(robotics.easternHeritage?.originalName).toContain('ものづくり')
+
+      const design = tracks.find((t) => t.id === 'track_design_production')!
+      expect(design.easternHeritage?.tradition).toBe('japanese')
+      expect(design.easternHeritage?.originalName).toContain('5S 原則')
+
+      const comm = tracks.find((t) => t.id === 'track_communication_collab')!
+      expect(comm.easternHeritage?.tradition).toBe('japanese')
+      expect(comm.easternHeritage?.originalName).toContain('起承転結')
+
+      const venture = tracks.find((t) => t.id === 'track_entrepreneurship_fin')!
+      expect(venture.easternHeritage?.tradition).toBe('chinese')
+      expect(venture.easternHeritage?.originalName).toContain('实事求是')
+
+      const tools = tracks.find((t) => t.id === 'track_digital_vocational')!
+      expect(tools.easternHeritage?.tradition).toBe('pan_asian')
+      expect(tools.easternHeritage?.originalName).toContain('正道入力')
+    }
+  })
 })
+

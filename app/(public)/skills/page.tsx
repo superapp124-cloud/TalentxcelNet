@@ -180,11 +180,16 @@ function SkillsBrowserContent() {
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-bold tracking-wide">
-                <Code className="w-3.5 h-3.5" />
-                <span>Domain 2: Skill Development</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
-                <span>8 Structured Tracks • Class-Calibrated Progression</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-bold tracking-wide">
+                  <Code className="w-3.5 h-3.5" />
+                  <span>Domain 2: Skill Development</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                  <span>8 Structured Tracks</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold tracking-wide">
+                  <span>🇯🇵 🇨🇳 Eastern Youth Mastery (Grades 4–9)</span>
+                </div>
               </div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 Learn by Doing, Building and{' '}
@@ -193,7 +198,7 @@ function SkillsBrowserContent() {
                 </span>
               </h1>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Structured learning outcomes, practical capstone projects, and evaluated submissions. Master AI, code, robotics, design, debate and venture building tailored to your grade from ₹999/month.
+                Empowering kids up to 9th grade and beyond with authentic Japanese craft (Kaizen, Soroban, Monozukuri) and Chinese algorithmic rigor (CSP-J, Deliberate Practice). Practical capstone projects and evaluated submissions from ₹999/month.
               </p>
             </div>
 
@@ -344,6 +349,74 @@ function SkillsBrowserContent() {
               </div>
             </div>
 
+            {/* Japanese & Chinese Youth Skill Academy Banner (Classes 4–9 Focus) */}
+            <div className="bg-gradient-to-r from-amber-50/90 via-orange-50/50 to-indigo-50/70 border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-2xl">🇯🇵 🇨🇳</span>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
+                        Japanese &amp; Chinese Youth Mastery Framework (Classes 4–9)
+                      </h3>
+                      <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[10px] font-bold">
+                        Disciplined Pedagogy
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      Grounding students up to 9th grade in authentic Eastern mastery: Soroban mental math visualization, CSP-J algorithmic tracing, Monozukuri physical precision, and 5S clean design.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="text-[11px] font-bold text-amber-900 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-1.5 shadow-2xs">
+                    <Clock className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Daily 15-Minute Deliberate Practice</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4 Eastern Discipline Pillars */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1 border-t border-amber-200/60">
+                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
+                    <span>🇯🇵 そろばん &amp; 暗算</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-tight">
+                    Internalized bead memory for lightning mental arithmetic &amp; non-routine invariants.
+                  </p>
+                </div>
+
+                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
+                    <span>🇨🇳 信息学奥赛 (CSP-J)</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-tight">
+                    Algorithmic trace tables on paper before typing code; eliminating guesswork.
+                  </p>
+                </div>
+
+                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
+                    <span>🇯🇵 ものづくり (Monozukuri)</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-tight">
+                    Zero-defect tactile circuits, tidy right-angled jumper leads, and schematic rigor.
+                  </p>
+                </div>
+
+                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
+                    <span>🇯🇵 5S 原則 &amp; 間 (Ma)</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-tight">
+                    Ergonomic clutter elimination (Muda), strict 8pt spatial rhythm &amp; high contrast.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Tracks Grid (8 Tracks for selected class) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredTracks.map((track) => (
@@ -389,6 +462,35 @@ function SkillsBrowserContent() {
                         </span>
                       ))}
                     </div>
+
+                    {/* Eastern Heritage Discipline & Daily Drill Badge */}
+                    {track.easternHeritage && (
+                      <div className="bg-gradient-to-r from-amber-50 to-orange-50/60 border border-amber-200/90 rounded-xl p-2.5 text-[11px] text-amber-950 space-y-1.5 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                            <span>
+                              {track.easternHeritage.tradition === 'japanese'
+                                ? '🇯🇵'
+                                : track.easternHeritage.tradition === 'chinese'
+                                ? '🇨🇳'
+                                : '🌏'}
+                            </span>
+                            <span className="truncate max-w-[170px]">
+                              {track.easternHeritage.originalName}
+                            </span>
+                          </div>
+                          {selectedClassNumber <= 9 && (
+                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-amber-200/80 text-amber-900 shrink-0">
+                              Grades 4–9
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-700 leading-tight font-medium line-clamp-2">
+                          <span className="font-bold text-amber-800">Daily Drill: </span>
+                          {track.easternHeritage.dailyDeliberateDrill}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Philosophy badge */}
                     <div className="bg-indigo-50/60 border border-indigo-100/80 rounded-xl p-2.5 text-[11px] text-indigo-900 leading-tight">

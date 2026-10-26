@@ -83,6 +83,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'indigo',
     philosophy: 'japanese_kaizen',
     philosophyNote: 'Japanese Kaizen craft: continuous iterative refinement of system prompts and deterministic reasoning guardrails.',
+    easternHeritage: {
+      tradition: 'japanese',
+      originalName: '改善 (Kaizen) & 反省 (Hansei)',
+      englishConcept: 'Continuous 1% Optimization & Socratic Reflection',
+      keyDiscipline: 'Disciplined iteration of prompt rules, boundary testing, and systematic mistake review (Hansei).',
+      dailyDeliberateDrill: '10-min prompt error audit: spot 3 AI misconceptions and rewrite system instructions.',
+      gradeTargetNote: 'Recommended for Classes 4–9 foundational AI & cognitive literacy.',
+    },
     ...(stage === 'junior'
       ? {
           classSpecificTitle: 'Generative AI Discovery & Creative Prompting',
@@ -240,6 +248,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'blue',
     philosophy: 'chinese_progression',
     philosophyNote: 'Chinese structured progression: rigorous algorithmic foundations, step-by-step logic drills, and deliberate coding practice.',
+    easternHeritage: {
+      tradition: 'chinese',
+      originalName: '信息学奥赛 (CSP-J Junior Informatics) & 刻意练习 (Keyi Lianxi)',
+      englishConcept: 'Algorithmic Rigor, Step Trace Tables & Zero-Guesswork Debugging',
+      keyDiscipline: 'Step-by-step dry-run traces on paper before typing code; eliminating guesswork and mastering nested control logic.',
+      dailyDeliberateDrill: '15-min hand-tracing drill: write input-output state table for 1 loop problem without running the compiler.',
+      gradeTargetNote: 'Focus for Classes 4–9 to build world-class algorithmic reflexes similar to Chinese junior informatics olympiad training.',
+    },
     ...(stage === 'junior'
       ? {
           classSpecificTitle: 'Visual Logic, Loops & Game Animation',
@@ -397,6 +413,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'amber',
     philosophy: 'universal_mastery',
     philosophyNote: 'Universal mastery: fast mental arithmetic, geometric visual proofs, combinatorial logic, and competitive Olympiad deduction.',
+    easternHeritage: {
+      tradition: 'japanese',
+      originalName: 'そろばん & 暗算 (Soroban & Anzan) + 小学奥数 (Aoshu Olympiad Math)',
+      englishConcept: 'Flash Mental Abacus Visualization & Non-Routine Heuristic Deduction',
+      keyDiscipline: 'Internalized bead-movement mental calculation (Anzan) combined with Chinese Aoshu pigeonhole and parity invariants.',
+      dailyDeliberateDrill: '15-min flash mental arithmetic & 1 Olympiad non-routine invariant puzzle (no scratch paper for first 5 mins).',
+      gradeTargetNote: 'Foundational mastery for Classes 4–9 before rote algebra calcifies.',
+    },
     classSpecificTitle: stage === 'junior'
       ? 'Mental Math Puzzles & Visual Geometry'
       : stage === 'middle'
@@ -456,6 +480,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'emerald',
     philosophy: 'japanese_kaizen',
     philosophyNote: 'Japanese Monozukuri: precision physical craft, disciplined safety, schematic cleanliness, and iterative hardware engineering.',
+    easternHeritage: {
+      tradition: 'japanese',
+      originalName: 'ものづくり (Monozukuri Craftsmanship) & 整理・整頓 (Seiri-Seiton)',
+      englishConcept: 'Precision Physical Engineering, Zero-Defect Assembly & Tactile Wiring',
+      keyDiscipline: 'Deep respect for the physical component, clean right-angle breadboard wiring, and systematic polarity/voltage check before power-on.',
+      dailyDeliberateDrill: '15-min circuit audit: inspect breadboard connections, calculate resistor drop, and test continuity with a multimeter.',
+      gradeTargetNote: 'Hands-on spatial & tactile engineering for Classes 4–9.',
+    },
     classSpecificTitle: stage === 'junior'
       ? 'Circuits, Switches & Simple Machines'
       : stage === 'middle'
@@ -515,6 +547,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'purple',
     philosophy: 'japanese_kaizen',
     philosophyNote: 'Japanese aesthetic minimalism: purposeful whitespace (Ma), high-contrast accessibility, and empathetic user-centered design.',
+    easternHeritage: {
+      tradition: 'japanese',
+      originalName: '5S 原則 (Seiri, Seiton) & 間 (Ma - Purposeful Space)',
+      englishConcept: 'Ergonomic Order, Clutter Elimination (Muda) & Purposeful Space',
+      keyDiscipline: 'Eliminating decorative clutter (Muda), enforcing an unyielding 8pt spatial rhythm, and ensuring WCAG AA high contrast.',
+      dailyDeliberateDrill: '15-min UI declutter drill: inspect 1 screen, remove 3 redundant visual elements, and align all margins to 8px intervals.',
+      gradeTargetNote: 'Instills design cleanliness, visual empathy, and ergonomic discipline for Classes 4–9.',
+    },
     classSpecificTitle: stage === 'junior'
       ? 'Visual Layout, Colors & Digital Posters'
       : stage === 'middle'
@@ -568,6 +608,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'cyan',
     philosophy: 'universal_mastery',
     philosophyNote: 'Universal mastery: structured rhetoric, evidence-based argument construction, active listening, and calm persuasive discourse.',
+    easternHeritage: {
+      tradition: 'japanese',
+      originalName: '起承転結 (Kishōtenketsu) & 和 (Wa - Harmonious Rhetoric)',
+      englishConcept: '4-Part Structural Rhetoric (Introduction, Development, Twist, Synthesis)',
+      keyDiscipline: 'Non-adversarial 4-stage storytelling and argument architecture enabling persuasive synthesis of viewpoints without hostility.',
+      dailyDeliberateDrill: '10-min speech structure drill: outline an argument using 4 index cards: Introduction, Development, Twist, and Unified Conclusion.',
+      gradeTargetNote: 'Develops disciplined, structured, and polite persuasive public speaking for Classes 4–9.',
+    },
     classSpecificTitle: stage === 'junior'
       ? 'Expressive Storytelling & Confident Speaking'
       : stage === 'middle'
@@ -621,6 +669,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'rose',
     philosophy: 'chinese_progression',
     philosophyNote: 'Chinese execution focus: early unit economics, frugal prototyping, direct customer feedback, and rapid capital reinvestment.',
+    easternHeritage: {
+      tradition: 'chinese',
+      originalName: '实事求是 (Seek Truth From Facts) & 算盘账 (Abacus Unit Economics)',
+      englishConcept: 'Frugal Unit Margins, Direct Customer Truth & Pragmatic Reinvestment',
+      keyDiscipline: 'Grounding every commercial decision in empirical customer reality (Seek Truth From Facts), positive unit gross margin on item 1, and zero wasteful cash burn.',
+      dailyDeliberateDrill: '15-min unit economics drill: calculate COGS, packaging, and break-even units for a lemonade or stationery stall.',
+      gradeTargetNote: 'Financial literacy and practical enterprise habits for Classes 4–9.',
+    },
     classSpecificTitle: stage === 'junior'
       ? 'Pocket Money Budgeting & Trade Games'
       : stage === 'middle'
@@ -674,6 +730,14 @@ export function getClassSkillTracks(classNumber: number): ClassSkillTrackMeta[] 
     colorTheme: 'sky',
     philosophy: 'universal_mastery',
     philosophyNote: 'Universal mastery: modern digital fluency, spreadsheet modeling, relational data organization, and cybersecurity hygiene.',
+    easternHeritage: {
+      tradition: 'pan_asian',
+      originalName: '正道入力 (Correct Posture Blind Typing) & 结构化数据 (Structured Relational Hygiene)',
+      englishConcept: 'Ergonomic Touch-Typing Precision & Strict Tabular Data Normalization',
+      keyDiscipline: '10-finger touch typing without looking at the keyboard (target 50+ WPM), consistent column naming, zero merged cells, and daily cloud backup hygiene.',
+      dailyDeliberateDrill: '10-min blind touch-typing drill + 5-min spreadsheet cleaning (remove duplicate rows & format headers).',
+      gradeTargetNote: 'Digital keyboarding fluency and data hygiene for Classes 4–9.',
+    },
     classSpecificTitle: stage === 'junior'
       ? 'Digital Literacy, Safe Browsing & Docs'
       : stage === 'middle'
