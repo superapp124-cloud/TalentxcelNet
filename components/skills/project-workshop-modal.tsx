@@ -52,10 +52,10 @@ export function ProjectWorkshopModal({
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900">
-                Capstone Project Workshop
+                Practical Life Skill Workshop
               </h3>
               <p className="text-xs text-slate-500">
-                Craftsmanship &amp; Rubric-Based Evaluation
+                Hands-On Application &amp; Rubric-Based Evaluation
               </p>
             </div>
           </div>
@@ -83,7 +83,7 @@ export function ProjectWorkshopModal({
                 Difficulty: {project.difficulty}
               </Badge>
               <Badge variant="outline" className="text-xs text-emerald-700 border-emerald-200 bg-emerald-50">
-                Verified Rubric
+                Verified Practical Rubric
               </Badge>
             </div>
 
@@ -95,7 +95,7 @@ export function ProjectWorkshopModal({
           <div className="p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl space-y-1">
             <h4 className="text-xs font-bold text-indigo-900 flex items-center gap-1.5 uppercase tracking-wide">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-              Real-World Engineering Context
+              Real-World Practical Context
             </h4>
             <p className="text-xs text-indigo-950 leading-relaxed">{project.realWorldContext}</p>
           </div>
@@ -103,7 +103,7 @@ export function ProjectWorkshopModal({
           {/* Deliverables */}
           <div className="space-y-2.5">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-              Required Capstone Deliverables
+              Required Practical Deliverables
             </h4>
             <ul className="space-y-2 text-xs text-slate-700">
               {project.deliverables.map((item, idx) => (
@@ -145,31 +145,34 @@ export function ProjectWorkshopModal({
           {/* Submission Form */}
           <div className="pt-4 border-t border-slate-200 space-y-3">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-              Submit Project Deliverables for Evaluation
+              Submit Practical Deliverables for Mentor Evaluation
             </h4>
 
             {submitted ? (
               <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-1">
                 <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                <p className="font-bold text-xs text-emerald-950">Project Submitted for Rubric Review!</p>
+                <p className="font-bold text-xs text-emerald-950">Activity Submitted for Rubric Review!</p>
                 <p className="text-[11px] text-emerald-800">
-                  Your deliverable has been queued. You will receive asynchronous rubric feedback.
+                  Your practical deliverable has been queued. You will receive constructive mentor feedback.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Deliverable URL (GitHub repo, Figma link, or Google Drive folder)
+                    Deliverable Link or Photo Evidence (Google Drive, Docs, or Checklist link)
                   </label>
                   <input
                     type="url"
                     required
                     value={submissionUrl}
                     onChange={(e) => setSubmissionUrl(e.target.value)}
-                    placeholder="https://github.com/username/project"
+                    placeholder="https://drive.google.com/... or https://docs.google.com/..."
                     className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Safety reminder: Never share passwords, home addresses, or private financial details.
+                  </p>
                 </div>
 
                 <div>

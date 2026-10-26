@@ -88,73 +88,97 @@ describe('Class-Wise Academic Learning Engine (Classes 4–12)', () => {
   })
 })
 
-describe('Class-Wise 8 Skill Development Tracks (Classes 4–12)', () => {
-  it('covers all 8 distinct skill tracks across every grade', () => {
-    const sampleClasses = [4, 6, 8, 10, 12]
-
-    for (const c of sampleClasses) {
+describe('Class-Wise Real-Life Skill Development Tracks (Classes 4–9)', () => {
+  it('covers all 8 practical real-life skill tracks across Classes 4–9', () => {
+    for (let c = 4; c <= 9; c++) {
       const tracks = getClassSkillTracks(c)
       expect(tracks.length).toBe(8)
 
       const trackIds = tracks.map((t) => t.id)
       expect(trackIds).toEqual([
-        'track_ai_automation',
-        'track_coding_computation',
-        'track_math_problem_solving',
-        'track_robotics_engineering',
-        'track_design_production',
-        'track_communication_collab',
-        'track_entrepreneurship_fin',
-        'track_digital_vocational',
+        'track_life_independence',
+        'track_life_communication',
+        'track_life_money_management',
+        'track_life_safety_health',
+        'track_life_critical_thinking',
+        'track_life_social_teamwork',
+        'track_life_study_skills',
+        'track_life_citizenship_community',
       ])
     }
   })
 
-  it('calibrates tools, outcomes, and capstones based on student age bracket', () => {
-    // Junior (Class 4)
-    const cl4Coding = getClassSkillTracks(4).find((t) => t.id === 'track_coding_computation')!
-    expect(cl4Coding.tools).toContain('Scratch 3.0')
-    expect(cl4Coding.level).toBe('foundation')
-    expect(cl4Coding.capstoneProject.difficulty).toBe('easy')
+  it('calibrates learning across 3 developmental stages (Classes 4–5, 6–7, 8–9)', () => {
+    // Stage 1: Foundation & Guided Practice (Classes 4–5)
+    expect(getSkillStage(4).lifeSkillStage).toBe('foundation_guided')
+    expect(getSkillStage(5).lifeSkillStage).toBe('foundation_guided')
 
-    // Middle (Class 8)
-    const cl8Coding = getClassSkillTracks(8).find((t) => t.id === 'track_coding_computation')!
-    expect(cl8Coding.tools).toContain('Python 3.12')
-    expect(cl8Coding.level).toBe('intermediate')
+    // Stage 2: Developing Independence & Decision-Making (Classes 6–7)
+    expect(getSkillStage(6).lifeSkillStage).toBe('developing_independence')
+    expect(getSkillStage(7).lifeSkillStage).toBe('developing_independence')
 
-    // Secondary (Class 10)
-    const cl10AI = getClassSkillTracks(10).find((t) => t.id === 'track_ai_automation')!
-    expect(cl10AI.tools).toContain('Python 3.12')
-    expect(cl10AI.classSpecificTitle).toContain('Retrieval-Augmented')
-    expect(cl10AI.capstoneProject.difficulty).toBe('hard')
-
-    // Senior (Class 12)
-    const cl12Coding = getClassSkillTracks(12).find((t) => t.id === 'track_coding_computation')!
-    expect(cl12Coding.tools).toContain('TypeScript')
-    expect(cl12Coding.tools).toContain('Next.js / React')
+    // Stage 3: Applied Responsibility & Real-World Readiness (Classes 8–9)
+    expect(getSkillStage(8).lifeSkillStage).toBe('applied_responsibility')
+    expect(getSkillStage(9).lifeSkillStage).toBe('applied_responsibility')
   })
 
-  it('provides 4-week structured module roadmaps for every track and class', () => {
-    for (let c = 4; c <= 12; c++) {
+  it('provides all 8 pedagogical learning elements for every track across all classes', () => {
+    for (let c = 4; c <= 9; c++) {
       const tracks = getClassSkillTracks(c)
       for (const track of tracks) {
-        expect(track.weeklyModules.length).toBeGreaterThanOrEqual(4)
+        // 1. Why it matters
+        expect(track.whyItMatters.length).toBeGreaterThan(15)
+
+        // 2. Relatable everyday scenario
+        expect(track.realLifeScenario.length).toBeGreaterThan(20)
+
+        // 3. Guided worked example
+        expect(track.workedExample.title.length).toBeGreaterThan(5)
+        expect(track.workedExample.scenario.length).toBeGreaterThan(10)
+        expect(track.workedExample.steps.length).toBeGreaterThanOrEqual(3)
+        expect(track.workedExample.takeaway.length).toBeGreaterThan(10)
+
+        // 4. Safe practical activity
+        expect(track.practicalActivity.title.length).toBeGreaterThan(5)
+        expect(track.practicalActivity.instructions.length).toBeGreaterThanOrEqual(3)
+        expect(track.practicalActivity.safeCheckNote.length).toBeGreaterThan(10)
+        expect(track.practicalActivity.deliverableDescription.length).toBeGreaterThan(5)
+
+        // 5. Reflection exercise
+        expect(track.reflectionExercise.promptQuestion.length).toBeGreaterThan(10)
+        expect(track.reflectionExercise.guidingPoints.length).toBeGreaterThanOrEqual(2)
+
+        // 6. Validated assessment with reasoning
+        expect(track.assessment.question.length).toBeGreaterThan(10)
+        expect(track.assessment.options.length).toBe(4)
+        expect(track.assessment.correctOptionId).toBeDefined()
+        const correctOpt = track.assessment.options.find((o) => o.id === track.assessment.correctOptionId)
+        expect(correctOpt).toBeDefined()
+        expect(correctOpt?.isCorrect).toBe(true)
+
+        // 7. 4-week module roadmap
+        expect(track.weeklyModules.length).toBe(4)
         for (const mod of track.weeklyModules) {
           expect(mod.weekNumber).toBeGreaterThan(0)
           expect(mod.title.length).toBeGreaterThan(3)
           expect(mod.objective.length).toBeGreaterThan(5)
           expect(mod.deliverable.length).toBeGreaterThan(3)
         }
+
+        // 8. Capstone project
+        expect(track.capstoneProject.id).toBeDefined()
+        expect(track.capstoneProject.title.length).toBeGreaterThan(5)
+        expect(track.capstoneProject.rubricCriteria.length).toBeGreaterThanOrEqual(3)
       }
     }
   })
 
   it('resolves capstone projects by ID and filters by class', () => {
-    const projCl10 = getSkillProjectById('proj_ai_c10')
-    expect(projCl10).toBeDefined()
-    expect(projCl10?.trackId).toBe('track_ai_automation')
-    expect(projCl10?.classNumber).toBe(10)
-    expect(projCl10?.rubricCriteria.length).toBeGreaterThanOrEqual(3)
+    const projCl4 = getSkillProjectById('proj_indep_c4')
+    expect(projCl4).toBeDefined()
+    expect(projCl4?.trackId).toBe('track_life_independence')
+    expect(projCl4?.classNumber).toBe(4)
+    expect(projCl4?.rubricCriteria.length).toBeGreaterThanOrEqual(3)
 
     const allCl7Projects = getAllClassProjects(7)
     expect(allCl7Projects.length).toBe(8)
@@ -169,56 +193,45 @@ describe('Class-Wise 8 Skill Development Tracks (Classes 4–12)', () => {
     expect(prices).toEqual([999, 2499, 4999])
   })
 
-  it('embeds authentic Japanese & Chinese skill heritage and daily drills for youth up to Class 9', () => {
-    // Test youth classes 4 through 9
+  it('strictly verifies zero Japanese/Chinese heritage frameworks and zero coding/robotics in Classes 4–9', () => {
+    const prohibitedKeywords = [
+      'Kaizen',
+      '改善',
+      'Monozukuri',
+      'ものづくり',
+      'Soroban',
+      'そろばん',
+      'Kishōtenketsu',
+      '起承転結',
+      '5S 原則',
+      '信息学奥赛',
+      'Python',
+      'Scratch',
+      'C++',
+      'TypeScript',
+      'microcontroller',
+      'robotics kit',
+      'prompt engineering',
+      'neural network',
+    ]
+
     for (let c = 4; c <= 9; c++) {
       const tracks = getClassSkillTracks(c)
-      expect(tracks.length).toBe(8)
-
       for (const track of tracks) {
-        expect(track.easternHeritage, `Track ${track.id} in Class ${c} must have easternHeritage`).toBeDefined()
-        const heritage = track.easternHeritage!
-        expect(['japanese', 'chinese', 'pan_asian']).toContain(heritage.tradition)
-        expect(heritage.originalName.length).toBeGreaterThan(4)
-        expect(heritage.englishConcept.length).toBeGreaterThan(4)
-        expect(heritage.keyDiscipline.length).toBeGreaterThan(15)
-        expect(heritage.dailyDeliberateDrill.length).toBeGreaterThan(15)
-        expect(heritage.gradeTargetNote).toContain('4–9')
+        // Assert no easternHeritage property
+        expect((track as unknown as Record<string, unknown>).easternHeritage).toBeUndefined()
+
+        // Check text content for prohibited technical/language concepts
+        const textPayload = JSON.stringify(track).toLowerCase()
+        for (const kw of prohibitedKeywords) {
+          expect(
+            textPayload.includes(kw.toLowerCase()),
+            `Class ${c} track ${track.id} must not contain "${kw}"`
+          ).toBe(false)
+        }
       }
-
-      // Verify specific pedagogical tradition mapping
-      const ai = tracks.find((t) => t.id === 'track_ai_automation')!
-      expect(ai.easternHeritage?.tradition).toBe('japanese')
-      expect(ai.easternHeritage?.originalName).toContain('改善 (Kaizen)')
-
-      const coding = tracks.find((t) => t.id === 'track_coding_computation')!
-      expect(coding.easternHeritage?.tradition).toBe('chinese')
-      expect(coding.easternHeritage?.originalName).toContain('信息学奥赛')
-
-      const math = tracks.find((t) => t.id === 'track_math_problem_solving')!
-      expect(math.easternHeritage?.originalName).toContain('そろばん')
-      expect(math.easternHeritage?.originalName).toContain('奥数')
-
-      const robotics = tracks.find((t) => t.id === 'track_robotics_engineering')!
-      expect(robotics.easternHeritage?.tradition).toBe('japanese')
-      expect(robotics.easternHeritage?.originalName).toContain('ものづくり')
-
-      const design = tracks.find((t) => t.id === 'track_design_production')!
-      expect(design.easternHeritage?.tradition).toBe('japanese')
-      expect(design.easternHeritage?.originalName).toContain('5S 原則')
-
-      const comm = tracks.find((t) => t.id === 'track_communication_collab')!
-      expect(comm.easternHeritage?.tradition).toBe('japanese')
-      expect(comm.easternHeritage?.originalName).toContain('起承転結')
-
-      const venture = tracks.find((t) => t.id === 'track_entrepreneurship_fin')!
-      expect(venture.easternHeritage?.tradition).toBe('chinese')
-      expect(venture.easternHeritage?.originalName).toContain('实事求是')
-
-      const tools = tracks.find((t) => t.id === 'track_digital_vocational')!
-      expect(tools.easternHeritage?.tradition).toBe('pan_asian')
-      expect(tools.easternHeritage?.originalName).toContain('正道入力')
     }
   })
 })
+
 

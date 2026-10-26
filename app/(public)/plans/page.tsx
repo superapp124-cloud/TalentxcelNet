@@ -269,7 +269,7 @@ export default function PlansPricingPage() {
                   <h2 className="text-xl font-bold text-slate-900">2. Skill Development</h2>
                 </div>
                 <p className="text-xs text-slate-600 mt-1">
-                  Japanese Kaizen craft & Chinese progression drills across Coding, AI, Robotics, UI Design & Financial Literacy.
+                  Practical real-life skills for Classes 4–9: personal independence, communication, money management, safety, and critical thinking.
                 </p>
               </div>
 

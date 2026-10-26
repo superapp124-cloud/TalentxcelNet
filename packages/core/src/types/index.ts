@@ -324,6 +324,14 @@ export interface LearnerAnalyticsSummary {
 export type LearningDomain = 'assessment' | 'skills' | 'academic'
 
 export type SkillCategory =
+  | 'life_independence'
+  | 'life_communication'
+  | 'life_money_management'
+  | 'life_safety_health'
+  | 'life_critical_thinking'
+  | 'life_social_teamwork'
+  | 'life_study_skills'
+  | 'life_citizenship_community'
   | 'ai_automation'
   | 'coding_computation'
   | 'math_problem_solving'
@@ -333,7 +341,13 @@ export type SkillCategory =
   | 'entrepreneurship_finance'
   | 'digital_vocational'
 
-export type PedagogicalPhilosophy = 'japanese_kaizen' | 'chinese_progression' | 'universal_mastery'
+export type PedagogicalPhilosophy =
+  | 'practical_life_skills'
+  | 'guided_independence'
+  | 'real_world_application'
+  | 'japanese_kaizen'
+  | 'chinese_progression'
+  | 'universal_mastery'
 
 export interface SkillTrack {
   id: string

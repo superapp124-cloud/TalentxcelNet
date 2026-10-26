@@ -4,19 +4,18 @@ import React, { useState, useMemo, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Code,
-  Sparkles,
-  Calculator,
-  Cpu,
-  Palette,
+  Home,
   MessageSquare,
-  TrendingUp,
-  Cloud,
+  Coins,
+  ShieldCheck,
+  Compass,
+  Users,
+  BookOpen,
+  Globe,
   CheckCircle2,
   Briefcase,
   Clock,
   ArrowRight,
-  ShieldCheck,
   CreditCard,
   Target,
   Search,
@@ -27,7 +26,10 @@ import {
   Activity,
   FileText,
   SlidersHorizontal,
-  Wrench,
+  Lightbulb,
+  Heart,
+  HelpCircle,
+  FileCheck,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -50,22 +52,32 @@ import type {
   SkillStage,
 } from '@/packages/core/src'
 
+const LIFE_SKILL_CATEGORIES = [
+  { id: 'all', label: 'All Life Skills' },
+  { id: 'life_independence', label: 'Independence & Daily Living' },
+  { id: 'life_communication', label: 'Communication & Confidence' },
+  { id: 'life_money_management', label: 'Money Management (₹)' },
+  { id: 'life_safety_health', label: 'Safety, Health & Well-being' },
+  { id: 'life_critical_thinking', label: 'Critical Thinking' },
+  { id: 'life_social_teamwork', label: 'Social Skills & Teamwork' },
+  { id: 'life_study_skills', label: 'Study Skills' },
+  { id: 'life_citizenship_community', label: 'Practical Citizenship' },
+] as const
+
 function SkillsBrowserContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
 
   // Read URL params or set defaults
-  const initialClassNum = Number(searchParams.get('class')) || 8
-  const initialLevel = (searchParams.get('level') as any) || 'all'
+  const initialClassNum = Number(searchParams.get('class')) || 6
+  const initialCategory = searchParams.get('category') || 'all'
   const initialTab = searchParams.get('tab') === 'projects' ? 'projects' : searchParams.get('tab') === 'plans' ? 'plans' : 'tracks'
 
   const [selectedClassNumber, setSelectedClassNumber] = useState<number>(
-    initialClassNum >= 4 && initialClassNum <= 12 ? initialClassNum : 8
+    initialClassNum >= 4 && initialClassNum <= 9 ? initialClassNum : 6
   )
-  const [levelFilter, setLevelFilter] = useState<'all' | 'foundation' | 'intermediate' | 'advanced'>(
-    ['all', 'foundation', 'intermediate', 'advanced'].includes(initialLevel) ? initialLevel : 'all'
-  )
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'tracks' | 'projects' | 'plans'>(initialTab)
 
@@ -73,10 +85,10 @@ function SkillsBrowserContent() {
   useEffect(() => {
     const params = new URLSearchParams()
     params.set('class', String(selectedClassNumber))
-    if (levelFilter !== 'all') params.set('level', levelFilter)
+    if (selectedCategory !== 'all') params.set('category', selectedCategory)
     if (activeTab !== 'tracks') params.set('tab', activeTab)
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [selectedClassNumber, levelFilter, activeTab, router, pathname])
+  }, [selectedClassNumber, selectedCategory, activeTab, router, pathname])
 
   // Modals state
   const [selectedTrack, setSelectedTrack] = useState<ClassSkillTrackMeta | null>(null)
@@ -90,29 +102,31 @@ function SkillsBrowserContent() {
   const [isGrowthPlanOpen, setIsGrowthPlanOpen] = useState(false)
 
   // Current stage metadata
-  const { stage, stageLabel } = useMemo(() => {
+  const { stage, stageLabel, lifeSkillStage, lifeSkillStageLabel } = useMemo(() => {
     return getSkillStage(selectedClassNumber)
   }, [selectedClassNumber])
 
-  // Resolved 8 skill tracks for the selected class
+  // Resolved 8 real-life skill tracks for the selected class
   const classTracks = useMemo(() => {
     return getClassSkillTracks(selectedClassNumber)
   }, [selectedClassNumber])
 
-  // Filtered tracks based on search and level
+  // Filtered tracks based on category and search query
   const filteredTracks = useMemo(() => {
     return classTracks.filter((track) => {
-      const matchesLevel = levelFilter === 'all' || track.level === levelFilter
+      const matchesCategory = selectedCategory === 'all' || track.category === selectedCategory
       const q = searchQuery.toLowerCase().trim()
       const matchesSearch =
         !q ||
         track.title.toLowerCase().includes(q) ||
         track.classSpecificTitle.toLowerCase().includes(q) ||
         track.description.toLowerCase().includes(q) ||
+        track.whyItMatters.toLowerCase().includes(q) ||
+        track.realLifeScenario.toLowerCase().includes(q) ||
         track.tools.some((t) => t.toLowerCase().includes(q))
-      return matchesLevel && matchesSearch
+      return matchesCategory && matchesSearch
     })
-  }, [classTracks, levelFilter, searchQuery])
+  }, [classTracks, selectedCategory, searchQuery])
 
   // Projects list for selected class
   const classProjects = useMemo(() => {
@@ -149,24 +163,24 @@ function SkillsBrowserContent() {
   // Icon helper
   const getTrackIcon = (iconName: string) => {
     switch (iconName) {
-      case 'Sparkles':
-        return <Sparkles className="w-5 h-5 text-indigo-600" />
-      case 'Code':
-        return <Code className="w-5 h-5 text-blue-600" />
-      case 'Calculator':
-        return <Calculator className="w-5 h-5 text-amber-600" />
-      case 'Cpu':
-        return <Cpu className="w-5 h-5 text-emerald-600" />
-      case 'Palette':
-        return <Palette className="w-5 h-5 text-purple-600" />
+      case 'Home':
+        return <Home className="w-5 h-5 text-indigo-600" />
       case 'MessageSquare':
-        return <MessageSquare className="w-5 h-5 text-cyan-600" />
-      case 'TrendingUp':
-        return <TrendingUp className="w-5 h-5 text-rose-600" />
-      case 'Cloud':
-        return <Cloud className="w-5 h-5 text-sky-600" />
+        return <MessageSquare className="w-5 h-5 text-blue-600" />
+      case 'Coins':
+        return <Coins className="w-5 h-5 text-emerald-600" />
+      case 'ShieldCheck':
+        return <ShieldCheck className="w-5 h-5 text-rose-600" />
+      case 'Compass':
+        return <Compass className="w-5 h-5 text-amber-600" />
+      case 'Users':
+        return <Users className="w-5 h-5 text-purple-600" />
+      case 'BookOpen':
+        return <BookOpen className="w-5 h-5 text-sky-600" />
+      case 'Globe':
+        return <Globe className="w-5 h-5 text-teal-600" />
       default:
-        return <Briefcase className="w-5 h-5 text-slate-600" />
+        return <Compass className="w-5 h-5 text-slate-600" />
     }
   }
 
@@ -175,54 +189,47 @@ function SkillsBrowserContent() {
       {/* Platform Navigation */}
       <SiteHeader onOpenGrowthPlan={() => setIsGrowthPlanOpen(true)} />
 
-      {/* Hero Header with Student Image & Quick Capstone Action */}
-      <section className="bg-white border-b border-slate-200/80 pt-4 sm:pt-5 pb-4 sm:pb-5 px-4 sm:px-6 lg:px-8">
+      {/* Hero Header: Real-Life Skills for a More Confident You */}
+      <section className="bg-white border-b border-slate-200/80 pt-5 sm:pt-6 pb-5 sm:pb-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div className="space-y-2 max-w-2xl">
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-bold tracking-wide">
-                  <Code className="w-3.5 h-3.5" />
-                  <span>Domain 2: Skill Development</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
-                  <span>8 Structured Tracks</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold tracking-wide">
-                  <span>🇯🇵 🇨🇳 Eastern Youth Mastery (Grades 4–9)</span>
-                </div>
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-bold tracking-wide">
+                <Compass className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Domain 2: Skill Development</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                <span>Real-Life Skills for Classes 4–9</span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                Learn by Doing, Building and{' '}
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                Real-Life Skills for a{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">
-                  Mastering Real Skills.
+                  More Confident You
                 </span>
               </h1>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Empowering kids up to 9th grade and beyond with authentic Japanese craft (Kaizen, Soroban, Monozukuri) and Chinese algorithmic rigor (CSP-J, Deliberate Practice). Practical capstone projects and evaluated submissions from ₹999/month.
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                Learn to make decisions, manage money, communicate confidently, stay safe and handle everyday challenges—one practical skill at a time.
               </p>
             </div>
 
-            {/* Student Image Thumbnail & Quick Capstone Action */}
-            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-2.5 shrink-0 max-w-md w-full shadow-2xs">
-              <img
-                src="/images/kids-skills-coding.jpg"
-                alt="Students learning hands-on coding"
-                className="w-20 h-20 rounded-lg object-cover shrink-0 border border-slate-200"
-              />
+            {/* Quick Practical Action Card */}
+            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-2xl p-3 shrink-0 max-w-md w-full shadow-2xs">
+              <div className="w-14 h-14 rounded-xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0">
+                <Briefcase className="w-7 h-7" />
+              </div>
               <div className="space-y-1 min-w-0 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-slate-500 uppercase">
-                    Class {selectedClassNumber} Capstone
+                    Class {selectedClassNumber} Practical Challenge
                   </span>
-                  <Badge className="bg-indigo-100 text-indigo-800 text-[9px] font-bold">
-                    Evaluated
+                  <Badge className="bg-emerald-100 text-emerald-900 text-[9px] font-bold">
+                    Safe Practice
                   </Badge>
                 </div>
                 <h4 className="text-xs font-bold text-slate-900 truncate">
-                  {classProjects[0]?.title || 'Capstone Project'}
+                  {classProjects[0]?.title || 'Practical Activity'}
                 </h4>
                 <Button
-                  onClick={() => handleOpenProject(classProjects[0]?.id || 'proj_ai')}
+                  onClick={() => handleOpenProject(classProjects[0]?.id || 'proj_indep')}
                   size="sm"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] h-7 px-3 rounded-lg flex items-center gap-1 w-full justify-center"
                 >
@@ -243,8 +250,8 @@ function SkillsBrowserContent() {
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
-              <span>8 Skill Tracks</span>
+              <Compass className="w-3.5 h-3.5" />
+              <span>8 Essential Life Skill Areas</span>
             </button>
             <button
               onClick={() => setActiveTab('projects')}
@@ -255,7 +262,7 @@ function SkillsBrowserContent() {
               }`}
             >
               <Briefcase className="w-3.5 h-3.5" />
-              <span>Class {selectedClassNumber} Capstones ({classProjects.length})</span>
+              <span>Class {selectedClassNumber} Practical Projects ({classProjects.length})</span>
             </button>
             <button
               onClick={() => setActiveTab('plans')}
@@ -266,7 +273,7 @@ function SkillsBrowserContent() {
               }`}
             >
               <CreditCard className="w-3.5 h-3.5" />
-              <span>Skill Studio Plans</span>
+              <span>Life Skills Passes</span>
               <span className="text-[10px] bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full font-bold">
                 From ₹999/mo
               </span>
@@ -276,29 +283,29 @@ function SkillsBrowserContent() {
       </section>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* ========================================================================= */}
-        {/* TAB 1: 8 SKILL TRACKS */}
+        {/* TAB 1: 8 REAL-LIFE SKILL TRACKS */}
         {/* ========================================================================= */}
         {activeTab === 'tracks' && (
           <section className="space-y-6">
             {/* Filter and Class Selection Bar */}
             <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
-              {/* Class Selector Bar */}
+              {/* Class Selector Bar: Classes 4 to 9 */}
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <span className="text-xs font-bold text-slate-700">
-                    Select Learner Grade (Classes 4–12):
+                    Select Learner Grade (Classes 4–9):
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-100">
-                      {stageLabel}
+                      {lifeSkillStageLabel || stageLabel}
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 sm:grid-cols-9 gap-1.5">
-                  {[4, 5, 6, 7, 8, 9, 10, 11, 12].map((cNum) => (
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {[4, 5, 6, 7, 8, 9].map((cNum) => (
                     <button
                       key={cNum}
                       onClick={() => setSelectedClassNumber(cNum)}
@@ -310,37 +317,36 @@ function SkillsBrowserContent() {
                     >
                       <span>Class {cNum}</span>
                       <span className={`text-[9px] font-normal ${selectedClassNumber === cNum ? 'text-indigo-200' : 'text-slate-500'}`}>
-                        {cNum <= 5 ? 'Junior' : cNum <= 8 ? 'Middle' : cNum <= 10 ? 'Secondary' : 'Senior'}
+                        {cNum <= 5 ? 'Foundation' : cNum <= 7 ? 'Independence' : 'Applied'}
                       </span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Level Filter & Search Bar */}
+              {/* Category Filter & Search Bar */}
               <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-                  <span className="text-xs font-bold text-slate-500 shrink-0">Level:</span>
-                  {(['all', 'foundation', 'intermediate', 'advanced'] as const).map((lvl) => (
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                  {LIFE_SKILL_CATEGORIES.map((cat) => (
                     <button
-                      key={lvl}
-                      onClick={() => setLevelFilter(lvl)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                        levelFilter === lvl
-                          ? 'bg-slate-900 text-white shadow-2xs'
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                        selectedCategory === cat.id
+                          ? 'bg-slate-900 text-white shadow-2xs font-bold'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
-                      {lvl}
+                      {cat.label}
                     </button>
                   ))}
                 </div>
 
-                <div className="relative w-full sm:w-72">
+                <div className="relative w-full sm:w-72 shrink-0">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
-                    placeholder="Search track, tools or outcome..."
+                    placeholder="Search practical skills, situations..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
@@ -349,82 +355,38 @@ function SkillsBrowserContent() {
               </div>
             </div>
 
-            {/* Japanese & Chinese Youth Skill Academy Banner (Classes 4–9 Focus) */}
-            <div className="bg-gradient-to-r from-amber-50/90 via-orange-50/50 to-indigo-50/70 border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-2xl">🇯🇵 🇨🇳</span>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
-                        Japanese &amp; Chinese Youth Mastery Framework (Classes 4–9)
-                      </h3>
-                      <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[10px] font-bold">
-                        Disciplined Pedagogy
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-slate-600 mt-0.5">
-                      Grounding students up to 9th grade in authentic Eastern mastery: Soroban mental math visualization, CSP-J algorithmic tracing, Monozukuri physical precision, and 5S clean design.
-                    </p>
-                  </div>
+            {/* Stage Guidance Card */}
+            <div className="bg-indigo-50/70 border border-indigo-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-600" />
+                  <h3 className="text-xs sm:text-sm font-extrabold text-indigo-950">
+                    {lifeSkillStageLabel}
+                  </h3>
                 </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="text-[11px] font-bold text-amber-900 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-1.5 shadow-2xs">
-                    <Clock className="w-3.5 h-3.5 text-amber-700" />
-                    <span>Daily 15-Minute Deliberate Practice</span>
-                  </div>
-                </div>
+                <p className="text-xs text-indigo-900/80 leading-relaxed max-w-3xl">
+                  {lifeSkillStage === 'foundation_guided'
+                    ? 'Guided practice and checklists: learning to pack bags, organize desks, speak politely, count currency change, and identify trusted adults.'
+                    : lifeSkillStage === 'developing_independence'
+                    ? 'Growing independence and decision-making: daily schedules, allowance budgeting, supermarket comparison, first-aid basics, and resisting peer pressure.'
+                    : 'Applied responsibility and complex scenarios: long-term goals, financial planning, de-escalating disputes, crisis protocols, and civic engagement.'}
+                </p>
               </div>
-
-              {/* 4 Eastern Discipline Pillars */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1 border-t border-amber-200/60">
-                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
-                    <span>🇯🇵 そろばん &amp; 暗算</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 leading-tight">
-                    Internalized bead memory for lightning mental arithmetic &amp; non-routine invariants.
-                  </p>
-                </div>
-
-                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
-                    <span>🇨🇳 信息学奥赛 (CSP-J)</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 leading-tight">
-                    Algorithmic trace tables on paper before typing code; eliminating guesswork.
-                  </p>
-                </div>
-
-                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
-                    <span>🇯🇵 ものづくり (Monozukuri)</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 leading-tight">
-                    Zero-defect tactile circuits, tidy right-angled jumper leads, and schematic rigor.
-                  </p>
-                </div>
-
-                <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200/70 space-y-0.5">
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-900">
-                    <span>🇯🇵 5S 原則 &amp; 間 (Ma)</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 leading-tight">
-                    Ergonomic clutter elimination (Muda), strict 8pt spatial rhythm &amp; high contrast.
-                  </p>
-                </div>
+              <div className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-white px-3 py-1.5 rounded-xl border border-indigo-200 shadow-2xs">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Class {selectedClassNumber} Curated</span>
               </div>
             </div>
 
-            {/* Tracks Grid (8 Tracks for selected class) */}
+            {/* Life Skills Grid (8 Real-Life Tracks for selected class) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredTracks.map((track) => (
                 <div
                   key={track.id}
-                  className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between gap-5 group"
+                  className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between gap-4 group"
                 >
                   <div className="space-y-3">
+                    {/* Header: Icon, Class, and Category */}
                     <div className="flex items-center justify-between">
                       <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
                         {getTrackIcon(track.iconName)}
@@ -433,26 +395,49 @@ function SkillsBrowserContent() {
                         <Badge className="bg-indigo-50 text-indigo-700 border-indigo-100 text-[10px] font-bold">
                           Class {track.classNumber}
                         </Badge>
-                        <Badge className="bg-slate-100 text-slate-700 border-slate-200 text-[10px] font-bold capitalize">
+                        <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 capitalize">
                           {track.level}
                         </Badge>
                       </div>
                     </div>
 
+                    {/* Titles */}
                     <div>
                       <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
                         {track.title}
                       </span>
-                      <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug mt-0.5">
+                      <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug mt-0.5">
                         {track.classSpecificTitle}
                       </h4>
-                      <p className="text-xs text-slate-500 line-clamp-3 mt-1.5 leading-relaxed">
+                      <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">
                         {track.description}
                       </p>
                     </div>
 
-                    {/* Tools Chips */}
-                    <div className="flex flex-wrap gap-1.5 pt-1">
+                    {/* Why It Matters Callout */}
+                    <div className="p-2.5 bg-blue-50/70 border border-blue-100 rounded-xl space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-blue-900 flex items-center gap-1">
+                        <Lightbulb className="w-3 h-3 text-amber-500" />
+                        <span>Why It Matters</span>
+                      </span>
+                      <p className="text-[11px] text-blue-950 font-medium line-clamp-2 leading-tight">
+                        {track.whyItMatters}
+                      </p>
+                    </div>
+
+                    {/* Real-Life Scenario Callout */}
+                    <div className="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                        <BookOpen className="w-3 h-3 text-indigo-600" />
+                        <span>Everyday Scenario</span>
+                      </span>
+                      <p className="text-[11px] text-slate-700 italic line-clamp-2 leading-tight">
+                        "{track.realLifeScenario}"
+                      </p>
+                    </div>
+
+                    {/* Tools & Resources */}
+                    <div className="flex flex-wrap gap-1 pt-1">
                       {track.tools.slice(0, 3).map((t, idx) => (
                         <span
                           key={idx}
@@ -463,68 +448,25 @@ function SkillsBrowserContent() {
                       ))}
                     </div>
 
-                    {/* Eastern Heritage Discipline & Daily Drill Badge */}
-                    {track.easternHeritage && (
-                      <div className="bg-gradient-to-r from-amber-50 to-orange-50/60 border border-amber-200/90 rounded-xl p-2.5 text-[11px] text-amber-950 space-y-1.5 shadow-2xs">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 font-bold text-amber-900">
-                            <span>
-                              {track.easternHeritage.tradition === 'japanese'
-                                ? '🇯🇵'
-                                : track.easternHeritage.tradition === 'chinese'
-                                ? '🇨🇳'
-                                : '🌏'}
-                            </span>
-                            <span className="truncate max-w-[170px]">
-                              {track.easternHeritage.originalName}
-                            </span>
-                          </div>
-                          {selectedClassNumber <= 9 && (
-                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-amber-200/80 text-amber-900 shrink-0">
-                              Grades 4–9
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-slate-700 leading-tight font-medium line-clamp-2">
-                          <span className="font-bold text-amber-800">Daily Drill: </span>
-                          {track.easternHeritage.dailyDeliberateDrill}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Philosophy badge */}
-                    <div className="bg-indigo-50/60 border border-indigo-100/80 rounded-xl p-2.5 text-[11px] text-indigo-900 leading-tight">
-                      <div className="flex items-center gap-1 font-bold mb-0.5 text-indigo-700">
-                        <Sparkles className="w-3 h-3" />
-                        <span>
-                          {track.philosophy === 'japanese_kaizen'
-                            ? 'Japanese Kaizen Craft'
-                            : track.philosophy === 'chinese_progression'
-                            ? 'Chinese Rigorous Progression'
-                            : 'Universal Mastery'}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-slate-600 line-clamp-2">{track.philosophyNote}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+                    {/* Meta stats */}
+                    <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
                       <span>{track.weeklyModules.length} Modules</span>
                       <span>•</span>
-                      <span className="font-medium text-slate-700">{track.capstoneProject.estimatedHours}h Capstone</span>
+                      <span className="font-medium text-slate-700">{track.capstoneProject.estimatedHours}h Practical</span>
                       <span>•</span>
-                      <span className="font-semibold text-indigo-600">Rubric Scored</span>
+                      <span className="font-semibold text-emerald-600">Verified Rubric</span>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="space-y-2 pt-3 border-t border-slate-100">
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
                     <Button
                       onClick={() => handleOpenCurriculum(track)}
                       variant="outline"
                       className="w-full text-xs font-semibold text-slate-700 border-slate-200 hover:bg-slate-50 h-8.5 rounded-xl flex items-center justify-center gap-1.5"
                     >
                       <Layers className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Inspect Modules &amp; Tools</span>
+                      <span>Inspect Complete Pathway</span>
                     </Button>
                     <Button
                       onClick={() => handleOpenProject(track.capstoneProject.id)}
@@ -541,75 +483,70 @@ function SkillsBrowserContent() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 2: EVALUATED CAPSTONE PROJECTS */}
+        {/* TAB 2: EVALUATED PRACTICAL PROJECTS */}
         {/* ========================================================================= */}
         {activeTab === 'projects' && (
           <section className="space-y-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="max-w-2xl space-y-1.5">
                 <h2 className="text-base font-bold text-slate-900">
-                  Class {selectedClassNumber} Rubric-Evaluated Capstones ({classProjects.length})
+                  Class {selectedClassNumber} Real-Life Practical Projects ({classProjects.length})
                 </h2>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Every TalentXcel capstone produces tangible deliverables: verified prompt scripts, Python code, circuit schematics, or lean canvases evaluated against transparent mastery rubrics.
+                  Every TalentXcel life project produces tangible, verified deliverables: completed school readiness checklists, grocery budgets, emergency cards, and decision reflection journals.
                 </p>
               </div>
 
               {/* Quick Class Switcher */}
               <div className="flex items-center gap-1 shrink-0 overflow-x-auto pb-1 sm:pb-0">
-                {[4, 6, 8, 10, 12].map((c) => (
+                {[4, 5, 6, 7, 8, 9].map((c) => (
                   <button
                     key={c}
                     onClick={() => setSelectedClassNumber(c)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                       selectedClassNumber === c
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    Cl {c}
+                    Class {c}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {classProjects.map((proj) => (
+              {classProjects.map((project) => (
                 <div
-                  key={proj.id}
-                  className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between gap-6"
+                  key={project.id}
+                  className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <Badge className="bg-indigo-600 text-white text-[10px] font-bold">
-                          Class {proj.classNumber}
-                        </Badge>
-                        <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 capitalize">
-                          {proj.difficulty}
-                        </Badge>
-                      </div>
-                      <Badge className="bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                        {proj.estimatedHours} Hours
+                      <Badge className="bg-indigo-100 text-indigo-800 text-[10px] font-bold">
+                        Class {project.classNumber} Project
+                      </Badge>
+                      <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 capitalize">
+                        {project.difficulty}
                       </Badge>
                     </div>
 
-                    <div>
-                      <h3 className="text-base font-bold text-slate-900 leading-snug">
-                        {proj.title}
-                      </h3>
-                      <p className="text-xs text-slate-500 mt-2 leading-relaxed line-clamp-3">
-                        {proj.brief}
-                      </p>
-                    </div>
+                    <h3 className="text-base font-bold text-slate-900 leading-snug">
+                      {project.title}
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {project.brief}
+                    </p>
 
-                    <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
-                      <span className="font-bold text-slate-700">Required Deliverables:</span>
-                      <ul className="space-y-1 text-slate-600">
-                        {proj.deliverables.slice(0, 2).map((del, idx) => (
-                          <li key={idx} className="flex items-start gap-1.5">
-                            <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                            <span className="line-clamp-1">{del}</span>
+                    <div className="space-y-1.5 pt-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                        Deliverables Required:
+                      </span>
+                      <ul className="space-y-1 text-xs text-slate-700">
+                        {project.deliverables.slice(0, 2).map((d, i) => (
+                          <li key={i} className="flex items-start gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <span className="line-clamp-1">{d}</span>
                           </li>
                         ))}
                       </ul>
@@ -617,10 +554,10 @@ function SkillsBrowserContent() {
                   </div>
 
                   <Button
-                    onClick={() => handleOpenProject(proj.id)}
-                    className="w-full bg-slate-900 hover:bg-black text-white font-bold text-xs h-9.5 rounded-xl shadow-xs flex items-center justify-center gap-1.5"
+                    onClick={() => handleOpenProject(project.id)}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-8.5 rounded-xl shadow-2xs flex items-center justify-center gap-1.5"
                   >
-                    <span>Open Workshop &amp; Submit</span>
+                    <span>Launch Practical Workshop</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -630,67 +567,70 @@ function SkillsBrowserContent() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 3: SKILL STUDIO PRICING PLANS */}
+        {/* TAB 3: LIFE SKILLS STUDIO PLANS */}
         {/* ========================================================================= */}
         {activeTab === 'plans' && (
           <section className="space-y-6">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Skill Development Subscriptions
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                Transparent Life Skills Studio Plans
               </h2>
-              <p className="text-xs text-slate-500">
-                Transparent monthly, semester, and annual plans. Cancel anytime. All plans include peer reviews, rubric evaluations, and verified credentials.
+              <p className="text-xs sm:text-sm text-slate-600">
+                Full access to age-appropriate learning pathways, practical workshops, decision-making scenarios, and verified mentor evaluations.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {SKILL_STUDIO_PLANS.map((prod: SkillStudioPlanProduct) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+              {SKILL_STUDIO_PLANS.map((plan) => (
                 <div
-                  key={prod.id}
-                  className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between gap-6 relative"
+                  key={plan.id}
+                  className={`bg-white rounded-3xl border p-6 flex flex-col justify-between gap-6 transition-all hover:shadow-lg ${
+                    plan.popular
+                      ? 'border-indigo-500 shadow-md ring-2 ring-indigo-500/10'
+                      : 'border-slate-200'
+                  }`}
                 >
-                  {prod.popular && (
-                    <div className="absolute top-4 right-4">
-                      <Badge className="bg-indigo-600 text-white font-bold text-[10px]">
-                        Popular
-                      </Badge>
-                    </div>
-                  )}
-
                   <div className="space-y-4">
+                    {plan.popular && (
+                      <span className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-bold uppercase tracking-wider inline-block">
+                        Most Popular for Families
+                      </span>
+                    )}
+
                     <div>
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        SKILL STUDIO {prod.period.toUpperCase()}
-                      </span>
-                      <h3 className="text-lg font-bold text-slate-900 mt-1">{prod.title}</h3>
-                      <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                        {prod.tagline}
-                      </p>
+                      <h3 className="text-lg font-extrabold text-slate-900">{plan.title}</h3>
+                      <p className="text-xs text-slate-500 mt-1">{plan.tagline}</p>
                     </div>
 
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-slate-900">
-                        ₹{prod.basePriceRupees.toLocaleString('en-IN')}
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold text-slate-900">
+                        ₹{plan.basePriceRupees}
                       </span>
-                      <span className="text-xs text-slate-400 font-medium">/ {prod.periodLabel.toLowerCase()} + 18% GST</span>
+                      <span className="text-xs text-slate-500 font-medium">
+                        / {plan.periodLabel}
+                      </span>
                     </div>
 
-                    <ul className="space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-4">
-                      {prod.features.map((feat: string, i: number) => (
+                    <ul className="space-y-2.5 text-xs text-slate-700 pt-2 border-t border-slate-100">
+                      {plan.features.map((feat, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
-                          <span className="leading-tight">{feat}</span>
+                          <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{feat}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
                   <Button
-                    onClick={() => handleOpenCheckout(prod.id)}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-10 rounded-xl shadow-xs flex items-center justify-center gap-1.5"
+                    onClick={() => handleOpenCheckout(plan.id)}
+                    className={`w-full font-bold text-xs h-9 rounded-xl shadow-xs ${
+                      plan.popular
+                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                        : 'bg-slate-900 hover:bg-slate-800 text-white'
+                    }`}
                   >
-                    <CreditCard className="w-4 h-4" />
-                    <span>Subscribe with Razorpay</span>
+                    <span>Get Started</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
                 </div>
               ))}
@@ -699,7 +639,7 @@ function SkillsBrowserContent() {
         )}
       </main>
 
-      {/* Track Curriculum & Module Inspector Modal */}
+      {/* Modals */}
       <TrackCurriculumModal
         track={selectedTrack}
         isOpen={isCurriculumModalOpen}
@@ -708,33 +648,25 @@ function SkillsBrowserContent() {
         onEnrollTrack={(productId) => handleOpenCheckout(productId)}
       />
 
-      {/* Project Workshop Modal */}
       <ProjectWorkshopModal
         project={selectedProject}
         isOpen={isWorkshopOpen}
         onClose={() => setIsWorkshopOpen(false)}
-        onEnrollTrack={() => {
-          setIsWorkshopOpen(false)
-          handleOpenCheckout('prod_skill_monthly_999')
-        }}
+        onEnrollTrack={() => handleOpenCheckout('prod_skill_monthly_999')}
       />
 
-      {/* Razorpay Checkout Modal */}
-      <RazorpayCheckoutModal
-        isOpen={isCheckoutOpen}
-        productId={checkoutProductId}
-        onClose={() => setIsCheckoutOpen(false)}
-        onSuccess={(entitlement) => {
-          setIsCheckoutOpen(false)
-          alert(`Success! Enrolled in ${entitlement.productId}. Access active until ${new Date(entitlement.validUntil).toLocaleDateString()}.`)
-        }}
-      />
-
-      {/* Growth Plan Modal */}
       <GrowthPlanModal
         isOpen={isGrowthPlanOpen}
         onClose={() => setIsGrowthPlanOpen(false)}
       />
+
+      {checkoutProductId && (
+        <RazorpayCheckoutModal
+          productId={checkoutProductId}
+          isOpen={isCheckoutOpen}
+          onClose={() => setIsCheckoutOpen(false)}
+        />
+      )}
     </div>
   )
 }
@@ -744,9 +676,9 @@ export default function SkillsPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-          <div className="text-center space-y-2">
-            <Code className="w-8 h-8 text-indigo-600 animate-pulse mx-auto" />
-            <p className="text-xs font-bold text-slate-600">Loading Skill Development Tracks...</p>
+          <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
+            <Compass className="w-5 h-5 animate-spin text-indigo-600" />
+            <span>Loading Real-Life Skills Studio...</span>
           </div>
         </div>
       }

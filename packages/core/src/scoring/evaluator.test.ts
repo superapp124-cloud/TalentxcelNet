@@ -251,15 +251,16 @@ describe('TalentXcel Core - Security & Server-Authoritative Scoring', () => {
     expect(result.evaluations[0].keyPoint).toBeDefined()
   })
 
-  it('validates Three-Domain Architecture: Skill Tracks embody Japanese & Chinese design inspirations', async () => {
+  it('validates Three-Domain Architecture: Skill Tracks embody real-life skills and practical application', async () => {
     const { SEED_SKILL_TRACKS, SEED_SKILL_PROJECTS } = await import('../data/seed-catalog')
     expect(SEED_SKILL_TRACKS.length).toBe(8)
     
-    // Check Japanese Kaizen & Chinese Progression philosophical tagging
-    const kaizenTracks = SEED_SKILL_TRACKS.filter((t) => t.philosophy === 'japanese_kaizen')
-    const progressionTracks = SEED_SKILL_TRACKS.filter((t) => t.philosophy === 'chinese_progression')
-    expect(kaizenTracks.length).toBeGreaterThan(0)
-    expect(progressionTracks.length).toBeGreaterThan(0)
+    // Check practical real-life skills categories
+    const categories = SEED_SKILL_TRACKS.map((t) => t.category)
+    expect(categories).toContain('life_independence')
+    expect(categories).toContain('life_communication')
+    expect(categories).toContain('life_money_management')
+    expect(categories).toContain('life_safety_health')
 
     // Check Projects and rubric criteria
     expect(SEED_SKILL_PROJECTS.length).toBeGreaterThanOrEqual(4)
