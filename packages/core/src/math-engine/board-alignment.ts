@@ -9,6 +9,7 @@ export interface BoardCurriculumMapping {
   curriculumEquivalent: string
   keyTopicsOverlap: string[]
   boardSpecificNotes: string
+  textbookBibliography?: string[]
 }
 
 export interface ClassBoardAlignmentDetail {
@@ -29,7 +30,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   4: {
     classNumber: 4,
     className: 'Class 4',
-    questionCount: 3600,
+    questionCount: 17000,
     chaptersCount: 12,
     cbse: {
       boardCode: 'CBSE',
@@ -50,6 +51,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Perimeter & Area of Rectangles & Squares',
       ],
       boardSpecificNotes: 'Fully aligned with NCERT Learning Outcomes and NIPUN Bharat foundational numeracy benchmarks.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 4',
+        'NCERT Exemplar Problems Class 4',
+        'RD Sharma Mathematics (Class 4)',
+        'RS Aggarwal Mathematics (Class 4)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -68,6 +76,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Perimeter of 2D Polygons',
       ],
       boardSpecificNotes: '92% direct overlap. ICSE introduces 6-digit numbers and elementary roman numerals slightly earlier than standard NCERT.',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 4)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 4)',
+        'Frank Modern Certificate Mathematics',
+        'CISCE Diagnostic Past Question Archive',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -85,6 +99,10 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Data Handling: Pictographs, Bar Charts, and Frequency Tables',
       ],
       boardSpecificNotes: '82% conceptual overlap. IB PYP emphasizes inquiry-based exploration and transdisciplinary problem solving over repetitive rote drill.',
+      textbookBibliography: [
+        'IB PYP Mathematics Scope & Sequence (Inquiry Investigations)',
+        'PYP Phase 3 Portfolio Tasks & Real-World Inquiries',
+      ],
     },
     comparativeSummary:
       'Class 4 mathematics across CBSE, ICSE, and IB shares a common core: multi-digit arithmetic, fractions, decimals, measurement, and elementary geometry. ICSE includes slightly larger numbers, while IB focuses on real-world spatial reasoning and data interpretation.',
@@ -96,7 +114,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   5: {
     classNumber: 5,
     className: 'Class 5',
-    questionCount: 3600,
+    questionCount: 18500,
     chaptersCount: 12,
     cbse: {
       boardCode: 'CBSE',
@@ -117,6 +135,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Speed, Distance, and Time Unitary Calculations',
       ],
       boardSpecificNotes: '100% verified against NCERT Class 5 core syllabus and foundational assessment competencies.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 5',
+        'NCERT Exemplar Problems Class 5',
+        'RD Sharma Mathematics (Class 5)',
+        'RS Aggarwal Mathematics (Class 5)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -135,6 +160,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Perimeter, Area of Rectangles, and Volume of Cubes/Cuboids',
       ],
       boardSpecificNotes: '90% direct alignment. ICSE includes introductory percentages and volume of cuboids in Class 5.',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 5)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 5)',
+        'Frank Modern Certificate Mathematics',
+        'CISCE Diagnostic Past Question Archive',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -152,6 +183,10 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Statistical Surveys and Probability Predictions',
       ],
       boardSpecificNotes: '80% conceptual alignment with IB PYP inquiry units. Questions emphasize mathematical reasoning and step-by-step verification.',
+      textbookBibliography: [
+        'IB PYP Mathematics Scope & Sequence (Inquiry Investigations)',
+        'PYP Phase 4 Portfolio Tasks & Real-World Inquiries',
+      ],
     },
     comparativeSummary:
       'Class 5 introduces foundational proportional reasoning across all three boards: LCM/HCF, fraction multiplication, decimals, and 2D/3D spatial geometry.',
@@ -163,7 +198,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   6: {
     classNumber: 6,
     className: 'Class 6',
-    questionCount: 3840,
+    questionCount: 21000,
     chaptersCount: 12,
     cbse: {
       boardCode: 'CBSE',
@@ -186,6 +221,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Ratio and Proportion (Unitary Method)',
       ],
       boardSpecificNotes: '100% verified against NCERT Middle School curriculum.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 6',
+        'NCERT Exemplar Problems Class 6',
+        'RD Sharma Mathematics (Class 6)',
+        'RS Aggarwal Mathematics (Class 6)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -206,6 +248,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Data Handling: Mean and Graphical Representation',
       ],
       boardSpecificNotes: '91% core match. ICSE covers introductory exponents and simple percentage calculations slightly earlier.',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 6)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 6)',
+        'Frank Modern Certificate Mathematics',
+        'CISCE Diagnostic Past Question Archive',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -222,6 +270,11 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Data Collection, Representation, and Range/Mean',
       ],
       boardSpecificNotes: '81% alignment with MYP Criterion A (Knowledge) and Criterion B (Investigating Patterns).',
+      textbookBibliography: [
+        'Haese & Harris IB MYP Mathematics (Years 1-3)',
+        'Oxford IB MYP Mathematics Concept-Based Learning',
+        'IB MYP Criteria A, B, C, D Assessment Exemplars',
+      ],
     },
     comparativeSummary:
       'Class 6 marks the critical transition to formal mathematical abstractions across CBSE, ICSE, and IB: negative integers, algebraic variables, and formal geometric proofs.',
@@ -233,7 +286,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   7: {
     classNumber: 7,
     className: 'Class 7',
-    questionCount: 3840,
+    questionCount: 22500,
     chaptersCount: 12,
     cbse: {
       boardCode: 'CBSE',
@@ -256,6 +309,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Exponents and Powers (Laws of Exponents)',
       ],
       boardSpecificNotes: '100% verified against NCERT Class 7 standard.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 7',
+        'NCERT Exemplar Problems Class 7',
+        'RD Sharma Mathematics (Class 7)',
+        'RS Aggarwal Mathematics (Class 7)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -276,6 +336,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Statistics: Frequency Distribution and Mean/Median/Mode',
       ],
       boardSpecificNotes: '89% alignment. ICSE includes formal triangle congruence proofs in Class 7, while CBSE emphasizes properties and introduces formal congruence in Class 7/9.',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 7)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 7)',
+        'Frank Modern Certificate Mathematics',
+        'CISCE Diagnostic Past Question Archive',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -292,6 +358,11 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Measures of Central Tendency and Experimental Probability',
       ],
       boardSpecificNotes: '83% conceptual alignment with MYP Criterion C (Communicating) and Criterion D (Real-world contexts).',
+      textbookBibliography: [
+        'Haese & Harris IB MYP Mathematics (Years 1-3)',
+        'Oxford IB MYP Mathematics Concept-Based Learning',
+        'IB MYP Criteria A, B, C, D Assessment Exemplars',
+      ],
     },
     comparativeSummary:
       'Class 7 builds strong algebraic and quantitative competency: solving linear equations, calculating simple interest, mastering exponent laws, and applying the Pythagorean theorem.',
@@ -303,7 +374,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   8: {
     classNumber: 8,
     className: 'Class 8',
-    questionCount: 4200,
+    questionCount: 24500,
     chaptersCount: 14,
     cbse: {
       boardCode: 'CBSE',
@@ -328,6 +399,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Introduction to Line Graphs & Cartesian Coordinates',
       ],
       boardSpecificNotes: '100% verified against NCERT Class 8 syllabus.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 8',
+        'NCERT Exemplar Problems Class 8',
+        'RD Sharma Mathematics (Class 8)',
+        'RS Aggarwal Mathematics (Class 8)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -348,6 +426,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Data Handling: Histograms, Frequency Polygons, Pie Charts',
       ],
       boardSpecificNotes: '88% match. ICSE introduces linear inequations (x ≤ 5, x ∈ N) and sets in Class 8.',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 8)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 8)',
+        'Frank Modern Certificate Mathematics',
+        'CISCE Diagnostic Past Question Archive',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -364,6 +448,11 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability Models and Statistical Distributions',
       ],
       boardSpecificNotes: '82% conceptual alignment with MYP Year 3 assessment rubrics.',
+      textbookBibliography: [
+        'Haese & Harris IB MYP Mathematics (Years 1-3)',
+        'Oxford IB MYP Mathematics Concept-Based Learning',
+        'IB MYP Criteria A, B, C, D Assessment Exemplars',
+      ],
     },
     comparativeSummary:
       'Class 8 serves as the foundation for secondary board examinations: compound interest, quadratic factorisation identities, direct/inverse proportions, and 3D solid mensuration.',
@@ -375,7 +464,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   9: {
     classNumber: 9,
     className: 'Class 9',
-    questionCount: 4290,
+    questionCount: 26000,
     chaptersCount: 13,
     cbse: {
       boardCode: 'CBSE',
@@ -399,6 +488,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability (Empirical / Experimental Probability)',
       ],
       boardSpecificNotes: '100% verified against CBSE Class 9 curriculum and examination blueprints.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 9',
+        'NCERT Exemplar Problems Class 9',
+        'RD Sharma Mathematics (Class 9)',
+        'RS Aggarwal Mathematics (Class 9)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -420,6 +516,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Statistics and Mean/Median Calculation',
       ],
       boardSpecificNotes: '86% core alignment. ICSE includes Logarithms, Simultaneous Equations, and Introductory Trigonometry in Class 9 (which CBSE covers in Class 10/11).',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 9)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 9)',
+        'Frank Modern Certificate Mathematics',
+        'CISCE Diagnostic Past Question Archive',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -437,6 +539,11 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Bivariate Data, Scatter Plots, and Experimental Probability',
       ],
       boardSpecificNotes: '84% alignment with MYP Criterion A (Mathematical knowledge) and Criterion B (Patterns and conjectures).',
+      textbookBibliography: [
+        'Oxford IB MYP Mathematics Standard & Extended (Years 4-5)',
+        'Haese & Harris IB MYP 4-5 Extended Mathematics',
+        'IB MYP eAssessment On-Screen Examination Papers (2018-2024)',
+      ],
     },
     comparativeSummary:
       'Class 9 establishes rigorous geometric proof (triangles, quadrilaterals, circle chords) and algebraic machinery (factor theorem, rationalizing surds, 3D volume of cones and spheres).',
@@ -448,7 +555,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   10: {
     classNumber: 10,
     className: 'Class 10',
-    questionCount: 4620,
+    questionCount: 28000,
     chaptersCount: 14,
     cbse: {
       boardCode: 'CBSE',
@@ -474,6 +581,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability (Theoretical Classical Probability, Cards, Dice)',
       ],
       boardSpecificNotes: '100% verified against CBSE Class 10 Board guidelines (both Mathematics Standard and Mathematics Basic).',
+      textbookBibliography: [
+        'NCERT Mathematics Class 10',
+        'NCERT Exemplar Problems Class 10',
+        'RD Sharma Mathematics (Class 10)',
+        'RS Aggarwal Mathematics (Class 10)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -496,6 +610,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability: Sample Space and Classical Calculations',
       ],
       boardSpecificNotes: '87% core overlap. ICSE adds Commercial Mathematics (GST, Banking Recurring Deposits, Shares and Dividends), Matrices, and Reflection in Class 10.',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 10)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 10)',
+        'Frank Modern Certificate Mathematics',
+        'ICSE 10-Yr Solved Board Papers (2014-2024)',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -513,6 +633,11 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Grouped Data Analysis, Standard Deviation, and Theoretical Probability',
       ],
       boardSpecificNotes: '85% alignment with MYP Year 5 on-screen eAssessment criteria. Covers common core analytical and problem-solving skills.',
+      textbookBibliography: [
+        'Oxford IB MYP Mathematics Standard & Extended (Years 4-5)',
+        'Haese & Harris IB MYP 4-5 Extended Mathematics',
+        'IB MYP eAssessment On-Screen Examination Papers (2018-2024)',
+      ],
     },
     comparativeSummary:
       'Class 10 is the major secondary benchmark across all three systems. Over 87% of core topics—quadratic equations, trigonometry, similarity, coordinate geometry, surface areas, and probability—are universally assessed across CBSE, ICSE, and IB.',
@@ -524,7 +649,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   11: {
     classNumber: 11,
     className: 'Class 11',
-    questionCount: 4340,
+    questionCount: 22500,
     chaptersCount: 14,
     cbse: {
       boardCode: 'CBSE',
@@ -550,6 +675,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability (Axiomatic Approach, Addition Theorem)',
       ],
       boardSpecificNotes: '100% verified against CBSE Class 11 Senior Secondary syllabus.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 11',
+        'NCERT Exemplar Problems Class 11',
+        'RD Sharma Mathematics (Class 11)',
+        'RS Aggarwal Mathematics (Class 11)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -571,6 +703,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability: Axiomatic Definition',
       ],
       boardSpecificNotes: '88% match with ISC Section A. ISC offers Section B (Conics/Vectors) or Section C (Commerce applications: Statistics/Index Numbers).',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 11)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 11)',
+        'Frank Modern Certificate Mathematics',
+        'ICSE 10-Yr Solved Board Papers (2014-2024)',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -587,6 +725,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Topic 5: Calculus (Limits, First Principle, Power/Product/Quotient Rules)',
       ],
       boardSpecificNotes: '82% conceptual alignment with IB DP Math AA and AI courses across the 5 core IB syllabus topics.',
+      textbookBibliography: [
+        'Oxford IB DP Mathematics: Analysis & Approaches (AA) SL/HL',
+        'Cambridge IB DP Mathematics: Applications & Interpretation (AI) SL/HL',
+        'Haese Mathematics IB DP Core Topics SL/HL',
+        'IB DP Past Examination Papers May/Nov TZ1/TZ2 (2015-2024)',
+      ],
     },
     comparativeSummary:
       'Class 11 forms the cornerstone of advanced STEM mathematics: differential calculus, sequences and series, permutations & combinations, conic sections, and axiomatic probability.',
@@ -598,7 +742,7 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
   12: {
     classNumber: 12,
     className: 'Class 12',
-    questionCount: 4160,
+    questionCount: 20000,
     chaptersCount: 13,
     cbse: {
       boardCode: 'CBSE',
@@ -623,6 +767,13 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability (Conditional Probability, Multiplication Rule, Bayes’ Theorem, Distributions)',
       ],
       boardSpecificNotes: '100% verified against CBSE Class 12 Board examination and national entrance (JEE/CUET) frameworks.',
+      textbookBibliography: [
+        'NCERT Mathematics Class 12',
+        'NCERT Exemplar Problems Class 12',
+        'RD Sharma Mathematics (Class 12)',
+        'RS Aggarwal Mathematics (Class 12)',
+        'CBSE 10-Yr Solved Board PYQs (2014-2024)',
+      ],
     },
     icse: {
       boardCode: 'CISCE',
@@ -642,6 +793,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Section C: Application of Calculus in Commerce (Cost & Revenue Functions) and Linear Programming',
       ],
       boardSpecificNotes: '89% direct alignment with Section A and B/C. ISC includes commerce-oriented calculus applications in Section C.',
+      textbookBibliography: [
+        'Selina Concise Mathematics (Dr. R.K. Bansal, Class 12)',
+        'Understanding ICSE Mathematics by M.L. Aggarwal (APC, Class 12)',
+        'Frank Modern Certificate Mathematics',
+        'ISC 10-Yr Solved Board Papers (2014-2024)',
+      ],
     },
     ib: {
       boardCode: 'IB',
@@ -658,6 +815,12 @@ export const CLASS_WISE_BOARD_ALIGNMENT: Record<number, ClassBoardAlignmentDetai
         'Probability Distributions: Discrete Random Variables, Normal Distribution, Bayes’ Theorem',
       ],
       boardSpecificNotes: '84% alignment with IB DP Math AA and AI higher-order application criteria. Questions feature full step-by-step derivations matching IB mark-scheme standards.',
+      textbookBibliography: [
+        'Oxford IB DP Mathematics: Analysis & Approaches (AA) SL/HL',
+        'Cambridge IB DP Mathematics: Applications & Interpretation (AI) SL/HL',
+        'Haese Mathematics IB DP Core Topics SL/HL',
+        'IB DP Past Examination Papers May/Nov TZ1/TZ2 (2015-2024)',
+      ],
     },
     comparativeSummary:
       'Class 12 is dominated by advanced calculus, vector algebra, matrices, and Bayes’ probability across CBSE, ISC, and IB DP. Over 85% of concepts are identical, differing primarily in exam format and international contextualization.',

@@ -63,7 +63,7 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
       href: '/dashboard/question-bank',
       label: 'Maths Question Bank',
       shortLabel: 'Maths Bank',
-      badge: '36.5k Qs',
+      badge: '200k Qs',
       icon: <Calculator className="w-4 h-4 text-blue-600" />,
       active: pathname.startsWith('/dashboard/question-bank'),
     },

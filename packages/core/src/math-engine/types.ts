@@ -13,6 +13,9 @@ export interface MathQuestion {
   classNumber: number // 4, 5, 6, 7, 8, 9, 10, 11, 12
   subjectCode: 'math'
   boardCode: BoardCode
+  bookSource?: string // e.g. "NCERT Mathematics Class 10", "Selina Concise Mathematics (Dr. R.K. Bansal)", "IB MYP Standard & Extended"
+  exerciseRef?: string // e.g. "Exercise 1.2 Q4", "Exercise 1(A) Q8", "Criterion A (Haese Ch 1)"
+  boardYearPYQ?: string // e.g. "CBSE Board 2023 Set 1", "ICSE 2022 Paper 1", "IB May 2021 Paper 2"
   chapterId: string
   chapterNumber: number
   chapterTitle: string
@@ -49,4 +52,9 @@ export interface MathBankSummary {
   totalClassesCount: number
   classCounts: Record<number, number>
   chapterCounts: Record<string, number>
+  boardBreakdown?: {
+    cbseCount: number
+    icseCount: number
+    ibCount: number
+  }
 }

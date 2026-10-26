@@ -10,7 +10,7 @@ import { MathQuestionBankClient } from '@/components/math/math-question-bank-cli
 export const metadata: Metadata = {
   title: 'Mathematics Question Bank (Classes 4–12) — TalentXcel',
   description:
-    '36,490 curriculum-aligned Mathematics questions across Classes 4 to 12 with full step-by-step derivations and live scoring behind secure learner login.',
+    '200,000 curriculum-aligned Mathematics questions across Classes 4 to 12 with full step-by-step derivations and live scoring behind secure learner login.',
 }
 
 export default async function MathQuestionBankPage() {

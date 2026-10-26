@@ -9,7 +9,7 @@ import { ShieldCheck, UserCheck } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Super Admin Mathematics Bank — TalentXcel Operations',
-  description: 'Super Admin operational console for auditing and testing all 36,490 Mathematics questions across Classes 4 through 12.',
+  description: 'Super Admin operational console for auditing and testing all 200,000 Mathematics questions across Classes 4 through 12.',
   robots: { index: false },
 }
 
@@ -40,7 +40,7 @@ export default async function AdminQuestionBankPage() {
             Mathematics Question Bank Ingestion &amp; Quality Audit
           </h1>
           <p className="text-xs text-blue-200 mt-1">
-            Authoritative access for <span className="font-semibold text-white">arsh.wani@gmail.com</span> &amp; <span className="font-semibold text-white">talentxcelservices@gmail.com</span> — All 36,490 curriculum questions unlocked.
+            Authoritative access for <span className="font-semibold text-white">arsh.wani@gmail.com</span> &amp; <span className="font-semibold text-white">talentxcelservices@gmail.com</span> — All 200,000 curriculum questions unlocked.
           </p>
         </div>
 

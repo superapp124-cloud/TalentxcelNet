@@ -73,12 +73,13 @@ export function MathQuestionBankClient({
   const [questions, setQuestions] = useState<MathQuestion[]>(initialQuestions)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  // Fetch questions when class or chapter changes (only when authenticated)
-  const loadChapterQuestions = async (cls: number, chId?: string, offset: number = 0) => {
+  // Fetch questions when class, chapter or board changes (only when authenticated)
+  const loadChapterQuestions = async (cls: number, chId?: string, offset: number = 0, board?: BoardCode) => {
     if (!isAuthenticated) return
     setIsLoading(true)
+    const activeBoard = board || selectedBoard
     try {
-      const url = `/api/questions/bank?classNumber=${cls}${chId ? `&chapterId=${chId}` : ''}&offset=${offset}&limit=20`
+      const url = `/api/questions/bank?classNumber=${cls}${chId ? `&chapterId=${chId}` : ''}&offset=${offset}&limit=20&boardCode=${activeBoard}`
       const res = await fetch(url)
       if (res.ok) {
         const data = await res.json()
@@ -102,12 +103,17 @@ export function MathQuestionBankClient({
     const newTax = taxonomy.find((c) => c.classNumber === cls)
     const newChId = newTax?.chapters[0]?.id || ''
     setSelectedChapterId(newChId)
-    loadChapterQuestions(cls, newChId, 0)
+    loadChapterQuestions(cls, newChId, 0, selectedBoard)
   }
 
   const handleSelectChapter = (chId: string) => {
     setSelectedChapterId(chId)
-    loadChapterQuestions(selectedClass, chId, 0)
+    loadChapterQuestions(selectedClass, chId, 0, selectedBoard)
+  }
+
+  const handleSelectBoard = (board: BoardCode) => {
+    setSelectedBoard(board)
+    loadChapterQuestions(selectedClass, selectedChapterId, 0, board)
   }
 
   const currentQuestion = questions[currentIndex] || questions[0]
@@ -171,7 +177,7 @@ export function MathQuestionBankClient({
                 Mathematics Chapter-Wise Question Bank
               </h1>
               <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-                {summary.totalQuestionsCount.toLocaleString('en-IN')} formula-verified questions with full step-by-step derivations across {summary.totalClassesCount} classes and 115 curriculum chapters.
+                {summary.totalQuestionsCount.toLocaleString('en-IN')} formula-verified questions with full step-by-step derivations across {summary.totalClassesCount} classes and 116 curriculum chapters.
               </p>
             </div>
 
@@ -179,7 +185,7 @@ export function MathQuestionBankClient({
             <div className="flex items-center gap-2 flex-wrap">
               <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center">
                 <span className="block text-xs font-medium text-slate-500">Total Bank</span>
-                <span className="text-base font-black text-slate-900">36,490 Qs</span>
+                <span className="text-base font-black text-slate-900">{summary.totalQuestionsCount.toLocaleString('en-IN')} Qs</span>
               </div>
               <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center">
                 <span className="block text-xs font-medium text-slate-500">Classes</span>
@@ -209,10 +215,10 @@ export function MathQuestionBankClient({
                     <span>Member-Only Learner Practice</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
-                    The Complete 36,490 Maths Question Bank is Strictly Reserved for Authenticated Learners
+                    The Complete {summary.totalQuestionsCount.toLocaleString('en-IN')} Maths Question Bank is Strictly Reserved for Authenticated Learners
                   </h2>
                   <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                    To maintain individual progress tracking, personal speed analytics, and verified solutions, all 9 classes (Classes 4–12) and 115 chapters are secured behind your student account.
+                    To maintain individual progress tracking, personal speed analytics, and verified solutions, all 9 classes (Classes 4–12) and 116 chapters are secured behind your student account.
                   </p>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
@@ -283,7 +289,7 @@ export function MathQuestionBankClient({
                     Curriculum Scope & Question Distribution
                   </h3>
                   <p className="text-xs text-slate-500">
-                    36,490 Questions meticulously mapped to CBSE / CISCE / State standards
+                    {summary.totalQuestionsCount.toLocaleString('en-IN')} Questions meticulously mapped to CBSE, ICSE / CISCE, and IB official textbooks & board exams
                   </p>
                 </div>
                 <span className="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg">
@@ -310,7 +316,7 @@ export function MathQuestionBankClient({
                     </div>
                     <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
                       <span>{cls.chapters.length} Chapters</span>
-                      <span className="font-semibold text-slate-700">~{Math.round(cls.totalQuestionsTarget / cls.chapters.length)} Qs/ch</span>
+                      <span className="font-semibold text-slate-700">~{Math.round(cls.totalQuestionsTarget / cls.chapters.length).toLocaleString('en-IN')} Qs/ch</span>
                     </div>
                   </div>
                 ))}
@@ -327,7 +333,7 @@ export function MathQuestionBankClient({
                   Board:
                 </span>
                 <button
-                  onClick={() => setSelectedBoard('CBSE')}
+                  onClick={() => handleSelectBoard('CBSE')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                     selectedBoard === 'CBSE'
                       ? 'bg-blue-600 text-white shadow-2xs'
@@ -340,7 +346,7 @@ export function MathQuestionBankClient({
                   </span>
                 </button>
                 <button
-                  onClick={() => setSelectedBoard('CISCE')}
+                  onClick={() => handleSelectBoard('CISCE')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                     selectedBoard === 'CISCE'
                       ? 'bg-blue-600 text-white shadow-2xs'
@@ -353,7 +359,7 @@ export function MathQuestionBankClient({
                   </span>
                 </button>
                 <button
-                  onClick={() => setSelectedBoard('IB')}
+                  onClick={() => handleSelectBoard('IB')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                     selectedBoard === 'IB'
                       ? 'bg-blue-600 text-white shadow-2xs'
@@ -469,6 +475,26 @@ export function MathQuestionBankClient({
                         </span>
                       </div>
                     </div>
+
+                    {/* Textbook Source & Official Board PYQ Citation */}
+                    {currentQuestion.bookSource && (
+                      <div className="flex flex-wrap items-center gap-2 py-2 px-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+                        <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                          <BookOpen className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                          <span>{currentQuestion.bookSource}</span>
+                        </span>
+                        {currentQuestion.exerciseRef && (
+                          <span className="text-slate-600 font-semibold border-l border-slate-200 pl-2">
+                            {currentQuestion.exerciseRef}
+                          </span>
+                        )}
+                        {currentQuestion.boardYearPYQ && (
+                          <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-extrabold text-[11px] border border-amber-200">
+                            {currentQuestion.boardYearPYQ}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Topic Name */}
                     <div className="text-xs font-medium text-slate-400">
@@ -686,7 +712,7 @@ export function MathQuestionBankClient({
                     <span>Curriculum Board Mapping Engine</span>
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                    {currentBoardAlignment.className} Board Alignment: CBSE, ICSE &amp; IB
+                    {currentBoardAlignment.className} Board Alignment: CBSE, ICSE &amp; IB ({currentBoardAlignment.questionCount.toLocaleString('en-IN')} Questions)
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">
                     {currentBoardAlignment.comparativeSummary}
@@ -724,6 +750,18 @@ export function MathQuestionBankClient({
                         ))}
                       </ul>
                     </div>
+                    {currentBoardAlignment.cbse.textbookBibliography && (
+                      <div className="mt-3 space-y-1">
+                        <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wider block">
+                          Official Textbooks &amp; PYQs:
+                        </span>
+                        <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
+                          {currentBoardAlignment.cbse.textbookBibliography.map((book, i) => (
+                            <li key={i} className="line-clamp-1">{book}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   <div className="pt-3 border-t border-blue-200/60 text-[11px] text-slate-600 italic">
                     {currentBoardAlignment.cbse.boardSpecificNotes}
@@ -752,6 +790,18 @@ export function MathQuestionBankClient({
                         ))}
                       </ul>
                     </div>
+                    {currentBoardAlignment.icse.textbookBibliography && (
+                      <div className="mt-3 space-y-1">
+                        <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block">
+                          Official Textbooks &amp; PYQs:
+                        </span>
+                        <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
+                          {currentBoardAlignment.icse.textbookBibliography.map((book, i) => (
+                            <li key={i} className="line-clamp-1">{book}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   <div className="pt-3 border-t border-slate-200/80 text-[11px] text-slate-600 italic">
                     {currentBoardAlignment.icse.boardSpecificNotes}
@@ -780,6 +830,18 @@ export function MathQuestionBankClient({
                         ))}
                       </ul>
                     </div>
+                    {currentBoardAlignment.ib.textbookBibliography && (
+                      <div className="mt-3 space-y-1">
+                        <span className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider block">
+                          Official Curricula &amp; Past Papers:
+                        </span>
+                        <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
+                          {currentBoardAlignment.ib.textbookBibliography.map((book, i) => (
+                            <li key={i} className="line-clamp-1">{book}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   <div className="pt-3 border-t border-indigo-200/60 text-[11px] text-slate-600 italic">
                     {currentBoardAlignment.ib.boardSpecificNotes}

@@ -32,7 +32,7 @@ export async function GET(req: NextRequest | Request) {
         {
           error: 'Authentication required',
           message:
-            'The 36,490 Mathematics Question Bank (Classes 4–12) is strictly reserved for authenticated learners. Please sign in to access full practice and solutions.',
+            'The 200,000 Mathematics Question Bank (Classes 4–12) is strictly reserved for authenticated learners. Please sign in to access full practice and solutions.',
           redirectTo: '/auth/login?redirectTo=/dashboard/question-bank',
         },
         { status: 401 }
@@ -46,12 +46,15 @@ export async function GET(req: NextRequest | Request) {
     const chapterId = searchParams.get('chapterId') || undefined
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0', 10))
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)))
+    const rawBoard = searchParams.get('boardCode') || undefined
+    const boardCode = rawBoard === 'CBSE' || rawBoard === 'CISCE' || rawBoard === 'IB' ? rawBoard : undefined
 
     const { questions, total } = getMathQuestionsForClassAndChapter(
       classNumber,
       chapterId,
       offset,
-      limit
+      limit,
+      boardCode
     )
 
     const classTaxonomy = MATH_CLASSES_TAXONOMY.find((c) => c.classNumber === classNumber)

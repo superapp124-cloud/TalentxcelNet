@@ -2,18 +2,18 @@ import type { MathClassTaxonomy } from './types'
 
 export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   // ==========================================================================
-  // CLASS 4 (Primary Foundation) — Target: 3,600 Questions
+  // CLASS 4 (Primary Foundation) — Target: 17,000 Questions
   // ==========================================================================
   {
     classNumber: 4,
     className: 'Class 4',
-    totalQuestionsTarget: 3600,
+    totalQuestionsTarget: 17000,
     chapters: [
       {
         id: 'math_c4_ch01',
         chapterNumber: 1,
         title: 'Large Numbers & Place Value (Up to 5 Digits)',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch01_t01', title: '5-Digit Numbers & Place Value Chart' },
           { id: 'math_c4_ch01_t02', title: 'Expanded Form & Standard Form' },
@@ -25,7 +25,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch02',
         chapterNumber: 2,
         title: 'Addition & Subtraction of Multi-Digit Numbers',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch02_t01', title: 'Addition with Regrouping / Carrying' },
           { id: 'math_c4_ch02_t02', title: 'Subtraction with Borrowing' },
@@ -37,7 +37,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch03',
         chapterNumber: 3,
         title: 'Multiplication Operations & Estimation',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch03_t01', title: 'Multiplying 3-Digit by 2-Digit Numbers' },
           { id: 'math_c4_ch03_t02', title: 'Properties of Multiplication (Commutative, Associative, Distributive)' },
@@ -49,7 +49,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch04',
         chapterNumber: 4,
         title: 'Division & Remainder Word Problems',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch04_t01', title: 'Long Division: 3-Digit and 4-Digit by 1-Digit' },
           { id: 'math_c4_ch04_t02', title: 'Division by 10, 100 and Multiples of 10' },
@@ -61,7 +61,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch05',
         chapterNumber: 5,
         title: 'Multiples & Factors (HCF & LCM Basics)',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch05_t01', title: 'Finding Multiples & Properties of Multiples' },
           { id: 'math_c4_ch05_t02', title: 'Common Multiples & Lowest Common Multiple (LCM)' },
@@ -73,7 +73,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch06',
         chapterNumber: 6,
         title: 'Fractions: Visual, Proper, Improper & Mixed',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch06_t01', title: 'Fraction as Part of a Whole & Collection' },
           { id: 'math_c4_ch06_t02', title: 'Equivalent Fractions & Simplest Form' },
@@ -85,7 +85,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch07',
         chapterNumber: 7,
         title: 'Decimals & Money Calculations',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch07_t01', title: 'Tenths and Hundredths on Number Line' },
           { id: 'math_c4_ch07_t02', title: 'Converting Fractions to Decimals and Vice Versa' },
@@ -97,7 +97,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch08',
         chapterNumber: 8,
         title: 'Metric Measurement (Length, Mass & Capacity)',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1420,
         topics: [
           { id: 'math_c4_ch08_t01', title: 'Units of Length: mm, cm, m, km' },
           { id: 'math_c4_ch08_t02', title: 'Units of Weight: mg, g, kg' },
@@ -109,7 +109,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch09',
         chapterNumber: 9,
         title: 'Perimeter and Grid Area',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1410,
         topics: [
           { id: 'math_c4_ch09_t01', title: 'Perimeter of Rectangles & Squares' },
           { id: 'math_c4_ch09_t02', title: 'Perimeter of Irregular Polygons' },
@@ -121,7 +121,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch10',
         chapterNumber: 10,
         title: 'Time, Clocks & Calendar',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1410,
         topics: [
           { id: 'math_c4_ch10_t01', title: 'Reading 12-Hour and 24-Hour Clocks' },
           { id: 'math_c4_ch10_t02', title: 'Elapsed Time and Duration Calculations' },
@@ -133,7 +133,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch11',
         chapterNumber: 11,
         title: '2D & 3D Shapes, Angles & Symmetry',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1410,
         topics: [
           { id: 'math_c4_ch11_t01', title: 'Properties of Circle, Triangle, Quadrilateral' },
           { id: 'math_c4_ch11_t02', title: '3D Solid Shapes: Cube, Cuboid, Cylinder, Cone, Sphere' },
@@ -145,7 +145,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c4_ch12',
         chapterNumber: 12,
         title: 'Data Handling & Pictographs',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1410,
         topics: [
           { id: 'math_c4_ch12_t01', title: 'Reading & Constructing Tally Marks' },
           { id: 'math_c4_ch12_t02', title: 'Interpreting Pictographs with Scale Keys' },
@@ -157,18 +157,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 5 — Target: 3,600 Questions
+  // CLASS 5 — Target: 18,500 Questions
   // ==========================================================================
   {
     classNumber: 5,
     className: 'Class 5',
-    totalQuestionsTarget: 3600,
+    totalQuestionsTarget: 18500,
     chapters: [
       {
         id: 'math_c5_ch01',
         chapterNumber: 1,
         title: 'Place Value & 7-8 Digit Numbers',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch01_t01', title: 'Indian vs International Numbering System' },
           { id: 'math_c5_ch01_t02', title: 'Crores, Millions & Place Value Shifts' },
@@ -180,7 +180,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch02',
         chapterNumber: 2,
         title: 'Arithmetic Operations & BODMAS',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch02_t01', title: 'Order of Operations: Brackets, Division, Multiplication' },
           { id: 'math_c5_ch02_t02', title: 'Large Number Multiplication (3-Digit by 3-Digit)' },
@@ -192,7 +192,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch03',
         chapterNumber: 3,
         title: 'Factors, Multiples, Prime Factorisation & HCF/LCM',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch03_t01', title: 'Prime Factorisation: Division & Tree Methods' },
           { id: 'math_c5_ch03_t02', title: 'Highest Common Factor (HCF) by Common Factors & Division' },
@@ -204,7 +204,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch04',
         chapterNumber: 4,
         title: 'Fractions: Operations & Reciprocals',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch04_t01', title: 'Addition & Subtraction of Unlike Fractions' },
           { id: 'math_c5_ch04_t02', title: 'Multiplication of Fractions and Whole Numbers' },
@@ -216,7 +216,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch05',
         chapterNumber: 5,
         title: 'Decimals Operations & Rounding',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch05_t01', title: 'Addition and Subtraction of Decimals' },
           { id: 'math_c5_ch05_t02', title: 'Multiplication of Decimals by 10, 100, 1000' },
@@ -228,7 +228,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch06',
         chapterNumber: 6,
         title: 'Percentages & Unitary Method',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch06_t01', title: 'Concept of Percent (Out of 100)' },
           { id: 'math_c5_ch06_t02', title: 'Converting Percentages, Fractions & Decimals' },
@@ -240,7 +240,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch07',
         chapterNumber: 7,
         title: 'Profit, Loss & Simple Interest Basics',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch07_t01', title: 'Cost Price (CP) and Selling Price (SP)' },
           { id: 'math_c5_ch07_t02', title: 'Calculating Profit and Loss Amounts' },
@@ -252,7 +252,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch08',
         chapterNumber: 8,
         title: 'Perimeter, Area & Volume',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch08_t01', title: 'Area of Rectangle (l × b) and Square (side²)' },
           { id: 'math_c5_ch08_t02', title: 'Perimeter vs Area Comparisons' },
@@ -264,7 +264,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch09',
         chapterNumber: 9,
         title: 'Angles, Triangles & Circles',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch09_t01', title: 'Measuring Angles using Protractor' },
           { id: 'math_c5_ch09_t02', title: 'Types of Angles: Acute, Right, Obtuse, Straight, Reflex' },
@@ -276,7 +276,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch10',
         chapterNumber: 10,
         title: 'Temperature & Clocks',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c5_ch10_t01', title: 'Celsius and Fahrenheit Temperature Scales' },
           { id: 'math_c5_ch10_t02', title: 'Conversion between °C and °F' },
@@ -288,7 +288,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch11',
         chapterNumber: 11,
         title: 'Symmetry, Nets & Perspectives',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1550,
         topics: [
           { id: 'math_c5_ch11_t01', title: 'Rotational Symmetry: 1/2 turn, 1/4 turn, 1/3 turn' },
           { id: 'math_c5_ch11_t02', title: 'Nets of Cubes, Cylinders, Cones' },
@@ -300,7 +300,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c5_ch12',
         chapterNumber: 12,
         title: 'Data Handling & Averages',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1550,
         topics: [
           { id: 'math_c5_ch12_t01', title: 'Calculating Average (Mean) of Numbers' },
           { id: 'math_c5_ch12_t02', title: 'Constructing and Interpreting Bar Graphs' },
@@ -312,18 +312,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 6 — Target: 3,840 Questions
+  // CLASS 6 — Target: 21,000 Questions
   // ==========================================================================
   {
     classNumber: 6,
     className: 'Class 6',
-    totalQuestionsTarget: 3840,
+    totalQuestionsTarget: 21000,
     chapters: [
       {
         id: 'math_c6_ch01',
         chapterNumber: 1,
         title: 'Knowing Our Numbers',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch01_t01', title: 'Large Numbers in Use & Place Value' },
           { id: 'math_c6_ch01_t02', title: 'Estimation of Sums, Differences, Products' },
@@ -335,7 +335,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch02',
         chapterNumber: 2,
         title: 'Whole Numbers & Number Line',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch02_t01', title: 'Natural Numbers vs Whole Numbers' },
           { id: 'math_c6_ch02_t02', title: 'Operations on the Number Line' },
@@ -347,7 +347,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch03',
         chapterNumber: 3,
         title: 'Playing with Numbers',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch03_t01', title: 'Factors, Multiples, Prime & Composite' },
           { id: 'math_c6_ch03_t02', title: 'Divisibility Rules for 2, 3, 4, 5, 6, 8, 9, 10, 11' },
@@ -359,7 +359,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch04',
         chapterNumber: 4,
         title: 'Basic Geometrical Ideas',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch04_t01', title: 'Points, Line Segments, Lines and Rays' },
           { id: 'math_c6_ch04_t02', title: 'Intersecting Lines, Parallel Lines, Curves' },
@@ -371,7 +371,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch05',
         chapterNumber: 5,
         title: 'Understanding Elementary Shapes',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch05_t01', title: 'Measuring Line Segments' },
           { id: 'math_c6_ch05_t02', title: 'Angles: Right, Straight, Complete Angles' },
@@ -383,7 +383,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch06',
         chapterNumber: 6,
         title: 'Integers',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch06_t01', title: 'Positive & Negative Numbers, Zero' },
           { id: 'math_c6_ch06_t02', title: 'Representation of Integers on Number Line' },
@@ -395,7 +395,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch07',
         chapterNumber: 7,
         title: 'Fractions',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch07_t01', title: 'Fraction on Number Line' },
           { id: 'math_c6_ch07_t02', title: 'Proper, Improper and Mixed Fractions' },
@@ -407,7 +407,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch08',
         chapterNumber: 8,
         title: 'Decimals',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch08_t01', title: 'Tenths, Hundredths and Thousandths' },
           { id: 'math_c6_ch08_t02', title: 'Comparing Decimals and Number Line' },
@@ -419,7 +419,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch09',
         chapterNumber: 9,
         title: 'Data Handling',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch09_t01', title: 'Recording and Organizing Data' },
           { id: 'math_c6_ch09_t02', title: 'Drawing and Interpreting Pictographs' },
@@ -431,7 +431,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch10',
         chapterNumber: 10,
         title: 'Mensuration (Perimeter & Area)',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch10_t01', title: 'Perimeter of Regular Polygons' },
           { id: 'math_c6_ch10_t02', title: 'Area of Rectangle and Square' },
@@ -443,7 +443,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch11',
         chapterNumber: 11,
         title: 'Introduction to Algebra',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch11_t01', title: 'Matchstick Patterns & Variables' },
           { id: 'math_c6_ch11_t02', title: 'Algebraic Expressions with Variables' },
@@ -455,7 +455,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c6_ch12',
         chapterNumber: 12,
         title: 'Ratio and Proportion',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c6_ch12_t01', title: 'Understanding Ratio in Simplest Form' },
           { id: 'math_c6_ch12_t02', title: 'Equivalent Ratios' },
@@ -467,18 +467,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 7 — Target: 3,840 Questions
+  // CLASS 7 — Target: 22,500 Questions
   // ==========================================================================
   {
     classNumber: 7,
     className: 'Class 7',
-    totalQuestionsTarget: 3840,
+    totalQuestionsTarget: 22500,
     chapters: [
       {
         id: 'math_c7_ch01',
         chapterNumber: 1,
         title: 'Integers: Properties & Operations',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch01_t01', title: 'Properties of Addition and Subtraction of Integers' },
           { id: 'math_c7_ch01_t02', title: 'Multiplication of Integers & Sign Rules' },
@@ -490,7 +490,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch02',
         chapterNumber: 2,
         title: 'Fractions and Decimals',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch02_t01', title: 'Multiplication of Fraction by Fraction' },
           { id: 'math_c7_ch02_t02', title: 'Division of Fractions and Reciprocals' },
@@ -502,7 +502,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch03',
         chapterNumber: 3,
         title: 'Data Handling: Central Tendencies',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch03_t01', title: 'Arithmetic Mean and Range' },
           { id: 'math_c7_ch03_t02', title: 'Mode and Median of Data' },
@@ -514,7 +514,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch04',
         chapterNumber: 4,
         title: 'Simple Linear Equations',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch04_t01', title: 'Setting up an Equation' },
           { id: 'math_c7_ch04_t02', title: 'Solving Equations by Transposition' },
@@ -526,7 +526,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch05',
         chapterNumber: 5,
         title: 'Lines and Angles',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch05_t01', title: 'Complementary and Supplementary Angles' },
           { id: 'math_c7_ch05_t02', title: 'Adjacent and Vertically Opposite Angles, Linear Pairs' },
@@ -538,7 +538,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch06',
         chapterNumber: 6,
         title: 'The Triangle and Its Properties',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch06_t01', title: 'Medians and Altitudes of a Triangle' },
           { id: 'math_c7_ch06_t02', title: 'Exterior Angle of a Triangle & Property' },
@@ -550,7 +550,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch07',
         chapterNumber: 7,
         title: 'Comparing Quantities',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch07_t01', title: 'Equivalent Ratios and Percentage Conversion' },
           { id: 'math_c7_ch07_t02', title: 'Increase or Decrease as Percent' },
@@ -562,7 +562,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch08',
         chapterNumber: 8,
         title: 'Rational Numbers',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch08_t01', title: 'Need for Rational Numbers (p/q, q ≠ 0)' },
           { id: 'math_c7_ch08_t02', title: 'Positive, Negative & Standard Form' },
@@ -574,7 +574,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch09',
         chapterNumber: 9,
         title: 'Perimeter and Area (Plane Figures)',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch09_t01', title: 'Area of Parallelograms (base × height)' },
           { id: 'math_c7_ch09_t02', title: 'Area of Triangles (1/2 × base × height)' },
@@ -586,7 +586,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch10',
         chapterNumber: 10,
         title: 'Algebraic Expressions',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch10_t01', title: 'Terms, Factors, Coefficients' },
           { id: 'math_c7_ch10_t02', title: 'Monomials, Binomials, Trinomials, Polynomials' },
@@ -598,7 +598,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch11',
         chapterNumber: 11,
         title: 'Exponents and Powers',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch11_t01', title: 'Exponential Form and Base/Power' },
           { id: 'math_c7_ch11_t02', title: 'Laws of Exponents: Product, Quotient, Power of Power' },
@@ -610,7 +610,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c7_ch12',
         chapterNumber: 12,
         title: 'Visualising Solid Shapes & Symmetry',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1875,
         topics: [
           { id: 'math_c7_ch12_t01', title: 'Plane Figures vs Solid Figures' },
           { id: 'math_c7_ch12_t02', title: 'Nets for Building 3D Shapes' },
@@ -622,18 +622,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 8 — Target: 4,200 Questions
+  // CLASS 8 — Target: 24,500 Questions
   // ==========================================================================
   {
     classNumber: 8,
     className: 'Class 8',
-    totalQuestionsTarget: 4200,
+    totalQuestionsTarget: 24500,
     chapters: [
       {
         id: 'math_c8_ch01',
         chapterNumber: 1,
         title: 'Rational Numbers: Properties & Denseness',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch01_t01', title: 'Properties of Rational Numbers' },
           { id: 'math_c8_ch01_t02', title: 'Additive and Multiplicative Identities & Inverses' },
@@ -645,7 +645,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch02',
         chapterNumber: 2,
         title: 'Linear Equations in One Variable',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch02_t01', title: 'Solving Equations Having Variables on Both Sides' },
           { id: 'math_c8_ch02_t02', title: 'Reducing Equations to Simpler Linear Form' },
@@ -657,7 +657,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch03',
         chapterNumber: 3,
         title: 'Understanding Quadrilaterals & Polygons',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch03_t01', title: 'Convex, Concave & Regular Polygons' },
           { id: 'math_c8_ch03_t02', title: 'Sum of Measures of Exterior Angles (360°)' },
@@ -669,7 +669,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch04',
         chapterNumber: 4,
         title: 'Data Handling & Probability',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch04_t01', title: 'Organising Data & Grouped Frequency Distribution' },
           { id: 'math_c8_ch04_t02', title: 'Histograms with Continuous Class Intervals' },
@@ -681,7 +681,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch05',
         chapterNumber: 5,
         title: 'Squares and Square Roots',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch05_t01', title: 'Properties of Square Numbers' },
           { id: 'math_c8_ch05_t02', title: 'Pythagorean Triplets (2m, m²-1, m²+1)' },
@@ -693,7 +693,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch06',
         chapterNumber: 6,
         title: 'Cubes and Cube Roots',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch06_t01', title: 'Properties of Cubes of Numbers' },
           { id: 'math_c8_ch06_t02', title: 'Prime Factorisation for Cube Roots' },
@@ -705,7 +705,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch07',
         chapterNumber: 7,
         title: 'Comparing Quantities (Compound Interest)',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch07_t01', title: 'Discount and Marked Price (Discount = MP - SP)' },
           { id: 'math_c8_ch07_t02', title: 'Sales Tax, Value Added Tax (VAT) and GST Calculations' },
@@ -717,7 +717,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch08',
         chapterNumber: 8,
         title: 'Algebraic Expressions & Identities',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch08_t01', title: 'Multiplication of Monomials, Binomials, Polynomials' },
           { id: 'math_c8_ch08_t02', title: 'Standard Identity I: (a + b)² = a² + 2ab + b²' },
@@ -729,7 +729,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch09',
         chapterNumber: 9,
         title: 'Mensuration (Solid Surfaces & Volumes)',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch09_t01', title: 'Area of Trapezium & General Quadrilaterals' },
           { id: 'math_c8_ch09_t02', title: 'Area of Rhombus & Special Polygons' },
@@ -741,7 +741,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch10',
         chapterNumber: 10,
         title: 'Exponents and Powers (Negative Powers)',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch10_t01', title: 'Powers with Negative Exponents (a⁻ⁿ = 1/aⁿ)' },
           { id: 'math_c8_ch10_t02', title: 'Laws of Exponents for Integral Powers' },
@@ -753,7 +753,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch11',
         chapterNumber: 11,
         title: 'Direct and Inverse Proportions',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch11_t01', title: 'Direct Proportion (x/y = k)' },
           { id: 'math_c8_ch11_t02', title: 'Inverse Proportion (xy = k)' },
@@ -765,7 +765,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch12',
         chapterNumber: 12,
         title: 'Factorisation',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch12_t01', title: 'Method of Common Factors & Regrouping Terms' },
           { id: 'math_c8_ch12_t02', title: 'Factorisation Using Standard Algebraic Identities' },
@@ -777,7 +777,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch13',
         chapterNumber: 13,
         title: 'Introduction to Graphs',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch13_t01', title: 'Bar Graph, Pie Graph, Histogram Review' },
           { id: 'math_c8_ch13_t02', title: 'Linear Graphs & Coordinates (Ordered Pairs x, y)' },
@@ -789,7 +789,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c8_ch14',
         chapterNumber: 14,
         title: 'Playing with Numbers (Puzzles & Divisibility)',
-        targetQuestionCount: 300,
+        targetQuestionCount: 1750,
         topics: [
           { id: 'math_c8_ch14_t01', title: 'Numbers in General Form (10a + b, 100a + 10b + c)' },
           { id: 'math_c8_ch14_t02', title: 'Games with Numbers: Reversing Digits & Differences' },
@@ -801,18 +801,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 9 — Target: 4,290 Questions
+  // CLASS 9 — Target: 26,000 Questions
   // ==========================================================================
   {
     classNumber: 9,
     className: 'Class 9',
-    totalQuestionsTarget: 4290,
+    totalQuestionsTarget: 26000,
     chapters: [
       {
         id: 'math_c9_ch01',
         chapterNumber: 1,
         title: 'Number Systems',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch01_t01', title: 'Irrational Numbers (√2, √3, π) on Number Line' },
           { id: 'math_c9_ch01_t02', title: 'Real Numbers and Decimal Expansions (Terminating/Recurring)' },
@@ -824,7 +824,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch02',
         chapterNumber: 2,
         title: 'Polynomials',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch02_t01', title: 'Polynomials in One Variable & Degree' },
           { id: 'math_c9_ch02_t02', title: 'Zeroes of a Polynomial' },
@@ -836,7 +836,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch03',
         chapterNumber: 3,
         title: 'Coordinate Geometry',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch03_t01', title: 'Cartesian System, Origin, Axes and Quadrants' },
           { id: 'math_c9_ch03_t02', title: 'Coordinates of a Point: Abscissa and Ordinate' },
@@ -848,7 +848,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch04',
         chapterNumber: 4,
         title: 'Linear Equations in Two Variables',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch04_t01', title: 'Standard Form: ax + by + c = 0' },
           { id: 'math_c9_ch04_t02', title: 'Solution of a Linear Equation (Infinitely Many Solutions)' },
@@ -860,7 +860,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch05',
         chapterNumber: 5,
         title: "Introduction to Euclid's Geometry",
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch05_t01', title: "Euclid's Definitions, Axioms and Postulates" },
           { id: 'math_c9_ch05_t02', title: 'Five Postulates and Parallel Postulate Equivalent Versions' },
@@ -872,7 +872,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch06',
         chapterNumber: 6,
         title: 'Lines and Angles',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch06_t01', title: 'Intersecting Lines and Non-Intersecting Lines' },
           { id: 'math_c9_ch06_t02', title: 'Pairs of Angles Axioms and Vertically Opposite Angles Theorem' },
@@ -884,7 +884,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch07',
         chapterNumber: 7,
         title: 'Triangles (Congruence & Inequalities)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch07_t01', title: 'Criteria for Congruence of Triangles (SAS, ASA, AAS)' },
           { id: 'math_c9_ch07_t02', title: 'Properties of Isosceles Triangles' },
@@ -896,7 +896,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch08',
         chapterNumber: 8,
         title: 'Quadrilaterals & Mid-Point Theorem',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch08_t01', title: 'Angle Sum Property of a Quadrilateral (360°)' },
           { id: 'math_c9_ch08_t02', title: 'Properties of Parallelograms (Theorems)' },
@@ -908,7 +908,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch09',
         chapterNumber: 9,
         title: 'Circles',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch09_t01', title: 'Angle Subtended by a Chord at a Point' },
           { id: 'math_c9_ch09_t02', title: 'Perpendicular from Centre to a Chord' },
@@ -917,10 +917,10 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         ],
       },
       {
-        id: 'math_c9_ch010',
+        id: 'math_c9_ch10',
         chapterNumber: 10,
         title: "Heron's Formula",
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch10_t01', title: "Area of a Triangle by Heron's Formula (√[s(s-a)(s-b)(s-c)])" },
           { id: 'math_c9_ch10_t02', title: 'Application of Heron’s Formula in Finding Areas of Quadrilaterals' },
@@ -932,7 +932,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch11',
         chapterNumber: 11,
         title: 'Surface Areas and Volumes',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch11_t01', title: 'Surface Area and Volume of Right Circular Cone' },
           { id: 'math_c9_ch11_t02', title: 'Surface Area and Volume of Sphere and Hemisphere' },
@@ -944,7 +944,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch12',
         chapterNumber: 12,
         title: 'Statistics',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch12_t01', title: 'Graphical Representation: Bar Graphs and Histograms' },
           { id: 'math_c9_ch12_t02', title: 'Histograms with Varying Base Widths' },
@@ -956,7 +956,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c9_ch13',
         chapterNumber: 13,
         title: 'Probability (Empirical & Theoretical)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c9_ch13_t01', title: 'Experimental (Empirical) Approach to Probability' },
           { id: 'math_c9_ch13_t02', title: 'Probability of Events: P(E) = Number of Trials / Total Trials' },
@@ -968,18 +968,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 10 (Secondary Board Benchmark) — Target: 4,620 Questions
+  // CLASS 10 (Secondary Board Benchmark) — Target: 28,000 Questions
   // ==========================================================================
   {
     classNumber: 10,
     className: 'Class 10',
-    totalQuestionsTarget: 4620,
+    totalQuestionsTarget: 28000,
     chapters: [
       {
         id: 'math_c10_ch01',
         chapterNumber: 1,
         title: 'Real Numbers & Fundamental Theorem of Arithmetic',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch01_t01', title: 'Fundamental Theorem of Arithmetic & Unique Factorisation' },
           { id: 'math_c10_ch01_t02', title: 'HCF and LCM via Prime Factorisation Method' },
@@ -991,7 +991,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch02',
         chapterNumber: 2,
         title: 'Polynomials & Zeroes Relationship',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch02_t01', title: 'Geometrical Meaning of Zeroes of a Polynomial' },
           { id: 'math_c10_ch02_t02', title: 'Relationship Between Zeroes and Coefficients of Quadratic Polynomial' },
@@ -1003,7 +1003,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch03',
         chapterNumber: 3,
         title: 'Pair of Linear Equations in Two Variables',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch03_t01', title: 'Graphical Method of Solution and Consistency Conditions (a₁/a₂, b₁/b₂, c₁/c₂)' },
           { id: 'math_c10_ch03_t02', title: 'Substitution Method of Solution' },
@@ -1015,7 +1015,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch04',
         chapterNumber: 4,
         title: 'Quadratic Equations',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch04_t01', title: 'Standard Form: ax² + bx + c = 0 (a ≠ 0)' },
           { id: 'math_c10_ch04_t02', title: 'Solution of Quadratic Equations by Factorisation' },
@@ -1027,7 +1027,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch05',
         chapterNumber: 5,
         title: 'Arithmetic Progressions (AP)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch05_t01', title: 'Introduction to AP, First Term (a) and Common Difference (d)' },
           { id: 'math_c10_ch05_t02', title: 'nth Term of an AP (aₙ = a + (n - 1)d)' },
@@ -1039,7 +1039,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch06',
         chapterNumber: 6,
         title: 'Triangles (Similarity Theorems)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch06_t01', title: 'Similar Figures and Criteria for Similarity of Triangles (AAA, SSS, SAS)' },
           { id: 'math_c10_ch06_t02', title: 'Basic Proportionality Theorem (Thales Theorem) and Converse' },
@@ -1051,7 +1051,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch07',
         chapterNumber: 7,
         title: 'Coordinate Geometry',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch07_t01', title: 'Distance Formula: √[(x₂ - x₁)² + (y₂ - y₁)²]' },
           { id: 'math_c10_ch07_t02', title: 'Section Formula: Internal Division [(mx₂+nx₁)/(m+n), (my₂+ny₁)/(m+n)]' },
@@ -1063,7 +1063,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch08',
         chapterNumber: 8,
         title: 'Introduction to Trigonometry',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch08_t01', title: 'Trigonometric Ratios of an Acute Angle: sin, cos, tan, cot, sec, cosec' },
           { id: 'math_c10_ch08_t02', title: 'Values of Trigonometric Ratios at 0°, 30°, 45°, 60°, 90°' },
@@ -1075,7 +1075,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch09',
         chapterNumber: 9,
         title: 'Some Applications of Trigonometry (Heights & Distances)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch09_t01', title: 'Line of Sight, Angle of Elevation and Angle of Depression' },
           { id: 'math_c10_ch09_t02', title: 'Simple Problems on Heights and Distances with One Triangle' },
@@ -1087,7 +1087,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch10',
         chapterNumber: 10,
         title: 'Circles & Tangents',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch10_t01', title: 'Tangent to a Circle at Point of Contact is Perpendicular to Radius' },
           { id: 'math_c10_ch10_t02', title: 'Lengths of Tangents from External Point to Circle are Equal' },
@@ -1099,7 +1099,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch11',
         chapterNumber: 11,
         title: 'Areas Related to Circles',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch11_t01', title: 'Perimeter and Area of a Circle Review' },
           { id: 'math_c10_ch11_t02', title: 'Area of Sector of Angle θ: (θ/360) × πr²' },
@@ -1111,7 +1111,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch12',
         chapterNumber: 12,
         title: 'Surface Areas and Volumes (Combinations of Solids)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch12_t01', title: 'Surface Area of Combinations of Solids (Cylinder + Cone/Hemisphere)' },
           { id: 'math_c10_ch12_t02', title: 'Volume of Combinations of Solids' },
@@ -1123,7 +1123,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch13',
         chapterNumber: 13,
         title: 'Statistics (Grouped Data Measures)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch13_t01', title: 'Mean of Grouped Data (Direct Method, Assumed Mean, Step Deviation)' },
           { id: 'math_c10_ch13_t02', title: 'Mode of Grouped Data: l + [(f₁ - f₀) / (2f₁ - f₀ - f₂)] × h' },
@@ -1135,7 +1135,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c10_ch14',
         chapterNumber: 14,
         title: 'Probability (Classical Approach)',
-        targetQuestionCount: 330,
+        targetQuestionCount: 2000,
         topics: [
           { id: 'math_c10_ch14_t01', title: 'Theoretical (Classical) Probability: P(E) = n(E)/n(S)' },
           { id: 'math_c10_ch14_t02', title: 'Elementary Events and Sum of Probabilities = 1' },
@@ -1147,18 +1147,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 11 — Target: 4,340 Questions
+  // CLASS 11 — Target: 22,500 Questions
   // ==========================================================================
   {
     classNumber: 11,
     className: 'Class 11',
-    totalQuestionsTarget: 4340,
+    totalQuestionsTarget: 22500,
     chapters: [
       {
         id: 'math_c11_ch01',
         chapterNumber: 1,
         title: 'Sets & Venn Diagrams',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch01_t01', title: 'Sets, Subsets, Power Set & Universal Set' },
           { id: 'math_c11_ch01_t02', title: 'Venn Diagrams & Operations on Sets (Union, Intersection, Difference)' },
@@ -1170,7 +1170,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch02',
         chapterNumber: 2,
         title: 'Relations and Functions',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch02_t01', title: 'Cartesian Product of Sets' },
           { id: 'math_c11_ch02_t02', title: 'Relations: Domain, Codomain and Range' },
@@ -1182,7 +1182,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch03',
         chapterNumber: 3,
         title: 'Trigonometric Functions',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch03_t01', title: 'Angles in Degrees & Radians (1 radian = 180°/π)' },
           { id: 'math_c11_ch03_t02', title: 'Trigonometric Functions on Unit Circle & Signs in Quadrants' },
@@ -1194,7 +1194,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch04',
         chapterNumber: 4,
         title: 'Complex Numbers & Quadratic Equations',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch04_t01', title: 'Need for Complex Numbers (i = √-1) & Algebra of Complex Numbers' },
           { id: 'math_c11_ch04_t02', title: 'Modulus and Conjugate of a Complex Number' },
@@ -1206,7 +1206,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch05',
         chapterNumber: 5,
         title: 'Linear Inequalities',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch05_t01', title: 'Algebraic Solutions of Linear Inequalities in One Variable' },
           { id: 'math_c11_ch05_t02', title: 'Graphical Representation on the Number Line' },
@@ -1218,7 +1218,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch06',
         chapterNumber: 6,
         title: 'Permutations and Combinations',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch06_t01', title: 'Fundamental Principle of Counting (Multiplication & Addition)' },
           { id: 'math_c11_ch06_t02', title: 'Factorial Notation (n!)' },
@@ -1230,7 +1230,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch07',
         chapterNumber: 7,
         title: 'Binomial Theorem',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch07_t01', title: "Binomial Theorem for Positive Integral Indices & Pascal's Triangle" },
           { id: 'math_c11_ch07_t02', title: 'General Term in Binomial Expansion (Tᵣ₊₁ = ⁿCᵣ aⁿ⁻ʳ bʳ)' },
@@ -1242,7 +1242,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch08',
         chapterNumber: 8,
         title: 'Sequences and Series (AP & GP)',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch08_t01', title: 'Arithmetic Progression (AP) and Arithmetic Mean (AM)' },
           { id: 'math_c11_ch08_t02', title: 'Geometric Progression (GP), nth Term (arⁿ⁻¹) and Sum (a(rⁿ-1)/(r-1))' },
@@ -1254,7 +1254,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch09',
         chapterNumber: 9,
         title: 'Straight Lines',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch09_t01', title: 'Slope of a Line (m = tanθ = (y₂-y₁)/(x₂-x₁)) and Angle Between Two Lines' },
           { id: 'math_c11_ch09_t02', title: 'Various Forms of Equation of Line (Slope-Intercept, Point-Slope, Intercept, Normal)' },
@@ -1266,7 +1266,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch10',
         chapterNumber: 10,
         title: 'Conic Sections',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch10_t01', title: 'Circle: Standard Equation (x - h)² + (y - k)² = r²' },
           { id: 'math_c11_ch10_t02', title: 'Parabola: Focus, Directrix, Vertex, Latus Rectum (y² = 4ax)' },
@@ -1278,7 +1278,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch11',
         chapterNumber: 11,
         title: 'Introduction to Three-Dimensional Geometry',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch11_t01', title: 'Coordinate Axes and Coordinate Planes in Three Dimensions' },
           { id: 'math_c11_ch11_t02', title: 'Coordinates of a Point in Space & 8 Octants' },
@@ -1290,7 +1290,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch12',
         chapterNumber: 12,
         title: 'Limits and Derivatives',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1600,
         topics: [
           { id: 'math_c11_ch12_t01', title: 'Intuitive Idea of Limits, Left Hand and Right Hand Limits' },
           { id: 'math_c11_ch12_t02', title: 'Limits of Polynomial and Rational Functions' },
@@ -1302,7 +1302,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch13',
         chapterNumber: 13,
         title: 'Statistics (Measures of Dispersion)',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1650,
         topics: [
           { id: 'math_c11_ch13_t01', title: 'Measures of Dispersion: Range, Quartile Deviation' },
           { id: 'math_c11_ch13_t02', title: 'Mean Deviation About Mean and Median' },
@@ -1314,7 +1314,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c11_ch14',
         chapterNumber: 14,
         title: 'Probability (Axiomatic Approach)',
-        targetQuestionCount: 310,
+        targetQuestionCount: 1650,
         topics: [
           { id: 'math_c11_ch14_t01', title: 'Random Experiments, Sample Space and Events' },
           { id: 'math_c11_ch14_t02', title: 'Occurrence of Events, Types of Events (Mutually Exclusive, Exhaustive)' },
@@ -1326,18 +1326,18 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
   },
 
   // ==========================================================================
-  // CLASS 12 (Senior Secondary & Entrance Core) — Target: 4,160 Questions
+  // CLASS 12 (Senior Secondary & Entrance Core) — Target: 20,000 Questions
   // ==========================================================================
   {
     classNumber: 12,
     className: 'Class 12',
-    totalQuestionsTarget: 4160,
+    totalQuestionsTarget: 20000,
     chapters: [
       {
         id: 'math_c12_ch01',
         chapterNumber: 1,
         title: 'Relations and Functions',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch01_t01', title: 'Types of Relations: Reflexive, Symmetric, Transitive, Equivalence' },
           { id: 'math_c12_ch01_t02', title: 'Types of Functions: One-One (Injective), Onto (Surjective), Bijective' },
@@ -1349,7 +1349,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch02',
         chapterNumber: 2,
         title: 'Inverse Trigonometric Functions',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch02_t01', title: 'Definition, Range, Domain, Principal Value Branches' },
           { id: 'math_c12_ch02_t02', title: 'Graphs of Inverse Trigonometric Functions' },
@@ -1361,7 +1361,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch03',
         chapterNumber: 3,
         title: 'Matrices',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch03_t01', title: 'Concept, Notation, Order, Equality and Types of Matrices' },
           { id: 'math_c12_ch03_t02', title: 'Operation on Matrices: Addition, Scalar Multiplication, Matrix Multiplication' },
@@ -1373,7 +1373,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch04',
         chapterNumber: 4,
         title: 'Determinants',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch04_t01', title: 'Determinant of a Square Matrix (up to 3 × 3 matrices)' },
           { id: 'math_c12_ch04_t02', title: 'Properties of Determinants' },
@@ -1385,7 +1385,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch05',
         chapterNumber: 5,
         title: 'Continuity and Differentiability',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch05_t01', title: 'Continuity of a Function at a Point and on an Interval' },
           { id: 'math_c12_ch05_t02', title: 'Derivative of Composite Functions (Chain Rule) & Implicit Functions' },
@@ -1397,7 +1397,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch06',
         chapterNumber: 6,
         title: 'Applications of Derivatives',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch06_t01', title: 'Rate of Change of Quantities' },
           { id: 'math_c12_ch06_t02', title: 'Increasing and Decreasing Functions (f′(x) > 0, f′(x) < 0)' },
@@ -1409,7 +1409,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch07',
         chapterNumber: 7,
         title: 'Integrals (Indefinite & Definite)',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch07_t01', title: 'Integration as Inverse Process of Differentiation' },
           { id: 'math_c12_ch07_t02', title: 'Integration by Substitution and Partial Fractions' },
@@ -1421,7 +1421,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch08',
         chapterNumber: 8,
         title: 'Applications of the Integrals',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch08_t01', title: 'Area Under Simple Curves (Lines, Circles, Parabolas, Ellipses)' },
           { id: 'math_c12_ch08_t02', title: 'Area of the Region Bounded by a Curve and a Line' },
@@ -1433,7 +1433,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch09',
         chapterNumber: 9,
         title: 'Differential Equations',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch09_t01', title: 'Order and Degree of Differential Equations' },
           { id: 'math_c12_ch09_t02', title: 'General and Particular Solutions of a Differential Equation' },
@@ -1445,7 +1445,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch10',
         chapterNumber: 10,
         title: 'Vector Algebra',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch10_t01', title: 'Vectors and Scalars, Magnitude and Direction Cosines' },
           { id: 'math_c12_ch10_t02', title: 'Types of Vectors, Position Vector and Direction Ratios' },
@@ -1457,7 +1457,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch11',
         chapterNumber: 11,
         title: 'Three-Dimensional Geometry',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1540,
         topics: [
           { id: 'math_c12_ch11_t01', title: 'Direction Cosines and Direction Ratios of a Line Joining Two Points' },
           { id: 'math_c12_ch11_t02', title: 'Vector and Cartesian Equations of a Line in Space' },
@@ -1469,7 +1469,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch12',
         chapterNumber: 12,
         title: 'Linear Programming (Optimization)',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1530,
         topics: [
           { id: 'math_c12_ch12_t01', title: 'Introduction and Formulation of Linear Programming Problems' },
           { id: 'math_c12_ch12_t02', title: 'Graphical Method of Solving LPP in Two Variables' },
@@ -1481,7 +1481,7 @@ export const MATH_CLASSES_TAXONOMY: MathClassTaxonomy[] = [
         id: 'math_c12_ch13',
         chapterNumber: 13,
         title: 'Probability (Conditional & Bayes’ Theorem)',
-        targetQuestionCount: 320,
+        targetQuestionCount: 1530,
         topics: [
           { id: 'math_c12_ch13_t01', title: 'Conditional Probability (P(A|B) = P(A ∩ B) / P(B))' },
           { id: 'math_c12_ch13_t02', title: 'Multiplication Theorem on Probability and Independent Events' },

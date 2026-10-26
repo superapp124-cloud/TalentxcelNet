@@ -13,12 +13,18 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
     expect(classNumbers).toEqual([4, 5, 6, 7, 8, 9, 10, 11, 12])
   })
 
-  it('provides between 30,000 and 40,000 Mathematics questions in the bank', () => {
+  it('provides exactly 200,000 verified Mathematics questions mapped across CBSE, ICSE, and IB', () => {
     const summary = getMathBankSummary()
-    expect(summary.totalQuestionsCount).toBeGreaterThanOrEqual(30000)
-    expect(summary.totalQuestionsCount).toBeLessThanOrEqual(40000)
-    expect(summary.totalQuestionsCount).toBe(36490)
+    expect(summary.totalQuestionsCount).toBe(200000)
     expect(summary.totalClassesCount).toBe(9)
+    expect(summary.boardBreakdown?.cbseCount).toBe(85500)
+    expect(summary.boardBreakdown?.icseCount).toBe(65000)
+    expect(summary.boardBreakdown?.ibCount).toBe(49500)
+    const sumBoards =
+      (summary.boardBreakdown?.cbseCount || 0) +
+      (summary.boardBreakdown?.icseCount || 0) +
+      (summary.boardBreakdown?.ibCount || 0)
+    expect(sumBoards).toBe(200000)
   })
 
   it('allocates comprehensive chapters to each class with verified topics', () => {
@@ -28,12 +34,12 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
         expect(chapter.id).toBeDefined()
         expect(chapter.title.length).toBeGreaterThan(3)
         expect(chapter.topics.length).toBeGreaterThanOrEqual(3)
-        expect(chapter.targetQuestionCount).toBeGreaterThanOrEqual(250)
+        expect(chapter.targetQuestionCount).toBeGreaterThanOrEqual(1400)
       }
     }
   })
 
-  it('deterministically generates valid, formula-verified questions with 4 unique options for any class', () => {
+  it('deterministically generates valid, formula-verified questions with 4 unique options and textbook citations', () => {
     const testCases = [
       { classNum: 4, chapterId: 'math_c4_ch01', idx: 1 },
       { classNum: 5, chapterId: 'math_c5_ch06', idx: 15 },
@@ -52,6 +58,8 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
       expect(q.classNumber).toBe(tc.classNum)
       expect(q.subjectCode).toBe('math')
       expect(q.options.length).toBe(4)
+      expect(q.bookSource).toBeDefined()
+      expect(q.exerciseRef).toBeDefined()
 
       // Ensure all 4 option texts are unique
       const optionTexts = q.options.map((o) => o.text)
@@ -66,6 +74,19 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
       expect(q.solutionSteps.length).toBeGreaterThan(0)
       expect(q.explanation.length).toBeGreaterThan(5)
     }
+
+    // Verify board-specific generation
+    const cbseQ = generateMathQuestion(10, 'math_c10_ch01', 1, 'CBSE')
+    expect(cbseQ.boardCode).toBe('CBSE')
+    expect(cbseQ.bookSource).toMatch(/NCERT|RD Sharma|RS Aggarwal/)
+
+    const icseQ = generateMathQuestion(10, 'math_c10_ch01', 1, 'CISCE')
+    expect(icseQ.boardCode).toBe('CISCE')
+    expect(icseQ.bookSource).toMatch(/Selina|ML Aggarwal|Frank/)
+
+    const ibQ = generateMathQuestion(10, 'math_c10_ch01', 1, 'IB')
+    expect(ibQ.boardCode).toBe('IB')
+    expect(ibQ.bookSource).toMatch(/IB|Haese|Oxford/)
   })
 
   it('produces identical questions when given the same seed index (deterministic reproducibility)', () => {
@@ -76,12 +97,14 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
     expect(q1.correctOptionId).toBe(q2.correctOptionId)
     expect(q1.options).toEqual(q2.options)
     expect(q1.explanation).toBe(q2.explanation)
+    expect(q1.bookSource).toBe(q2.bookSource)
+    expect(q1.exerciseRef).toBe(q2.exerciseRef)
   })
 
   it('supports paginated question fetching for classes and chapters', () => {
     const result = getMathQuestionsForClassAndChapter(10, 'math_c10_ch01', 0, 10)
     expect(result.questions.length).toBe(10)
-    expect(result.total).toBe(330)
+    expect(result.total).toBe(2000)
     expect(result.offset).toBe(0)
     expect(result.limit).toBe(10)
 
@@ -118,8 +141,8 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
       expect(body.classNumber).toBe(10)
       expect(body.chapterId).toBe('math_c10_ch04')
       expect(body.questions.length).toBe(5)
-      expect(body.total).toBe(330)
-      expect(body.summary.totalQuestionsCount).toBe(36490)
+      expect(body.total).toBe(2000)
+      expect(body.summary.totalQuestionsCount).toBe(200000)
     })
   })
 })
