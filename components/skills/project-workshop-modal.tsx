@@ -14,10 +14,10 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { SkillProject } from '@/packages/core/src'
+import type { SkillProject, ClassSkillProject } from '@/packages/core/src'
 
 interface ProjectWorkshopModalProps {
-  project: SkillProject | null
+  project: SkillProject | ClassSkillProject | null
   isOpen: boolean
   onClose: () => void
   onEnrollTrack?: () => void
@@ -71,6 +71,11 @@ export function ProjectWorkshopModal({
         <div className="p-6 overflow-y-auto space-y-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
+              {'classNumber' in project && project.classNumber && (
+                <Badge className="bg-indigo-600 text-white font-bold text-xs">
+                  Class {project.classNumber}
+                </Badge>
+              )}
               <Badge className="bg-indigo-100 text-indigo-800 border-none font-bold text-xs">
                 {project.estimatedHours} Hours Required
               </Badge>

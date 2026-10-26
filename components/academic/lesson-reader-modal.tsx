@@ -12,10 +12,10 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { AcademicLesson } from '@/packages/core/src'
+import type { AcademicLesson, AcademicLessonData } from '@/packages/core/src'
 
 interface LessonReaderModalProps {
-  lesson: AcademicLesson | null
+  lesson: AcademicLesson | AcademicLessonData | null
   isOpen: boolean
   onClose: () => void
   onLaunchPractice?: () => void
@@ -58,7 +58,12 @@ export function LessonReaderModal({
         {/* Content Body */}
         <div className="p-6 overflow-y-auto space-y-6">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              {'classNumber' in lesson && lesson.classNumber && (
+                <Badge className="bg-emerald-600 text-white font-bold text-xs">
+                  Class {lesson.classNumber}
+                </Badge>
+              )}
               <Badge className="bg-emerald-100 text-emerald-800 border-none font-bold text-xs">
                 Lesson {lesson.lessonNumber}
               </Badge>
@@ -66,9 +71,11 @@ export function LessonReaderModal({
                 <Clock className="w-3.5 h-3.5" />
                 <span>{lesson.readingTimeMinutes} Minutes Read</span>
               </div>
-              <Badge variant="outline" className="text-xs text-emerald-700 border-emerald-200 bg-emerald-50">
-                Verified Syllabus Mapping
-              </Badge>
+              {'textbookCitation' in lesson && lesson.textbookCitation && (
+                <Badge variant="outline" className="text-xs text-emerald-700 border-emerald-200 bg-emerald-50">
+                  {lesson.textbookCitation}
+                </Badge>
+              )}
             </div>
 
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">{lesson.title}</h2>

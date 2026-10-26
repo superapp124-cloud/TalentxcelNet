@@ -27,11 +27,13 @@ import type {
   AssessmentBlueprint,
   AssessmentResult,
   SubmittedAnswer,
+  ConfidentialQuestionSolution,
 } from '@/packages/core/src'
 
 interface TestRunnerModalProps {
   blueprint: AssessmentBlueprint | null
   questions: AuthorizedQuestion[]
+  solutions?: ConfidentialQuestionSolution[]
   isOpen: boolean
   onClose: () => void
   onUnlockPaidPack?: (productId: string) => void
@@ -40,6 +42,7 @@ interface TestRunnerModalProps {
 export function TestRunnerModal({
   blueprint,
   questions,
+  solutions,
   isOpen,
   onClose,
   onUnlockPaidPack,
@@ -99,12 +102,19 @@ export function TestRunnerModal({
       timeSpentSeconds: 30,
     }))
 
+    const solutionsMap = new Map<string, ConfidentialQuestionSolution>(SEED_CONFIDENTIAL_SOLUTIONS)
+    if (solutions && solutions.length > 0) {
+      for (const s of solutions) {
+        solutionsMap.set(s.questionId, s)
+      }
+    }
+
     const result = evaluateAssessmentAttempt({
       attemptId: `att_run_${Date.now()}`,
       blueprint,
       learnerId: 'anonymous_learner',
       questions,
-      solutions: SEED_CONFIDENTIAL_SOLUTIONS,
+      solutions: solutionsMap,
       submittedAnswers,
     })
 

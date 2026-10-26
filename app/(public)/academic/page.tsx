@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
   GraduationCap,
@@ -21,6 +22,9 @@ import {
   FileText,
   Activity,
   Bookmark,
+  Languages,
+  Globe,
+  SlidersHorizontal,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -31,78 +35,129 @@ import { GrowthPlanModal } from '@/components/intelligence/growth-plan-modal'
 import { RazorpayCheckoutModal } from '@/components/commerce/razorpay-checkout-modal'
 import {
   SEED_BOARDS,
-  SEED_CLASSES,
-  SEED_SUBJECTS,
-  SEED_GRADE4_SUBJECTS,
-  SEED_CHAPTERS,
-  SEED_ACADEMIC_LESSONS,
-  SEED_BLUEPRINTS,
-  SEED_AUTHORIZED_QUESTIONS,
-  ACADEMIC_PRODUCTS,
+  ACADEMIC_CLASSES,
+  ACADEMIC_PASS_PRODUCTS,
+  getCurriculumChapters,
+  getAcademicLessonForChapter,
+  getChapterDiagnosticTest,
+  getSubjectBoardCitations,
 } from '@/packages/core/src'
 import type {
-  AcademicLesson,
+  BoardCode,
+  AcademicLessonData,
   AssessmentBlueprint,
   AuthorizedQuestion,
-  CommercialProduct,
+  ConfidentialQuestionSolution,
+  AcademicPassProduct,
 } from '@/packages/core/src'
 
-export default function AcademicPage() {
-  const [selectedBoardId, setSelectedBoardId] = useState<string>('board_cbse')
-  const [selectedClassId, setSelectedClassId] = useState<string>('class_g4')
-  const [selectedSubjectCode, setSelectedSubjectCode] = useState<string>('math')
+function AcademicBrowserContent() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // Read URL params or set defaults
+  const initialBoard = (searchParams.get('board') as BoardCode) || 'CBSE'
+  const initialClassNum = Number(searchParams.get('class')) || 10
+  const initialSubject = searchParams.get('subject') || 'math'
+  const initialTab = searchParams.get('tab') === 'passes' ? 'passes' : 'curriculum'
+
+  const [selectedBoardCode, setSelectedBoardCode] = useState<BoardCode>(
+    ['CBSE', 'CISCE', 'IB'].includes(initialBoard) ? initialBoard : 'CBSE'
+  )
+  const [selectedClassNumber, setSelectedClassNumber] = useState<number>(
+    initialClassNum >= 4 && initialClassNum <= 12 ? initialClassNum : 10
+  )
+  const [selectedSubjectCode, setSelectedSubjectCode] = useState<string>(initialSubject)
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeTab, setActiveTab] = useState<'curriculum' | 'passes'>('curriculum')
+  const [activeTab, setActiveTab] = useState<'curriculum' | 'passes'>(initialTab)
+
+  // Sync state to URL without full page reload
+  useEffect(() => {
+    const params = new URLSearchParams()
+    params.set('board', selectedBoardCode)
+    params.set('class', String(selectedClassNumber))
+    params.set('subject', selectedSubjectCode)
+    if (activeTab === 'passes') params.set('tab', 'passes')
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [selectedBoardCode, selectedClassNumber, selectedSubjectCode, activeTab, router, pathname])
 
   // Modals state
-  const [selectedLesson, setSelectedLesson] = useState<AcademicLesson | null>(null)
+  const [selectedLesson, setSelectedLesson] = useState<AcademicLessonData | null>(null)
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false)
 
   const [activeBlueprint, setActiveBlueprint] = useState<AssessmentBlueprint | null>(null)
   const [activeQuestions, setActiveQuestions] = useState<AuthorizedQuestion[]>([])
+  const [activeSolutions, setActiveSolutions] = useState<ConfidentialQuestionSolution[]>([])
   const [isTestRunnerOpen, setIsTestRunnerOpen] = useState(false)
 
   const [checkoutProductId, setCheckoutProductId] = useState<string | null>(null)
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
-
   const [isGrowthPlanOpen, setIsGrowthPlanOpen] = useState(false)
 
-  // Current selections
-  const currentBoard = SEED_BOARDS.find((b) => b.id === selectedBoardId) || SEED_BOARDS[0]
-  const currentClass = SEED_CLASSES.find((c) => c.id === selectedClassId) || SEED_CLASSES[1]
-
-  // Filtered chapters for current selection
-  const classChapters = useMemo(() => {
-    let chapters = SEED_CHAPTERS.filter(
-      (ch) => ch.subjectId.includes(selectedSubjectCode) || ch.id.includes(selectedSubjectCode)
+  // Current class metadata
+  const currentClassMeta = useMemo(() => {
+    return (
+      ACADEMIC_CLASSES.find((c) => c.classNumber === selectedClassNumber) || ACADEMIC_CLASSES[6]
     )
-    if (chapters.length === 0) {
-      chapters = SEED_CHAPTERS.slice(0, 3)
+  }, [selectedClassNumber])
+
+  // Verify that selectedSubjectCode is valid for current class
+  useEffect(() => {
+    const exists = currentClassMeta.subjects.some((s) => s.code === selectedSubjectCode)
+    if (!exists && currentClassMeta.subjects.length > 0) {
+      setSelectedSubjectCode(currentClassMeta.subjects[0].code)
     }
-    if (!searchQuery.trim()) return chapters
-    const q = searchQuery.toLowerCase()
-    return chapters.filter(
-      (ch) => ch.title.toLowerCase().includes(q) || (ch.description && ch.description.toLowerCase().includes(q))
+  }, [currentClassMeta, selectedSubjectCode])
+
+  // Board citations
+  const boardCitations = useMemo(() => {
+    return getSubjectBoardCitations(
+      (selectedSubjectCode === 'math' || selectedSubjectCode === 'science' || selectedSubjectCode === 'english' || selectedSubjectCode === 'hindi' || selectedSubjectCode === 'social_science')
+        ? (selectedSubjectCode as any)
+        : 'math',
+      selectedClassNumber,
+      selectedBoardCode
     )
-  }, [selectedSubjectCode, searchQuery])
+  }, [selectedSubjectCode, selectedClassNumber, selectedBoardCode])
 
-  // Filtered lessons
-  const filteredLessons = useMemo(() => {
-    return SEED_ACADEMIC_LESSONS
-  }, [])
+  // Resolved curriculum chapters for selected Class, Subject, and Board
+  const chapters = useMemo(() => {
+    const raw = getCurriculumChapters(selectedClassNumber, selectedSubjectCode, selectedBoardCode)
+    if (!searchQuery.trim()) return raw
+    const q = searchQuery.toLowerCase().trim()
+    return raw.filter(
+      (ch) =>
+        ch.title.toLowerCase().includes(q) ||
+        (ch.disciplineName && ch.disciplineName.toLowerCase().includes(q)) ||
+        ch.topics.some((t) => t.title.toLowerCase().includes(q))
+    )
+  }, [selectedClassNumber, selectedSubjectCode, selectedBoardCode, searchQuery])
 
-  // Open Lesson Reader
-  const handleOpenLesson = (lessonId: string) => {
-    const lesson = SEED_ACADEMIC_LESSONS.find((l) => l.id === lessonId) || SEED_ACADEMIC_LESSONS[0]
+  // Handle opening rich lesson
+  const handleOpenLesson = (chapterId: string) => {
+    const lesson = getAcademicLessonForChapter(
+      selectedClassNumber,
+      selectedSubjectCode,
+      chapterId,
+      selectedBoardCode
+    )
     setSelectedLesson(lesson)
     setIsLessonModalOpen(true)
   }
 
-  // Open Diagnostic Test for chapter
-  const handleLaunchPractice = (blueprintId: string) => {
-    const bp = SEED_BLUEPRINTS.find((b) => b.id === blueprintId) || SEED_BLUEPRINTS[0]
-    setActiveBlueprint(bp)
-    setActiveQuestions(SEED_AUTHORIZED_QUESTIONS.slice(0, bp.totalQuestions || 5))
+  // Handle launching diagnostic practice (5 Qs)
+  const handleLaunchPractice = (chapterId: string) => {
+    const { blueprint, questions, solutions } = getChapterDiagnosticTest(
+      selectedClassNumber,
+      selectedSubjectCode,
+      chapterId,
+      selectedBoardCode,
+      5
+    )
+    setActiveBlueprint(blueprint)
+    setActiveQuestions(questions)
+    setActiveSolutions(solutions)
     setIsTestRunnerOpen(true)
   }
 
@@ -112,12 +167,30 @@ export default function AcademicPage() {
     setIsCheckoutOpen(true)
   }
 
+  // Subject icon helper
+  const renderSubjectIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Calculator':
+        return <Calculator className="w-3.5 h-3.5 text-amber-600" />
+      case 'FlaskConical':
+        return <FlaskConical className="w-3.5 h-3.5 text-emerald-600" />
+      case 'BookOpen':
+        return <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+      case 'Languages':
+        return <Languages className="w-3.5 h-3.5 text-rose-600" />
+      case 'Globe':
+        return <Globe className="w-3.5 h-3.5 text-purple-600" />
+      default:
+        return <FileText className="w-3.5 h-3.5 text-slate-600" />
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800">
       {/* Platform Navigation */}
       <SiteHeader onOpenGrowthPlan={() => setIsGrowthPlanOpen(true)} />
 
-      {/* Compact Hero Header with Student Image */}
+      {/* Hero Header with Student Image & Quick Practice */}
       <section className="bg-white border-b border-slate-200/80 pt-4 sm:pt-5 pb-4 sm:pb-5 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -126,7 +199,7 @@ export default function AcademicPage() {
                 <GraduationCap className="w-3.5 h-3.5" />
                 <span>Domain 3: Academic Learning</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                <span>CBSE Verified • CISCE &amp; IB</span>
+                <span>Classes 4–12 • CBSE, ICSE &amp; IB Aligned</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 Calm, Curriculum-Aligned Learning for{' '}
@@ -139,7 +212,7 @@ export default function AcademicPage() {
               </p>
             </div>
 
-            {/* Student Image Thumbnail & Quick Lesson Action */}
+            {/* Student Image Thumbnail & Quick Featured Lesson Action */}
             <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-2.5 shrink-0 max-w-md w-full shadow-2xs">
               <img
                 src="/images/kids-academic-reading.jpg"
@@ -148,12 +221,18 @@ export default function AcademicPage() {
               />
               <div className="space-y-1 min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Featured Lesson</span>
-                  <Badge className="bg-emerald-100 text-emerald-800 text-[9px] font-bold">Class 4 Math</Badge>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">
+                    Class {selectedClassNumber} Sample
+                  </span>
+                  <Badge className="bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                    {selectedBoardCode} Verified
+                  </Badge>
                 </div>
-                <h4 className="text-xs font-bold text-slate-900 truncate">Understanding Multiples</h4>
+                <h4 className="text-xs font-bold text-slate-900 truncate">
+                  {chapters[0]?.title || 'Chapter 1 Overview'}
+                </h4>
                 <Button
-                  onClick={() => handleOpenLesson('less_g4_m6_l1')}
+                  onClick={() => handleOpenLesson(chapters[0]?.id || 'ch01')}
                   size="sm"
                   className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] h-7 px-3 rounded-lg flex items-center gap-1 w-full justify-center"
                 >
@@ -187,7 +266,9 @@ export default function AcademicPage() {
             >
               <CreditCard className="w-3.5 h-3.5" />
               <span>Class Passes (Classes 4–12)</span>
-              <span className="text-[10px] bg-amber-400 text-amber-950 px-1 py-0.2 rounded-full font-bold">From ₹1,999/mo</span>
+              <span className="text-[10px] bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full font-bold">
+                From ₹1,999/mo
+              </span>
             </button>
           </div>
         </div>
@@ -200,71 +281,82 @@ export default function AcademicPage() {
         {/* ========================================================================= */}
         {activeTab === 'curriculum' && (
           <section className="space-y-6">
-            {/* Filter Bar: Board, Class, Subject */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
+            {/* Filter Bar: Board, Class, Subject & Search */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">Academic Hierarchy</h2>
+                  <h2 className="text-base font-bold text-slate-900">
+                    Academic Navigation Hierarchy
+                  </h2>
                   <p className="text-xs text-slate-500">
                     Board → Class → Subject → Chapter → Topic → Lesson
                   </p>
                 </div>
+
                 {/* Board Selector */}
-                <div className="inline-flex p-1 bg-slate-100 rounded-xl gap-1">
-                  {SEED_BOARDS.map((board) => (
+                <div className="inline-flex p-1 bg-slate-100 rounded-xl gap-1 shrink-0">
+                  {(['CBSE', 'CISCE', 'IB'] as const).map((bCode) => (
                     <button
-                      key={board.id}
-                      onClick={() => setSelectedBoardId(board.id)}
+                      key={bCode}
+                      onClick={() => setSelectedBoardCode(bCode)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                        selectedBoardId === board.id
+                        selectedBoardCode === bCode
                           ? 'bg-white text-slate-900 shadow-2xs'
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      <span>{board.code}</span>
+                      <span>{bCode === 'CISCE' ? 'ICSE / CISCE' : bCode}</span>
                       <span
                         className={`text-[9px] px-1.5 py-0.2 rounded-full ${
-                          board.status === 'verified'
+                          bCode === 'CBSE'
                             ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800'
+                            : 'bg-indigo-100 text-indigo-800'
                         }`}
                       >
-                        {board.status === 'verified' ? 'Verified' : 'Provis.'}
+                        {bCode === 'CBSE' ? '100% Verified' : 'Aligned'}
                       </span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Class Buttons Grid */}
+              {/* Class Buttons Grid (Classes 4 through 12) */}
               <div className="space-y-2 pt-2 border-t border-slate-100">
-                <span className="text-xs font-bold text-slate-600">Select Academic Grade:</span>
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                  {SEED_CLASSES.map((cls) => (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-600">
+                    Select Grade (Classes 4–12):
+                  </span>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                    {currentClassMeta.stageLabel} • {currentClassMeta.ageGroup}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-9 gap-1.5">
+                  {ACADEMIC_CLASSES.map((cls) => (
                     <button
-                      key={cls.id}
-                      onClick={() => setSelectedClassId(cls.id)}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                        selectedClassId === cls.id
-                          ? 'bg-slate-900 text-white shadow-xs'
+                      key={cls.classNumber}
+                      onClick={() => setSelectedClassNumber(cls.classNumber)}
+                      className={`py-2 px-1 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-0.5 ${
+                        selectedClassNumber === cls.classNumber
+                          ? 'bg-slate-900 text-white shadow-xs scale-102'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      {cls.name}
+                      <span>Class {cls.classNumber}</span>
+                      <span className={`text-[9px] font-normal ${selectedClassNumber === cls.classNumber ? 'text-slate-300' : 'text-slate-500'}`}>
+                        {cls.stage === 'primary' ? 'Primary' : cls.stage === 'middle' ? 'Middle' : cls.stage === 'secondary' ? 'Secondary' : 'Senior'}
+                      </span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Subject Tabs */}
+              {/* Subject Tabs tailored to current class */}
               <div className="space-y-2 pt-2 border-t border-slate-100">
-                <span className="text-xs font-bold text-slate-600">Select Subject:</span>
+                <span className="text-xs font-bold text-slate-600">
+                  Select Class {selectedClassNumber} Subject:
+                </span>
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                  {[
-                    { code: 'math', name: 'Mathematics', icon: <Calculator className="w-3.5 h-3.5 text-amber-600" /> },
-                    { code: 'science', name: 'Science', icon: <FlaskConical className="w-3.5 h-3.5 text-emerald-600" /> },
-                    { code: 'english', name: 'English Language', icon: <BookOpen className="w-3.5 h-3.5 text-blue-600" /> },
-                  ].map((sub) => (
+                  {currentClassMeta.subjects.map((sub) => (
                     <button
                       key={sub.code}
                       onClick={() => setSelectedSubjectCode(sub.code)}
@@ -274,10 +366,31 @@ export default function AcademicPage() {
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      {sub.icon}
+                      {renderSubjectIcon(sub.iconName)}
                       <span>{sub.name}</span>
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Search & Board Alignment Note */}
+              <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="text-xs text-slate-600 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>
+                    Textbooks: <strong className="text-slate-800">{boardCitations.textbooks[0]}</strong> ({selectedBoardCode})
+                  </span>
+                </div>
+
+                <div className="relative w-full sm:w-72">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search chapter or topic..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
                 </div>
               </div>
             </div>
@@ -286,18 +399,29 @@ export default function AcademicPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-slate-900">
-                  {currentClass.name} Chapters &amp; Lessons ({currentBoard.code})
+                  Class {selectedClassNumber} Curriculum Chapters ({chapters.length} loaded)
                 </h3>
                 <span className="text-xs text-slate-500 font-medium">
-                  {classChapters.length} chapters loaded
+                  {selectedBoardCode} 2026-27 Aligned
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {classChapters.map((chap) => {
-                  const relatedLesson = filteredLessons.find((l) => l.chapterId === chap.id) || filteredLessons[0]
-
-                  return (
+              {chapters.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-2">
+                  <p className="text-sm font-bold text-slate-800">No chapters matching your search</p>
+                  <p className="text-xs text-slate-500">Try clearing the search query to see all chapters.</p>
+                  <Button
+                    onClick={() => setSearchQuery('')}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs rounded-xl"
+                  >
+                    Clear Search
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {chapters.map((chap) => (
                     <div
                       key={chap.id}
                       className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-5 group"
@@ -307,9 +431,16 @@ export default function AcademicPage() {
                           <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
                             Chapter {chap.chapterNumber}
                           </span>
-                          <Badge className="bg-slate-100 text-slate-700 border-none text-[10px] font-semibold">
-                            {chap.totalTopics} Topics
-                          </Badge>
+                          <div className="flex items-center gap-1.5">
+                            {chap.disciplineName && (
+                              <Badge className="bg-indigo-50 text-indigo-700 border-indigo-100 text-[10px] font-semibold">
+                                {chap.disciplineName}
+                              </Badge>
+                            )}
+                            <Badge className="bg-slate-100 text-slate-700 border-none text-[10px] font-semibold">
+                              {chap.topics.length} Topics
+                            </Badge>
+                          </div>
                         </div>
 
                         <div>
@@ -317,31 +448,31 @@ export default function AcademicPage() {
                             {chap.title}
                           </h4>
                           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                            {chap.description || 'Curriculum aligned concept breakdowns and practice.'}
+                            Verified curriculum-aligned concept breakdowns, step-by-step worked solutions, and practice checkpoints.
                           </p>
                         </div>
 
-                        {/* Sample Lesson Callout */}
-                        {relatedLesson && (
-                          <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 space-y-1.5 text-xs">
-                            <div className="flex items-center justify-between text-slate-500 text-[11px]">
-                              <span className="font-bold text-slate-700">Lesson {relatedLesson.lessonNumber}:</span>
-                              <span>{relatedLesson.readingTimeMinutes} min read</span>
-                            </div>
-                            <p className="font-semibold text-slate-800 line-clamp-1">
-                              {relatedLesson.title}
-                            </p>
-                            <p className="text-[11px] text-slate-500 line-clamp-1">
-                              {relatedLesson.conceptBreakdown[0]?.heading} • {relatedLesson.workedExamples.length} worked examples
-                            </p>
+                        {/* Topics Pill List */}
+                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 space-y-2 text-xs">
+                          <div className="flex items-center justify-between text-slate-500 text-[11px]">
+                            <span className="font-bold text-slate-700">Curriculum Topics:</span>
+                            <span>{chap.targetQuestionCount.toLocaleString()} Qs Bank</span>
                           </div>
-                        )}
+                          <ul className="space-y-1 text-slate-600">
+                            {chap.topics.map((t) => (
+                              <li key={t.id} className="flex items-start gap-1.5 text-[11px] leading-tight">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1" />
+                                <span className="line-clamp-1">{t.title}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
 
                       {/* Actions */}
                       <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100">
                         <Button
-                          onClick={() => handleOpenLesson(relatedLesson?.id || 'less_g4_m6_l1')}
+                          onClick={() => handleOpenLesson(chap.id)}
                           variant="outline"
                           className="w-full text-xs font-semibold text-slate-700 border-slate-200 hover:bg-slate-50 h-8.5 rounded-xl flex items-center justify-center gap-1"
                         >
@@ -349,7 +480,7 @@ export default function AcademicPage() {
                           <span>Read Lesson</span>
                         </Button>
                         <Button
-                          onClick={() => handleLaunchPractice(relatedLesson?.linkedBlueprintId || 'bp_free_g4_math')}
+                          onClick={() => handleLaunchPractice(chap.id)}
                           className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8.5 rounded-xl shadow-2xs flex items-center justify-center gap-1"
                         >
                           <span>Take Test (5 Qs)</span>
@@ -357,9 +488,9 @@ export default function AcademicPage() {
                         </Button>
                       </div>
                     </div>
-                  )
-                })}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -370,14 +501,16 @@ export default function AcademicPage() {
         {activeTab === 'passes' && (
           <section className="space-y-6">
             <div>
-              <h2 className="text-base font-bold text-slate-900">Academic Class Monthly Passes</h2>
+              <h2 className="text-base font-bold text-slate-900">
+                Academic Class Monthly Passes (Classes 4–12)
+              </h2>
               <p className="text-xs text-slate-500">
                 Unlimited access to verified lessons, worked solutions, and full diagnostic test banks for your grade.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {ACADEMIC_PRODUCTS.map((prod: CommercialProduct) => (
+              {ACADEMIC_PASS_PRODUCTS.map((prod: AcademicPassProduct) => (
                 <div
                   key={prod.id}
                   className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between gap-6 relative"
@@ -392,8 +525,8 @@ export default function AcademicPage() {
 
                   <div className="space-y-4">
                     <div>
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        {prod.domain.toUpperCase()} PASS
+                      <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
+                        {prod.classRange} PASS
                       </span>
                       <h3 className="text-base font-bold text-slate-900 mt-1">{prod.title}</h3>
                       <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-3">
@@ -409,10 +542,10 @@ export default function AcademicPage() {
                     </div>
 
                     <ul className="space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-4">
-                      {prod.features.slice(0, 3).map((feat: string, i: number) => (
-                        <li key={i} className="flex items-center gap-2">
-                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                          <span>{feat}</span>
+                      {prod.features.map((feat: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span className="leading-tight">{feat}</span>
                         </li>
                       ))}
                     </ul>
@@ -439,7 +572,9 @@ export default function AcademicPage() {
         onClose={() => setIsLessonModalOpen(false)}
         onLaunchPractice={() => {
           setIsLessonModalOpen(false)
-          handleLaunchPractice(selectedLesson?.linkedBlueprintId || 'bp_free_g4_math')
+          if (selectedLesson?.chapterId) {
+            handleLaunchPractice(selectedLesson.chapterId)
+          }
         }}
       />
 
@@ -447,6 +582,7 @@ export default function AcademicPage() {
       <TestRunnerModal
         blueprint={activeBlueprint}
         questions={activeQuestions}
+        solutions={activeSolutions}
         isOpen={isTestRunnerOpen}
         onClose={() => setIsTestRunnerOpen(false)}
         onUnlockPaidPack={(prodId) => handleOpenCheckout(prodId)}
@@ -469,5 +605,22 @@ export default function AcademicPage() {
         onClose={() => setIsGrowthPlanOpen(false)}
       />
     </div>
+  )
+}
+
+export default function AcademicPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <div className="text-center space-y-2">
+            <GraduationCap className="w-8 h-8 text-emerald-600 animate-pulse mx-auto" />
+            <p className="text-xs font-bold text-slate-600">Loading Academic Learning Browser...</p>
+          </div>
+        </div>
+      }
+    >
+      <AcademicBrowserContent />
+    </Suspense>
   )
 }
