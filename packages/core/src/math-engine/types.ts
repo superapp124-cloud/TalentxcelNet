@@ -36,6 +36,8 @@ export interface MathChapterMeta {
   id: string
   chapterNumber: number
   title: string
+  disciplineCode?: string
+  disciplineName?: string
   topics: Array<{ id: string; title: string }>
   targetQuestionCount: number
 }

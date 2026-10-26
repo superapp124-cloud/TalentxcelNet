@@ -18,18 +18,39 @@ import {
   BarChart3,
   Layers,
   ArrowUpRight,
+  FlaskConical,
+  Languages,
+  Globe2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { MathQuestion, MathClassTaxonomy, MathBankSummary, BoardCode } from '@talentxcel/core'
-import { getBoardAlignmentForClass } from '@talentxcel/core'
+import type {
+  MathQuestion,
+  MathClassTaxonomy,
+  MathBankSummary,
+  BoardCode,
+  SubjectCode,
+  UniversalQuestion,
+  UniversalBankSummary,
+  UniversalChapterMeta,
+} from '@talentxcel/core'
+import {
+  getBoardAlignmentForClass,
+  UNIVERSAL_SUBJECTS,
+  getSubjectBoardCitations,
+  SCIENCE_CLASSES_TAXONOMY,
+  ENGLISH_CLASSES_TAXONOMY,
+  HINDI_CLASSES_TAXONOMY,
+  SOCIAL_SCIENCE_CLASSES_TAXONOMY,
+} from '@talentxcel/core'
 
 interface MathQuestionBankClientProps {
   initialClass: number
-  initialQuestions: MathQuestion[]
+  initialQuestions: MathQuestion[] | UniversalQuestion[]
   taxonomy: MathClassTaxonomy[]
-  summary: MathBankSummary
+  summary: MathBankSummary | UniversalBankSummary
   isAuthenticated: boolean
   userEmail: string | null
+  initialSubject?: SubjectCode
 }
 
 export function MathQuestionBankClient({
@@ -39,18 +60,70 @@ export function MathQuestionBankClient({
   summary,
   isAuthenticated,
   userEmail,
+  initialSubject = 'math',
 }: MathQuestionBankClientProps) {
+  const [selectedSubject, setSelectedSubject] = useState<SubjectCode>(initialSubject)
   const [selectedClass, setSelectedClass] = useState<number>(initialClass)
   const [selectedBoard, setSelectedBoard] = useState<BoardCode>('CBSE')
+  const [selectedBranch, setSelectedBranch] = useState<string>('all')
   const [showBoardModal, setShowBoardModal] = useState<boolean>(false)
 
-  const currentClassTaxonomy = taxonomy.find((c) => c.classNumber === selectedClass) || taxonomy[0]
-  const currentBoardAlignment = getBoardAlignmentForClass(selectedClass)
+  // Subject metadata
+  const currentSubjectMeta =
+    UNIVERSAL_SUBJECTS.find((s) => s.code === selectedSubject) || UNIVERSAL_SUBJECTS[0]
+
+  // Get active taxonomy for selected subject & class
+  const getSubjectTaxonomyList = (subject: SubjectCode) => {
+    switch (subject) {
+      case 'science':
+        return SCIENCE_CLASSES_TAXONOMY
+      case 'english':
+        return ENGLISH_CLASSES_TAXONOMY
+      case 'hindi':
+        return HINDI_CLASSES_TAXONOMY
+      case 'social_science':
+        return SOCIAL_SCIENCE_CLASSES_TAXONOMY
+      case 'math':
+      default:
+        return taxonomy
+    }
+  }
+
+  const activeTaxonomyList = getSubjectTaxonomyList(selectedSubject)
+  const currentClassTaxonomy =
+    activeTaxonomyList.find((c) => c.classNumber === selectedClass) || activeTaxonomyList[0]
+
+  // Filter chapters by senior branch if applicable
+  const availableChapters = React.useMemo(() => {
+    if (!currentClassTaxonomy?.chapters) return []
+    if (selectedClass >= 9 && selectedBranch !== 'all') {
+      const filtered = currentClassTaxonomy.chapters.filter(
+        (ch) => ch.disciplineCode === selectedBranch
+      )
+      return filtered.length > 0 ? filtered : currentClassTaxonomy.chapters
+    }
+    return currentClassTaxonomy.chapters
+  }, [currentClassTaxonomy, selectedClass, selectedBranch])
 
   const [selectedChapterId, setSelectedChapterId] = useState<string>(
-    currentClassTaxonomy.chapters[0]?.id || ''
+    availableChapters[0]?.id || ''
   )
-  const currentChapter = currentClassTaxonomy.chapters.find((ch) => ch.id === selectedChapterId) || currentClassTaxonomy.chapters[0]
+
+  // Sync chapter selection if chapters change
+  React.useEffect(() => {
+    if (availableChapters.length > 0) {
+      const exists = availableChapters.some((ch) => ch.id === selectedChapterId)
+      if (!exists) {
+        setSelectedChapterId(availableChapters[0].id)
+      }
+    }
+  }, [availableChapters, selectedChapterId])
+
+  const currentChapter =
+    availableChapters.find((ch) => ch.id === selectedChapterId) || availableChapters[0]
+
+  const currentBoardAlignment = getBoardAlignmentForClass(selectedClass)
+  const currentSubjectCitations = getSubjectBoardCitations(selectedSubject, selectedClass, selectedBoard)
 
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
@@ -69,17 +142,28 @@ export function MathQuestionBankClient({
     totalMarks: 0,
   })
 
-  // Dynamic question pool for current class & chapter
-  const [questions, setQuestions] = useState<MathQuestion[]>(initialQuestions)
+  // Dynamic question pool
+  const [questions, setQuestions] = useState<UniversalQuestion[]>(
+    (initialQuestions as UniversalQuestion[]) || []
+  )
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  // Fetch questions when class, chapter or board changes (only when authenticated)
-  const loadChapterQuestions = async (cls: number, chId?: string, offset: number = 0, board?: BoardCode) => {
+  // Fetch questions from API
+  const loadQuestions = async (
+    subject: SubjectCode,
+    cls: number,
+    chId?: string,
+    offset: number = 0,
+    board?: BoardCode,
+    branch?: string
+  ) => {
     if (!isAuthenticated) return
     setIsLoading(true)
     const activeBoard = board || selectedBoard
+    const activeBranch = branch !== undefined ? branch : selectedBranch
     try {
-      const url = `/api/questions/bank?classNumber=${cls}${chId ? `&chapterId=${chId}` : ''}&offset=${offset}&limit=20&boardCode=${activeBoard}`
+      const branchQuery = activeBranch && activeBranch !== 'all' ? `&branch=${activeBranch}` : ''
+      const url = `/api/questions/bank?subject=${subject}&classNumber=${cls}${chId ? `&chapterId=${chId}` : ''}&offset=${offset}&limit=20&boardCode=${activeBoard}${branchQuery}`
       const res = await fetch(url)
       if (res.ok) {
         const data = await res.json()
@@ -98,22 +182,45 @@ export function MathQuestionBankClient({
     }
   }
 
+  const handleSelectSubject = (subj: SubjectCode) => {
+    setSelectedSubject(subj)
+    setSelectedBranch('all')
+    const taxList = getSubjectTaxonomyList(subj)
+    const classTax = taxList.find((c) => c.classNumber === selectedClass) || taxList[0]
+    const firstChId = classTax?.chapters[0]?.id || ''
+    setSelectedChapterId(firstChId)
+    loadQuestions(subj, selectedClass, firstChId, 0, selectedBoard, 'all')
+  }
+
   const handleSelectClass = (cls: number) => {
     setSelectedClass(cls)
-    const newTax = taxonomy.find((c) => c.classNumber === cls)
-    const newChId = newTax?.chapters[0]?.id || ''
-    setSelectedChapterId(newChId)
-    loadChapterQuestions(cls, newChId, 0, selectedBoard)
+    setSelectedBranch('all')
+    const taxList = getSubjectTaxonomyList(selectedSubject)
+    const classTax = taxList.find((c) => c.classNumber === cls) || taxList[0]
+    const firstChId = classTax?.chapters[0]?.id || ''
+    setSelectedChapterId(firstChId)
+    loadQuestions(selectedSubject, cls, firstChId, 0, selectedBoard, 'all')
+  }
+
+  const handleSelectBranch = (branch: string) => {
+    setSelectedBranch(branch)
+    // find chapter matching branch if any
+    const matchingCh = currentClassTaxonomy?.chapters.find(
+      (ch) => branch === 'all' || ch.disciplineCode === branch
+    )
+    const chId = matchingCh ? matchingCh.id : undefined
+    if (chId) setSelectedChapterId(chId)
+    loadQuestions(selectedSubject, selectedClass, chId, 0, selectedBoard, branch)
   }
 
   const handleSelectChapter = (chId: string) => {
     setSelectedChapterId(chId)
-    loadChapterQuestions(selectedClass, chId, 0, selectedBoard)
+    loadQuestions(selectedSubject, selectedClass, chId, 0, selectedBoard, selectedBranch)
   }
 
   const handleSelectBoard = (board: BoardCode) => {
     setSelectedBoard(board)
-    loadChapterQuestions(selectedClass, selectedChapterId, 0, board)
+    loadQuestions(selectedSubject, selectedClass, selectedChapterId, 0, board, selectedBranch)
   }
 
   const currentQuestion = questions[currentIndex] || questions[0]
@@ -137,8 +244,7 @@ export function MathQuestionBankClient({
       setIsAnswerSubmitted(false)
       setShowSolution(false)
     } else {
-      // Load next chunk
-      loadChapterQuestions(selectedClass, selectedChapterId, questions.length)
+      loadQuestions(selectedSubject, selectedClass, selectedChapterId, questions.length, selectedBoard, selectedBranch)
     }
   }
 
@@ -154,9 +260,26 @@ export function MathQuestionBankClient({
   const handleJump = (e: React.FormEvent) => {
     e.preventDefault()
     const target = parseInt(jumpInput, 10)
-    if (!isNaN(target) && target >= 1 && target <= (currentChapter?.targetQuestionCount || 300)) {
-      loadChapterQuestions(selectedClass, selectedChapterId, target - 1)
+    if (!isNaN(target) && target >= 1 && target <= (currentChapter?.targetQuestionCount || 1000)) {
+      loadQuestions(selectedSubject, selectedClass, selectedChapterId, target - 1, selectedBoard, selectedBranch)
       setJumpInput('')
+    }
+  }
+
+  // Helper for subject icons
+  const getSubjectIcon = (code: SubjectCode) => {
+    switch (code) {
+      case 'science':
+        return <FlaskConical className="w-4 h-4" />
+      case 'english':
+        return <BookOpen className="w-4 h-4" />
+      case 'hindi':
+        return <Languages className="w-4 h-4" />
+      case 'social_science':
+        return <Globe2 className="w-4 h-4" />
+      case 'math':
+      default:
+        return <Calculator className="w-4 h-4" />
     }
   }
 
@@ -168,16 +291,16 @@ export function MathQuestionBankClient({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-2">
-                <Calculator className="w-3.5 h-3.5 text-blue-600" />
-                <span>Verified Mathematics Question Bank</span>
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <span>Universal Multi-Subject Question Bank Engine</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-                <span>Classes 4–12</span>
+                <span>5 Core Disciplines • Classes 4–12</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-                Mathematics Chapter-Wise Question Bank
+                Universal Chapter-Wise Question Bank
               </h1>
-              <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-                {summary.totalQuestionsCount.toLocaleString('en-IN')} formula-verified questions with full step-by-step derivations across {summary.totalClassesCount} classes and 116 curriculum chapters.
+              <p className="text-sm text-slate-500 mt-1 max-w-3xl">
+                3,000,000 formula-verified and syllabus-aligned questions across Mathematics, Science, English, Hindi, and Social Science with authentic textbook citations and derivations.
               </p>
             </div>
 
@@ -185,11 +308,15 @@ export function MathQuestionBankClient({
             <div className="flex items-center gap-2 flex-wrap">
               <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center">
                 <span className="block text-xs font-medium text-slate-500">Total Bank</span>
-                <span className="text-base font-black text-slate-900">{summary.totalQuestionsCount.toLocaleString('en-IN')} Qs</span>
+                <span className="text-base font-black text-slate-900">3,000,000 Qs</span>
               </div>
               <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center">
-                <span className="block text-xs font-medium text-slate-500">Classes</span>
-                <span className="text-base font-black text-blue-600">4 to 12</span>
+                <span className="block text-xs font-medium text-slate-500">Per Subject</span>
+                <span className="text-base font-black text-blue-600">600,000 Qs</span>
+              </div>
+              <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                <span className="block text-xs font-medium text-slate-500">Classes 9–12</span>
+                <span className="text-base font-black text-indigo-600">400k / Subj</span>
               </div>
               <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center">
                 <span className="block text-xs font-medium text-slate-500">Access</span>
@@ -215,20 +342,20 @@ export function MathQuestionBankClient({
                     <span>Member-Only Learner Practice</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
-                    The Complete {summary.totalQuestionsCount.toLocaleString('en-IN')} Maths Question Bank is Strictly Reserved for Authenticated Learners
+                    The Complete 3,000,000 Universal Question Bank is Strictly Reserved for Authenticated Learners
                   </h2>
                   <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                    To maintain individual progress tracking, personal speed analytics, and verified solutions, all 9 classes (Classes 4–12) and 116 chapters are secured behind your student account.
+                    Access over 600,000 verified questions in each of the 5 core subjects: Mathematics, Science (Physics, Chemistry, Biology), English (Grammar & Literature), Hindi (व्याकरण एवं साहित्य), and Social Science (History, Civics, Geography, Economics).
                   </p>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                      <span className="block text-xs font-semibold text-slate-500">Step Solutions</span>
-                      <span className="text-sm font-bold text-slate-900">Every Question</span>
+                      <span className="block text-xs font-semibold text-slate-500">Classes 9–12 Focus</span>
+                      <span className="text-sm font-bold text-slate-900">400k Qs Per Subject</span>
                     </div>
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                      <span className="block text-xs font-semibold text-slate-500">Formulas Cited</span>
-                      <span className="text-sm font-bold text-slate-900">Full Derivations</span>
+                      <span className="block text-xs font-semibold text-slate-500">Textbook Aligned</span>
+                      <span className="text-sm font-bold text-slate-900">NCERT, Selina, IB</span>
                     </div>
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                       <span className="block text-xs font-semibold text-slate-500">Free Practice</span>
@@ -261,7 +388,7 @@ export function MathQuestionBankClient({
                   <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-xs aspect-4/3 bg-slate-100">
                     <Image
                       src="/images/kids-tablet-learning.jpg"
-                      alt="Student practicing mathematics questions"
+                      alt="Student practicing universal questions"
                       fill
                       className="object-cover"
                       priority
@@ -269,10 +396,10 @@ export function MathQuestionBankClient({
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent flex items-end p-4">
                       <div className="text-white">
                         <span className="text-xs font-bold uppercase tracking-wider text-blue-300">
-                          Day-1 Access Included
+                          Complete 5-Subject Ingestion
                         </span>
                         <p className="text-sm font-medium text-white/95">
-                          Practice Class 4 through 12 arithmetic, algebra, geometry, calculus, and statistics.
+                          Physics, Chemistry, Biology, Mathematics, English Grammar, Hindi Vyakaran, and Social Sciences.
                         </p>
                       </div>
                     </div>
@@ -281,42 +408,31 @@ export function MathQuestionBankClient({
               </div>
             </div>
 
-            {/* Curriculum Breakdown Preview Table */}
+            {/* Subject Scope Cards */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">
-                    Curriculum Scope & Question Distribution
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    {summary.totalQuestionsCount.toLocaleString('en-IN')} Questions meticulously mapped to CBSE, ICSE / CISCE, and IB official textbooks & board exams
-                  </p>
-                </div>
-                <span className="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg">
-                  9 Classes Verified
-                </span>
-              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-1">
+                Universal Subjects &amp; Question Allocations
+              </h3>
+              <p className="text-xs text-slate-500 mb-4">
+                3,000,000 questions across CBSE, ICSE, and IB official textbooks
+              </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-3">
-                {taxonomy.map((cls) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {UNIVERSAL_SUBJECTS.map((s) => (
                   <div
-                    key={cls.classNumber}
-                    className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-blue-200 transition-all flex flex-col justify-between"
+                    key={s.code}
+                    className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-col justify-between"
                   >
                     <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-extrabold text-slate-900">{cls.className}</span>
-                        <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                          {cls.totalQuestionsTarget.toLocaleString('en-IN')} Qs
-                        </span>
+                      <div className="flex items-center gap-2 mb-2 text-blue-600 font-bold text-sm">
+                        {getSubjectIcon(s.code)}
+                        <span>{s.shortLabel}</span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                        {cls.chapters.length} Chapters: {cls.chapters.slice(0, 3).map((c) => c.title.split('(')[0]).join(', ')}...
-                      </p>
+                      <p className="text-xs text-slate-600 line-clamp-2">{s.description}</p>
                     </div>
-                    <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
-                      <span>{cls.chapters.length} Chapters</span>
-                      <span className="font-semibold text-slate-700">~{Math.round(cls.totalQuestionsTarget / cls.chapters.length).toLocaleString('en-IN')} Qs/ch</span>
+                    <div className="mt-4 pt-2 border-t border-slate-200 text-xs font-black text-slate-900 flex justify-between">
+                      <span>Total Bank</span>
+                      <span className="text-blue-600">{s.totalQuestions.toLocaleString('en-IN')} Qs</span>
                     </div>
                   </div>
                 ))}
@@ -324,9 +440,40 @@ export function MathQuestionBankClient({
             </div>
           </div>
         ) : (
-          /* When Authenticated: The Full Interactive Mathematics Practice Studio */
+          /* When Authenticated: The Full Interactive Question Studio */
           <div className="space-y-6">
-            {/* Board & Curriculum Alignment Selector */}
+            {/* 1. SUBJECT SELECTOR BAR (5 Core Subjects) */}
+            <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-2 overflow-x-auto no-scrollbar">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 whitespace-nowrap">
+                Subject:
+              </span>
+              {UNIVERSAL_SUBJECTS.map((s) => {
+                const isSelected = selectedSubject === s.code
+                return (
+                  <button
+                    key={s.code}
+                    onClick={() => handleSelectSubject(s.code)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                      isSelected
+                        ? 'bg-blue-600 text-white shadow-2xs ring-2 ring-blue-500/20'
+                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    {getSubjectIcon(s.code)}
+                    <span>{s.shortLabel}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        isSelected ? 'bg-blue-500 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {(s.totalQuestions / 1000).toLocaleString('en-IN')}k
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* 2. BOARD & CLASS SELECTOR BAR */}
             <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 whitespace-nowrap">
@@ -341,7 +488,13 @@ export function MathQuestionBankClient({
                   }`}
                 >
                   <span>CBSE</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedBoard === 'CBSE' ? 'bg-blue-500 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      selectedBoard === 'CBSE'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-emerald-100 text-emerald-800'
+                    }`}
+                  >
                     100% Verified
                   </span>
                 </button>
@@ -354,8 +507,14 @@ export function MathQuestionBankClient({
                   }`}
                 >
                   <span>ICSE / CISCE</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedBoard === 'CISCE' ? 'bg-blue-500 text-white' : 'bg-slate-200 text-slate-700'}`}>
-                    ~88% Aligned
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      selectedBoard === 'CISCE'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    ~92% Aligned
                   </span>
                 </button>
                 <button
@@ -367,49 +526,105 @@ export function MathQuestionBankClient({
                   }`}
                 >
                   <span>IB (MYP/DP)</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedBoard === 'IB' ? 'bg-blue-500 text-white' : 'bg-indigo-100 text-indigo-800'}`}>
-                    ~82% Aligned
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      selectedBoard === 'IB'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-indigo-100 text-indigo-800'
+                    }`}
+                  >
+                    ~86% Aligned
                   </span>
                 </button>
               </div>
 
-              {/* View Board Comparison Details CTA */}
+              {/* View Board Mapping Details CTA */}
               <button
                 onClick={() => setShowBoardModal(true)}
                 className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 self-start md:self-auto px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
-                <span>View {currentClassTaxonomy.className} Board Mapping Details</span>
+                <span>View {currentSubjectMeta.shortLabel} Board Mapping Details</span>
               </button>
             </div>
 
-            {/* Class Selector Tabs */}
+            {/* 3. CLASS SELECTOR TABS */}
             <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-1.5 overflow-x-auto no-scrollbar">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">
-                Select Class:
+                Class:
               </span>
-              {taxonomy.map((cls) => {
-                const isSelected = selectedClass === cls.classNumber
+              {[4, 5, 6, 7, 8, 9, 10, 11, 12].map((clsNum) => {
+                const isSelected = selectedClass === clsNum
+                const isSenior = clsNum >= 9
+                const classQuestionCount = isSenior ? 100000 : 40000
+
                 return (
                   <button
-                    key={cls.classNumber}
-                    onClick={() => handleSelectClass(cls.classNumber)}
+                    key={clsNum}
+                    onClick={() => handleSelectClass(clsNum)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                       isSelected
                         ? 'bg-blue-600 text-white shadow-2xs'
                         : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                     }`}
                   >
-                    {cls.className}
-                    <span className={`ml-1 text-[10px] font-medium opacity-85 ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
-                      ({cls.totalQuestionsTarget.toLocaleString('en-IN')})
+                    Class {clsNum}
+                    <span
+                      className={`ml-1 text-[10px] font-medium opacity-85 ${
+                        isSelected ? 'text-blue-100' : 'text-slate-400'
+                      }`}
+                    >
+                      ({(classQuestionCount / 1000).toLocaleString('en-IN')}k)
                     </span>
                   </button>
                 )
               })}
             </div>
 
-            {/* Chapter Selector & Jump Form */}
+            {/* 4. SENIOR CLASS BRANCH SUB-FILTER (Classes 9–12) */}
+            {selectedClass >= 9 && currentSubjectMeta.seniorBranches && (
+              <div className="bg-blue-50/50 p-2.5 rounded-2xl border border-blue-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <span className="text-xs font-bold text-blue-900 uppercase tracking-wider px-2 whitespace-nowrap">
+                  Specialised Stream:
+                </span>
+                <button
+                  onClick={() => handleSelectBranch('all')}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                    selectedBranch === 'all'
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                  }`}
+                >
+                  All {currentSubjectMeta.shortLabel} (100k Qs)
+                </button>
+                {currentSubjectMeta.seniorBranches.map((br) => {
+                  const isBrSelected = selectedBranch === br.code
+                  const count = Math.round(100000 * br.allocationShare)
+                  return (
+                    <button
+                      key={br.code}
+                      onClick={() => handleSelectBranch(br.code)}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                        isBrSelected
+                          ? 'bg-blue-600 text-white shadow-2xs'
+                          : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                      }`}
+                    >
+                      <span>{br.name}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                          isBrSelected ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-700'
+                        }`}
+                      >
+                        {(count / 1000).toFixed(0)}k
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* 5. CHAPTER SELECTOR & JUMP FORM */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-3">
                 <label htmlFor="chapter-select" className="text-xs font-bold text-slate-600 whitespace-nowrap">
@@ -421,9 +636,9 @@ export function MathQuestionBankClient({
                   onChange={(e) => handleSelectChapter(e.target.value)}
                   className="w-full sm:w-auto flex-1 max-w-md bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                 >
-                  {currentClassTaxonomy.chapters.map((ch) => (
+                  {availableChapters.map((ch) => (
                     <option key={ch.id} value={ch.id}>
-                      Ch {ch.chapterNumber}: {ch.title} ({ch.targetQuestionCount} Qs)
+                      Ch {ch.chapterNumber}: {ch.title.split('(')[0]} ({ch.targetQuestionCount.toLocaleString('en-IN')} Qs)
                     </option>
                   ))}
                 </select>
@@ -438,11 +653,11 @@ export function MathQuestionBankClient({
                 <input
                   type="number"
                   min="1"
-                  max={currentChapter?.targetQuestionCount || 300}
-                  placeholder="1-330"
+                  max={currentChapter?.targetQuestionCount || 10000}
+                  placeholder={`1-${currentChapter?.targetQuestionCount || 1000}`}
                   value={jumpInput}
                   onChange={(e) => setJumpInput(e.target.value)}
-                  className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                  className="w-24 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                 />
                 <Button type="submit" size="sm" variant="outline" className="text-xs font-bold h-8 rounded-xl px-3">
                   Go
@@ -450,7 +665,7 @@ export function MathQuestionBankClient({
               </form>
             </div>
 
-            {/* Workspace Grid: Question Card & Session Analytics */}
+            {/* 6. WORKSPACE GRID: QUESTION CARD & SESSION ANALYTICS */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               {/* Question & Solution Viewport */}
               <div className="lg:col-span-8 space-y-4">
@@ -458,12 +673,20 @@ export function MathQuestionBankClient({
                   <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
                     {/* Header info */}
                     <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-extrabold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg">
                           Question {currentIndex + 1} of {questions.length}
                         </span>
-                        <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-                          Ch {currentQuestion.chapterNumber}: {currentQuestion.chapterTitle.split('(')[0]}
+                        <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
+                          {currentSubjectMeta.name}
+                        </span>
+                        {currentQuestion.disciplineName && (
+                          <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                            {currentQuestion.disciplineName}
+                          </span>
+                        )}
+                        <span className="text-xs font-medium text-slate-500">
+                          Ch {currentQuestion.chapterNumber}: {currentQuestion.chapterTitle?.split('(')[0]}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -602,13 +825,13 @@ export function MathQuestionBankClient({
                       </div>
                     </div>
 
-                    {/* Step-by-Step Mathematical Derivation Card */}
+                    {/* Step-by-Step Mathematical/Scientific Derivation Card */}
                     {showSolution && (
                       <div className="mt-4 p-5 rounded-2xl bg-blue-50/70 border border-blue-100 space-y-3 animate-in fade-in-50">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wider flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                            Step-by-Step Mathematical Derivation
+                            Step-by-Step Pedagogical Derivation
                           </span>
                           <span className="text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-md">
                             Correct: Option {currentQuestion.options.find((o) => o.id === currentQuestion.correctOptionId)?.label}
@@ -617,7 +840,7 @@ export function MathQuestionBankClient({
 
                         {currentQuestion.keyFormula && (
                           <div className="p-2.5 bg-white rounded-xl border border-blue-200/80 text-xs text-blue-900 font-mono font-semibold">
-                            Key Formula: {currentQuestion.keyFormula}
+                            Core Rule / Formula: {currentQuestion.keyFormula}
                           </div>
                         )}
 
@@ -630,19 +853,19 @@ export function MathQuestionBankClient({
                         </div>
 
                         <div className="pt-2 text-xs text-slate-600 border-t border-blue-200/60 font-medium">
-                          <span className="font-bold text-slate-800">Concept:</span> {currentQuestion.explanation}
+                          <span className="font-bold text-slate-800">Conceptual Note:</span> {currentQuestion.explanation}
                         </div>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-                    <p className="text-sm text-slate-500">Loading questions from the mathematics engine...</p>
+                    <p className="text-sm text-slate-500">Loading verified questions from the universal engine...</p>
                   </div>
                 )}
               </div>
 
-              {/* Sidebar: Session Stats & Chapter Syllabus */}
+              {/* Sidebar: Session Stats & Chapter Topics */}
               <div className="lg:col-span-4 space-y-4">
                 {/* Session Performance Card */}
                 <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
@@ -702,7 +925,7 @@ export function MathQuestionBankClient({
         )}
 
         {/* Board Alignment Comparison Modal */}
-        {showBoardModal && currentBoardAlignment && (
+        {showBoardModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
             <div className="bg-white rounded-3xl border border-slate-200 shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6">
               <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
@@ -712,10 +935,10 @@ export function MathQuestionBankClient({
                     <span>Curriculum Board Mapping Engine</span>
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                    {currentBoardAlignment.className} Board Alignment: CBSE, ICSE &amp; IB ({currentBoardAlignment.questionCount.toLocaleString('en-IN')} Questions)
+                    Class {selectedClass} {currentSubjectMeta.name} — Board Alignment
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    {currentBoardAlignment.comparativeSummary}
+                    Verified mappings across CBSE, ICSE/CISCE, and IB official textbooks &amp; exam archives.
                   </p>
                 </div>
                 <button
@@ -729,124 +952,103 @@ export function MathQuestionBankClient({
               {/* 3 Board Comparison Columns */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* CBSE Card */}
-                <div className="p-5 rounded-2xl border border-blue-200 bg-blue-50/40 space-y-3 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-black text-slate-900">CBSE</span>
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-600 text-white">
-                        {currentBoardAlignment.cbse.coveragePercentage}% Verified
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-semibold text-blue-700 block mt-1">
-                      {currentBoardAlignment.cbse.framework}
-                    </span>
-                    <div className="mt-3 space-y-1.5">
-                      <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                        Core Topics Mapped:
-                      </span>
-                      <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
-                        {currentBoardAlignment.cbse.keyTopicsOverlap.slice(0, 5).map((topic, i) => (
-                          <li key={i} className="line-clamp-1">{topic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    {currentBoardAlignment.cbse.textbookBibliography && (
-                      <div className="mt-3 space-y-1">
-                        <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wider block">
-                          Official Textbooks &amp; PYQs:
+                {(() => {
+                  const cbseCitations = getSubjectBoardCitations(selectedSubject, selectedClass, 'CBSE')
+                  return (
+                    <div className="p-5 rounded-2xl border border-blue-200 bg-blue-50/40 space-y-3 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-black text-slate-900">CBSE</span>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-600 text-white">
+                            {cbseCitations.coveragePercentage}% Verified
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-semibold text-blue-700 block mt-1">
+                          {cbseCitations.framework}
                         </span>
-                        <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
-                          {currentBoardAlignment.cbse.textbookBibliography.map((book, i) => (
-                            <li key={i} className="line-clamp-1">{book}</li>
-                          ))}
-                        </ul>
+                        <div className="mt-3 space-y-1">
+                          <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wider block">
+                            Official Textbooks:
+                          </span>
+                          <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
+                            {cbseCitations.textbooks.map((b, i) => (
+                              <li key={i} className="line-clamp-1">{b}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  <div className="pt-3 border-t border-blue-200/60 text-[11px] text-slate-600 italic">
-                    {currentBoardAlignment.cbse.boardSpecificNotes}
-                  </div>
-                </div>
+                      <div className="pt-3 border-t border-blue-200/60 text-[11px] text-slate-600 italic">
+                        {cbseCitations.pedagogicalFocus}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* ICSE Card */}
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-black text-slate-900">ICSE / CISCE</span>
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                        ~{currentBoardAlignment.icse.coveragePercentage}% Aligned
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-semibold text-slate-600 block mt-1">
-                      {currentBoardAlignment.icse.framework}
-                    </span>
-                    <div className="mt-3 space-y-1.5">
-                      <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                        Core Topics Mapped:
-                      </span>
-                      <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
-                        {currentBoardAlignment.icse.keyTopicsOverlap.slice(0, 5).map((topic, i) => (
-                          <li key={i} className="line-clamp-1">{topic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    {currentBoardAlignment.icse.textbookBibliography && (
-                      <div className="mt-3 space-y-1">
-                        <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block">
-                          Official Textbooks &amp; PYQs:
+                {(() => {
+                  const icseCitations = getSubjectBoardCitations(selectedSubject, selectedClass, 'CISCE')
+                  return (
+                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-black text-slate-900">ICSE / CISCE</span>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                            ~{icseCitations.coveragePercentage}% Aligned
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-semibold text-slate-600 block mt-1">
+                          {icseCitations.framework}
                         </span>
-                        <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
-                          {currentBoardAlignment.icse.textbookBibliography.map((book, i) => (
-                            <li key={i} className="line-clamp-1">{book}</li>
-                          ))}
-                        </ul>
+                        <div className="mt-3 space-y-1">
+                          <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block">
+                            Official Textbooks:
+                          </span>
+                          <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
+                            {icseCitations.textbooks.map((b, i) => (
+                              <li key={i} className="line-clamp-1">{b}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  <div className="pt-3 border-t border-slate-200/80 text-[11px] text-slate-600 italic">
-                    {currentBoardAlignment.icse.boardSpecificNotes}
-                  </div>
-                </div>
+                      <div className="pt-3 border-t border-slate-200/80 text-[11px] text-slate-600 italic">
+                        {icseCitations.pedagogicalFocus}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* IB Card */}
-                <div className="p-5 rounded-2xl border border-indigo-200 bg-indigo-50/40 space-y-3 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-black text-slate-900">IB (MYP / DP)</span>
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
-                        ~{currentBoardAlignment.ib.coveragePercentage}% Aligned
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-semibold text-indigo-700 block mt-1">
-                      {currentBoardAlignment.ib.framework}
-                    </span>
-                    <div className="mt-3 space-y-1.5">
-                      <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                        Core Topics Mapped:
-                      </span>
-                      <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
-                        {currentBoardAlignment.ib.keyTopicsOverlap.slice(0, 5).map((topic, i) => (
-                          <li key={i} className="line-clamp-1">{topic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    {currentBoardAlignment.ib.textbookBibliography && (
-                      <div className="mt-3 space-y-1">
-                        <span className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider block">
-                          Official Curricula &amp; Past Papers:
+                {(() => {
+                  const ibCitations = getSubjectBoardCitations(selectedSubject, selectedClass, 'IB')
+                  return (
+                    <div className="p-5 rounded-2xl border border-indigo-200 bg-indigo-50/40 space-y-3 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-black text-slate-900">IB (MYP / DP)</span>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                            ~{ibCitations.coveragePercentage}% Aligned
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-semibold text-indigo-700 block mt-1">
+                          {ibCitations.framework}
                         </span>
-                        <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
-                          {currentBoardAlignment.ib.textbookBibliography.map((book, i) => (
-                            <li key={i} className="line-clamp-1">{book}</li>
-                          ))}
-                        </ul>
+                        <div className="mt-3 space-y-1">
+                          <span className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider block">
+                            Curricula &amp; Materials:
+                          </span>
+                          <ul className="text-xs text-slate-700 space-y-0.5 list-disc list-inside">
+                            {ibCitations.textbooks.map((b, i) => (
+                              <li key={i} className="line-clamp-1">{b}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  <div className="pt-3 border-t border-indigo-200/60 text-[11px] text-slate-600 italic">
-                    {currentBoardAlignment.ib.boardSpecificNotes}
-                  </div>
-                </div>
+                      <div className="pt-3 border-t border-indigo-200/60 text-[11px] text-slate-600 italic">
+                        {ibCitations.pedagogicalFocus}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
 
               {/* Close Button */}

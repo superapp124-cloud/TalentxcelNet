@@ -2,14 +2,14 @@ import { Metadata } from 'next'
 import {
   MATH_CLASSES_TAXONOMY,
   getMathQuestionsForClassAndChapter,
-  getMathBankSummary,
+  getUniversalBankSummary,
 } from '@talentxcel/core'
 import { MathQuestionBankClient } from '@/components/math/math-question-bank-client'
 import { ShieldCheck, UserCheck } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Super Admin Mathematics Bank — TalentXcel Operations',
-  description: 'Super Admin operational console for auditing and testing all 200,000 Mathematics questions across Classes 4 through 12.',
+  title: 'Super Admin Universal Question Bank — TalentXcel Operations',
+  description: 'Super Admin operational console for auditing and testing all 3,000,000 questions across Mathematics, Science, English, Hindi, and Social Science for Classes 4 through 12.',
   robots: { index: false },
 }
 
@@ -25,7 +25,7 @@ export default async function AdminQuestionBankPage() {
     20
   )
 
-  const summary = getMathBankSummary()
+  const summary = getUniversalBankSummary()
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
@@ -37,10 +37,10 @@ export default async function AdminQuestionBankPage() {
             <span>Super Admin Operational Console</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black">
-            Mathematics Question Bank Ingestion &amp; Quality Audit
+            Universal Question Bank Ingestion &amp; Quality Audit
           </h1>
           <p className="text-xs text-blue-200 mt-1">
-            Authoritative access for <span className="font-semibold text-white">arsh.wani@gmail.com</span> &amp; <span className="font-semibold text-white">talentxcelservices@gmail.com</span> — All 200,000 curriculum questions unlocked.
+            Authoritative access for <span className="font-semibold text-white">arsh.wani@gmail.com</span> &amp; <span className="font-semibold text-white">talentxcelservices@gmail.com</span> — All 3,000,000 curriculum questions unlocked across all 5 subjects.
           </p>
         </div>
 

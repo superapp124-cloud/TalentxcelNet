@@ -3,14 +3,14 @@ import { createClient } from '@/lib/supabase/server'
 import {
   MATH_CLASSES_TAXONOMY,
   getMathQuestionsForClassAndChapter,
-  getMathBankSummary,
+  getUniversalBankSummary,
 } from '@talentxcel/core'
 import { MathQuestionBankClient } from '@/components/math/math-question-bank-client'
 
 export const metadata: Metadata = {
-  title: 'Mathematics Question Bank (Classes 4–12) — TalentXcel',
+  title: 'Universal Question Bank (Classes 4–12) — TalentXcel',
   description:
-    '200,000 curriculum-aligned Mathematics questions across Classes 4 to 12 with full step-by-step derivations and live scoring behind secure learner login.',
+    '3,000,000 curriculum-aligned questions across Mathematics, Science, English, Hindi, and Social Science (Classes 4–12) with full step-by-step derivations, textbook citations, and live scoring behind secure learner login.',
 }
 
 export default async function MathQuestionBankPage() {
@@ -52,7 +52,7 @@ export default async function MathQuestionBankPage() {
     20
   )
 
-  const summary = getMathBankSummary()
+  const summary = getUniversalBankSummary()
 
   return (
     <div className="w-full min-h-screen bg-[#F8FAFC]">
