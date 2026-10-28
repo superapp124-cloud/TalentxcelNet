@@ -74,6 +74,44 @@ export default async function CertificateVerificationPage({
                     <div className="font-medium text-foreground">{certificate.issuedAt}</div>
                   </div>
                 </div>
+
+                {certificate.totalScore !== undefined && (
+                  <div className="pt-3 border-t border-border space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        Evaluated Rubric Score
+                      </span>
+                      <span className="text-base font-black text-emerald-600 font-mono">
+                        {certificate.totalScore} / 100
+                      </span>
+                    </div>
+
+                    {certificate.rubricBreakdown && (
+                      <div className="grid grid-cols-2 gap-2 text-xs bg-muted/30 p-3 rounded-xl border border-border/50">
+                        <div>
+                          <span className="text-muted-foreground block text-[11px]">Timetable Precision:</span>
+                          <span className="font-semibold text-foreground">{certificate.rubricBreakdown.timetableAccuracy} / 40 pts</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block text-[11px]">Weight Band:</span>
+                          <span className="font-semibold text-foreground">{certificate.rubricBreakdown.weightBand} / 20 pts</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block text-[11px]">Ergonomic Placement:</span>
+                          <span className="font-semibold text-foreground">{certificate.rubricBreakdown.placement} / 15 pts</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block text-[11px]">Socratic Reflection:</span>
+                          <span className="font-semibold text-foreground">{certificate.rubricBreakdown.reasoning} / 25 pts</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 p-2.5 rounded-lg leading-relaxed">
+                      <strong>Educational Credential</strong>: Digital simulation performance only. Not a medical guarantee of carrying comfort or spinal health.
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 rounded-xl border bg-muted/40 text-xs text-muted-foreground leading-relaxed">

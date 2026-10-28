@@ -1,7 +1,9 @@
+import Link from 'next/link'
 import { Metadata } from 'next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Users, GraduationCap, CreditCard, Cpu, TrendingUp, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Users, GraduationCap, CreditCard, Cpu, TrendingUp, AlertCircle, ArrowRight, Compass } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Admin Overview',
@@ -67,6 +69,31 @@ export default function AdminOverviewPage() {
             <div className="text-xs text-muted-foreground mt-1">Avg latency: 412ms</div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Life Skills Curriculum Banner */}
+      <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Badge variant="outline" className="border-emerald-600 text-emerald-700 dark:text-emerald-300 font-semibold text-xs">
+              Classes 4–9 Curriculum
+            </Badge>
+            <Badge className="bg-emerald-600 text-white text-xs">
+              216 / 216 Modules Published
+            </Badge>
+          </div>
+          <h3 className="text-lg font-bold text-foreground">Practical Life-Skills Curriculum Console</h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            100% verified, age-progressive practical life skills across 6 grade levels, 72 monthly units, and 8 core domains. Inspect individual lessons, visual teaching aids, video storyboards, practical activities, and rubrics.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/admin/life-skills">
+            <Button className="bg-[#0080FF] hover:bg-[#0070DF] text-white gap-2 font-semibold text-xs">
+              <Compass className="h-4 w-4" /> Open Curriculum Console <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Ambition Tracking Banner */}

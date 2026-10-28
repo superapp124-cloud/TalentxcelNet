@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import {
   Clock,
@@ -15,6 +15,12 @@ import {
   X,
   CreditCard,
   ArrowRight,
+  Send,
+  FileText,
+  Smartphone,
+  ShieldCheck,
+  Zap,
+  TrendingUp,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -53,6 +59,27 @@ export function TestRunnerModal({
   const [activeTab, setActiveTab] = useState<'explanation' | 'hint' | 'related'>('explanation')
   const [assessmentResult, setAssessmentResult] = useState<AssessmentResult | null>(null)
 
+  // Mobile drawer toggle for step-by-step guidance
+  const [isMobileGuidanceOpen, setIsMobileGuidanceOpen] = useState(false)
+
+  // Parent Lead Form state
+  const [leadStudentName, setLeadStudentName] = useState('')
+  const [leadParentPhone, setLeadParentPhone] = useState('')
+  const [leadParentEmail, setLeadParentEmail] = useState('')
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false)
+  const [leadSubmitted, setLeadSubmitted] = useState(false)
+
+  // Memoized solutions map combining seed solutions and any dynamically passed solutions
+  const solutionsMap = useMemo(() => {
+    const map = new Map<string, ConfidentialQuestionSolution>(SEED_CONFIDENTIAL_SOLUTIONS)
+    if (solutions && solutions.length > 0) {
+      for (const s of solutions) {
+        map.set(s.questionId, s)
+      }
+    }
+    return map
+  }, [solutions])
+
   // Reset state when blueprint changes or modal opens
   useEffect(() => {
     if (isOpen && blueprint) {
@@ -60,6 +87,8 @@ export function TestRunnerModal({
       setUserSelectedAnswers({})
       setAssessmentResult(null)
       setTimeRemainingSeconds(blueprint.durationMinutes * 60)
+      setLeadSubmitted(false)
+      setIsMobileGuidanceOpen(false)
     }
   }, [isOpen, blueprint])
 
@@ -102,13 +131,6 @@ export function TestRunnerModal({
       timeSpentSeconds: 30,
     }))
 
-    const solutionsMap = new Map<string, ConfidentialQuestionSolution>(SEED_CONFIDENTIAL_SOLUTIONS)
-    if (solutions && solutions.length > 0) {
-      for (const s of solutions) {
-        solutionsMap.set(s.questionId, s)
-      }
-    }
-
     const result = evaluateAssessmentAttempt({
       attemptId: `att_run_${Date.now()}`,
       blueprint,
@@ -148,33 +170,62 @@ export function TestRunnerModal({
     }).catch(() => {})
   }
 
+  const handleSendLeadReport = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!leadStudentName || !leadParentPhone) return
+
+    setIsSubmittingLead(true)
+    try {
+      await fetch('/api/assessment/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: leadStudentName,
+          parentPhone: leadParentPhone,
+          parentEmail: leadParentEmail || undefined,
+          classGrade: blueprint.title,
+          subject: blueprint.subjectId,
+          scoreObtained: assessmentResult?.scoreObtained,
+          percentage: assessmentResult?.percentage,
+        }),
+      })
+      setLeadSubmitted(true)
+    } catch {
+      setLeadSubmitted(true)
+    } finally {
+      setIsSubmittingLead(false)
+    }
+  }
+
   const currentQ = questions[currentQuestionIndex]
-  const currentSolution = currentQ ? SEED_CONFIDENTIAL_SOLUTIONS.get(currentQ.id) : null
+  const currentSolution = currentQ ? solutionsMap.get(currentQ.id) : null
   const selectedOptId = currentQ ? userSelectedAnswers[currentQ.id] : undefined
   const isSelectedOptCorrect =
     currentSolution && selectedOptId
       ? currentSolution.correctOptionIds.includes(selectedOptId)
       : false
 
+  const progressPercentage = Math.round(((currentQuestionIndex + 1) / questions.length) * 100)
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
-      <div className="relative w-full max-w-6xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
+      <div className="relative w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] max-w-6xl bg-white rounded-none sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
         {/* Top Header */}
-        <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-4 shrink-0">
-          <div className="flex items-center gap-3">
-            <span className="font-extrabold text-base tracking-tight text-slate-900">
+        <div className="px-4 sm:px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="font-extrabold text-base tracking-tight text-slate-900 shrink-0">
               Talent<span className="text-blue-600">Xcel</span>
             </span>
-            <span className="text-slate-300">|</span>
-            <span className="text-xs sm:text-sm font-semibold text-slate-700 truncate max-w-[200px] sm:max-w-md">
+            <span className="text-slate-300 hidden sm:inline">|</span>
+            <span className="text-xs sm:text-sm font-semibold text-slate-700 truncate">
               {blueprint.title}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {!assessmentResult && (
               <>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 rounded-lg text-slate-700 text-xs font-semibold shadow-2xs">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-slate-700 text-xs font-semibold shadow-2xs">
                   <Clock className="w-3.5 h-3.5 text-blue-600" />
                   <span>{formatTimer(timeRemainingSeconds)}</span>
                 </div>
@@ -186,27 +237,39 @@ export function TestRunnerModal({
 
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+              aria-label="Close test runner"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
+        {/* Animated Progress Bar */}
+        {!assessmentResult && (
+          <div className="w-full bg-slate-100 h-1.5 overflow-hidden shrink-0">
+            <div
+              className="bg-blue-600 h-full transition-all duration-300 ease-out"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+        )}
+
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {assessmentResult ? (
-            /* SCORECARD & EVALUATION VIEW */
+            /* SCORECARD & EVALUATION VIEW WITH LOGIQIDS-STYLE PARENT REPORT HOOK */
             <div className="max-w-3xl mx-auto space-y-6">
+              {/* Header Score Card */}
               <div className="text-center space-y-3 pb-6 border-b border-slate-100">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 mb-1">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 mb-1 shadow-sm">
                   <Award className="w-8 h-8" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                  {assessmentResult.passed ? 'Assessment Completed!' : 'Diagnostic Completed'}
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  {assessmentResult.passed ? 'Diagnostic Completed Successfully!' : 'Diagnostic Completed'}
                 </h2>
-                <p className="text-sm text-slate-600">
-                  Official Server-Validated Evaluation • Zero Login Required
+                <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
+                  Server-Validated Curriculum Performance &amp; Cognitive Breakdown • Zero Login Required
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
@@ -222,6 +285,96 @@ export function TestRunnerModal({
                     </Badge>
                   )}
                 </div>
+              </div>
+
+              {/* Cognitive Pillars & Skill Radar Gauges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-center space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Accuracy</span>
+                  <p className="text-lg font-black text-slate-900">{assessmentResult.percentage}%</p>
+                  <span className="text-[10px] text-emerald-600 font-semibold">
+                    {assessmentResult.percentage >= 70 ? 'High Precision' : 'Needs Practice'}
+                  </span>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-center space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Logic Acuity</span>
+                  <p className="text-lg font-black text-indigo-600">
+                    {assessmentResult.percentage >= 60 ? 'Strong' : 'Developing'}
+                  </p>
+                  <span className="text-[10px] text-slate-500 font-medium">Concept application</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-center space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">National Percentile</span>
+                  <p className="text-lg font-black text-blue-600">
+                    {assessmentResult.percentage >= 80 ? 'Top 15%' : assessmentResult.percentage >= 60 ? 'Top 35%' : 'Top 50%'}
+                  </p>
+                  <span className="text-[10px] text-slate-500 font-medium">Class cohort estimate</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-center space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Reward Balance</span>
+                  <p className="text-lg font-black text-amber-600">₹{assessmentResult.earnedPassCredits}</p>
+                  <span className="text-[10px] text-amber-700 font-medium">100% discount eligible</span>
+                </div>
+              </div>
+
+              {/* LEVER 1: LOGIQIDS-STYLE PARENT LEAD CAPTURE & WHATSAPP PDF DIAGNOSTIC REPORT */}
+              <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-blue-950 text-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-lg border border-indigo-700/40 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-1 max-w-xl">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold border border-emerald-500/30">
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Instant Parent WhatsApp / Email Dispatch</span>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-extrabold tracking-tight">
+                      Get Your Child’s Full Cognitive Gap &amp; Board Readiness Report (PDF)
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Includes topic-wise strengths, step-by-step revision flashcards, and personalized chapter focus areas mapped to CBSE/ICSE.
+                    </p>
+                  </div>
+                  <div className="hidden sm:block shrink-0">
+                    <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                      <FileText className="w-8 h-8 text-emerald-400" />
+                    </div>
+                  </div>
+                </div>
+
+                {leadSubmitted ? (
+                  <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-xl p-4 flex items-center gap-3 text-emerald-200 text-xs">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <div>
+                      <p className="font-bold text-white text-sm">Report Dispatched!</p>
+                      <p>Check your WhatsApp message and inbox shortly for the full diagnostic breakdown.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSendLeadReport} className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <input
+                      type="text"
+                      placeholder="Student's Name *"
+                      value={leadStudentName}
+                      onChange={(e) => setLeadStudentName(e.target.value)}
+                      required
+                      className="px-3.5 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-400"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Parent's WhatsApp / Phone *"
+                      value={leadParentPhone}
+                      onChange={(e) => setLeadParentPhone(e.target.value)}
+                      required
+                      className="px-3.5 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-400"
+                    />
+                    <Button
+                      type="submit"
+                      disabled={isSubmittingLead}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs h-10 rounded-xl flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>{isSubmittingLead ? 'Sending...' : 'Send Free PDF Report'}</span>
+                    </Button>
+                  </form>
+                )}
               </div>
 
               {/* Day 1 Paid Entitlement Direct Unlock */}
@@ -328,17 +481,17 @@ export function TestRunnerModal({
               </div>
             </div>
           ) : (
-            /* ACTIVE SPLIT-SCREEN TEST RUNNER */
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            /* ACTIVE SPLIT-SCREEN & MOBILE OPTIMIZED TEST RUNNER */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
               {/* Left Column: Question & Options */}
               <div className="lg:col-span-7 space-y-5">
-                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-2xs space-y-4">
                   <div className="flex items-center justify-between text-xs text-slate-500">
                     <span className="font-bold text-blue-600 uppercase tracking-wider">
                       Question {currentQuestionIndex + 1} of {questions.length}
                     </span>
-                    <span className="font-semibold text-slate-600">
-                      Class 4 • {currentQ.topicId}
+                    <span className="font-semibold text-slate-600 truncate max-w-[200px]">
+                      {currentQ.topicId}
                     </span>
                   </div>
 
@@ -346,18 +499,18 @@ export function TestRunnerModal({
                     {currentQ.questionText}
                   </h3>
 
-                  {/* Options */}
-                  <div className="space-y-2.5 pt-2">
+                  {/* Finger-friendly Options (LogIQids Mobile Benchmark: min-height 52px) */}
+                  <div className="space-y-3 pt-2">
                     {currentQ.options.map((opt) => {
                       const isSelected = selectedOptId === opt.id
                       const isCorrect = currentSolution?.correctOptionIds.includes(opt.id)
 
-                      let optClass = 'bg-white border-slate-200 text-slate-800 hover:border-blue-400'
+                      let optClass = 'bg-white border-slate-200 text-slate-800 hover:border-blue-400 active:scale-[0.99]'
                       if (isSelected) {
                         if (isCorrect) {
-                          optClass = 'bg-emerald-50 border-emerald-500 text-emerald-950 font-medium'
+                          optClass = 'bg-emerald-50 border-emerald-500 text-emerald-950 font-medium ring-2 ring-emerald-500/20'
                         } else {
-                          optClass = 'bg-blue-50 border-blue-500 text-blue-950 font-medium'
+                          optClass = 'bg-blue-50 border-blue-500 text-blue-950 font-medium ring-2 ring-blue-500/20'
                         }
                       }
 
@@ -365,11 +518,11 @@ export function TestRunnerModal({
                         <button
                           key={opt.id}
                           onClick={() => handleSelectOption(currentQ.id, opt.id)}
-                          className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left text-xs sm:text-sm transition-all shadow-2xs ${optClass}`}
+                          className={`w-full min-h-[52px] flex items-center justify-between p-3.5 sm:p-4 rounded-xl border text-left text-xs sm:text-sm transition-all shadow-2xs ${optClass}`}
                         >
                           <div className="flex items-center gap-3">
                             <span
-                              className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${
+                              className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
                                 isSelected && isCorrect
                                   ? 'bg-emerald-600 text-white'
                                   : isSelected
@@ -379,11 +532,11 @@ export function TestRunnerModal({
                             >
                               {opt.label}
                             </span>
-                            <span>{opt.text}</span>
+                            <span className="leading-relaxed">{opt.text}</span>
                           </div>
 
                           {isSelected && isCorrect && (
-                            <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+                            <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 ml-2">
                               <Check className="w-3.5 h-3.5 stroke-[3]" />
                             </div>
                           )}
@@ -392,6 +545,7 @@ export function TestRunnerModal({
                     })}
                   </div>
 
+                  {/* Instant Feedback Pill */}
                   {selectedOptId && (
                     <div
                       className={`p-3.5 rounded-xl border flex items-start gap-2.5 text-xs ${
@@ -414,10 +568,40 @@ export function TestRunnerModal({
                           <div>
                             <p className="font-bold text-rose-950">Not quite right</p>
                             <p className="text-rose-800 mt-0.5">
-                              Check the step-by-step guidance on the right to understand why!
+                              {currentSolution?.explanation || 'Check the step-by-step guidance to understand the core concept!'}
                             </p>
                           </div>
                         </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Mobile Guidance Expand Button */}
+                  <div className="block lg:hidden pt-2">
+                    <button
+                      onClick={() => setIsMobileGuidanceOpen(!isMobileGuidanceOpen)}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+                    >
+                      <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                      <span>{isMobileGuidanceOpen ? 'Hide Explanation' : 'View Step-by-Step Guidance'}</span>
+                    </button>
+                  </div>
+
+                  {/* Mobile Guidance Dropdown Drawer */}
+                  {isMobileGuidanceOpen && (
+                    <div className="block lg:hidden p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
+                      <p className="font-bold text-slate-900">Step-by-Step Derivation:</p>
+                      {currentSolution?.solutionSteps && currentSolution.solutionSteps.length > 0 ? (
+                        currentSolution.solutionSteps.map((step, idx) => (
+                          <p key={idx} className="leading-relaxed">{step}</p>
+                        ))
+                      ) : (
+                        <p className="text-slate-500">{currentSolution?.explanation || 'Select an option to see derivation.'}</p>
+                      )}
+                      {currentSolution?.keyPoint && (
+                        <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-950 text-[11px] font-medium">
+                          <strong>Key Takeaway:</strong> {currentSolution.keyPoint}
+                        </div>
                       )}
                     </div>
                   )}
@@ -435,7 +619,7 @@ export function TestRunnerModal({
                       Previous
                     </Button>
 
-                    <div className="flex items-center gap-1 hidden sm:flex">
+                    <div className="flex items-center gap-1">
                       {questions.map((q, idx) => {
                         const isAnswered = !!userSelectedAnswers[q.id]
                         const isCurrent = idx === currentQuestionIndex
@@ -443,7 +627,7 @@ export function TestRunnerModal({
                           <button
                             key={q.id}
                             onClick={() => setCurrentQuestionIndex(idx)}
-                            className={`w-6 h-6 rounded-lg text-xs font-bold transition-all ${
+                            className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
                               isCurrent
                                 ? 'bg-slate-900 text-white'
                                 : isAnswered
@@ -474,7 +658,7 @@ export function TestRunnerModal({
                       <Button
                         size="sm"
                         onClick={handleSubmitAssessment}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs"
                       >
                         Submit Test
                         <CheckCircle2 className="w-3.5 h-3.5 ml-1" />
@@ -484,8 +668,8 @@ export function TestRunnerModal({
                 </div>
               </div>
 
-              {/* Right Column: Step-by-Step Explanation & Hints */}
-              <div className="lg:col-span-5 space-y-4">
+              {/* Right Column: Step-by-Step Explanation & Hints (Desktop View) */}
+              <div className="hidden lg:block lg:col-span-5 space-y-4">
                 <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
                   <div className="flex items-center border-b border-slate-200 pb-2 gap-3 text-xs font-bold">
                     <button
@@ -524,7 +708,7 @@ export function TestRunnerModal({
                     <div className="space-y-3 text-xs text-slate-700">
                       <p className="font-bold text-slate-900">Step-by-Step Guidance:</p>
                       <div className="space-y-1.5">
-                        {currentSolution ? (
+                        {currentSolution && currentSolution.solutionSteps && currentSolution.solutionSteps.length > 0 ? (
                           currentSolution.solutionSteps.map((step, idx) => (
                             <p key={idx} className="leading-relaxed">
                               {step}
@@ -532,7 +716,7 @@ export function TestRunnerModal({
                           ))
                         ) : (
                           <p className="text-slate-500 italic">
-                            Select an option to reveal step-by-step guidance.
+                            {currentSolution?.explanation || 'Select an option to reveal step-by-step guidance.'}
                           </p>
                         )}
                       </div>
@@ -558,7 +742,7 @@ export function TestRunnerModal({
                         <span>Socratic Hint:</span>
                       </p>
                       <p>
-                        Recall the core definition: A multiple is formed by multiplying a counting number. Check if dividing leaves a remainder of 0.
+                        Break down the problem into fundamental definitions. Review the units and verify your calculations before finalizing.
                       </p>
                     </div>
                   )}
@@ -567,9 +751,9 @@ export function TestRunnerModal({
                     <div className="space-y-2 text-xs text-slate-600">
                       <p className="font-bold text-slate-800">Connected Curriculum Lessons:</p>
                       <ul className="list-disc list-inside space-y-1">
-                        <li>Class 4 Math: Chapter 6 — Factors & Multiples</li>
-                        <li>Finding Common Multiples on the Number Line</li>
-                        <li>Lowest Common Multiple (LCM) Basics</li>
+                        <li>Standard Board Curriculum Topic: {currentQ.topicId}</li>
+                        <li>Verified National Syllabus Benchmark</li>
+                        <li>Stepwise Mastery &amp; Problem Solving</li>
                       </ul>
                     </div>
                   )}

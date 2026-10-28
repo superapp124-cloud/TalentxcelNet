@@ -9,11 +9,13 @@ import {
   Globe,
   ArrowLeft,
   Calculator,
+  Compass,
 } from 'lucide-react'
 import { Logo } from '@/components/brand/logo'
 
 const navItems = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { label: 'Life Skills (216 Modules)', href: '/admin/life-skills', icon: Compass },
   { label: 'Question Bank (3M Qs)', href: '/admin/question-bank', icon: Calculator },
   { label: 'Ecosystem Growth OS', href: '/admin/growth-os', icon: Globe },
   { label: 'Admissions CRM', href: '/admin/admissions', icon: Users },

@@ -7,6 +7,16 @@ export interface CertificateRecord {
   issuedAt: string
   verificationUrl: string
   isRevoked: boolean
+  totalScore?: number
+  rubricBreakdown?: {
+    timetableAccuracy: number
+    weightBand: number
+    placement: number
+    reasoning: number
+  }
+  measuredWeightKg?: number
+  credentialStatus?: 'digital_simulation_completed' | 'parent_reported_practice'
+  signature?: string
 }
 
 // In-memory/deterministic certificate registry for verification
@@ -37,4 +47,8 @@ export function issueCertificate(learnerName: string, programmeTitle: string): C
 
 export function verifyCertificate(certificateNumber: string): CertificateRecord | null {
   return DEMO_CERTIFICATES[certificateNumber] ?? null
+}
+
+export function registerLifeSkillCertificate(cert: CertificateRecord): void {
+  DEMO_CERTIFICATES[cert.certificateNumber] = cert
 }

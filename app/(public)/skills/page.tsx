@@ -30,6 +30,9 @@ import {
   Heart,
   HelpCircle,
   FileCheck,
+  Volume2,
+  Sparkles,
+  Play,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -355,129 +358,160 @@ function SkillsBrowserContent() {
               </div>
             </div>
 
-            {/* Stage Guidance Card */}
-            <div className="bg-indigo-50/70 border border-indigo-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-600" />
-                  <h3 className="text-xs sm:text-sm font-extrabold text-indigo-950">
-                    {lifeSkillStageLabel}
+            {/* 4 Interactive Pillars Subscription Value Banner */}
+            <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-5 sm:p-6 text-white border border-indigo-500/20 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs font-black uppercase tracking-wider text-indigo-300">
+                      Why Parents &amp; Schools Subscribe to Life Skills Pass (₹999/mo)
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-white mt-1">
+                    Hands-On Practical Mastery for Class {selectedClassNumber} · {lifeSkillStageLabel}
                   </h3>
                 </div>
-                <p className="text-xs text-indigo-900/80 leading-relaxed max-w-3xl">
-                  {lifeSkillStage === 'foundation_guided'
-                    ? 'Guided practice and checklists: learning to pack bags, organize desks, speak politely, count currency change, and identify trusted adults.'
-                    : lifeSkillStage === 'developing_independence'
-                    ? 'Growing independence and decision-making: daily schedules, allowance budgeting, supermarket comparison, first-aid basics, and resisting peer pressure.'
-                    : 'Applied responsibility and complex scenarios: long-term goals, financial planning, de-escalating disputes, crisis protocols, and civic engagement.'}
-                </p>
+
+                <Badge className="bg-amber-400 text-slate-950 font-black text-xs px-3 py-1 shadow-md self-start sm:self-center">
+                  ⭐ NEP 2020 Aligned Practical Labs
+                </Badge>
               </div>
-              <div className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-white px-3 py-1.5 rounded-xl border border-indigo-200 shadow-2xs">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Class {selectedClassNumber} Curated</span>
+
+              {/* 4 Value Pillars Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 space-y-1">
+                  <span className="text-lg">🎮</span>
+                  <div className="font-black text-white leading-tight">Interactive Simulators</div>
+                  <p className="text-[11px] text-indigo-200">Bag packers, cash register &amp; first-aid responders</p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 space-y-1">
+                  <span className="text-lg">🎙️</span>
+                  <div className="font-black text-white leading-tight">Coach Voice Studio</div>
+                  <p className="text-[11px] text-indigo-200">Coach Maya &amp; Rohan real spoken audio guidance</p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 space-y-1">
+                  <span className="text-lg">🏆</span>
+                  <div className="font-black text-white leading-tight">Official Certificates</div>
+                  <p className="text-[11px] text-indigo-200">Accredited QR-verifiable competency credentials</p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 space-y-1">
+                  <span className="text-lg">📋</span>
+                  <div className="font-black text-white leading-tight">Fridge Mission Cards</div>
+                  <p className="text-[11px] text-indigo-200">Printable weekend home habit contracts for parents</p>
+                </div>
               </div>
             </div>
 
             {/* Life Skills Grid (8 Real-Life Tracks for selected class) */}
+            {/* Life Skills Grid (8 Real-Life Tracks for selected class) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredTracks.map((track) => (
-                <div
-                  key={track.id}
-                  className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between gap-4 group"
-                >
-                  <div className="space-y-3">
-                    {/* Header: Icon, Class, and Category */}
-                    <div className="flex items-center justify-between">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
-                        {getTrackIcon(track.iconName)}
+              {filteredTracks.map((track) => {
+                const getPastelTheme = (cat: string) => {
+                  switch (cat) {
+                    case 'life_independence':
+                      return { card: 'bg-amber-50/40 hover:bg-amber-50/70 border-amber-200/80', icon: 'bg-amber-100/80 text-amber-800 border-amber-300/80', bar: 'bg-amber-500' }
+                    case 'life_safety_health':
+                      return { card: 'bg-emerald-50/40 hover:bg-emerald-50/70 border-emerald-200/80', icon: 'bg-emerald-100/80 text-emerald-800 border-emerald-300/80', bar: 'bg-emerald-500' }
+                    case 'life_money_management':
+                      return { card: 'bg-blue-50/40 hover:bg-blue-50/70 border-blue-200/80', icon: 'bg-blue-100/80 text-blue-800 border-blue-300/80', bar: 'bg-blue-500' }
+                    case 'life_communication':
+                      return { card: 'bg-pink-50/40 hover:bg-pink-50/70 border-pink-200/80', icon: 'bg-pink-100/80 text-pink-800 border-pink-300/80', bar: 'bg-pink-500' }
+                    case 'life_critical_thinking':
+                      return { card: 'bg-purple-50/40 hover:bg-purple-50/70 border-purple-200/80', icon: 'bg-purple-100/80 text-purple-800 border-purple-300/80', bar: 'bg-purple-500' }
+                    case 'life_social_teamwork':
+                      return { card: 'bg-teal-50/40 hover:bg-teal-50/70 border-teal-200/80', icon: 'bg-teal-100/80 text-teal-800 border-teal-300/80', bar: 'bg-teal-500' }
+                    default:
+                      return { card: 'bg-slate-50/50 hover:bg-slate-100/60 border-slate-200', icon: 'bg-slate-100 text-slate-800 border-slate-300', bar: 'bg-blue-500' }
+                  }
+                }
+                const theme = getPastelTheme(track.category)
+
+                return (
+                  <div
+                    key={track.id}
+                    className={`rounded-2xl sm:rounded-3xl border p-5 shadow-2xs hover:shadow-lg transition-all flex flex-col justify-between gap-4 group ${theme.card}`}
+                  >
+                    <div className="space-y-3">
+                      {/* Header: Icon, Class, and Category */}
+                      <div className="flex items-center justify-between">
+                        <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center text-xl shadow-2xs ${theme.icon}`}>
+                          {getTrackIcon(track.iconName)}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Badge className="bg-white/90 text-slate-700 border-slate-200 text-[10px] font-bold">
+                            Class {track.classNumber}
+                          </Badge>
+                          <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[9px] font-bold flex items-center gap-1">
+                            <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
+                            <span>Interactive</span>
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <Badge className="bg-indigo-50 text-indigo-700 border-indigo-100 text-[10px] font-bold">
-                          Class {track.classNumber}
-                        </Badge>
-                        <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 capitalize">
-                          {track.level}
-                        </Badge>
-                      </div>
-                    </div>
 
-                    {/* Titles */}
-                    <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-                        {track.title}
-                      </span>
-                      <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug mt-0.5">
-                        {track.classSpecificTitle}
-                      </h4>
-                      <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">
-                        {track.description}
-                      </p>
-                    </div>
-
-                    {/* Why It Matters Callout */}
-                    <div className="p-2.5 bg-blue-50/70 border border-blue-100 rounded-xl space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-blue-900 flex items-center gap-1">
-                        <Lightbulb className="w-3 h-3 text-amber-500" />
-                        <span>Why It Matters</span>
-                      </span>
-                      <p className="text-[11px] text-blue-950 font-medium line-clamp-2 leading-tight">
-                        {track.whyItMatters}
-                      </p>
-                    </div>
-
-                    {/* Real-Life Scenario Callout */}
-                    <div className="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
-                        <BookOpen className="w-3 h-3 text-indigo-600" />
-                        <span>Everyday Scenario</span>
-                      </span>
-                      <p className="text-[11px] text-slate-700 italic line-clamp-2 leading-tight">
-                        "{track.realLifeScenario}"
-                      </p>
-                    </div>
-
-                    {/* Tools & Resources */}
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {track.tools.slice(0, 3).map((t, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-semibold text-slate-700 border border-slate-200"
-                        >
-                          {t}
+                      {/* Titles & Subtitle matching Image 2 */}
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                          {track.title}
                         </span>
-                      ))}
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug mt-0.5">
+                          {track.classSpecificTitle}
+                        </h4>
+                        <p className="text-[11px] font-medium text-slate-500 mt-0.5">
+                          Practice · Tests · Revision
+                        </p>
+                        <p className="text-xs text-slate-600 line-clamp-2 mt-1.5 leading-relaxed">
+                          {track.description}
+                        </p>
+                      </div>
+
+                      {/* Everyday Scenario Callout */}
+                      <div className="p-2.5 bg-white/80 border border-slate-200/80 rounded-xl space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                          <BookOpen className="w-3 h-3 text-blue-600" />
+                          <span>Real Scenario</span>
+                        </span>
+                        <p className="text-[11px] text-slate-700 italic line-clamp-2 leading-tight">
+                          "{track.realLifeScenario}"
+                        </p>
+                      </div>
+
+                      {/* Thin Progress Bar matching Image 2 */}
+                      <div className="space-y-1 pt-1">
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                          <span>Progress: 3 / 8 Tests</span>
+                          <span className="text-emerald-600 font-bold">Interactive Active</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
+                          <div className={`h-full ${theme.bar} rounded-full`} style={{ width: '38%' }} />
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Meta stats */}
-                    <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
-                      <span>{track.weeklyModules.length} Modules</span>
-                      <span>•</span>
-                      <span className="font-medium text-slate-700">{track.capstoneProject.estimatedHours}h Practical</span>
-                      <span>•</span>
-                      <span className="font-semibold text-emerald-600">Verified Rubric</span>
+                    {/* Actions */}
+                    <div className="space-y-2 pt-2 border-t border-slate-200/60">
+                      <Button
+                        onClick={() => handleOpenCurriculum(track)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-9 rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-all"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-white" />
+                        <span>Start Practice &amp; Video</span>
+                      </Button>
+                      <Button
+                        onClick={() => handleOpenProject(track.capstoneProject.id)}
+                        variant="outline"
+                        className="w-full text-xs font-semibold text-slate-700 border-slate-200 hover:bg-white bg-white/70 h-8 rounded-xl flex items-center justify-center gap-1.5"
+                      >
+                        <Award className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Certificate &amp; Project</span>
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Actions */}
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                    <Button
-                      onClick={() => handleOpenCurriculum(track)}
-                      variant="outline"
-                      className="w-full text-xs font-semibold text-slate-700 border-slate-200 hover:bg-slate-50 h-8.5 rounded-xl flex items-center justify-center gap-1.5"
-                    >
-                      <Layers className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Inspect Complete Pathway</span>
-                    </Button>
-                    <Button
-                      onClick={() => handleOpenProject(track.capstoneProject.id)}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-8.5 rounded-xl shadow-2xs flex items-center justify-center gap-1.5"
-                    >
-                      <span>Open Workshop • From ₹999/mo</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </section>
         )}
