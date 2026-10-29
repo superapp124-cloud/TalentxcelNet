@@ -38,17 +38,21 @@ import {
 import type {
   AuthorizedQuestion,
   AssessmentBlueprint,
+  ConfidentialQuestionSolution,
 } from '@/packages/core/src'
+import { getClassDiagnosticPackage } from '@/lib/assessment/class-diagnostic-engine'
 
 export default function HomePage() {
   // Quick-selector state
   const [selectedBoardCode, setSelectedBoardCode] = useState('CBSE')
   const [selectedClassGrade, setSelectedClassGrade] = useState('Class 4')
+  const [selectedSubjectCode, setSelectedSubjectCode] = useState<string>('math')
 
   // Modals state
   const [isTestRunnerOpen, setIsTestRunnerOpen] = useState(false)
   const [activeBlueprint, setActiveBlueprint] = useState<AssessmentBlueprint | null>(null)
   const [activeQuestions, setActiveQuestions] = useState<AuthorizedQuestion[]>([])
+  const [activeSolutions, setActiveSolutions] = useState<ConfidentialQuestionSolution[]>([])
 
   const [isGrowthPlanOpen, setIsGrowthPlanOpen] = useState(false)
 
@@ -58,11 +62,14 @@ export default function HomePage() {
   // Accordion state for FAQs
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
 
-  // Launch free diagnostic test matching selection
-  const handleLaunchFreeDiagnostic = () => {
-    const bp = SEED_BLUEPRINTS[0]
-    setActiveBlueprint(bp)
-    setActiveQuestions(SEED_AUTHORIZED_QUESTIONS.slice(0, bp?.totalQuestions || 5))
+  // Launch free diagnostic test matching selection with verified grade-specific questions
+  const handleLaunchFreeDiagnostic = (subjCode?: string | React.MouseEvent) => {
+    const code = typeof subjCode === 'string' ? subjCode : selectedSubjectCode
+    const classNum = parseInt(selectedClassGrade.replace('Class ', ''), 10) || 4
+    const pkg = getClassDiagnosticPackage(classNum, code, selectedBoardCode)
+    setActiveBlueprint(pkg.blueprint)
+    setActiveQuestions(pkg.questions)
+    setActiveSolutions(pkg.solutions)
     setIsTestRunnerOpen(true)
   }
 
@@ -121,7 +128,7 @@ export default function HomePage() {
                 {/* 1 Dominant Blue CTA + Subtle Secondary Action */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
                   <Button
-                    onClick={handleLaunchFreeDiagnostic}
+                    onClick={() => handleLaunchFreeDiagnostic()}
                     className="w-full sm:w-auto bg-[#245BFF] hover:bg-[#1D4ED8] text-white font-bold text-sm h-11 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
                   >
                     <span>Start Free Practice</span>
@@ -151,56 +158,94 @@ export default function HomePage() {
                 {/* ===================================================================== */}
                 {/* 2. COMPACT BOARD & CLASS SELECTOR (RESPONSIVE SEGMENTED CONTROLS) */}
                 {/* ===================================================================== */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 max-w-lg shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Board:
-                    </span>
-                    <div className="inline-flex p-0.5 bg-white border border-slate-200 rounded-lg gap-0.5" role="tablist">
-                      {['CBSE', 'CISCE', 'IB'].map((board) => (
-                        <button
-                          key={board}
-                          onClick={() => setSelectedBoardCode(board)}
-                          role="tab"
-                          aria-selected={selectedBoardCode === board}
-                          className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
-                            selectedBoardCode === board
-                              ? 'bg-[#245BFF] text-white shadow-2xs'
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          {board}
-                        </button>
-                      ))}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 max-w-xl shadow-2xs space-y-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Board:
+                      </span>
+                      <div className="inline-flex p-0.5 bg-white border border-slate-200 rounded-lg gap-0.5" role="tablist">
+                        {['CBSE', 'CISCE', 'IB'].map((board) => (
+                          <button
+                            key={board}
+                            onClick={() => setSelectedBoardCode(board)}
+                            role="tab"
+                            aria-selected={selectedBoardCode === board}
+                            className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
+                              selectedBoardCode === board
+                                ? 'bg-[#245BFF] text-white shadow-2xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            {board}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Grade:
+                      </span>
+                      <select
+                        value={selectedClassGrade}
+                        onChange={(e) => setSelectedClassGrade(e.target.value)}
+                        aria-label="Select class grade"
+                        className="bg-white border border-slate-200 text-slate-900 text-xs font-bold rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
+                      >
+                        {[
+                          'Class 4',
+                          'Class 5',
+                          'Class 6',
+                          'Class 7',
+                          'Class 8',
+                          'Class 9',
+                          'Class 10',
+                          'Class 11',
+                          'Class 12',
+                        ].map((g) => (
+                          <option key={g} value={g}>
+                            {g}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      Grade:
-                    </span>
-                    <select
-                      value={selectedClassGrade}
-                      onChange={(e) => setSelectedClassGrade(e.target.value)}
-                      aria-label="Select class grade"
-                      className="bg-white border border-slate-200 text-slate-900 text-xs font-bold rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
-                    >
+                  {/* Subject Quick Launch Chips */}
+                  <div className="pt-2 border-t border-slate-200/80">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        Instant Subject Diagnostic (5 Qs Free):
+                      </span>
+                      <span className="text-[10px] text-blue-600 font-semibold">Instant Scoring</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
                       {[
-                        'Class 4',
-                        'Class 5',
-                        'Class 6',
-                        'Class 7',
-                        'Class 8',
-                        'Class 9',
-                        'Class 10',
-                        'Class 11',
-                        'Class 12',
-                      ].map((g) => (
-                        <option key={g} value={g}>
-                          {g}
-                        </option>
+                        { code: 'math', label: 'Mathematics' },
+                        { code: 'science', label: 'Science' },
+                        { code: 'english', label: 'English' },
+                        { code: 'hindi', label: 'Hindi' },
+                        { code: 'sst', label: 'Social Science' },
+                        { code: 'reasoning', label: 'Reasoning' },
+                      ].map((s) => (
+                        <button
+                          key={s.code}
+                          onClick={() => {
+                            setSelectedSubjectCode(s.code)
+                            handleLaunchFreeDiagnostic(s.code)
+                          }}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1 ${
+                            selectedSubjectCode === s.code
+                              ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-2xs font-bold'
+                              : 'bg-white border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600'
+                          }`}
+                        >
+                          <span>{s.label}</span>
+                          <span className="text-[9px] text-blue-500">&rarr;</span>
+                        </button>
                       ))}
-                    </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -221,6 +266,53 @@ export default function HomePage() {
                   </div>
                   <div className="absolute bottom-2.5 right-2.5 bg-slate-900/90 backdrop-blur-xs px-2.5 py-1 rounded-lg text-white shadow-xs text-[11px] font-semibold">
                     {selectedBoardCode} • {selectedClassGrade}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ===================================================================== */}
+            {/* 2B. CURRICULUM AUTHORITY & TRUST STATS STRIP */}
+            {/* ===================================================================== */}
+            <div className="mt-8 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-4 sm:p-5 text-white shadow-md border border-blue-800">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-2">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center shrink-0">
+                    <Calculator className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">3,000,000+</div>
+                    <div className="text-[11px] text-slate-300 font-medium">Verified Question Bank</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center shrink-0">
+                    <GraduationCap className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">Classes 4–12 + Entrances</div>
+                    <div className="text-[11px] text-slate-300 font-medium">CBSE • CISCE • IB • JEE • NEET</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">Instant Explanations</div>
+                    <div className="text-[11px] text-slate-300 font-medium">Socratic Hints &amp; Derivations</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">10-Min Daily Drills</div>
+                    <div className="text-[11px] text-slate-300 font-medium">Cognitive Skill Gap Audits</div>
                   </div>
                 </div>
               </div>
@@ -629,7 +721,7 @@ export default function HomePage() {
             </p>
             <div className="pt-2 flex flex-col sm:flex-row justify-center items-center gap-3">
               <Button
-                onClick={handleLaunchFreeDiagnostic}
+                onClick={() => handleLaunchFreeDiagnostic()}
                 className="w-full sm:w-auto bg-white text-blue-900 hover:bg-blue-50 font-black text-sm h-11 px-8 rounded-xl shadow-md transition-all active:scale-98"
               >
                 <span>Start Free Practice Now</span>
@@ -653,8 +745,12 @@ export default function HomePage() {
       {/* ========================================================================= */}
       <footer className="border-t border-slate-200 bg-white text-slate-600 text-xs py-8 px-4 sm:px-6 lg:px-8" role="contentinfo">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
-            <span className="font-bold text-slate-900">TalentXcel.net</span>
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+            <img
+              src="/brand/talentxcel-logo.png"
+              alt="talentXcel"
+              className="h-7 w-auto object-contain"
+            />
             <span className="hidden sm:inline text-slate-300">•</span>
             <span className="text-slate-500 text-[11px]">
               Universal Learning, Assessment &amp; Skill Development Platform
@@ -682,6 +778,7 @@ export default function HomePage() {
       <TestRunnerModal
         blueprint={activeBlueprint}
         questions={activeQuestions}
+        solutions={activeSolutions}
         isOpen={isTestRunnerOpen}
         onClose={() => setIsTestRunnerOpen(false)}
         onUnlockPaidPack={(prodId) => {

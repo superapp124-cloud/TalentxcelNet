@@ -74,13 +74,12 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand Mark */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex flex-col group">
-            <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-none">
-              Talent<span className="text-blue-600">Xcel</span>
-            </span>
-            <span className="text-[10px] font-semibold text-slate-400 tracking-wider">
-              Universal Learning & Assessment
-            </span>
+          <Link href="/" className="flex items-center gap-2 group focus:outline-none">
+            <img
+              src="/brand/talentxcel-logo.png"
+              alt="talentXcel"
+              className="h-8 sm:h-9 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation Links */}
@@ -170,6 +169,14 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-150">
+          <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
+            <img
+              src="/brand/talentxcel-logo.png"
+              alt="talentXcel"
+              className="h-7 w-auto object-contain"
+            />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Navigation</span>
+          </div>
           <div className="space-y-1">
             {navLinks.map((link) => (
               <Link

@@ -393,9 +393,11 @@ export default function AssessmentPage() {
           {/* Mobile App Bar Stats */}
           <div className="flex items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-xs shadow-sm">
-                TX
-              </div>
+              <img
+                src="/brand/talentxcel-icon.png"
+                alt="talentXcel"
+                className="w-8 h-8 rounded-full object-contain bg-white border border-slate-200 shadow-2xs"
+              />
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-slate-900 text-xs sm:text-sm">Cognitive Gym</span>
