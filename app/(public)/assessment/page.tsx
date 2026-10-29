@@ -58,6 +58,7 @@ import type {
 } from '@/packages/core/src'
 import {
   getClassDiagnosticPackage,
+  getCompetitiveExamDiagnosticPackage,
   REASONING_DIMENSIONS_DATA,
 } from '@/lib/assessment/class-diagnostic-engine'
 
@@ -363,6 +364,15 @@ export default function AssessmentPage() {
     })
     setActiveQuestions(selectedQuestions)
     setActiveSolutions([])
+    setIsTestRunnerOpen(true)
+  }
+
+  // Dynamic Competitive Exam Launcher (JEE, NEET, CUET, UPSC, STATE_PSC, SSC, BANKING, GATE)
+  const handleLaunchCompetitiveExamTest = (examCode: string, examName: string) => {
+    const pkg = getCompetitiveExamDiagnosticPackage(examCode, examName)
+    setActiveBlueprint(pkg.blueprint)
+    setActiveQuestions(pkg.questions)
+    setActiveSolutions(pkg.solutions)
     setIsTestRunnerOpen(true)
   }
 
@@ -819,7 +829,7 @@ export default function AssessmentPage() {
 
                   <div className="space-y-2 pt-2 border-t border-slate-100">
                     <Button
-                      onClick={() => handleLaunchReasoningTest('logical-deduction', exam.name)}
+                      onClick={() => handleLaunchCompetitiveExamTest(exam.examCode, exam.name)}
                       className="w-full bg-slate-900 hover:bg-black text-white text-xs font-bold h-9 rounded-2xl"
                     >
                       Sample Mock (Free)

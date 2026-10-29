@@ -2478,3 +2478,1005 @@ export function getClassDiagnosticPackage(
 
   return { blueprint, questions, solutions }
 }
+
+// ============================================================================
+// 4. COMPETITIVE EXAM TAILORED DIAGNOSTIC & MOCK GENERATOR
+// ============================================================================
+
+export function getCompetitiveExamDiagnosticPackage(
+  examCode: string,
+  examName?: string
+): DiagnosticAssessmentPackage {
+  const code = (examCode || 'JEE').toUpperCase().trim()
+  const questions: AuthorizedQuestion[] = []
+  const solutions: ConfidentialQuestionSolution[] = []
+
+  if (code === 'JEE') {
+    questions.push(
+      {
+        id: 'q_jee_01',
+        topicId: 'Rotational Dynamics (Physics)',
+        questionType: 'single_choice',
+        questionText: 'A solid uniform cylinder of mass M and radius R rolls without slipping down an inclined plane of inclination angle θ. What is the magnitude of its linear acceleration down the incline?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'hard',
+        language: 'en',
+        options: [
+          { id: 'opt_jee_1a', label: 'A', text: '(2/3) g sin θ' },
+          { id: 'opt_jee_1b', label: 'B', text: '(1/2) g sin θ' },
+          { id: 'opt_jee_1c', label: 'C', text: '(3/4) g sin θ' },
+          { id: 'opt_jee_1d', label: 'D', text: 'g sin θ' },
+        ],
+      },
+      {
+        id: 'q_jee_02',
+        topicId: 'Calculus & Limits (Mathematics)',
+        questionType: 'single_choice',
+        questionText: 'Evaluate the standard indeterminate limit: lim (x → 0) [(sin x - x) / x³].',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_jee_2a', label: 'A', text: '-1/6' },
+          { id: 'opt_jee_2b', label: 'B', text: '1/6' },
+          { id: 'opt_jee_2c', label: 'C', text: '0' },
+          { id: 'opt_jee_2d', label: 'D', text: '-1/3' },
+        ],
+      },
+      {
+        id: 'q_jee_03',
+        topicId: 'Chemical Thermodynamics (Chemistry)',
+        questionType: 'single_choice',
+        questionText: 'For a chemical process occurring spontaneously at constant temperature and constant pressure, which fundamental thermodynamic criterion must strictly be satisfied?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_jee_3a', label: 'A', text: 'ΔG < 0 (Change in Gibbs Free Energy is negative)' },
+          { id: 'opt_jee_3b', label: 'B', text: 'ΔH < 0 strictly' },
+          { id: 'opt_jee_3c', label: 'C', text: 'ΔS_system > 0 strictly' },
+          { id: 'opt_jee_3d', label: 'D', text: 'ΔU = 0 strictly' },
+        ],
+      },
+      {
+        id: 'q_jee_04',
+        topicId: 'Magnetic Forces on Moving Charges (Physics)',
+        questionType: 'single_choice',
+        questionText: 'A particle of mass m carrying electric charge q enters a uniform magnetic field B with perpendicular velocity v. What is the orbital radius r of its resulting circular trajectory?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_jee_4a', label: 'A', text: 'r = mv / (qB)' },
+          { id: 'opt_jee_4b', label: 'B', text: 'r = qB / (mv)' },
+          { id: 'opt_jee_4c', label: 'C', text: 'r = mv² / (qB)' },
+          { id: 'opt_jee_4d', label: 'D', text: 'r = qv / (mB)' },
+        ],
+      },
+      {
+        id: 'q_jee_05',
+        topicId: 'Conic Sections & Tangents (Mathematics)',
+        questionType: 'single_choice',
+        questionText: 'What is the necessary condition on constant c such that the straight line y = mx + c is a tangent to the parabola y² = 4ax (where m ≠ 0)?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_jee_5a', label: 'A', text: 'c = a / m' },
+          { id: 'opt_jee_5b', label: 'B', text: 'c = am' },
+          { id: 'opt_jee_5c', label: 'C', text: 'c = -am²' },
+          { id: 'opt_jee_5d', label: 'D', text: 'c = a / m²' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_jee_01',
+        correctOptionIds: ['opt_jee_1a'],
+        solutionSteps: ['1. Rolling acceleration formula: a = (g sin θ) / (1 + I / (MR²)).', '2. For a solid cylinder, I = (1/2) MR², so I / (MR²) = 1/2.', '3. a = (g sin θ) / (1 + 1/2) = (2/3) g sin θ.'],
+        explanation: 'Acceleration for rolling without slipping is (2/3) g sin θ.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_jee_02',
+        correctOptionIds: ['opt_jee_2a'],
+        solutionSteps: ['1. Taylor expansion: sin x = x - x³/6 + x⁵/120 - ...', '2. sin x - x = -x³/6 + O(x⁵).', '3. Divide by x³: lim = -1/6.'],
+        explanation: 'Taylor expansion yields limit = -1/6.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_jee_03',
+        correctOptionIds: ['opt_jee_3a'],
+        solutionSteps: ['1. Second Law of Thermodynamics at constant T and P requires ΔG < 0 for spontaneity.'],
+        explanation: 'Spontaneous processes at constant T, P have ΔG < 0.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_jee_04',
+        correctOptionIds: ['opt_jee_4a'],
+        solutionSteps: ['1. Centripetal force balance: q v B = m v² / r.', '2. Solving for r gives r = m v / (q B).'],
+        explanation: 'Larmor orbital radius is mv/(qB).',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_jee_05',
+        correctOptionIds: ['opt_jee_5a'],
+        solutionSteps: ['1. Substitute y = mx + c into y² = 4ax: (mx + c)² = 4ax.', '2. Set discriminant Δ = 0: (2mc - 4a)² - 4m²c² = 0 → c = a/m.'],
+        explanation: 'Tangent condition for y² = 4ax is c = a/m.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (code === 'NEET') {
+    questions.push(
+      {
+        id: 'q_neet_01',
+        topicId: 'Human Genetics & Karyotyping (Botany/Zoology)',
+        questionType: 'single_choice',
+        questionText: 'Which human genetic chromosomal disorder is characterized by a karyotype of 45 chromosomes with an XO sex complement, causing rudimentary ovaries and short stature?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_neet_1a', label: 'A', text: 'Turner’s Syndrome (45, XO)' },
+          { id: 'opt_neet_1b', label: 'B', text: 'Klinefelter’s Syndrome (47, XXY)' },
+          { id: 'opt_neet_1c', label: 'C', text: 'Down’s Syndrome (Trisomy 21)' },
+          { id: 'opt_neet_1d', label: 'D', text: 'Cri du Chat Syndrome' },
+        ],
+      },
+      {
+        id: 'q_neet_02',
+        topicId: 'Human Circulatory Physiology',
+        questionType: 'single_choice',
+        questionText: 'If a healthy resting adult individual possesses a ventricular stroke volume of 70 mL and a steady heart rate of 72 beats per minute, what is their calculated Cardiac Output?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_neet_2a', label: 'A', text: '5.04 Litres/min (5,040 mL/min)' },
+          { id: 'opt_neet_2b', label: 'B', text: '3.60 Litres/min' },
+          { id: 'opt_neet_2c', label: 'C', text: '7.20 Litres/min' },
+          { id: 'opt_neet_2d', label: 'D', text: '1.44 Litres/min' },
+        ],
+      },
+      {
+        id: 'q_neet_03',
+        topicId: 'Aldehydes, Ketones & Carboxylic Acids (Organic Chemistry)',
+        questionType: 'single_choice',
+        questionText: 'Which of the following organic carbonyl compounds lacks an α-hydrogen atom and consequently undergoes the Cannizzaro self-redox reaction in concentrated alkaline medium?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_neet_3a', label: 'A', text: 'Benzaldehyde (C₆H₅CHO)' },
+          { id: 'opt_neet_3b', label: 'B', text: 'Acetaldehyde (CH₃CHO)' },
+          { id: 'opt_neet_3c', label: 'C', text: 'Propionaldehyde (CH₃CH₂CHO)' },
+          { id: 'opt_neet_3d', label: 'D', text: 'Acetone (CH₃COCH₃)' },
+        ],
+      },
+      {
+        id: 'q_neet_04',
+        topicId: 'Dual Nature of Matter & Radiation (Physics)',
+        questionType: 'single_choice',
+        questionText: 'What is the de Broglie wavelength λ associated with an electron accelerated from rest across an electrical potential difference of V volts?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_neet_4a', label: 'A', text: 'λ ≈ 1.227 / √V nm' },
+          { id: 'opt_neet_4b', label: 'B', text: 'λ ≈ 12.27 × √V nm' },
+          { id: 'opt_neet_4c', label: 'C', text: 'λ ≈ 0.286 / √V nm' },
+          { id: 'opt_neet_4d', label: 'D', text: 'λ ≈ 0.101 / V nm' },
+        ],
+      },
+      {
+        id: 'q_neet_05',
+        topicId: 'Ecological Pyramids (Ecology)',
+        questionType: 'single_choice',
+        questionText: 'What is the characteristic geometric orientation of the ecological pyramid of biomass in an open sea or lake aquatic ecosystem?',
+        marks: 4,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_neet_5a', label: 'A', text: 'Inverted (Phytoplankton biomass is less than Zooplankton and Fish)' },
+          { id: 'opt_neet_5b', label: 'B', text: 'Upright with broad photosynthetic base' },
+          { id: 'opt_neet_5c', label: 'C', text: 'Spindle shaped' },
+          { id: 'opt_neet_5d', label: 'D', text: 'Horizontal linear' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_neet_01',
+        correctOptionIds: ['opt_neet_1a'],
+        solutionSteps: ['1. Turner’s syndrome is caused by monosomy of the sex chromosome (44 autosomes + XO = 45).'],
+        explanation: 'Turner’s syndrome is 45, XO.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_neet_02',
+        correctOptionIds: ['opt_neet_2a'],
+        solutionSteps: ['1. Cardiac Output (CO) = Stroke Volume (SV) × Heart Rate (HR).', '2. CO = 70 mL × 72 bpm = 5,040 mL/min ≈ 5.04 L/min.'],
+        explanation: 'Standard human resting cardiac output is ~5 L/min.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_neet_03',
+        correctOptionIds: ['opt_neet_3a'],
+        solutionSteps: ['1. Cannizzaro reaction occurs in aldehydes lacking alpha hydrogens.', '2. Benzaldehyde has no alpha-H and disproportionates to benzyl alcohol and benzoate.'],
+        explanation: 'Benzaldehyde undergoes Cannizzaro reaction.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_neet_04',
+        correctOptionIds: ['opt_neet_4a'],
+        solutionSteps: ['1. λ = h / p = h / √(2 m e V).', '2. Substituting constants (h, m_e, e) yields λ = 1.227 / √V nm.'],
+        explanation: 'De Broglie wavelength for electron is 1.227 / √V nm.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_neet_05',
+        correctOptionIds: ['opt_neet_5a'],
+        solutionSteps: ['1. Phytoplankton have high turnover rates and low standing biomass compared to long-lived consumers.', '2. Thus, the sea biomass pyramid is inverted.'],
+        explanation: 'Aquatic ecosystem biomass pyramid is inverted.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (code === 'CUET') {
+    questions.push(
+      {
+        id: 'q_cuet_01',
+        topicId: 'Quantitative Aptitude & Percentages',
+        questionType: 'single_choice',
+        questionText: 'A retailer marks up an academic textbook by 40% above its cost price and subsequently offers a trade discount of 15% on the marked price. What is the retailer’s net profit percentage?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_cuet_1a', label: 'A', text: '19%' },
+          { id: 'opt_cuet_1b', label: 'B', text: '25%' },
+          { id: 'opt_cuet_1c', label: 'C', text: '20%' },
+          { id: 'opt_cuet_1d', label: 'D', text: '16.5%' },
+        ],
+      },
+      {
+        id: 'q_cuet_02',
+        topicId: 'English Verbal Ability (Antonyms)',
+        questionType: 'single_choice',
+        questionText: 'Choose the word that is most opposite in meaning to the capitalized word: EPHEMERAL.',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_cuet_2a', label: 'A', text: 'Permanent (Enduring)' },
+          { id: 'opt_cuet_2b', label: 'B', text: 'Fleeting' },
+          { id: 'opt_cuet_2c', label: 'C', text: 'Transitory' },
+          { id: 'opt_cuet_2d', label: 'D', text: 'Fragile' },
+        ],
+      },
+      {
+        id: 'q_cuet_03',
+        topicId: 'General Knowledge & Indian Constitution',
+        questionType: 'single_choice',
+        questionText: 'Which Constitutional Amendment Act added the words "Socialist", "Secular", and "Integrity" to the Preamble of the Indian Constitution?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_cuet_3a', label: 'A', text: '42nd Constitutional Amendment Act, 1976' },
+          { id: 'opt_cuet_3b', label: 'B', text: '44th Constitutional Amendment Act, 1978' },
+          { id: 'opt_cuet_3c', label: 'C', text: '86th Constitutional Amendment Act, 2002' },
+          { id: 'opt_cuet_3d', label: 'D', text: '73rd Constitutional Amendment Act, 1992' },
+        ],
+      },
+      {
+        id: 'q_cuet_04',
+        topicId: 'Logical Reasoning (Letter Coding)',
+        questionType: 'single_choice',
+        questionText: 'If in a code language "BRAIN" is coded as "CSBJO" (shifting each letter forward by +1), how will "SMART" be coded in that same pattern?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_cuet_4a', label: 'A', text: 'TNBSU' },
+          { id: 'opt_cuet_4b', label: 'B', text: 'TNARU' },
+          { id: 'opt_cuet_4c', label: 'C', text: 'RNBST' },
+          { id: 'opt_cuet_4d', label: 'D', text: 'TOCTU' },
+        ],
+      },
+      {
+        id: 'q_cuet_05',
+        topicId: 'Current Affairs & Global Institutions',
+        questionType: 'single_choice',
+        questionText: 'The 2030 Agenda for Sustainable Development adopted by all United Nations Member States in 2015 is structured around how many Sustainable Development Goals (SDGs)?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_cuet_5a', label: 'A', text: '17 Global Goals' },
+          { id: 'opt_cuet_5b', label: 'B', text: '15 Goals' },
+          { id: 'opt_cuet_5c', label: 'C', text: '21 Goals' },
+          { id: 'opt_cuet_5d', label: 'D', text: '12 Goals' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_cuet_01',
+        correctOptionIds: ['opt_cuet_1a'],
+        solutionSteps: ['1. Let CP = 100. Marked Price = 140.', '2. Selling Price = 140 × (1 - 0.15) = 140 × 0.85 = 119.', '3. Profit = 119 - 100 = 19%.'],
+        explanation: 'Net profit percentage is 19%.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_cuet_02',
+        correctOptionIds: ['opt_cuet_2a'],
+        solutionSteps: ['1. Ephemeral means short-lived or transitory. Opposite is permanent.'],
+        explanation: 'Permanent is the exact antonym of ephemeral.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_cuet_03',
+        correctOptionIds: ['opt_cuet_3a'],
+        solutionSteps: ['1. 42nd Amendment Act (1976) introduced "Socialist, Secular, Integrity" into the Preamble.'],
+        explanation: '42nd Amendment 1976 modified the Preamble.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_cuet_04',
+        correctOptionIds: ['opt_cuet_4a'],
+        solutionSteps: ['1. S+1=T, M+1=N, A+1=B, R+1=S, T+1=U → TNBSU.'],
+        explanation: 'Alphabetical +1 shift yields TNBSU.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_cuet_05',
+        correctOptionIds: ['opt_cuet_5a'],
+        solutionSteps: ['1. UN 2030 agenda has 17 Sustainable Development Goals and 169 targets.'],
+        explanation: '17 SDGs comprise the 2030 Agenda.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (code === 'UPSC') {
+    questions.push(
+      {
+        id: 'q_upsc_01',
+        topicId: 'Indian Polity & Constitutional Jurisprudence',
+        questionType: 'single_choice',
+        questionText: 'The "Basic Structure Doctrine", which curtails Parliament’s constituent amending power under Article 368 from altering essential constitutional features, was established in:',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'hard',
+        language: 'en',
+        options: [
+          { id: 'opt_upsc_1a', label: 'A', text: 'Kesavananda Bharati v. State of Kerala (1973)' },
+          { id: 'opt_upsc_1b', label: 'B', text: 'Golaknath v. State of Punjab (1967)' },
+          { id: 'opt_upsc_1c', label: 'C', text: 'Minerva Mills v. Union of India (1980)' },
+          { id: 'opt_upsc_1d', label: 'D', text: 'Shankari Prasad v. Union of India (1951)' },
+        ],
+      },
+      {
+        id: 'q_upsc_02',
+        topicId: 'Modern Indian History & Constitutional Acts',
+        questionType: 'single_choice',
+        questionText: 'Which colonial statute provided for "Provincial Autonomy", abolished dyarchy in provincial executives, and legislated the inception of a Federal Court in British India?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'hard',
+        language: 'en',
+        options: [
+          { id: 'opt_upsc_2a', label: 'A', text: 'Government of India Act, 1935' },
+          { id: 'opt_upsc_2b', label: 'B', text: 'Government of India Act, 1919 (Montagu-Chelmsford)' },
+          { id: 'opt_upsc_2c', label: 'C', text: 'Indian Councils Act, 1909 (Morley-Minto)' },
+          { id: 'opt_upsc_2d', label: 'D', text: 'Indian Independence Act, 1947' },
+        ],
+      },
+      {
+        id: 'q_upsc_03',
+        topicId: 'Ecology & International Conventions',
+        questionType: 'single_choice',
+        questionText: 'The Ramsar Convention, signed in 1971 in Ramsar, Iran, is an intergovernmental treaty dedicated primarily to the conservation and ecological stewardship of:',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_upsc_3a', label: 'A', text: 'Wetlands of International Importance' },
+          { id: 'opt_upsc_3b', label: 'B', text: 'Endangered Migratory Avian Species' },
+          { id: 'opt_upsc_3c', label: 'C', text: 'High-Altitude Glaciers and Permafrost' },
+          { id: 'opt_upsc_3d', label: 'D', text: 'Benthic Deep-Sea Hydrothermal Vents' },
+        ],
+      },
+      {
+        id: 'q_upsc_04',
+        topicId: 'Indian Economy & Balance of Payments',
+        questionType: 'single_choice',
+        questionText: 'In India’s Balance of Payments (BoP) accounting, which of the following items is cataloged under the Current Account?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_upsc_4a', label: 'A', text: 'Merchandise trade balance, software exports, and private remittances' },
+          { id: 'opt_upsc_4b', label: 'B', text: 'Foreign Direct Investment (FDI) inflows' },
+          { id: 'opt_upsc_4c', label: 'C', text: 'External Commercial Borrowings (ECB)' },
+          { id: 'opt_upsc_4d', label: 'D', text: 'Foreign Portfolio Investment (FPI) in equities' },
+        ],
+      },
+      {
+        id: 'q_upsc_05',
+        topicId: 'CSAT (Analytical Reasoning & Logic)',
+        questionType: 'single_choice',
+        questionText: 'Premise: "Every developed nation allocates significant expenditure towards primary education and fundamental research." Which deduction logically and necessarily follows?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'hard',
+        language: 'en',
+        options: [
+          { id: 'opt_upsc_5a', label: 'A', text: 'A nation that does not allocate significant expenditure towards education and research cannot be classified as a developed nation.' },
+          { id: 'opt_upsc_5b', label: 'B', text: 'Any nation allocating expenditure to education automatically attains developed status.' },
+          { id: 'opt_upsc_5c', label: 'C', text: 'Developing nations allocate zero expenditure to research.' },
+          { id: 'opt_upsc_5d', label: 'D', text: 'Education spending is the sole causal determinant of national wealth.' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_upsc_01',
+        correctOptionIds: ['opt_upsc_1a'],
+        solutionSteps: ['1. Kesavananda Bharati (1973) held 7:6 that Article 368 does not enable Parliament to alter the basic structure.'],
+        explanation: 'Basic Structure Doctrine formulated in Kesavananda Bharati (1973).',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_upsc_02',
+        correctOptionIds: ['opt_upsc_2a'],
+        solutionSteps: ['1. GoI Act 1935 established provincial autonomy and Federal Court (inaugurated 1937).'],
+        explanation: 'Government of India Act 1935 granted provincial autonomy.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_upsc_03',
+        correctOptionIds: ['opt_upsc_3a'],
+        solutionSteps: ['1. Ramsar Convention protects wetlands of international significance.'],
+        explanation: 'Ramsar Convention is for wetlands.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_upsc_04',
+        correctOptionIds: ['opt_upsc_4a'],
+        solutionSteps: ['1. Current account includes visible trade (goods) and invisibles (services, transfers, remittances). Capital account includes FDI/FPI/loans.'],
+        explanation: 'Merchandise trade and remittances belong to the Current Account.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_upsc_05',
+        correctOptionIds: ['opt_upsc_5a'],
+        solutionSteps: ['1. Contrapositive rule: If P → Q, then ¬Q → ¬P. Developed → High Spending; hence Not High Spending → Not Developed.'],
+        explanation: 'Contrapositive deduction is logically valid.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (code === 'STATE_PSC') {
+    questions.push(
+      {
+        id: 'q_spsc_01',
+        topicId: 'State Executive & Constitutional Powers',
+        questionType: 'single_choice',
+        questionText: 'Under Article 213 of the Constitution of India, who is vested with the constitutional authority to promulgate ordinances during the recess of the State Legislature?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_spsc_1a', label: 'A', text: 'The Governor of the State' },
+          { id: 'opt_spsc_1b', label: 'B', text: 'The Chief Minister' },
+          { id: 'opt_spsc_1c', label: 'C', text: 'The Chief Justice of the State High Court' },
+          { id: 'opt_spsc_1d', label: 'D', text: 'The Speaker of the Legislative Assembly' },
+        ],
+      },
+      {
+        id: 'q_spsc_02',
+        topicId: 'Indian Physical Geography (Passes)',
+        questionType: 'single_choice',
+        questionText: 'Which major mountain pass situated across the Western Ghats (Sahyadris) links Mumbai with Nashik and northern India?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_spsc_2a', label: 'A', text: 'Thal Ghat (Kasara Ghat)' },
+          { id: 'opt_spsc_2b', label: 'B', text: 'Bhor Ghat' },
+          { id: 'opt_spsc_2c', label: 'C', text: 'Palghat Gap' },
+          { id: 'opt_spsc_2d', label: 'D', text: 'Shencottah Gap' },
+        ],
+      },
+      {
+        id: 'q_spsc_03',
+        topicId: 'Local Self Government & Panchayati Raj',
+        questionType: 'single_choice',
+        questionText: 'The 73rd Constitutional Amendment Act of 1992 incorporated which Schedule into the Constitution, enumerating 29 functional subjects for Panchayati Raj Institutions?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_spsc_3a', label: 'A', text: 'Eleventh Schedule (11th Schedule)' },
+          { id: 'opt_spsc_3b', label: 'B', text: 'Twelfth Schedule (12th Schedule)' },
+          { id: 'opt_spsc_3d', label: 'C', text: 'Seventh Schedule' },
+          { id: 'opt_spsc_3d2', label: 'D', text: 'Tenth Schedule' },
+        ],
+      },
+      {
+        id: 'q_spsc_04',
+        topicId: 'Public Policy & Planning Bodies',
+        questionType: 'single_choice',
+        questionText: 'Who acts as the ex-officio Chairperson of NITI Aayog (National Institution for Transforming India)?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_spsc_4a', label: 'A', text: 'The Prime Minister of India' },
+          { id: 'opt_spsc_4b', label: 'B', text: 'The Union Minister of Finance' },
+          { id: 'opt_spsc_4c', label: 'C', text: 'The Governor of RBI' },
+          { id: 'opt_spsc_4d', label: 'D', text: 'The Vice Chairperson of NITI Aayog' },
+        ],
+      },
+      {
+        id: 'q_spsc_05',
+        topicId: 'Indian Space Science & Technology',
+        questionType: 'single_choice',
+        questionText: 'Which launch vehicle developed by ISRO is celebrated as the "Workhorse of ISRO" after successfully launching Chandrayaan-1 and the Mars Orbiter Mission (Mangalyaan)?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_spsc_5a', label: 'A', text: 'PSLV (Polar Satellite Launch Vehicle)' },
+          { id: 'opt_spsc_5b', label: 'B', text: 'GSLV Mk III (LVM3)' },
+          { id: 'opt_spsc_5c', label: 'C', text: 'SLV-3' },
+          { id: 'opt_spsc_5d', label: 'D', text: 'ASLV' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_spsc_01',
+        correctOptionIds: ['opt_spsc_1a'],
+        solutionSteps: ['1. Article 213 empowers the Governor to promulgate ordinances when the state legislature is in recess.'],
+        explanation: 'Article 213 gives Governor ordinance making power.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_spsc_02',
+        correctOptionIds: ['opt_spsc_2a'],
+        solutionSteps: ['1. Thal Ghat connects Mumbai with Nashik. Bhor Ghat connects Mumbai with Pune.'],
+        explanation: 'Thal Ghat connects Mumbai with Nashik.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_spsc_03',
+        correctOptionIds: ['opt_spsc_3a'],
+        solutionSteps: ['1. 73rd Amendment inserted 11th Schedule containing 29 subjects for Panchayats.'],
+        explanation: '11th Schedule specifies Panchayat subjects.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_spsc_04',
+        correctOptionIds: ['opt_spsc_4a'],
+        solutionSteps: ['1. The Prime Minister is the ex-officio Chairperson of NITI Aayog.'],
+        explanation: 'Prime Minister chairs NITI Aayog.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_spsc_05',
+        correctOptionIds: ['opt_spsc_5a'],
+        solutionSteps: ['1. PSLV is ISRO’s versatile workhorse with dozens of consecutive successful orbital flights.'],
+        explanation: 'PSLV is the workhorse of ISRO.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (code === 'SSC') {
+    questions.push(
+      {
+        id: 'q_ssc_01',
+        topicId: 'Quantitative Aptitude (Relative Speed & Trains)',
+        questionType: 'single_choice',
+        questionText: 'Two trains of length 140 m and 160 m run on parallel tracks in opposite directions at 60 km/h and 48 km/h respectively. In how many seconds will they completely cross each other?',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_ssc_1a', label: 'A', text: '10 seconds' },
+          { id: 'opt_ssc_1b', label: 'B', text: '12 seconds' },
+          { id: 'opt_ssc_1c', label: 'C', text: '15 seconds' },
+          { id: 'opt_ssc_1d', label: 'D', text: '8 seconds' },
+        ],
+      },
+      {
+        id: 'q_ssc_02',
+        topicId: 'General Intelligence & Reasoning (Number Series)',
+        questionType: 'single_choice',
+        questionText: 'Find the missing number in the sequence: 7, 14, 42, 168, 840, ?',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_ssc_2a', label: 'A', text: '5040' },
+          { id: 'opt_ssc_2b', label: 'B', text: '4200' },
+          { id: 'opt_ssc_2c', label: 'C', text: '5880' },
+          { id: 'opt_ssc_2d', label: 'D', text: '6720' },
+        ],
+      },
+      {
+        id: 'q_ssc_03',
+        topicId: 'General Awareness (Indian Economy & Five Year Plans)',
+        questionType: 'single_choice',
+        questionText: 'The First Five-Year Plan of India (1951–1956) was structurally grounded on which economic growth model emphasizing agrarian development?',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_ssc_3a', label: 'A', text: 'Harrod-Domar Model' },
+          { id: 'opt_ssc_3b', label: 'B', text: 'Mahalanobis Model' },
+          { id: 'opt_ssc_3c', label: 'C', text: 'Gadgil Formula' },
+          { id: 'opt_ssc_3d', label: 'D', text: 'Chakravarty Model' },
+        ],
+      },
+      {
+        id: 'q_ssc_04',
+        topicId: 'English Language & Idioms',
+        questionType: 'single_choice',
+        questionText: 'What is the precise meaning of the idiomatic phrase: "At the drop of a hat"?',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_ssc_4a', label: 'A', text: 'Instantly, without hesitation or prior planning' },
+          { id: 'opt_ssc_4b', label: 'B', text: 'After prolonged hesitation' },
+          { id: 'opt_ssc_4c', label: 'C', text: 'With careful deliberation' },
+          { id: 'opt_ssc_4d', label: 'D', text: 'Incurring severe monetary loss' },
+        ],
+      },
+      {
+        id: 'q_ssc_05',
+        topicId: 'Quantitative Aptitude (Trigonometric Identities)',
+        questionType: 'single_choice',
+        questionText: 'In a right-angled triangle, if tan θ = 4/3, what is the value of (sin θ + cos θ)?',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_ssc_5a', label: 'A', text: '7/5 (1.4)' },
+          { id: 'opt_ssc_5b', label: 'B', text: '1/5' },
+          { id: 'opt_ssc_5c', label: 'C', text: '5/7' },
+          { id: 'opt_ssc_5d', label: 'D', text: '12/25' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_ssc_01',
+        correctOptionIds: ['opt_ssc_1a'],
+        solutionSteps: ['1. Relative speed = 60 + 48 = 108 km/h = 108 × (5/18) = 30 m/s.', '2. Total distance = 140 + 160 = 300 m.', '3. Time = 300 / 30 = 10 seconds.'],
+        explanation: 'Time taken to cross each other is 10 seconds.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_ssc_02',
+        correctOptionIds: ['opt_ssc_2a'],
+        solutionSteps: ['1. 7 × 2 = 14, 14 × 3 = 42, 42 × 4 = 168, 168 × 5 = 840.', '2. Next term = 840 × 6 = 5,040.'],
+        explanation: 'Multipliers are 2, 3, 4, 5, 6.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_ssc_03',
+        correctOptionIds: ['opt_ssc_3a'],
+        solutionSteps: ['1. First Plan was based on Harrod-Domar. Second Plan was based on Mahalanobis.'],
+        explanation: 'First Plan followed Harrod-Domar model.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_ssc_04',
+        correctOptionIds: ['opt_ssc_4a'],
+        solutionSteps: ['1. "At the drop of a hat" signifies prompt action without hesitation.'],
+        explanation: 'Means instantly without hesitation.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_ssc_05',
+        correctOptionIds: ['opt_ssc_5a'],
+        solutionSteps: ['1. tan θ = 4/3 → opposite = 4, adjacent = 3, hypotenuse = 5.', '2. sin θ = 4/5, cos θ = 3/5 → sum = 7/5.'],
+        explanation: 'sin θ + cos θ = 7/5.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (code === 'BANKING') {
+    questions.push(
+      {
+        id: 'q_bank_01',
+        topicId: 'Quantitative Aptitude (Quadratic Comparison)',
+        questionType: 'single_choice',
+        questionText: 'Compare the roots of the two equations: Equation I: x² - 7x + 12 = 0; Equation II: y² - 9y + 20 = 0.',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_bank_1a', label: 'A', text: 'x ≤ y' },
+          { id: 'opt_bank_1b', label: 'B', text: 'x ≥ y' },
+          { id: 'opt_bank_1c', label: 'C', text: 'x > y' },
+          { id: 'opt_bank_1d', label: 'D', text: 'Relationship cannot be established' },
+        ],
+      },
+      {
+        id: 'q_bank_02',
+        topicId: 'Banking Awareness (Regulatory Norms & PSL)',
+        questionType: 'single_choice',
+        questionText: 'What is the mandatory Priority Sector Lending (PSL) target set by the RBI for Domestic Scheduled Commercial Banks as a percentage of Adjusted Net Bank Credit (ANBC)?',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_bank_2a', label: 'A', text: '40% of ANBC' },
+          { id: 'opt_bank_2b', label: 'B', text: '32% of ANBC' },
+          { id: 'opt_bank_2c', label: 'C', text: '50% of ANBC' },
+          { id: 'opt_bank_2d', label: 'D', text: '25% of ANBC' },
+        ],
+      },
+      {
+        id: 'q_bank_03',
+        topicId: 'Reasoning Ability (Syllogisms)',
+        questionType: 'single_choice',
+        questionText: 'Statements: (1) Some banks are funds. (2) All funds are vaults. (3) No vault is a debt. Which conclusions follow? I. No fund is a debt. II. Some banks are vaults.',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_bank_3a', label: 'A', text: 'Both Conclusion I and Conclusion II follow' },
+          { id: 'opt_bank_3b', label: 'B', text: 'Only Conclusion I follows' },
+          { id: 'opt_bank_3c', label: 'C', text: 'Only Conclusion II follows' },
+          { id: 'opt_bank_3d', label: 'D', text: 'Neither conclusion follows' },
+        ],
+      },
+      {
+        id: 'q_bank_04',
+        topicId: 'English Language (Financial Vocabulary)',
+        questionType: 'single_choice',
+        questionText: 'In financial audit and risk assessment context, choose the synonym most equivalent in meaning to "PRUDENT":',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_bank_4a', label: 'A', text: 'Circumspect & Judicious' },
+          { id: 'opt_bank_4b', label: 'B', text: 'Reckless & Rash' },
+          { id: 'opt_bank_4c', label: 'C', text: 'Extravagant' },
+          { id: 'opt_bank_4d', label: 'D', text: 'Impetuous' },
+        ],
+      },
+      {
+        id: 'q_bank_05',
+        topicId: 'Quantitative Aptitude (Compound Interest vs Simple Interest)',
+        questionType: 'single_choice',
+        questionText: 'What is the difference between Compound Interest and Simple Interest on a principal sum of ₹10,000 for 2 years at an annual interest rate of 10%?',
+        marks: 2,
+        negativeMarkingRatio: 0.25,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_bank_5a', label: 'A', text: '₹100' },
+          { id: 'opt_bank_5b', label: 'B', text: '₹200' },
+          { id: 'opt_bank_5c', label: 'C', text: '₹50' },
+          { id: 'opt_bank_5d', label: 'D', text: '₹150' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_bank_01',
+        correctOptionIds: ['opt_bank_1a'],
+        solutionSteps: ['1. x² - 7x + 12 = 0 → (x-3)(x-4) = 0 → x = 3, 4.', '2. y² - 9y + 20 = 0 → (y-4)(y-5) = 0 → y = 4, 5.', '3. Comparing: 3 < 4, 3 < 5; 4 = 4, 4 < 5. Thus, x ≤ y.'],
+        explanation: 'Every root of x is less than or equal to every root of y.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_bank_02',
+        correctOptionIds: ['opt_bank_2a'],
+        solutionSteps: ['1. Domestic scheduled commercial banks must allocate 40% of ANBC to priority sector lending.'],
+        explanation: 'Mandatory PSL target is 40% of ANBC.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_bank_03',
+        correctOptionIds: ['opt_bank_3a'],
+        solutionSteps: ['1. All funds are vaults and no vault is debt → No fund is debt (I follows).', '2. Some banks are funds and all funds are vaults → Some banks are vaults (II follows).'],
+        explanation: 'Both syllogisms follow definitively.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_bank_04',
+        correctOptionIds: ['opt_bank_4a'],
+        solutionSteps: ['1. Prudence indicates careful, cautious, and judicious judgment in risk and financial stewardship.'],
+        explanation: 'Prudent means circumspect and judicious.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_bank_05',
+        correctOptionIds: ['opt_bank_5a'],
+        solutionSteps: ['1. 2-year difference formula: CI - SI = P(R/100)².', '2. Difference = 10,000 × (10/100)² = 10,000 × (1/100) = ₹100.'],
+        explanation: 'Difference between CI and SI for 2 years is ₹100.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else {
+    // GATE & UGC-NET Entrance & Fellowships
+    questions.push(
+      {
+        id: 'q_gate_01',
+        topicId: 'Linear Algebra & Eigenvalues (Engineering Mathematics)',
+        questionType: 'single_choice',
+        questionText: 'A 2×2 real matrix has a trace of 7 and a determinant of 12. What are the two eigenvalues of this matrix?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_gate_1a', label: 'A', text: '3 and 4' },
+          { id: 'opt_gate_1b', label: 'B', text: '2 and 6' },
+          { id: 'opt_gate_1c', label: 'C', text: '1 and 12' },
+          { id: 'opt_gate_1d', label: 'D', text: '5 and 2' },
+        ],
+      },
+      {
+        id: 'q_gate_02',
+        topicId: 'Data Structures & Algorithms (Sorting Complexity)',
+        questionType: 'single_choice',
+        questionText: 'What is the worst-case asymptotic time complexity of standard QuickSort on an array of size n when the chosen pivot is consistently the minimum or maximum element?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_gate_2a', label: 'A', text: 'O(n²)' },
+          { id: 'opt_gate_2b', label: 'B', text: 'O(n log n)' },
+          { id: 'opt_gate_2c', label: 'C', text: 'O(n)' },
+          { id: 'opt_gate_2d', label: 'D', text: 'O(log n)' },
+        ],
+      },
+      {
+        id: 'q_gate_03',
+        topicId: 'Discrete Mathematics (Graph Theory & Euler Tours)',
+        questionType: 'single_choice',
+        questionText: 'According to Euler’s theorem, a connected undirected graph G possesses an Eulerian circuit (a closed trail visiting every edge exactly once) if and only if:',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_gate_3a', label: 'A', text: 'Every vertex in G has an even degree' },
+          { id: 'opt_gate_3b', label: 'B', text: 'G is a complete bipartite graph' },
+          { id: 'opt_gate_3c', label: 'C', text: 'Exactly two vertices have odd degree' },
+          { id: 'opt_gate_3d', label: 'D', text: 'G contains a Hamiltonian cycle' },
+        ],
+      },
+      {
+        id: 'q_gate_04',
+        topicId: 'Operating Systems (Deadlock Conditions)',
+        questionType: 'single_choice',
+        questionText: 'Which of the following is NOT one of the four necessary Coffman conditions required for a system deadlock to persist?',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: 'opt_gate_4a', label: 'A', text: 'Preemptive resource reclamation permitted by the scheduler' },
+          { id: 'opt_gate_4b', label: 'B', text: 'Mutual Exclusion' },
+          { id: 'opt_gate_4c', label: 'C', text: 'Hold and Wait' },
+          { id: 'opt_gate_4d', label: 'D', text: 'Circular Wait' },
+        ],
+      },
+      {
+        id: 'q_gate_05',
+        topicId: 'Research Methodology & Hypothesis Testing',
+        questionType: 'single_choice',
+        questionText: 'In statistical research hypothesis testing, a "Type I Error" occurs when the investigator:',
+        marks: 2,
+        negativeMarkingRatio: 0.33,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: 'opt_gate_5a', label: 'A', text: 'Rejects the null hypothesis (H₀) when it is in fact true' },
+          { id: 'opt_gate_5b', label: 'B', text: 'Fails to reject the null hypothesis (H₀) when it is false' },
+          { id: 'opt_gate_5c', label: 'C', text: 'Selects a biased non-random sample' },
+          { id: 'opt_gate_5d', label: 'D', text: 'Increases the sample size indefinitely' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: 'q_gate_01',
+        correctOptionIds: ['opt_gate_1a'],
+        solutionSteps: ['1. Sum of eigenvalues = trace = 7.', '2. Product of eigenvalues = determinant = 12.', '3. λ² - 7λ + 12 = 0 → (λ-3)(λ-4) = 0 → λ = 3, 4.'],
+        explanation: 'Eigenvalues are 3 and 4.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_gate_02',
+        correctOptionIds: ['opt_gate_2a'],
+        solutionSteps: ['1. Unbalanced partitions yield recurrence T(n) = T(n-1) + O(n) = O(n²).'],
+        explanation: 'Worst-case time complexity of QuickSort is O(n²).',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_gate_03',
+        correctOptionIds: ['opt_gate_3a'],
+        solutionSteps: ['1. Euler’s theorem establishes that an Euler circuit exists iff all vertices have even degree.'],
+        explanation: 'All vertices must have even degree for an Euler tour.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_gate_04',
+        correctOptionIds: ['opt_gate_4a'],
+        solutionSteps: ['1. The Coffman condition is "No preemption" (resources cannot be forcibly reclaimed). Preemption breaks deadlock.'],
+        explanation: 'Preemption breaks deadlock rather than causing it.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: 'q_gate_05',
+        correctOptionIds: ['opt_gate_5a'],
+        solutionSteps: ['1. Type I error (α) is rejecting a true null hypothesis (false positive).'],
+        explanation: 'Type I error is rejecting true H₀.',
+        reviewStatus: 'verified',
+      }
+    )
+  }
+
+  const blueprint: AssessmentBlueprint = {
+    id: `bp_comp_${code.toLowerCase()}`,
+    title: examName || `${code} Official Diagnostic Mock Test`,
+    subjectId: `subj_comp_${code.toLowerCase()}`,
+    chapterId: 'mock_pipeline',
+    durationMinutes: code === 'JEE' || code === 'NEET' ? 15 : 10,
+    totalQuestions: questions.length,
+    totalMarks: questions.reduce((sum, q) => sum + (q.marks || 2), 0),
+    negativeMarkingRatio: code === 'JEE' || code === 'NEET' ? 0.25 : code === 'UPSC' || code === 'STATE_PSC' || code === 'GATE' ? 0.33 : 0,
+    passingPercentage: 50,
+    rewardCreditAmount: 30,
+    examType: 'mock_exam',
+    category: 'aptitude',
+    difficulty: code === 'JEE' || code === 'UPSC' || code === 'GATE' ? 'hard' : 'medium',
+  }
+
+  return { blueprint, questions, solutions }
+}
