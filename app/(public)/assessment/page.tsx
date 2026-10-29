@@ -22,6 +22,7 @@ import {
   Activity,
   AlertCircle,
   HelpCircle,
+  Atom,
   Flame,
   Award,
   Users,
@@ -87,7 +88,107 @@ export default function AssessmentPage() {
     const isSenior = classNum >= 9
 
     let subjects = SEED_SUBJECTS.filter((s) => s.classId === selectedClassId)
-    if (subjects.length === 0 && selectedClassId === 'class_g4') {
+
+    if (selectedClassId === 'class_g11' && subjects.length === 0) {
+      subjects = [
+        {
+          id: 'subj_g11_phy',
+          classId: 'class_g11',
+          code: 'physics',
+          name: 'Physics',
+          colorTheme: 'cyan',
+          iconName: 'Atom',
+          totalTests: 24,
+          completedTests: 2,
+          status: 'verified',
+          description: 'Units & Dimensions, Kinematics, Laws of Motion, Work Energy Power & Gravitation',
+        },
+        {
+          id: 'subj_g11_chem',
+          classId: 'class_g11',
+          code: 'chemistry',
+          name: 'Chemistry',
+          colorTheme: 'emerald',
+          iconName: 'FlaskConical',
+          totalTests: 22,
+          completedTests: 1,
+          status: 'verified',
+          description: 'Atomic Structure, Chemical Bonding, Thermodynamics & Chemical Equilibrium',
+        },
+        {
+          id: 'subj_g11_math',
+          classId: 'class_g11',
+          code: 'math',
+          name: 'Mathematics (Core & Applied)',
+          colorTheme: 'amber',
+          iconName: 'Calculator',
+          totalTests: 22,
+          completedTests: 3,
+          status: 'verified',
+          description: 'Sets, Relations & Functions, Trigonometry, Complex Numbers & Coordinate Geometry',
+        },
+        {
+          id: 'subj_g11_bio',
+          classId: 'class_g11',
+          code: 'biology',
+          name: 'Biology (Botany & Zoology)',
+          colorTheme: 'emerald',
+          iconName: 'FlaskConical',
+          totalTests: 20,
+          completedTests: 2,
+          status: 'verified',
+          description: 'Diversity of Living Organisms, Cell Structure, Plant & Human Physiology',
+        },
+        {
+          id: 'subj_g11_eng',
+          classId: 'class_g11',
+          code: 'english',
+          name: 'English Core',
+          colorTheme: 'blue',
+          iconName: 'BookOpen',
+          totalTests: 16,
+          completedTests: 2,
+          status: 'verified',
+          description: 'Hornbill, Snapshots, Reading Comprehension, Note Making & Creative Writing',
+        },
+        {
+          id: 'subj_g11_hin',
+          classId: 'class_g11',
+          code: 'hindi',
+          name: "Hindi Core (हिंदी 'आधार' व 'ऐच्छिक')",
+          colorTheme: 'pink',
+          iconName: 'Languages',
+          totalTests: 14,
+          completedTests: 1,
+          status: 'verified',
+          description: 'अभिव्यक्ति और माध्यम, अंतरा, आरोह, जनसंचार माध्यम व अपठित काव्यांश',
+        },
+        {
+          id: 'subj_g11_cs',
+          classId: 'class_g11',
+          code: 'computer_science',
+          name: 'Computer Science (Python & SQL)',
+          colorTheme: 'indigo',
+          iconName: 'Layers',
+          totalTests: 18,
+          completedTests: 1,
+          status: 'verified',
+          description: 'Python Basics, Flow of Control, Strings, Lists, Tuples & Relational Databases',
+        },
+        {
+          id: 'subj_g11_eco',
+          classId: 'class_g11',
+          code: 'economics',
+          name: 'Economics (Microeconomics & Stats)',
+          colorTheme: 'purple',
+          iconName: 'Compass',
+          totalTests: 16,
+          completedTests: 1,
+          status: 'verified',
+          description: 'Consumer Equilibrium, Demand, Production, Costs & Statistics for Economics',
+        },
+      ]
+    } else if (subjects.length === 0 && selectedClassId === 'class_g4') {
       subjects = SEED_GRADE4_SUBJECTS
     } else if (subjects.length === 0) {
       subjects = [
@@ -95,14 +196,14 @@ export default function AssessmentPage() {
           id: `subj_${selectedClassId}_math`,
           classId: selectedClassId,
           code: 'math',
-          name: isSenior ? 'Mathematics (Core & Applied)' : 'Mathematics',
+          name: isSenior ? 'Mathematics (Standard & Basic)' : 'Mathematics',
           colorTheme: 'amber',
           iconName: 'Calculator',
           totalTests: 15,
           completedTests: 0,
           status: 'verified',
           description: isSenior
-            ? `${currentClass.name} Calculus, Vectors, Algebra & Financial Math`
+            ? `${currentClass.name} Real Numbers, Polynomials, Coordinate Geometry & Trigonometry`
             : `${currentClass.name} Problem Solving, Arithmetic, Geometry & Fractions`,
         },
         {
@@ -116,32 +217,32 @@ export default function AssessmentPage() {
           completedTests: 0,
           status: 'verified',
           description: isSenior
-            ? `${currentClass.name} Mechanics, Chemical Bonding, Genetics & Optics`
+            ? `${currentClass.name} Matter, Chemical Reactions, Motion, Force & Living Cells`
             : `${currentClass.name} Living Systems, Energy, Materials & Inquiry`,
         },
         {
           id: `subj_${selectedClassId}_eng`,
           classId: selectedClassId,
           code: 'english',
-          name: 'English Language & Comprehension',
+          name: isSenior ? 'English Language & Literature' : 'English Language & Comprehension',
           colorTheme: 'blue',
           iconName: 'BookOpen',
           totalTests: 12,
           completedTests: 0,
           status: 'verified',
-          description: `${currentClass.name} Reading Comprehension, Applied Syntax, Grammar & Vocabulary`,
+          description: `${currentClass.name} Reading Comprehension, Applied Syntax, Grammar & Literature`,
         },
         {
           id: `subj_${selectedClassId}_hin`,
           classId: selectedClassId,
           code: 'hindi',
-          name: 'Hindi (हिंदी व्याकरण एवं साहित्य)',
+          name: isSenior ? "Hindi (हिंदी 'अ' व 'ब' - व्याकरण एवं साहित्य)" : 'Hindi (हिंदी व्याकरण एवं साहित्य)',
           colorTheme: 'pink',
           iconName: 'Languages',
           totalTests: 10,
           completedTests: 0,
           status: 'verified',
-          description: `${currentClass.name} व्याकरण (संधि, समास, रस, अलंकार), अपठित बोध एवं साहित्य`,
+          description: `${currentClass.name} व्याकरण (संज्ञा, सर्वनाम, संधि, समास, रस, अलंकार), अपठित बोध एवं साहित्य`,
         },
         {
           id: `subj_${selectedClassId}_sst`,
@@ -156,6 +257,44 @@ export default function AssessmentPage() {
           description: `${currentClass.name} Indian Heritage, Physical Geography, Democracy & Economics`,
         },
       ]
+    } else {
+      // Ensure Hindi & English are never omitted if catalog has only Math/Science
+      const hasHindi = subjects.some((s) => s.code === 'hindi')
+      if (!hasHindi) {
+        subjects = [
+          ...subjects,
+          {
+            id: `subj_${selectedClassId}_hin`,
+            classId: selectedClassId,
+            code: 'hindi',
+            name: isSenior ? "Hindi (हिंदी 'अ' व 'ब' - व्याकरण एवं साहित्य)" : 'Hindi (हिंदी व्याकरण एवं साहित्य)',
+            colorTheme: 'pink',
+            iconName: 'Languages',
+            totalTests: 10,
+            completedTests: 0,
+            status: 'verified',
+            description: `${currentClass.name} व्याकरण (संज्ञा, सर्वनाम, संधि, समास, रस, अलंकार), अपठित बोध एवं साहित्य`,
+          },
+        ]
+      }
+      const hasEnglish = subjects.some((s) => s.code === 'english')
+      if (!hasEnglish) {
+        subjects = [
+          ...subjects,
+          {
+            id: `subj_${selectedClassId}_eng`,
+            classId: selectedClassId,
+            code: 'english',
+            name: isSenior ? 'English Language & Literature' : 'English Language & Comprehension',
+            colorTheme: 'blue',
+            iconName: 'BookOpen',
+            totalTests: 12,
+            completedTests: 0,
+            status: 'verified',
+            description: `${currentClass.name} Reading Comprehension, Applied Syntax, Grammar & Vocabulary`,
+          },
+        ]
+      }
     }
     if (!searchQuery.trim()) return subjects
     const q = searchQuery.toLowerCase()
@@ -426,10 +565,48 @@ export default function AssessmentPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {classSubjects.map((subj) => {
-                  const isMath = subj.code === 'math'
-                  const isSci = subj.code === 'science'
-                  const isEng = subj.code === 'english'
-                  const isHin = subj.code === 'hindi'
+                  const code = subj.code.toLowerCase()
+                  const isMath = code.includes('math')
+                  const isPhy = code.includes('phy')
+                  const isChem = code.includes('chem')
+                  const isBio = code.includes('bio')
+                  const isSci = code.includes('sci') || isPhy || isChem || isBio
+                  const isEng = code.includes('eng')
+                  const isHin = code.includes('hin')
+                  const isTech = code.includes('comp') || code.includes('info') || code === 'it' || code === 'cs'
+                  const isEco = code.includes('eco')
+
+                  let iconColorClass = 'bg-purple-100 text-purple-700'
+                  let IconComponent = Compass
+
+                  if (isMath) {
+                    iconColorClass = 'bg-amber-100 text-amber-700'
+                    IconComponent = Calculator
+                  } else if (isPhy) {
+                    iconColorClass = 'bg-cyan-100 text-cyan-700'
+                    IconComponent = Atom
+                  } else if (isChem) {
+                    iconColorClass = 'bg-emerald-100 text-emerald-700'
+                    IconComponent = FlaskConical
+                  } else if (isBio) {
+                    iconColorClass = 'bg-teal-100 text-teal-700'
+                    IconComponent = FlaskConical
+                  } else if (isSci) {
+                    iconColorClass = 'bg-emerald-100 text-emerald-700'
+                    IconComponent = FlaskConical
+                  } else if (isEng) {
+                    iconColorClass = 'bg-blue-100 text-blue-700'
+                    IconComponent = BookOpen
+                  } else if (isHin) {
+                    iconColorClass = 'bg-pink-100 text-pink-700'
+                    IconComponent = Languages
+                  } else if (isTech) {
+                    iconColorClass = 'bg-indigo-100 text-indigo-700'
+                    IconComponent = Layers
+                  } else if (isEco) {
+                    iconColorClass = 'bg-violet-100 text-violet-700'
+                    IconComponent = TrendingUp
+                  }
 
                   return (
                     <div
@@ -439,29 +616,9 @@ export default function AssessmentPage() {
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <div
-                            className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold shadow-2xs ${
-                              isMath
-                                ? 'bg-amber-100 text-amber-700'
-                                : isSci
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : isEng
-                                ? 'bg-blue-100 text-blue-700'
-                                : isHin
-                                ? 'bg-pink-100 text-pink-700'
-                                : 'bg-purple-100 text-purple-700'
-                            }`}
+                            className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold shadow-2xs ${iconColorClass}`}
                           >
-                            {isMath ? (
-                              <Calculator className="w-6 h-6" />
-                            ) : isSci ? (
-                              <FlaskConical className="w-6 h-6" />
-                            ) : isEng ? (
-                              <BookOpen className="w-6 h-6" />
-                            ) : isHin ? (
-                              <Languages className="w-6 h-6" />
-                            ) : (
-                              <Compass className="w-6 h-6" />
-                            )}
+                            <IconComponent className="w-6 h-6" />
                           </div>
                           <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-extrabold py-0.5">
                             5 Questions Free

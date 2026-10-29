@@ -241,9 +241,9 @@ export const REASONING_DIMENSIONS_DATA: Record<string, { title: string; question
         difficulty: 'hard',
         language: 'en',
         options: [
-          { id: 'opt_ns5_a', label: 'A', text: '7' },
+          { id: 'opt_ns5_a', label: 'A', text: '3' },
           { id: 'opt_ns5_b', label: 'B', text: '1' },
-          { id: 'opt_ns5_c', label: 'C', text: '3' },
+          { id: 'opt_ns5_c', label: 'C', text: '7' },
           { id: 'opt_ns5_d', label: 'D', text: '9' },
         ],
       },
@@ -301,11 +301,10 @@ export const REASONING_DIMENSIONS_DATA: Record<string, { title: string; question
         correctOptionIds: ['opt_ns5_a'],
         solutionSteps: [
           '1. Extract units digits: 3, 7, 9, 3, 9.',
-          '2. Multiply stepwise modulo 10:',
-          '   3 × 7 = 21 → 1',
-          '   1 × 9 = 9',
-          '   9 × 3 = 27 → 7',
-          '   7 × 9 = 63 → 3 (Wait: 3*7=21, 1*9=9, 9*3=27->7, 7*9=63->3. Let recheck options: 3*7*9*3*9 = 21*27*9 = 567*9 = 5103->3? Ah let check: 3*7=21 (1), 1*9=9, 9*3=27 (7), 7*9=63 (3). Wait! If 3, let check option C = 3!).',
+          '2. 3 × 7 = 21 → ends in 1.',
+          '3. 1 × 9 = 9.',
+          '4. 9 × 3 = 27 → ends in 7.',
+          '5. 7 × 9 = 63 → ends in 3.',
         ],
         explanation: 'Units digit modulo arithmetic: 3 × 7 × 9 × 3 × 9 = 5,103 → ends in 3.',
         keyPoint: 'Product modulo 10 gives 3.',
@@ -464,7 +463,506 @@ export const REASONING_DIMENSIONS_DATA: Record<string, { title: string; question
 }
 
 // ============================================================================
-// 2. CLASS-SPECIFIC CURRICULUM DIAGNOSTIC TESTS (CLASSES 3 THROUGH 12)
+// 2. REAL DEVNAGARI HINDI CURRICULUM QUESTIONS (CLASSES 3 THROUGH 12)
+// ============================================================================
+
+export function getHindiClassQuestions(classNumber: number): { questions: AuthorizedQuestion[]; solutions: ConfidentialQuestionSolution[] } {
+  const cls = Math.max(3, Math.min(12, classNumber))
+  const questions: AuthorizedQuestion[] = []
+  const solutions: ConfidentialQuestionSolution[] = []
+
+  if (cls <= 5) {
+    questions.push(
+      {
+        id: `q_hin_p_${cls}_01`,
+        topicId: 'संज्ञा एवं सर्वनाम (Noun & Pronoun)',
+        questionType: 'single_choice',
+        questionText: "वाक्य 'रोहन अपनी पुस्तक पढ़ रहा है' में व्यक्तिवाचक संज्ञा शब्द कौन-सा है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'hi',
+        options: [
+          { id: 'opt_hp_1a', label: 'A', text: 'रोहन' },
+          { id: 'opt_hp_1b', label: 'B', text: 'पुस्तक' },
+          { id: 'opt_hp_1c', label: 'C', text: 'अपनी' },
+          { id: 'opt_hp_1d', label: 'D', text: 'पढ़ रहा' },
+        ],
+      },
+      {
+        id: `q_hin_p_${cls}_02`,
+        topicId: 'विलोम शब्द (Antonyms)',
+        questionType: 'single_choice',
+        questionText: "'प्रकाश' शब्द का सही विलोम शब्द निम्न में से कौन-सा है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'hi',
+        options: [
+          { id: 'opt_hp_2a', label: 'A', text: 'अंधकार' },
+          { id: 'opt_hp_2b', label: 'B', text: 'उजाला' },
+          { id: 'opt_hp_2c', label: 'C', text: 'सवेरा' },
+          { id: 'opt_hp_2d', label: 'D', text: 'दीपक' },
+        ],
+      },
+      {
+        id: `q_hin_p_${cls}_03`,
+        topicId: 'पर्यायवाची शब्द (Synonyms)',
+        questionType: 'single_choice',
+        questionText: "निम्न में से कौन-सा शब्द 'सूर्य' का पर्यायवाची नहीं है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'hi',
+        options: [
+          { id: 'opt_hp_3a', label: 'A', text: 'शशि (चंद्रमा)' },
+          { id: 'opt_hp_3b', label: 'B', text: 'रवि' },
+          { id: 'opt_hp_3c', label: 'C', text: 'दिनकर' },
+          { id: 'opt_hp_3d', label: 'D', text: 'भास्कर' },
+        ],
+      },
+      {
+        id: `q_hin_p_${cls}_04`,
+        topicId: 'मुहावरे (Idioms)',
+        questionType: 'single_choice',
+        questionText: "मुहावरे 'नौ दो ग्यारह होना' का सही अर्थ क्या है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'hi',
+        options: [
+          { id: 'opt_hp_4a', label: 'A', text: 'भाग जाना' },
+          { id: 'opt_hp_4b', label: 'B', text: 'गिनती सीखना' },
+          { id: 'opt_hp_4c', label: 'C', text: 'मिलकर काम करना' },
+          { id: 'opt_hp_4d', label: 'D', text: 'गुस्सा होना' },
+        ],
+      },
+      {
+        id: `q_hin_p_${cls}_05`,
+        topicId: 'शुद्ध वर्तनी एवं वचन',
+        questionType: 'single_choice',
+        questionText: "निम्न में से किस शब्द की वर्तनी (Spelling) पूर्णतः शुद्ध है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'hi',
+        options: [
+          { id: 'opt_hp_5a', label: 'A', text: 'उज्ज्वल' },
+          { id: 'opt_hp_5b', label: 'B', text: 'उज्वल' },
+          { id: 'opt_hp_5c', label: 'C', text: 'उज्जवल' },
+          { id: 'opt_hp_5d', label: 'D', text: 'ऊज्जवल' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_hin_p_${cls}_01`,
+        correctOptionIds: ['opt_hp_1a'],
+        solutionSteps: ["1. व्यक्तिवाचक संज्ञा किसी विशेष व्यक्ति, स्थान या वस्तु के नाम को कहते हैं।", "2. यहाँ 'रोहन' एक विशेष बालक का नाम है, अतः यह व्यक्तिवाचक संज्ञा है।"],
+        explanation: "रोहन व्यक्तिवाचक संज्ञा है।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_p_${cls}_02`,
+        correctOptionIds: ['opt_hp_2a'],
+        solutionSteps: ["1. 'प्रकाश' का अर्थ उजाला होता है।", "2. इसका विपरीतार्थक (उल्टा अर्थ वाला) शब्द 'अंधकार' है।"],
+        explanation: "प्रकाश का विलोम अंधकार होता है।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_p_${cls}_03`,
+        correctOptionIds: ['opt_hp_3a'],
+        solutionSteps: ["1. रवि, दिनकर, भास्कर सूर्य के पर्यायवाची हैं।", "2. 'शशि' चंद्रमा का पर्यायवाची शब्द है।"],
+        explanation: "शशि चंद्रमा का पर्यायवाची है, सूर्य का नहीं।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_p_${cls}_04`,
+        correctOptionIds: ['opt_hp_4a'],
+        solutionSteps: ["1. 'नौ दो ग्यारह होना' एक प्रसिद्ध लोक मुहावरा है जिसका अर्थ बिना बताए तेज़ी से भाग जाना होता है।"],
+        explanation: "नौ दो ग्यारह होना अर्थात् भाग जाना।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_p_${cls}_05`,
+        correctOptionIds: ['opt_hp_5a'],
+        solutionSteps: ["1. संधि नियम: उत् + ज्वल = उज्ज्वल (दोनों 'ज' आधे होते हैं)।"],
+        explanation: "उज्ज्वल की शुद्ध वर्तनी में दो आधे 'ज' होते हैं।",
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (cls <= 8) {
+    questions.push(
+      {
+        id: `q_hin_m_${cls}_01`,
+        topicId: 'स्वर संधि (Sandhi)',
+        questionType: 'single_choice',
+        questionText: "'सूर्योदय' शब्द का सही संधि-विच्छेद एवं संधि का नाम क्या है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hm_1a', label: 'A', text: 'सूर्य + उदय (गुण स्वर संधि)' },
+          { id: 'opt_hm_1b', label: 'B', text: 'सूर्यो + दय (दीर्घ संधि)' },
+          { id: 'opt_hm_1c', label: 'C', text: 'सूर्य + दय (यण संधि)' },
+          { id: 'opt_hm_1d', label: 'D', text: 'सूर्या + उदय (वृद्धि संधि)' },
+        ],
+      },
+      {
+        id: `q_hin_m_${cls}_02`,
+        topicId: 'कारक एवं विभक्ति (Case & Inflection)',
+        questionType: 'single_choice',
+        questionText: "वाक्य 'पेड़ से पत्ता गिरा' में रेखांकित पद 'पेड़ से' में कौन-सा कारक है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hm_2a', label: 'A', text: 'अपादान कारक (अलग होने के अर्थ में)' },
+          { id: 'opt_hm_2b', label: 'B', text: 'करण कारक (साधन के रूप में)' },
+          { id: 'opt_hm_2c', label: 'C', text: 'कर्म कारक' },
+          { id: 'opt_hm_2d', label: 'D', text: 'संबोधन कारक' },
+        ],
+      },
+      {
+        id: `q_hin_m_${cls}_03`,
+        topicId: 'उपसर्ग एवं प्रत्यय (Prefix & Suffix)',
+        questionType: 'single_choice',
+        questionText: "'अपमान' शब्द में कौन-सा उपसर्ग जुड़ा हुआ है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'hi',
+        options: [
+          { id: 'opt_hm_3a', label: 'A', text: 'अप' },
+          { id: 'opt_hm_3b', label: 'B', text: 'अ' },
+          { id: 'opt_hm_3c', label: 'C', text: 'मान' },
+          { id: 'opt_hm_3d', label: 'D', text: 'अपम' },
+        ],
+      },
+      {
+        id: `q_hin_m_${cls}_04`,
+        topicId: 'समास परिचय (Compound Words)',
+        questionType: 'single_choice',
+        questionText: "'चौराहा' (चार राहों का समूह) में कौन-सा समास है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hm_4a', label: 'A', text: 'द्विगु समास (पहला पद संख्यावाची)' },
+          { id: 'opt_hm_4b', label: 'B', text: 'द्वंद्व समास' },
+          { id: 'opt_hm_4c', label: 'C', text: 'तत्पुरुष समास' },
+          { id: 'opt_hm_4d', label: 'D', text: 'अव्ययीभाव समास' },
+        ],
+      },
+      {
+        id: `q_hin_m_${cls}_05`,
+        topicId: 'वाक्य भेद (Sentences)',
+        questionType: 'single_choice',
+        questionText: "'अरे! कितना सुंदर उपवन है!' यह अर्थ की दृष्टि से किस प्रकार का वाक्य है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'hi',
+        options: [
+          { id: 'opt_hm_5a', label: 'A', text: 'विस्मयादिबोधक वाक्य' },
+          { id: 'opt_hm_5b', label: 'B', text: 'विधानवाचक वाक्य' },
+          { id: 'opt_hm_5c', label: 'C', text: 'निषेधवाचक वाक्य' },
+          { id: 'opt_hm_5d', label: 'D', text: 'आज्ञावाचक वाक्य' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_hin_m_${cls}_01`,
+        correctOptionIds: ['opt_hm_1a'],
+        solutionSteps: ["1. सूर्य + उदय: अ + उ मिलकर 'ओ' बन जाता है।", "2. यह गुण स्वर संधि का नियम है।"],
+        explanation: "सूर्य + उदय = सूर्योदय (गुण स्वर संधि)।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_m_${cls}_02`,
+        correctOptionIds: ['opt_hm_2a'],
+        solutionSteps: ["1. जहाँ किसी वस्तु का किसी स्थान से अलग होना पाया जाए, वहाँ अपादान कारक (विभक्ति: से) होता है।"],
+        explanation: "पेड़ से अलग होने के कारण अपादान कारक है।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_m_${cls}_03`,
+        correctOptionIds: ['opt_hm_3a'],
+        solutionSteps: ["1. मूल शब्द 'मान' में पूर्व में 'अप' शब्दांश जुड़कर 'अपमान' बना है।"],
+        explanation: "अप उपसर्ग है।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_m_${cls}_04`,
+        correctOptionIds: ['opt_hm_4a'],
+        solutionSteps: ["1. जिस समास का पहला पद संख्यावाचक विशेषण हो और वह समूह का बोध कराए, वह द्विगु समास कहलाता है।"],
+        explanation: "चौराहा में द्विगु समास है।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_m_${cls}_05`,
+        correctOptionIds: ['opt_hm_5a'],
+        solutionSteps: ["1. जिस वाक्य में विस्मय, हर्ष, शोक या आश्चर्य का भाव प्रकट हो, वह विस्मयादिबोधक वाक्य होता है।"],
+        explanation: "विस्मयादिबोधक वाक्य।",
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (cls <= 10) {
+    questions.push(
+      {
+        id: `q_hin_s_${cls}_01`,
+        topicId: 'रचना के आधार पर वाक्य रूपांतरण (Sentence Syntax)',
+        questionType: 'single_choice',
+        questionText: "वाक्य 'जैसे ही सूर्योदय हुआ, वैसे ही पक्षी चहचहाने लगे' रचना की दृष्टि से किस प्रकार का वाक्य है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hs_1a', label: 'A', text: 'मिश्र वाक्य (Complex Sentence)' },
+          { id: 'opt_hs_1b', label: 'B', text: 'सरल वाक्य' },
+          { id: 'opt_hs_1c', label: 'C', text: 'संयुक्त वाक्य' },
+          { id: 'opt_hs_1d', label: 'D', text: 'विधानवाचक वाक्य' },
+        ],
+      },
+      {
+        id: `q_hin_s_${cls}_02`,
+        topicId: 'वाच्य (Voice: कर्तृ, कर्म, भाववाच्य)',
+        questionType: 'single_choice',
+        questionText: "'रोगी से चला नहीं जाता' इस वाक्य में कौन-सा वाच्य है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hs_2a', label: 'A', text: 'भाववाच्य (Impersonal Voice)' },
+          { id: 'opt_hs_2b', label: 'B', text: 'कर्तृवाच्य' },
+          { id: 'opt_hs_2c', label: 'C', text: 'कर्मवाच्य' },
+          { id: 'opt_hs_2d', label: 'D', text: 'मिश्र वाच्य' },
+        ],
+      },
+      {
+        id: `q_hin_s_${cls}_03`,
+        topicId: 'पद परिचय (Morphological Analysis)',
+        questionType: 'single_choice',
+        questionText: "वाक्य 'हम प्रतिदिन विद्यालय जाते हैं' में 'प्रतिदिन' पद का सही व्याकरणिक परिचय क्या है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'hard',
+        language: 'hi',
+        options: [
+          { id: 'opt_hs_3a', label: 'A', text: "कालवाचक क्रियाविशेषण, 'जाते हैं' क्रिया की विशेषता" },
+          { id: 'opt_hs_3b', label: 'B', text: 'रीतिवाचक क्रियाविशेषण' },
+          { id: 'opt_hs_3c', label: 'C', text: 'गुणवाचक विशेषण' },
+          { id: 'opt_hs_3d', label: 'D', text: 'स्थानवाचक क्रियाविशेषण' },
+        ],
+      },
+      {
+        id: `q_hin_s_${cls}_04`,
+        topicId: 'रस सिद्धांत (Rasa Theory)',
+        questionType: 'single_choice',
+        questionText: "शृंगार रस का स्थायी भाव (Sthayi Bhava) निम्न में से कौन-सा है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hs_4a', label: 'A', text: 'रति (प्रेम)' },
+          { id: 'opt_hs_4b', label: 'B', text: 'उत्साह' },
+          { id: 'opt_hs_4c', label: 'C', text: 'शोक' },
+          { id: 'opt_hs_4d', label: 'D', text: 'क्रोध' },
+        ],
+      },
+      {
+        id: `q_hin_s_${cls}_05`,
+        topicId: 'अलंकार (Figures of Speech)',
+        questionType: 'single_choice',
+        questionText: "पंक्ति 'कनक कनक ते सौ गुनी, मादकता अधिकाय' में कौन-सा अलंकार प्रयुक्त हुआ है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hs_5a', label: 'A', text: 'यमक अलंकार (एक ही शब्द के भिन्न अर्थ)' },
+          { id: 'opt_hs_5b', label: 'B', text: 'अनुप्रास अलंकार' },
+          { id: 'opt_hs_5c', label: 'C', text: 'श्लेष अलंकार' },
+          { id: 'opt_hs_5d', label: 'D', text: 'उपमा अलंकार' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_hin_s_${cls}_01`,
+        correctOptionIds: ['opt_hs_1a'],
+        solutionSteps: ["1. 'जैसे ही... वैसे ही' योजक शब्दों से जुड़ा वाक्य जिसमें एक प्रधान उपवाक्य तथा एक आश्रित उपवाक्य हो, मिश्र वाक्य कहलाता है।"],
+        explanation: "मिश्र वाक्य की संरचना।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_s_${cls}_02`,
+        correctOptionIds: ['opt_hs_2a'],
+        solutionSteps: ["1. जहाँ क्रिया का संबंध कर्ता या कर्म से न होकर केवल भाव से हो और असमर्थता का बोध हो, वहाँ भाववाच्य होता है।"],
+        explanation: "भाववाच्य में अकर्मक क्रिया तथा असमर्थता प्रकट होती है।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_s_${cls}_03`,
+        correctOptionIds: ['opt_hs_3a'],
+        solutionSteps: ["1. 'प्रतिदिन' शब्द क्रिया के होने के समय का बोध करा रहा है। अतः यह कालवाचक क्रियाविशेषण है।"],
+        explanation: "कालवाचक क्रियाविशेषण पद परिचय।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_s_${cls}_04`,
+        correctOptionIds: ['opt_hs_4a'],
+        solutionSteps: ["1. शृंगार रस का स्थायी भाव 'रति' (प्रेम) होता है। उत्साह वीर रस का तथा क्रोध रौद्र रस का स्थायी भाव है।"],
+        explanation: "शृंगार रस का स्थायी भाव रति है।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_s_${cls}_05`,
+        correctOptionIds: ['opt_hs_5a'],
+        solutionSteps: ["1. 'कनक' शब्द दो बार आया है - पहले का अर्थ 'सोना' तथा दूसरे का अर्थ 'धतूरा' है।", "2. जहाँ एक ही शब्द की आवृत्ति हो और अर्थ भिन्न हों, वहाँ यमक अलंकार होता है।"],
+        explanation: "यमक अलंकार: कनक (सोना) व कनक (धतूरा)।",
+        reviewStatus: 'verified',
+      }
+    )
+  } else {
+    // Classes 11, 12 (Senior Secondary Hindi Core / Elective)
+    questions.push(
+      {
+        id: `q_hin_sr_${cls}_01`,
+        topicId: 'शब्द शक्ति (Shabda Shakti)',
+        questionType: 'single_choice',
+        questionText: "काव्य शास्त्र के अनुसार 'सूर्यास्त हो गया' (जिससे ग्वाले, पुजारी, मजदूर अपने-अपने अर्थ समझें) में कौन-सी शब्द शक्ति सक्रिय है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'hard',
+        language: 'hi',
+        options: [
+          { id: 'opt_hsr_1a', label: 'A', text: 'व्यंजना शब्द शक्ति (Suggested Meaning)' },
+          { id: 'opt_hsr_1b', label: 'B', text: 'अभिधा शब्द शक्ति' },
+          { id: 'opt_hsr_1c', label: 'C', text: 'लक्षणा शब्द शक्ति' },
+          { id: 'opt_hsr_1d', label: 'D', text: 'तात्पर्या शब्द शक्ति' },
+        ],
+      },
+      {
+        id: `q_hin_sr_${cls}_02`,
+        topicId: 'जनसंचार एवं पत्रकारिता (Mass Media & Journalism)',
+        questionType: 'single_choice',
+        questionText: "समाचार लेखन की सबसे लोकप्रिय एवं मानक शैली 'उल्टा पिरामिड शैली' (Inverted Pyramid) में सबसे महत्वपूर्ण तथ्य कहाँ आते हैं?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hsr_2a', label: 'A', text: 'प्रारंभिक भाग (इंट्रो / मुखड़ा) में' },
+          { id: 'opt_hsr_2b', label: 'B', text: 'मध्य भाग (बॉडी) में' },
+          { id: 'opt_hsr_2c', label: 'C', text: 'अंतिम भाग (समापन) में' },
+          { id: 'opt_hsr_2d', label: 'D', text: 'शीर्षक के अंत में' },
+        ],
+      },
+      {
+        id: `q_hin_sr_${cls}_03`,
+        topicId: 'काव्य सौंदर्य एवं छंद (Prosody)',
+        questionType: 'single_choice',
+        questionText: "मात्रिक अर्धसम छंद 'दोहा' के प्रथम एवं तृतीय (विषम) चरणों में कितनी-कितनी मात्राएँ होती हैं?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hsr_3a', label: 'A', text: '13-13 मात्राएँ' },
+          { id: 'opt_hsr_3b', label: 'B', text: '11-11 मात्राएँ' },
+          { id: 'opt_hsr_3c', label: 'C', text: '16-16 मात्राएँ' },
+          { id: 'opt_hsr_3d', label: 'D', text: '12-12 मात्राएँ' },
+        ],
+      },
+      {
+        id: `q_hin_sr_${cls}_04`,
+        topicId: 'साहित्यिक प्रवृत्तियाँ (Literary Eras)',
+        questionType: 'single_choice',
+        questionText: "हिंदी साहित्य में 'छायावाद' के चार प्रमुख स्तंभों में निम्न में से कौन-से कवि सम्मिलित नहीं हैं?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hsr_4a', label: 'A', text: 'रामधारी सिंह दिनकर' },
+          { id: 'opt_hsr_4b', label: 'B', text: 'जयशंकर प्रसाद' },
+          { id: 'opt_hsr_4c', label: 'C', text: 'सूर्यकांत त्रिपाठी निराला' },
+          { id: 'opt_hsr_4d', label: 'D', text: 'महादेवी वर्मा' },
+        ],
+      },
+      {
+        id: `q_hin_sr_${cls}_05`,
+        topicId: 'अलंकार सिद्धांत (Advanced Rhetoric)',
+        questionType: 'single_choice',
+        questionText: "जहाँ उपमेय में उपमान की संभावना या कल्पना की जाए और 'मनु, मानहु, जनु, जानहु' वाचक शब्द आएं, वहाँ कौन-सा अलंकार होता है?",
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'hi',
+        options: [
+          { id: 'opt_hsr_5a', label: 'A', text: 'उत्प्रेक्षा अलंकार' },
+          { id: 'opt_hsr_5b', label: 'B', text: 'रूपक अलंकार' },
+          { id: 'opt_hsr_5c', label: 'C', text: 'उपमा अलंकार' },
+          { id: 'opt_hsr_5d', label: 'D', text: 'संदेह अलंकार' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_hin_sr_${cls}_01`,
+        correctOptionIds: ['opt_hsr_1a'],
+        solutionSteps: ["1. जब किसी कथन का सामान्य वाच्यार्थ न होकर संदर्भ के अनुसार अनेक व्यंग्यार्थ निकलते हैं, वहाँ व्यंजना शब्द शक्ति होती है।"],
+        explanation: "व्यंजना शब्द शक्ति।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_sr_${cls}_02`,
+        correctOptionIds: ['opt_hsr_2a'],
+        solutionSteps: ["1. उल्टा पिरामिड शैली में सबसे महत्वपूर्ण सूचना/तथ्य सबसे पहले (इंट्रो/लीड) में लिखे जाते हैं।"],
+        explanation: "उल्टा पिरामिड शैली का नियम।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_sr_${cls}_03`,
+        correctOptionIds: ['opt_hsr_3a'],
+        solutionSteps: ["1. दोहा छंद के विषम (1, 3) चरणों में 13-13 मात्राएँ तथा सम (2, 4) चरणों में 11-11 मात्राएँ होती हैं।"],
+        explanation: "दोहा छंद लक्षण: 13 + 11 = 24 मात्राएँ।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_sr_${cls}_04`,
+        correctOptionIds: ['opt_hsr_4a'],
+        solutionSteps: ["1. छायावाद के चार स्तंभ हैं: प्रसाद, पंत, निराला और महादेवी वर्मा। रामधारी सिंह दिनकर राष्ट्रीय सांस्कृतिक काव्यधारा / प्रगतिवादी युग के हैं।"],
+        explanation: "दिनकर छायावाद के चार स्तंभों में नहीं आते।",
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_hin_sr_${cls}_05`,
+        correctOptionIds: ['opt_hsr_5a'],
+        solutionSteps: ["1. उपमेय में उपमान की संभावना तथा 'मानो, जानो, मनहु, जनु' वाचक शब्दों की उपस्थिति उत्प्रेक्षा अलंकार की पहचान है।"],
+        explanation: "उत्प्रेक्षा अलंकार लक्षण।",
+        reviewStatus: 'verified',
+      }
+    )
+  }
+
+  return { questions, solutions }
+}
+
+// ============================================================================
+// 3. MASTER CLASS-SPECIFIC DIAGNOSTIC PACKAGE GENERATOR
 // ============================================================================
 
 export function getClassDiagnosticPackage(
@@ -472,15 +970,35 @@ export function getClassDiagnosticPackage(
   subjectCode: string,
   boardCode: string = 'CBSE'
 ): DiagnosticAssessmentPackage {
-  // Safe class bounds
   const cls = Math.max(3, Math.min(12, classNumber))
   const subj = subjectCode.toLowerCase()
 
-  // Generate authentic class questions
+  // 1. HINDI: Returns 100% authentic Devnagari Hindi questions for all classes
+  if (subj.includes('hin')) {
+    const hindiData = getHindiClassQuestions(cls)
+    const blueprint: AssessmentBlueprint = {
+      id: `bp_diag_c${cls}_hindi`,
+      title: `Class ${cls} Hindi Diagnostic (हिंदी व्याकरण एवं साहित्य • ${boardCode})`,
+      subjectId: `subj_c${cls}_hindi`,
+      chapterId: 'diagnostic_hindi_core',
+      durationMinutes: 10,
+      totalQuestions: hindiData.questions.length,
+      totalMarks: hindiData.questions.length * 2,
+      negativeMarkingRatio: 0,
+      passingPercentage: 60,
+      rewardCreditAmount: 20,
+      examType: 'periodic_test',
+      category: 'academic',
+      difficulty: 'medium',
+    }
+    return { blueprint, questions: hindiData.questions, solutions: hindiData.solutions }
+  }
+
+  // 2. MATHEMATICS: Differentiated questions for each class
   const questions: AuthorizedQuestion[] = []
   const solutions: ConfidentialQuestionSolution[] = []
 
-  if (subj === 'math') {
+  if (subj === 'math' || subj === 'mathematics') {
     if (cls === 3) {
       questions.push(
         {
@@ -603,13 +1121,12 @@ export function getClassDiagnosticPackage(
         }
       )
     } else if (cls <= 6) {
-      // Classes 4, 5, 6
       questions.push(
         {
           id: `q_m${cls}_01`,
           topicId: 'Integers & Arithmetic',
           questionType: 'single_choice',
-          questionText: `What is the value of: (-15) + (-28) - (-12)?`,
+          questionText: 'What is the value of: (-15) + (-28) - (-12)?',
           marks: 2,
           negativeMarkingRatio: 0,
           difficulty: 'medium',
@@ -725,7 +1242,6 @@ export function getClassDiagnosticPackage(
         }
       )
     } else if (cls <= 8) {
-      // Classes 7 & 8
       questions.push(
         {
           id: `q_m${cls}_01`,
@@ -847,7 +1363,6 @@ export function getClassDiagnosticPackage(
         }
       )
     } else if (cls <= 10) {
-      // Classes 9 & 10 (Secondary Board)
       questions.push(
         {
           id: `q_m${cls}_01`,
@@ -969,7 +1484,6 @@ export function getClassDiagnosticPackage(
         }
       )
     } else {
-      // Classes 11 & 12 (Senior Secondary)
       questions.push(
         {
           id: `q_m${cls}_01`,
@@ -1091,8 +1605,7 @@ export function getClassDiagnosticPackage(
         }
       )
     }
-  } else if (subj === 'science') {
-    // Science questions graded for this class
+  } else if (subj === 'science' || subj === 'sci' || subj === 'physics' || subj === 'chemistry' || subj === 'biology') {
     if (cls <= 5) {
       questions.push(
         {
@@ -1215,7 +1728,6 @@ export function getClassDiagnosticPackage(
         }
       )
     } else {
-      // Classes 6 to 12 Science
       questions.push(
         {
           id: `q_s${cls}_01`,
@@ -1337,125 +1849,612 @@ export function getClassDiagnosticPackage(
         }
       )
     }
-  } else {
-    // Other subjects (English, Hindi, Social Science)
+  } else if (subj === 'english' || subj === 'eng') {
     questions.push(
       {
-        id: `q_${subj}${cls}_01`,
-        topicId: `${subj.toUpperCase()} Core Concept`,
+        id: `q_eng_${cls}_01`,
+        topicId: 'Subject-Verb Concord',
         questionType: 'single_choice',
-        questionText: `Which of the following is the verified core principle for Class ${cls} ${subj.toUpperCase()}?`,
+        questionText: 'Identify the sentence with the correct grammatical subject-verb agreement:',
         marks: 2,
         negativeMarkingRatio: 0,
         difficulty: 'medium',
         language: 'en',
         options: [
-          { id: `opt_${subj}${cls}_1a`, label: 'A', text: 'Option A: Foundation & Critical Mastery' },
-          { id: `opt_${subj}${cls}_1b`, label: 'B', text: 'Option B: Secondary Analysis' },
-          { id: `opt_${subj}${cls}_1c`, label: 'C', text: 'Option C: Peripheral Context' },
-          { id: `opt_${subj}${cls}_1d`, label: 'D', text: 'Option D: Auxiliary Rule' },
+          { id: `opt_eng_${cls}_1a`, label: 'A', text: 'Neither the principal nor the teachers were present at the seminar.' },
+          { id: `opt_eng_${cls}_1b`, label: 'B', text: 'Neither the principal nor the teachers was present at the seminar.' },
+          { id: `opt_eng_${cls}_1c`, label: 'C', text: 'Neither the principal nor the teachers has been present.' },
+          { id: `opt_eng_${cls}_1d`, label: 'D', text: 'Neither the principal nor the teachers is being present.' },
         ],
       },
       {
-        id: `q_${subj}${cls}_02`,
-        topicId: `${subj.toUpperCase()} Diagnostic Check`,
+        id: `q_eng_${cls}_02`,
+        topicId: 'Tenses & Active-Passive Voice',
         questionType: 'single_choice',
-        questionText: `Identify the correct analytical conclusion for Class ${cls} ${subj.toUpperCase()}:`,
+        questionText: 'Convert into correct passive voice: "The scientific team will publish the research findings next month."',
         marks: 2,
         negativeMarkingRatio: 0,
         difficulty: 'medium',
         language: 'en',
         options: [
-          { id: `opt_${subj}${cls}_2a`, label: 'A', text: 'Standard syllabus benchmark satisfied' },
-          { id: `opt_${subj}${cls}_2b`, label: 'B', text: 'Provisional rule applies' },
-          { id: `opt_${subj}${cls}_2c`, label: 'C', text: 'Indeterminate outcome' },
-          { id: `opt_${subj}${cls}_2d`, label: 'D', text: 'Exception rule required' },
+          { id: `opt_eng_${cls}_2a`, label: 'A', text: 'The research findings will be published by the scientific team next month.' },
+          { id: `opt_eng_${cls}_2b`, label: 'B', text: 'The research findings would be published by the team next month.' },
+          { id: `opt_eng_${cls}_2c`, label: 'C', text: 'The research findings will have been published next month.' },
+          { id: `opt_eng_${cls}_2d`, label: 'D', text: 'The research findings is being published by the scientific team.' },
         ],
       },
       {
-        id: `q_${subj}${cls}_03`,
-        topicId: `${subj.toUpperCase()} Syntax & Application`,
+        id: `q_eng_${cls}_03`,
+        topicId: 'Reported Speech',
         questionType: 'single_choice',
-        questionText: `Evaluate the application rule for Class ${cls} ${subj.toUpperCase()}:`,
+        questionText: 'Convert into indirect speech: The teacher said, "Did everyone complete the science project?"',
         marks: 2,
         negativeMarkingRatio: 0,
         difficulty: 'medium',
         language: 'en',
         options: [
-          { id: `opt_${subj}${cls}_3a`, label: 'A', text: 'Direct application validated' },
-          { id: `opt_${subj}${cls}_3b`, label: 'B', text: 'Indirect extrapolation' },
-          { id: `opt_${subj}${cls}_3c`, label: 'C', text: 'Converse interpretation' },
-          { id: `opt_${subj}${cls}_3d`, label: 'D', text: 'Inverse transformation' },
+          { id: `opt_eng_${cls}_3a`, label: 'A', text: 'The teacher enquired if everyone had completed the science project.' },
+          { id: `opt_eng_${cls}_3b`, label: 'B', text: 'The teacher asked that did everyone complete the science project.' },
+          { id: `opt_eng_${cls}_3c`, label: 'C', text: 'The teacher said whether everyone completed the project.' },
+          { id: `opt_eng_${cls}_3d`, label: 'D', text: 'The teacher enquired that had everyone completed the project.' },
         ],
       },
       {
-        id: `q_${subj}${cls}_04`,
-        topicId: `${subj.toUpperCase()} Comprehension Check`,
+        id: `q_eng_${cls}_04`,
+        topicId: 'Vocabulary & Idioms',
         questionType: 'single_choice',
-        questionText: `What is the primary takeaway of this unit in Class ${cls}?`,
+        questionText: 'What is the precise contextual meaning of the idiom: "A blessing in disguise"?',
         marks: 2,
         negativeMarkingRatio: 0,
         difficulty: 'easy',
         language: 'en',
         options: [
-          { id: `opt_${subj}${cls}_4a`, label: 'A', text: 'Mastery of foundational curriculum principles' },
-          { id: `opt_${subj}${cls}_4b`, label: 'B', text: 'Rote memorization without application' },
-          { id: `opt_${subj}${cls}_4c`, label: 'C', text: 'Unverified external references' },
-          { id: `opt_${subj}${cls}_4d`, label: 'D', text: 'Optional non-evaluative review' },
+          { id: `opt_eng_${cls}_4a`, label: 'A', text: 'An apparent misfortune that eventually produces beneficial results.' },
+          { id: `opt_eng_${cls}_4b`, label: 'B', text: 'A completely unexpected financial expense.' },
+          { id: `opt_eng_${cls}_4c`, label: 'C', text: 'A secretive ceremony conducted in private.' },
+          { id: `opt_eng_${cls}_4d`, label: 'D', text: 'A false praise given by a deceptive friend.' },
         ],
       },
       {
-        id: `q_${subj}${cls}_05`,
-        topicId: `${subj.toUpperCase()} Board Benchmark`,
+        id: `q_eng_${cls}_05`,
+        topicId: 'Poetic Devices & Literature',
         questionType: 'single_choice',
-        questionText: `According to ${boardCode} curriculum guidelines for Class ${cls}, this concept requires:`,
+        questionText: 'Identify the poetic device used in: "The whispering trees danced gracefully in the evening breeze."',
         marks: 2,
         negativeMarkingRatio: 0,
-        difficulty: 'medium',
+        difficulty: 'easy',
         language: 'en',
         options: [
-          { id: `opt_${subj}${cls}_5a`, label: 'A', text: 'Stepwise justification with conceptual clarity' },
-          { id: `opt_${subj}${cls}_5b`, label: 'B', text: 'Single line answer without proof' },
-          { id: `opt_${subj}${cls}_5c`, label: 'C', text: 'Approximation without formulas' },
-          { id: `opt_${subj}${cls}_5d`, label: 'D', text: 'Omission in final assessment' },
+          { id: `opt_eng_${cls}_5a`, label: 'A', text: 'Personification (attributing human qualities to non-human entities)' },
+          { id: `opt_eng_${cls}_5b`, label: 'B', text: 'Simile' },
+          { id: `opt_eng_${cls}_5c`, label: 'C', text: 'Hyperbole' },
+          { id: `opt_eng_${cls}_5d`, label: 'D', text: 'Oxymoron' },
         ],
       }
     )
 
     solutions.push(
       {
-        questionId: `q_${subj}${cls}_01`,
-        correctOptionIds: [`opt_${subj}${cls}_1a`],
-        solutionSteps: [`1. Reviewing ${boardCode} Class ${cls} curriculum guidelines confirms Option A.`],
-        explanation: 'Foundation and critical mastery is prioritized in board benchmarks.',
+        questionId: `q_eng_${cls}_01`,
+        correctOptionIds: [`opt_eng_${cls}_1a`],
+        solutionSteps: ['1. With "neither...nor", the verb agrees with the closer subject ("teachers" is plural, so use "were").'],
+        explanation: 'Rule of proximity for correlative conjunctions.',
         reviewStatus: 'verified',
       },
       {
-        questionId: `q_${subj}${cls}_02`,
-        correctOptionIds: [`opt_${subj}${cls}_2a`],
-        solutionSteps: ['1. Applying standard curriculum benchmarks confirms validation.'],
-        explanation: 'Standard syllabus benchmark satisfied.',
+        questionId: `q_eng_${cls}_02`,
+        correctOptionIds: [`opt_eng_${cls}_2a`],
+        solutionSteps: ['1. Future simple passive: will + be + past participle (published).'],
+        explanation: 'Active will + V1 converts to will + be + V3.',
         reviewStatus: 'verified',
       },
       {
-        questionId: `q_${subj}${cls}_03`,
-        correctOptionIds: [`opt_${subj}${cls}_3a`],
-        solutionSteps: ['1. Direct application follows curriculum requirements.'],
-        explanation: 'Direct application validated.',
+        questionId: `q_eng_${cls}_03`,
+        correctOptionIds: [`opt_eng_${cls}_3a`],
+        solutionSteps: ['1. Yes/no interrogative backshifts: simple past "Did complete" → past perfect "had completed" with conjunction "if".'],
+        explanation: 'Indirect question syntax.',
         reviewStatus: 'verified',
       },
       {
-        questionId: `q_${subj}${cls}_04`,
-        correctOptionIds: [`opt_${subj}${cls}_4a`],
-        solutionSteps: ['1. Foundational mastery ensures retention across academic milestones.'],
-        explanation: 'Mastery of foundational curriculum principles.',
+        questionId: `q_eng_${cls}_04`,
+        correctOptionIds: [`opt_eng_${cls}_4a`],
+        solutionSteps: ['1. "A blessing in disguise" means something that seems bad at first turns out to be good.'],
+        explanation: 'Idiomatic definition.',
         reviewStatus: 'verified',
       },
       {
-        questionId: `q_${subj}${cls}_05`,
-        correctOptionIds: [`opt_${subj}${cls}_5a`],
-        solutionSteps: ['1. Board examination guidelines require stepwise justification.'],
-        explanation: 'Stepwise justification with conceptual clarity.',
+        questionId: `q_eng_${cls}_05`,
+        correctOptionIds: [`opt_eng_${cls}_5a`],
+        solutionSteps: ['1. Trees "whispering" and "dancing" gives human actions to inanimate trees, which is personification.'],
+        explanation: 'Personification gives human traits to nature.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (subj.includes('bio')) {
+    // Biology (Botany & Zoology)
+    questions.push(
+      {
+        id: `q_bio_${cls}_01`,
+        topicId: 'Molecular Genetics & DNA Replication',
+        questionType: 'single_choice',
+        questionText: 'Which enzyme is primarily responsible for unwinding and separating the double-stranded DNA helix at the replication fork?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_bio_${cls}_1a`, label: 'A', text: 'DNA Helicase' },
+          { id: `opt_bio_${cls}_1b`, label: 'B', text: 'DNA Ligase' },
+          { id: `opt_bio_${cls}_1c`, label: 'C', text: 'RNA Polymerase' },
+          { id: `opt_bio_${cls}_1d`, label: 'D', text: 'Topoisomerase' },
+        ],
+      },
+      {
+        id: `q_bio_${cls}_02`,
+        topicId: 'Mendelian Principles of Inheritance',
+        questionType: 'single_choice',
+        questionText: 'In a classical Mendelian dihybrid cross (RrYy × RrYy), what is the expected phenotypic ratio in the F2 generation?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_bio_${cls}_2a`, label: 'A', text: '9 : 3 : 3 : 1' },
+          { id: `opt_bio_${cls}_2b`, label: 'B', text: '3 : 1' },
+          { id: `opt_bio_${cls}_2c`, label: 'C', text: '1 : 2 : 1' },
+          { id: `opt_bio_${cls}_2d`, label: 'D', text: '9 : 7' },
+        ],
+      },
+      {
+        id: `q_bio_${cls}_03`,
+        topicId: 'Plant Physiology & Calvin Cycle',
+        questionType: 'single_choice',
+        questionText: 'In C3 plants, what is the primary CO₂ acceptor enzyme located in the chloroplast stroma?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_bio_${cls}_3a`, label: 'A', text: 'RuBisCO (Ribulose-1,5-bisphosphate carboxylase-oxygenase)' },
+          { id: `opt_bio_${cls}_3b`, label: 'B', text: 'PEP Carboxylase' },
+          { id: `opt_bio_${cls}_3c`, label: 'C', text: 'ATP Synthase' },
+          { id: `opt_bio_${cls}_3d`, label: 'D', text: 'Pyruvate Dehydrogenase' },
+        ],
+      },
+      {
+        id: `q_bio_${cls}_04`,
+        topicId: 'Human Renal Physiology',
+        questionType: 'single_choice',
+        questionText: 'Which hairpin-shaped segment of the human nephron creates a hyperosmotic medullary gradient via countercurrent multiplication?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'hard',
+        language: 'en',
+        options: [
+          { id: `opt_bio_${cls}_4a`, label: 'A', text: 'Loop of Henle' },
+          { id: `opt_bio_${cls}_4b`, label: 'B', text: 'Bowman’s Capsule' },
+          { id: `opt_bio_${cls}_4c`, label: 'C', text: 'Proximal Convoluted Tubule (PCT)' },
+          { id: `opt_bio_${cls}_4d`, label: 'D', text: 'Distal Convoluted Tubule (DCT)' },
+        ],
+      },
+      {
+        id: `q_bio_${cls}_05`,
+        topicId: 'Ecosystem & Energy Dynamics',
+        questionType: 'single_choice',
+        questionText: 'According to Lindeman’s ecological efficiency rule, approximately what percentage of energy is transferred to the next consecutive trophic level?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_bio_${cls}_5a`, label: 'A', text: '10%' },
+          { id: `opt_bio_${cls}_5b`, label: 'B', text: '50%' },
+          { id: `opt_bio_${cls}_5c`, label: 'C', text: '100%' },
+          { id: `opt_bio_${cls}_5d`, label: 'D', text: '1%' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_bio_${cls}_01`,
+        correctOptionIds: [`opt_bio_${cls}_1a`],
+        solutionSteps: ['1. Helicase breaks hydrogen bonds between nucleotide bases to separate strands.'],
+        explanation: 'DNA Helicase unwinds the double helix at the replication fork.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_bio_${cls}_02`,
+        correctOptionIds: [`opt_bio_${cls}_2a`],
+        solutionSteps: ['1. Dihybrid independent assortment yields (3:1) × (3:1) = 9:3:3:1.'],
+        explanation: 'Classical Mendelian dihybrid phenotypic ratio.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_bio_${cls}_03`,
+        correctOptionIds: [`opt_bio_${cls}_3a`],
+        solutionSteps: ['1. RuBisCO fixes CO₂ to 5-carbon RuBP, forming 3-PGA.'],
+        explanation: 'RuBisCO is the most abundant enzyme on Earth.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_bio_${cls}_04`,
+        correctOptionIds: [`opt_bio_${cls}_4a`],
+        solutionSteps: ['1. Loop of Henle descends into renal medulla creating osmotic multiplier gradient.'],
+        explanation: 'Loop of Henle operates countercurrent multiplier system.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_bio_${cls}_05`,
+        correctOptionIds: [`opt_bio_${cls}_5a`],
+        solutionSteps: ['1. Lindeman’s 10% law dictates only ~10% chemical energy is stored at successive trophic levels.'],
+        explanation: 'Lindeman 10% trophic efficiency rule.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (subj.includes('comp') || subj.includes('info') || subj === 'it' || subj === 'cs') {
+    // Computer Science & Information Technology
+    questions.push(
+      {
+        id: `q_cs_${cls}_01`,
+        topicId: 'Python Core Data Types',
+        questionType: 'single_choice',
+        questionText: 'In Python 3, which of the following standard data types is immutable (cannot be altered in place after instantiation)?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_cs_${cls}_1a`, label: 'A', text: 'Tuple' },
+          { id: `opt_cs_${cls}_1b`, label: 'B', text: 'List' },
+          { id: `opt_cs_${cls}_1c`, label: 'C', text: 'Dictionary' },
+          { id: `opt_cs_${cls}_1d`, label: 'D', text: 'Set' },
+        ],
+      },
+      {
+        id: `q_cs_${cls}_02`,
+        topicId: 'List Comprehension & Loops',
+        questionType: 'single_choice',
+        questionText: 'What is the evaluated output of the Python expression: [x**2 for x in range(5) if x % 2 == 1]?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_cs_${cls}_2a`, label: 'A', text: '[1, 9]' },
+          { id: `opt_cs_${cls}_2b`, label: 'B', text: '[0, 4, 16]' },
+          { id: `opt_cs_${cls}_2c`, label: 'C', text: '[1, 3, 5]' },
+          { id: `opt_cs_${cls}_2d`, label: 'D', text: '[1, 4, 9, 16]' },
+        ],
+      },
+      {
+        id: `q_cs_${cls}_03`,
+        topicId: 'Relational Database Management (SQL)',
+        questionType: 'single_choice',
+        questionText: 'Which SQL keyword is specifically utilized to filter out duplicate rows and return unique values from a table query?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_cs_${cls}_3a`, label: 'A', text: 'SELECT DISTINCT' },
+          { id: `opt_cs_${cls}_3b`, label: 'B', text: 'SELECT UNIQUE' },
+          { id: `opt_cs_${cls}_3c`, label: 'C', text: 'SELECT ISOLATE' },
+          { id: `opt_cs_${cls}_3d`, label: 'D', text: 'SELECT NO_REPEAT' },
+        ],
+      },
+      {
+        id: `q_cs_${cls}_04`,
+        topicId: 'Abstract Data Types (Stack)',
+        questionType: 'single_choice',
+        questionText: 'Which data structure follows the strict Last-In, First-Out (LIFO) operational discipline with push() and pop()?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_cs_${cls}_4a`, label: 'A', text: 'Stack' },
+          { id: `opt_cs_${cls}_4b`, label: 'B', text: 'Queue' },
+          { id: `opt_cs_${cls}_4c`, label: 'C', text: 'Singly Linked List' },
+          { id: `opt_cs_${cls}_4d`, label: 'D', text: 'Binary Search Tree' },
+        ],
+      },
+      {
+        id: `q_cs_${cls}_05`,
+        topicId: 'Computer Networks & Protocols',
+        questionType: 'single_choice',
+        questionText: 'Which transport layer protocol provides connection-oriented, guaranteed, byte-stream transmission with a 3-way handshake?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_cs_${cls}_5a`, label: 'A', text: 'TCP (Transmission Control Protocol)' },
+          { id: `opt_cs_${cls}_5b`, label: 'B', text: 'UDP (User Datagram Protocol)' },
+          { id: `opt_cs_${cls}_5c`, label: 'C', text: 'IP (Internet Protocol)' },
+          { id: `opt_cs_${cls}_5d`, label: 'D', text: 'ICMP (Internet Control Message Protocol)' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_cs_${cls}_01`,
+        correctOptionIds: [`opt_cs_${cls}_1a`],
+        solutionSteps: ['1. Tuples, strings, and integers are immutable in Python.'],
+        explanation: 'Tuples cannot have their elements modified after creation.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_cs_${cls}_02`,
+        correctOptionIds: [`opt_cs_${cls}_2a`],
+        solutionSteps: ['1. range(5) = 0, 1, 2, 3, 4. Odd values are 1 and 3. Squares: 1² = 1, 3² = 9.'],
+        explanation: 'Evaluating comprehension gives [1, 9].',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_cs_${cls}_03`,
+        correctOptionIds: [`opt_cs_${cls}_3a`],
+        solutionSteps: ['1. SELECT DISTINCT column_name eliminates duplicate tuples from query results.'],
+        explanation: 'SQL standard syntax uses DISTINCT.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_cs_${cls}_04`,
+        correctOptionIds: [`opt_cs_${cls}_4a`],
+        solutionSteps: ['1. Stack operates on LIFO (Last In First Out). Queue operates on FIFO.'],
+        explanation: 'A stack enforces LIFO order.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_cs_${cls}_05`,
+        correctOptionIds: [`opt_cs_${cls}_5a`],
+        solutionSteps: ['1. TCP performs SYN, SYN-ACK, ACK 3-way handshake for reliable delivery.'],
+        explanation: 'TCP is connection-oriented and reliable.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else if (subj.includes('eco')) {
+    // Economics (Macroeconomics, Microeconomics & Indian Economy)
+    questions.push(
+      {
+        id: `q_eco_${cls}_01`,
+        topicId: 'National Income Accounting',
+        questionType: 'single_choice',
+        questionText: 'What is the correct mathematical relationship between GDP at Market Price (GDP_MP) and GDP at Factor Cost (GDP_FC)?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_eco_${cls}_1a`, label: 'A', text: 'GDP_FC = GDP_MP - Net Indirect Taxes (NIT)' },
+          { id: `opt_eco_${cls}_1b`, label: 'B', text: 'GDP_FC = GDP_MP + Net Indirect Taxes (NIT)' },
+          { id: `opt_eco_${cls}_1c`, label: 'C', text: 'GDP_FC = GDP_MP - Depreciation' },
+          { id: `opt_eco_${cls}_1d`, label: 'D', text: 'GDP_FC = GDP_MP + Net Factor Income from Abroad (NFIA)' },
+        ],
+      },
+      {
+        id: `q_eco_${cls}_02`,
+        topicId: 'Monetary Policy & Central Banking',
+        questionType: 'single_choice',
+        questionText: 'When the Reserve Bank of India (RBI) aims to rein in high inflation, what monetary measure does it implement regarding the Repo Rate?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_eco_${cls}_2a`, label: 'A', text: 'Increases the Repo Rate' },
+          { id: `opt_eco_${cls}_2b`, label: 'B', text: 'Decreases the Repo Rate' },
+          { id: `opt_eco_${cls}_2c`, label: 'C', text: 'Reduces the Cash Reserve Ratio (CRR)' },
+          { id: `opt_eco_${cls}_2d`, label: 'D', text: 'Purchases securities via Open Market Operations' },
+        ],
+      },
+      {
+        id: `q_eco_${cls}_03`,
+        topicId: 'Consumer Utility & Microeconomics',
+        questionType: 'single_choice',
+        questionText: 'Which economic law states that as consumption of a good expands, the additional satisfaction from each subsequent unit declines?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_eco_${cls}_3a`, label: 'A', text: 'Law of Diminishing Marginal Utility' },
+          { id: `opt_eco_${cls}_3b`, label: 'B', text: 'Law of Variable Proportions' },
+          { id: `opt_eco_${cls}_3c`, label: 'C', text: 'Law of Increasing Returns' },
+          { id: `opt_eco_${cls}_3d`, label: 'D', text: 'Engel’s Expenditure Law' },
+        ],
+      },
+      {
+        id: `q_eco_${cls}_04`,
+        topicId: 'Government Budget & Fiscal Deficit',
+        questionType: 'single_choice',
+        questionText: 'Fiscal Deficit in a union government budget represents:',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_eco_${cls}_4a`, label: 'A', text: 'Total Expenditure - Total Receipts (excluding borrowings)' },
+          { id: `opt_eco_${cls}_4b`, label: 'B', text: 'Revenue Expenditure - Revenue Receipts' },
+          { id: `opt_eco_${cls}_4c`, label: 'C', text: 'Fiscal Deficit - Interest Payments' },
+          { id: `opt_eco_${cls}_4d`, label: 'D', text: 'Capital Expenditure - Capital Receipts' },
+        ],
+      },
+      {
+        id: `q_eco_${cls}_05`,
+        topicId: 'Indian Economic Development (1991)',
+        questionType: 'single_choice',
+        questionText: 'The New Economic Policy (NEP) launched in India in July 1991 was anchored on which core triad of reforms?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_eco_${cls}_5a`, label: 'A', text: 'Liberalisation, Privatisation, and Globalisation (LPG)' },
+          { id: `opt_eco_${cls}_5b`, label: 'B', text: 'License Raj, Import Substitution, and Nationalisation' },
+          { id: `opt_eco_${cls}_5c`, label: 'C', text: 'Five-Year Plans, Monopoly Controls, and Price Ceilings' },
+          { id: `opt_eco_${cls}_5d`, label: 'D', text: 'Agricultural Subsidies, Export Bans, and Public Monopolies' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_eco_${cls}_01`,
+        correctOptionIds: [`opt_eco_${cls}_1a`],
+        solutionSteps: ['1. Net Indirect Taxes = Indirect Taxes - Subsidies. Factor Cost = Market Price - NIT.'],
+        explanation: 'GDP_FC = GDP_MP - NIT.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_eco_${cls}_02`,
+        correctOptionIds: [`opt_eco_${cls}_2a`],
+        solutionSteps: ['1. Raising repo rate increases interest rates, curbing commercial credit creation and cooling inflation.'],
+        explanation: 'Contractionary monetary policy hikes repo rate.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_eco_${cls}_03`,
+        correctOptionIds: [`opt_eco_${cls}_3a`],
+        solutionSteps: ['1. Gossen’s First Law: Marginal utility diminishes with every successive unit consumed.'],
+        explanation: 'Law of Diminishing Marginal Utility.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_eco_${cls}_04`,
+        correctOptionIds: [`opt_eco_${cls}_4a`],
+        solutionSteps: ['1. Fiscal deficit indicates total net borrowing requirements of the government.'],
+        explanation: 'Total expenditure minus non-debt receipts equals fiscal deficit.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_eco_${cls}_05`,
+        correctOptionIds: [`opt_eco_${cls}_5a`],
+        solutionSteps: ['1. Dr. Manmohan Singh and P.V. Narasimha Rao spearheaded 1991 LPG reforms.'],
+        explanation: '1991 LPG reforms dismantled industrial licensing.',
+        reviewStatus: 'verified',
+      }
+    )
+  } else {
+    // Social Science / History / Geography / Civics
+    questions.push(
+      {
+        id: `q_sst_${cls}_01`,
+        topicId: 'Indian Constitution & Fundamental Rights',
+        questionType: 'single_choice',
+        questionText: 'Which Article of the Constitution of India guarantees the Right to Equality before the law?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_sst_${cls}_1a`, label: 'A', text: 'Article 14' },
+          { id: `opt_sst_${cls}_1b`, label: 'B', text: 'Article 19' },
+          { id: `opt_sst_${cls}_1c`, label: 'C', text: 'Article 21' },
+          { id: `opt_sst_${cls}_1d`, label: 'D', text: 'Article 32' },
+        ],
+      },
+      {
+        id: `q_sst_${cls}_02`,
+        topicId: 'Sectors of Indian Economy',
+        questionType: 'single_choice',
+        questionText: 'In which economic sector do agriculture, forestry, fishing, and dairy farming fall?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_sst_${cls}_2a`, label: 'A', text: 'Primary Sector' },
+          { id: `opt_sst_${cls}_2b`, label: 'B', text: 'Secondary Sector' },
+          { id: `opt_sst_${cls}_2c`, label: 'C', text: 'Tertiary (Service) Sector' },
+          { id: `opt_sst_${cls}_2d`, label: 'D', text: 'Quaternary Sector' },
+        ],
+      },
+      {
+        id: `q_sst_${cls}_03`,
+        topicId: 'Physical Geography & Resources',
+        questionType: 'single_choice',
+        questionText: 'Which soil type, formed from volcanic basalt lava, is best suited for cotton cultivation in the Deccan Plateau?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_sst_${cls}_3a`, label: 'A', text: 'Black Soil (Regur Soil)' },
+          { id: `opt_sst_${cls}_3b`, label: 'B', text: 'Alluvial Soil' },
+          { id: `opt_sst_${cls}_3c`, label: 'C', text: 'Laterite Soil' },
+          { id: `opt_sst_${cls}_3d`, label: 'D', text: 'Red and Yellow Soil' },
+        ],
+      },
+      {
+        id: `q_sst_${cls}_04`,
+        topicId: 'Democratic Politics & Federalism',
+        questionType: 'single_choice',
+        questionText: 'What is the minimum voting age for a citizen of India in Lok Sabha and Vidhan Sabha elections?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'easy',
+        language: 'en',
+        options: [
+          { id: `opt_sst_${cls}_4a`, label: 'A', text: '18 Years (Universal Adult Suffrage)' },
+          { id: `opt_sst_${cls}_4b`, label: 'B', text: '21 Years' },
+          { id: `opt_sst_${cls}_4c`, label: 'C', text: '25 Years' },
+          { id: `opt_sst_${cls}_4d`, label: 'D', text: '16 Years' },
+        ],
+      },
+      {
+        id: `q_sst_${cls}_05`,
+        topicId: 'Modern Indian History',
+        questionType: 'single_choice',
+        questionText: 'In which year and from where did Mahatma Gandhi launch the historic Dandi Salt March?',
+        marks: 2,
+        negativeMarkingRatio: 0,
+        difficulty: 'medium',
+        language: 'en',
+        options: [
+          { id: `opt_sst_${cls}_5a`, label: 'A', text: '1930 from Sabarmati Ashram' },
+          { id: `opt_sst_${cls}_5b`, label: 'B', text: '1920 from Champaran' },
+          { id: `opt_sst_${cls}_5c`, label: 'C', text: '1942 from Wardha' },
+          { id: `opt_sst_${cls}_5d`, label: 'D', text: '1919 from Amritsar' },
+        ],
+      }
+    )
+
+    solutions.push(
+      {
+        questionId: `q_sst_${cls}_01`,
+        correctOptionIds: [`opt_sst_${cls}_1a`],
+        solutionSteps: ['1. Article 14 establishes equality before law and equal protection of laws.'],
+        explanation: 'Article 14 guarantees Right to Equality.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_sst_${cls}_02`,
+        correctOptionIds: [`opt_sst_${cls}_2a`],
+        solutionSteps: ['1. Activities directly exploiting natural resources (soil, water, forests) form the Primary Sector.'],
+        explanation: 'Agriculture is the backbone of the primary sector.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_sst_${cls}_03`,
+        correctOptionIds: [`opt_sst_${cls}_3a`],
+        solutionSteps: ['1. Black soil (also known as Regur soil) has high clay content and moisture retention, ideal for cotton.'],
+        explanation: 'Black soil is also called black cotton soil.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_sst_${cls}_04`,
+        correctOptionIds: [`opt_sst_${cls}_4a`],
+        solutionSteps: ['1. 61st Constitutional Amendment Act lowered the voting age from 21 to 18 years.'],
+        explanation: 'Article 326 guarantees voting at age 18.',
+        reviewStatus: 'verified',
+      },
+      {
+        questionId: `q_sst_${cls}_05`,
+        correctOptionIds: [`opt_sst_${cls}_5a`],
+        solutionSteps: ['1. Dandi March began on 12 March 1930 from Sabarmati Ashram, reaching Dandi on 6 April 1930.'],
+        explanation: 'Salt Satyagraha began in 1930 from Sabarmati.',
         reviewStatus: 'verified',
       }
     )
