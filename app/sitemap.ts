@@ -40,8 +40,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // ── Core public pages ────────────────────────────────────────────
     {
       url: BASE,
-      changeFrequency: 'weekly',
+      changeFrequency: 'daily',
       priority: 1.0,
+    },
+    {
+      url: `${BASE}/assessment`,
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+    {
+      url: `${BASE}/skills`,
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE}/academic`,
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE}/plans`,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/faq`,
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
     {
       url: `${BASE}/about`,
