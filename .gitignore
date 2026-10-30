@@ -22,6 +22,9 @@ dist
 # misc
 .DS_Store
 *.pem
+*service*account*.json
+talentxcel-seo*.json
+*.key.json
 
 # debug
 npm-debug.log*

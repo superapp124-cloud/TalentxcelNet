@@ -1,12 +1,11 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { LearnerWorkspace } from '@/components/academy/learner-workspace'
-import { EcosystemDiscoveryBanner } from '@/components/ecosystem/ecosystem-discovery-banner'
+import { UnifiedLearnerDashboard } from '@/components/dashboard/unified-learner-dashboard'
 
 export const metadata: Metadata = {
-  title: 'Learner Workspace — TalentXcel Academy',
-  description: 'Your personalized AI-first learning and skills workspace.',
+  title: 'Learner Workspace — TalentXcel',
+  description: 'Your personalized universal learning, assessment, and skills workspace.',
   robots: { index: false },
 }
 
@@ -19,7 +18,9 @@ export default async function DashboardPage() {
   const { headers, cookies } = await import('next/headers')
   const headerList = await headers()
   const cookieStore = await cookies()
-  const isE2EAudit = headerList.get('x-e2e-audit') === '1' || cookieStore.get('e2e_audit')?.value === '1'
+  const isE2EAudit =
+    headerList.get('x-e2e-audit') === '1' ||
+    cookieStore.get('e2e_audit')?.value === '1'
 
   if (!user && !isE2EAudit) {
     redirect('/auth/login')
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
 
   const effectiveUser = user || {
     id: 'demo-learner-001',
-    email: 'demo.learner@talentxcel.net',
+    email: 'talentxcelservices@gmail.com',
   }
 
   let profile = null
@@ -55,20 +56,36 @@ export default async function DashboardPage() {
     enrolments = enr
   }
 
-  const displayName = profile?.display_name || profile?.full_name || effectiveUser.email
+  const email = user?.email || effectiveUser.email
+  const rawName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    profile?.display_name ||
+    profile?.full_name
+  const displayName = rawName || email?.split('@')[0] || 'Learner'
+  const avatarUrl =
+    user?.user_metadata?.avatar_url ||
+    user?.user_metadata?.picture ||
+    profile?.avatar_url ||
+    null
+
+  const isGoogleUser = Boolean(
+    user?.app_metadata?.provider === 'google' ||
+      user?.identities?.some((id) => id.provider === 'google')
+  )
 
   return (
-    <div className="min-h-screen bg-muted/10 py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-        <EcosystemDiscoveryBanner variant="card" currentContext="learner_dashboard" />
-        <LearnerWorkspace
+    <div className="min-h-screen bg-slate-50/50 dark:bg-neutral-950 py-6 sm:py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <UnifiedLearnerDashboard
           user={{
             id: effectiveUser.id,
-            email: effectiveUser.email,
+            email,
             displayName,
+            avatarUrl,
+            isGoogleUser,
           }}
           enrolments={enrolments || []}
-          isInitialEmpty={!enrolments || enrolments.length === 0}
         />
       </div>
     </div>
