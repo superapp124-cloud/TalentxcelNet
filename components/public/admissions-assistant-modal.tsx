@@ -15,6 +15,12 @@ export function AdmissionsAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+
+  React.useEffect(() => {
+    const handleOpen = () => setIsOpen(true)
+    window.addEventListener('open-talentxcel-ai', handleOpen)
+    return () => window.removeEventListener('open-talentxcel-ai', handleOpen)
+  }, [])
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -79,10 +85,10 @@ export function AdmissionsAssistantWidget() {
 
   return (
     <>
-      {/* Floating Chatbot Trigger */}
+      {/* Floating Chatbot Trigger - Shown on desktop/tablet; on mobile it is integrated into the bottom app navigation bar */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] right-3 sm:bottom-6 sm:right-6 z-30 flex items-center gap-2 rounded-full border border-blue-400/40 bg-[#245BFF] hover:bg-[#1D4ED8] px-3.5 py-2 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        className="hidden md:flex fixed bottom-6 right-6 z-30 items-center gap-2 rounded-full border border-blue-400/40 bg-[#245BFF] hover:bg-[#1D4ED8] px-4 py-2.5 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         aria-label="Open TalentXcel AI Chatbot"
       >
         <Sparkles className="h-4 w-4 text-cyan-200 animate-pulse" />

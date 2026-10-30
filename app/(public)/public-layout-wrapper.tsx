@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { PublicNavbar } from '@/components/public/navbar'
 import { PublicFooter } from '@/components/public/footer'
 import { AdmissionsAssistantWidget } from '@/components/public/admissions-assistant-modal'
+import { MobileBottomNav } from '@/components/navigation/mobile-bottom-nav'
 
 export function PublicLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -20,9 +21,10 @@ export function PublicLayoutWrapper({ children }: { children: React.ReactNode })
   if (isPlatformRoute) {
     return (
       <div className="flex min-h-screen flex-col overflow-x-hidden w-full max-w-full bg-[#F8FAFC]">
-        <main className="flex-1" id="main-content">
+        <main className="flex-1 pb-16 md:pb-0" id="main-content">
           {children}
         </main>
+        <MobileBottomNav />
         <AdmissionsAssistantWidget />
       </div>
     )
@@ -33,9 +35,10 @@ export function PublicLayoutWrapper({ children }: { children: React.ReactNode })
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden w-full max-w-full">
       <PublicNavbar />
-      <main className="flex-1" id="main-content">
+      <main className="flex-1 pb-16 md:pb-0" id="main-content">
         {children}
       </main>
+      <MobileBottomNav />
       <AdmissionsAssistantWidget />
       <PublicFooter />
     </div>

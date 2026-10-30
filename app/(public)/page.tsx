@@ -26,6 +26,8 @@ import {
   Zap,
   BarChart3,
   Bot,
+  Flame,
+  Play,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -107,18 +109,170 @@ export default function HomePage() {
         {/* 1. HERO SECTION (RESPONSIVE FOR ALL SCREEN SIZES) */}
         {/* ========================================================================= */}
         <section className="bg-white border-b border-slate-200/80 pt-4 sm:pt-8 pb-5 sm:pb-8 px-3.5 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
-              {/* Left Column: Focused Headline & Actions */}
-              <div className="lg:col-span-7 space-y-3 sm:space-y-4">
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] sm:text-xs font-bold tracking-wide">
-                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
-                  <span>Universal Learning &amp; Assessment Platform</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 hidden sm:inline-block" />
-                  <span className="hidden sm:inline-block">Classes 4–12</span>
+          <div className="max-w-7xl mx-auto space-y-4">
+            {/* ========================================================================= */}
+            {/* 1A. MOBILE APP-NATIVE VIEW (ACTIVATED ON MOBILE SCREENS < 1024px) */}
+            {/* ========================================================================= */}
+            <div className="lg:hidden space-y-3.5">
+              {/* App Status Bar: Cognitive Gym, Streak & Points */}
+              <div className="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200/90 rounded-2xl p-2.5 shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/brand/talentxcel-icon.png"
+                    alt="talentXcel"
+                    className="w-7 h-7 rounded-full object-contain bg-white border border-slate-200 shadow-2xs"
+                  />
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-extrabold text-slate-900 text-xs">Cognitive Gym</span>
+                      <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.2 rounded-md">
+                        {selectedClassGrade}
+                      </span>
+                    </div>
+                    <p className="text-[9.5px] text-slate-400 font-medium">CBSE • ICSE • IB Standards</p>
+                  </div>
                 </div>
 
-                <h1 className="text-xl sm:text-3xl lg:text-4xl xl:text-[42px] font-black text-slate-900 tracking-tight leading-snug sm:leading-[1.15]">
+                <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg text-amber-800 font-extrabold text-[10px] shadow-2xs">
+                    <Flame className="w-3 h-3 text-amber-500 fill-amber-500 animate-bounce" />
+                    <span>3-Day Streak</span>
+                  </div>
+                  <div className="flex items-center gap-0.5 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg text-emerald-800 font-bold text-[10px]">
+                    <span>★ 40 Pts</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Horizontal Grade Switcher (Snap-Scroll Pills) */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] px-1 font-bold text-slate-500">
+                  <span className="uppercase tracking-wider text-[10px]">Select Class:</span>
+                  <div className="flex items-center gap-1">
+                    {['CBSE', 'CISCE', 'IB'].map((board) => (
+                      <button
+                        key={board}
+                        onClick={() => setSelectedBoardCode(board)}
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                          selectedBoardCode === board
+                            ? 'bg-[#245BFF] text-white shadow-2xs'
+                            : 'bg-white border border-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {board}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {[
+                    'Class 4',
+                    'Class 5',
+                    'Class 6',
+                    'Class 7',
+                    'Class 8',
+                    'Class 9',
+                    'Class 10',
+                    'Class 11',
+                    'Class 12',
+                  ].map((grade) => {
+                    const isSelected = selectedClassGrade === grade
+                    return (
+                      <button
+                        key={grade}
+                        onClick={() => setSelectedClassGrade(grade)}
+                        className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+                          isSelected
+                            ? 'bg-[#245BFF] text-white shadow-md scale-102'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:border-blue-300'
+                        }`}
+                      >
+                        {grade}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* App Hero: Daily Brain Workout Card */}
+              <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 rounded-3xl p-4 text-white shadow-md relative overflow-hidden space-y-3">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold backdrop-blur-xs">
+                    <Zap className="w-3 h-3 text-amber-300 fill-amber-300" />
+                    <span>Daily 10-Minute Brain Workout</span>
+                  </div>
+                  <h2 className="text-lg font-black tracking-tight leading-snug">
+                    {selectedClassGrade} Diagnostic &amp; Skill Gap Test
+                  </h2>
+                  <p className="text-[11px] text-blue-100 leading-relaxed">
+                    5 verified syllabus questions • Instant scoring &amp; step-by-step derivations
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => handleLaunchFreeDiagnostic()}
+                  className="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs h-10 rounded-xl shadow-[0_3px_0_0_#d97706] active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2"
+                >
+                  <Play className="w-3.5 h-3.5 fill-slate-950" />
+                  <span>Start Free Test (5 Qs)</span>
+                </Button>
+
+                {/* Instant Subject Launchers */}
+                <div className="pt-2 border-t border-white/15">
+                  <div className="text-[10px] text-blue-100 font-bold mb-1.5 uppercase tracking-wider">
+                    Or Tap a Subject to Practice:
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { code: 'math', label: 'Math', icon: '🧮' },
+                      { code: 'science', label: 'Science', icon: '🔬' },
+                      { code: 'english', label: 'English', icon: '📖' },
+                      { code: 'hindi', label: 'Hindi', icon: '🇮🇳' },
+                      { code: 'sst', label: 'Social', icon: '🌍' },
+                      { code: 'reasoning', label: 'Reasoning', icon: '🧩' },
+                    ].map((s) => (
+                      <button
+                        key={s.code}
+                        onClick={() => {
+                          setSelectedSubjectCode(s.code)
+                          handleLaunchFreeDiagnostic(s.code)
+                        }}
+                        className="flex items-center justify-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg py-1.5 px-2 text-[11px] font-bold active:scale-95 transition-all"
+                      >
+                        <span>{s.icon}</span>
+                        <span>{s.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Artwork Card */}
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm w-full bg-slate-50 aspect-[1210/420]">
+                <img
+                  src="/images/landing-hero-students.jpg"
+                  alt="Students learning and succeeding with TalentXcel Academy"
+                  className="w-full h-full object-cover object-center"
+                  loading="eager"
+                />
+              </div>
+            </div>
+
+            {/* ========================================================================= */}
+            {/* 1B. DESKTOP HERO VIEW (DISPLAYED ON SCREENS >= 1024px) */}
+            {/* ========================================================================= */}
+            <div className="hidden lg:grid grid-cols-12 gap-8 items-center">
+              {/* Left Column: Focused Headline & Actions */}
+              <div className="lg:col-span-7 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wide">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>Universal Learning &amp; Assessment Platform</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 inline-block" />
+                  <span>Classes 4–12</span>
+                </div>
+
+                <h1 className="text-3xl lg:text-4xl xl:text-[42px] font-black text-slate-900 tracking-tight leading-[1.15]">
                   Universal Learning,
                   <br />
                   Assessment &amp;{' '}
@@ -129,24 +283,24 @@ export default function HomePage() {
                   for Every Learner.
                 </h1>
 
-                <p className="text-xs sm:text-sm text-slate-600 max-w-xl leading-relaxed font-normal">
+                <p className="text-sm text-slate-600 max-w-xl leading-relaxed font-normal">
                   Rigorous curriculum assessments, hands-on skill projects, and verified academic lessons for school students and competitive entrance aspirants.
                 </p>
 
                 {/* Primary & Secondary Action Buttons */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-0.5 sm:pt-1">
+                <div className="flex items-center gap-3 pt-1">
                   <Button
                     onClick={() => handleLaunchFreeDiagnostic()}
-                    className="w-full sm:w-auto bg-[#245BFF] hover:bg-[#1D4ED8] text-white font-bold text-xs sm:text-sm h-10 sm:h-11 px-5 sm:px-7 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
+                    className="bg-[#245BFF] hover:bg-[#1D4ED8] text-white font-bold text-sm h-11 px-7 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
                   >
                     <span>Start Free Practice</span>
-                    <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <ArrowRight className="w-4 h-4" />
                   </Button>
 
-                  <Link href="/plans" className="text-center sm:text-left">
+                  <Link href="/plans">
                     <Button
                       variant="outline"
-                      className="w-full sm:w-auto text-xs font-bold text-slate-700 bg-white border-slate-300 hover:bg-slate-50 h-10 sm:h-11 px-4 sm:px-5 rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
+                      className="text-xs font-bold text-slate-700 bg-white border-slate-300 hover:bg-slate-50 h-11 px-5 rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
                     >
                       <span>View Pricing &amp; Plans</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -154,40 +308,40 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                {/* 4 Trust Points Row: 2x2 Grid on Mobile */}
-                <div className="pt-1.5 sm:pt-2 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-x-3 gap-y-2 text-[11px] text-slate-700 font-medium">
+                {/* 4 Trust Points Row */}
+                <div className="pt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-slate-700 font-medium">
                   <div className="flex items-center gap-1.5">
                     <span className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                     </span>
-                    <span className="font-semibold text-slate-800 text-[10.5px] sm:text-xs">5 Free Qs / Subject</span>
+                    <span className="font-semibold text-slate-800">5 Free Questions Per Subject</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <span className="w-4 h-4 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
                       <ShieldCheck className="w-3 h-3 text-purple-600" />
                     </span>
-                    <span className="font-semibold text-slate-800 text-[10.5px] sm:text-xs">No Login Required</span>
+                    <span className="font-semibold text-slate-800">No Registration Required</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <span className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
                       <Zap className="w-3 h-3 text-amber-600" />
                     </span>
-                    <span className="font-semibold text-slate-800 text-[10.5px] sm:text-xs">Instant Step Hints</span>
+                    <span className="font-semibold text-slate-800">Instant Scoring &amp; Solutions</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <span className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                       <BarChart3 className="w-3 h-3 text-blue-600" />
                     </span>
-                    <span className="font-semibold text-slate-800 text-[10.5px] sm:text-xs">Server Analytics</span>
+                    <span className="font-semibold text-slate-800">Server-graded Analytics</span>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Hero Visual from Mockup (Scaled to true 2.88 aspect ratio so it never cuts off) */}
-              <div className="lg:col-span-5 relative mt-1 lg:mt-0">
+              {/* Right Column: Hero Visual from Mockup */}
+              <div className="lg:col-span-5 relative">
                 <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 shadow-md w-full bg-slate-50 aspect-[1210/420]">
                   <img
                     src="/images/landing-hero-students.jpg"
