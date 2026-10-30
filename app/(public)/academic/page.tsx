@@ -281,6 +281,32 @@ function AcademicBrowserContent() {
         {/* ========================================================================= */}
         {activeTab === 'curriculum' && (
           <section className="space-y-6">
+            {/* Next-Gen Interactive Physics Showcase Banner */}
+            <div className="rounded-3xl border border-blue-200 dark:border-neutral-800 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-7 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="space-y-2 max-w-xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="bg-[#0080FF] text-white font-bold text-xs uppercase tracking-wider">
+                    Next-Gen Learning Showcase
+                  </Badge>
+                  <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold">
+                    60FPS Ray-Tracing Physics
+                  </Badge>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black">
+                  Class 10 Physics: Light &amp; Ray-Tracing Lab
+                </h3>
+                <p className="text-xs text-blue-200 leading-relaxed">
+                  Experience the industry&apos;s most advanced academic learning engine: drag real candles on a 60FPS optical bench, solve the laser vault heist, master Cartesian signs intuitively, and learn with Socratic AI guidance.
+                </p>
+              </div>
+              <Link href="/academic/optics-lab" className="shrink-0 w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-[#0080FF] hover:bg-blue-600 text-white font-extrabold text-xs h-11 px-6 rounded-2xl shadow-md gap-2">
+                  <Sparkles className="w-4 h-4 text-cyan-300" />
+                  <span>Launch Interactive Optics Lab →</span>
+                </Button>
+              </Link>
+            </div>
+
             {/* Filter Bar: Board, Class, Subject & Search */}
             <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -470,7 +496,16 @@ function AcademicBrowserContent() {
                       </div>
 
                       {/* Actions */}
-                      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100">
+                      <div className="space-y-2 pt-3 border-t border-slate-100">
+                        {chap.title.toLowerCase().includes('light') && (
+                          <Link href="/academic/optics-lab" className="block w-full">
+                            <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs h-9 rounded-xl shadow-xs gap-1.5 cursor-pointer">
+                              <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
+                              <span>Launch 60FPS Interactive Optics Lab →</span>
+                            </Button>
+                          </Link>
+                        )}
+                        <div className="grid grid-cols-2 gap-2">
                         <Button
                           onClick={() => handleOpenLesson(chap.id)}
                           variant="outline"
@@ -488,6 +523,7 @@ function AcademicBrowserContent() {
                         </Button>
                       </div>
                     </div>
+                  </div>
                   ))}
                 </div>
               )}

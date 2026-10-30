@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import {
   BookOpen,
   CheckCircle2,
@@ -79,6 +80,25 @@ export function LessonReaderModal({
             </div>
 
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">{lesson.title}</h2>
+
+            {lesson.title.toLowerCase().includes('light') && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900 to-indigo-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md mt-2">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-300">
+                    <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
+                    <span>60FPS Interactive Physics Lab Active</span>
+                  </div>
+                  <p className="text-xs text-blue-100">
+                    Don&apos;t just read about rays — drag the live candle, trigger virtual rays, and unlock the laser vault.
+                  </p>
+                </div>
+                <Link href="/academic/optics-lab" onClick={onClose} className="shrink-0">
+                  <Button className="bg-[#0080FF] hover:bg-blue-600 text-white font-extrabold text-xs px-4 h-9 rounded-xl shadow-xs">
+                    Launch Optics Lab →
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Concept Breakdown */}
