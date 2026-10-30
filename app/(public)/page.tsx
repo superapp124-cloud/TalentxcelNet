@@ -22,6 +22,10 @@ import {
   HelpCircle,
   Calculator,
   Compass,
+  FileText,
+  Zap,
+  BarChart3,
+  Bot,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -100,13 +104,13 @@ export default function HomePage() {
       {/* Main Content with Safe Bottom Spacing to Prevent Floating Widget Overlap */}
       <main className="flex-1 space-y-8 sm:space-y-12 pb-24 sm:pb-20" id="main-content">
         {/* ========================================================================= */}
-        {/* 1. MOBILE-FIRST HERO SECTION */}
+        {/* 1. HERO SECTION (MATCHING LANDING PAGE MOCKUP) */}
         {/* ========================================================================= */}
-        <section className="bg-white border-b border-slate-200/80 pt-5 sm:pt-7 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8">
+        <section className="bg-white border-b border-slate-200/80 pt-5 sm:pt-8 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-              {/* Left Column: Focused Headline & Single Dominant CTA */}
-              <div className="lg:col-span-7 space-y-3.5 sm:space-y-4">
+              {/* Left Column: Focused Headline & Actions */}
+              <div className="lg:col-span-7 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wide">
                   <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                   <span>Universal Learning &amp; Assessment Platform</span>
@@ -114,115 +118,195 @@ export default function HomePage() {
                   <span className="hidden sm:inline-block">Classes 4–12</span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                  Universal Learning, Assessment &amp;{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
-                    Real Skills for Every Learner.
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-[42px] font-black text-slate-900 tracking-tight leading-[1.15]">
+                  Universal Learning,
+                  <br />
+                  Assessment &amp;{' '}
+                  <span className="text-[#245BFF]">
+                    Real Skills
                   </span>
+                  <br />
+                  for Every Learner.
                 </h1>
 
-                <p className="text-xs sm:text-sm text-slate-600 max-w-xl leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 max-w-xl leading-relaxed font-normal">
                   Rigorous curriculum assessments, hands-on skill projects, and verified academic lessons for school students and competitive entrance aspirants.
                 </p>
 
-                {/* 1 Dominant Blue CTA + Subtle Secondary Action */}
+                {/* Primary & Secondary Action Buttons */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
                   <Button
                     onClick={() => handleLaunchFreeDiagnostic()}
-                    className="w-full sm:w-auto bg-[#245BFF] hover:bg-[#1D4ED8] text-white font-bold text-sm h-11 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
+                    className="w-full sm:w-auto bg-[#245BFF] hover:bg-[#1D4ED8] text-white font-bold text-sm h-11 px-7 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
                   >
                     <span>Start Free Practice</span>
                     <ArrowRight className="w-4 h-4" />
                   </Button>
 
                   <Link href="/plans" className="text-center sm:text-left">
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 transition-colors">
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto text-xs font-bold text-slate-700 bg-white border-slate-300 hover:bg-slate-50 h-11 px-5 rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
+                    >
                       <span>View Pricing &amp; Plans</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Button>
                   </Link>
                 </div>
 
-                {/* Transparent Guarantees */}
-                <div className="text-[11px] text-slate-500 font-medium flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                    5 Free Questions / Subject
-                  </span>
-                  <span className="text-slate-300">•</span>
-                  <span>No Registration Required</span>
-                  <span className="text-slate-300">•</span>
-                  <span>Server-Graded Analytics</span>
+                {/* 4 Trust Points Row from Mockup */}
+                <div className="pt-2 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-slate-600 font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    </span>
+                    <span className="font-semibold text-slate-800">5 Free Questions <span className="hidden sm:inline">Per Subject</span></span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                      <ShieldCheck className="w-3 h-3 text-purple-600" />
+                    </span>
+                    <span className="font-semibold text-slate-800">No Registration <span className="hidden sm:inline">Required</span></span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                      <Zap className="w-3 h-3 text-amber-600" />
+                    </span>
+                    <span className="font-semibold text-slate-800">Instant Scoring <span className="hidden sm:inline">&amp; Solutions</span></span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                      <BarChart3 className="w-3 h-3 text-blue-600" />
+                    </span>
+                    <span className="font-semibold text-slate-800">Server-graded Analytics</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Hero Visual from Mockup */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 shadow-md aspect-[16/10] sm:aspect-[4/3] lg:aspect-[16/11] w-full bg-slate-50 flex items-center justify-center">
+                  <img
+                    src="/images/landing-hero-students.jpg"
+                    alt="Students learning and succeeding with TalentXcel Academy"
+                    className="w-full h-full object-cover object-center"
+                    loading="eager"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Authority / Trust Stats Strip from Mockup */}
+            <div className="mt-8 bg-[#0B1E48] rounded-2xl p-4 sm:p-5 text-white shadow-md border border-blue-900/60">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-2">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">3,000,000+</div>
+                    <div className="text-[11px] text-slate-300 font-medium">Verified Question Bank</div>
+                  </div>
                 </div>
 
-                {/* ===================================================================== */}
-                {/* 2. COMPACT BOARD & CLASS SELECTOR (RESPONSIVE SEGMENTED CONTROLS) */}
-                {/* ===================================================================== */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 max-w-xl shadow-2xs space-y-2.5">
-                  <div className="flex flex-wrap items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        Board:
-                      </span>
-                      <div className="inline-flex p-0.5 bg-white border border-slate-200 rounded-lg gap-0.5" role="tablist">
-                        {['CBSE', 'CISCE', 'IB'].map((board) => (
-                          <button
-                            key={board}
-                            onClick={() => setSelectedBoardCode(board)}
-                            role="tab"
-                            aria-selected={selectedBoardCode === board}
-                            className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
-                              selectedBoardCode === board
-                                ? 'bg-[#245BFF] text-white shadow-2xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                            }`}
-                          >
-                            {board}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+                  <div className="w-10 h-10 rounded-xl bg-purple-600/30 border border-purple-400/30 flex items-center justify-center shrink-0">
+                    <GraduationCap className="w-5 h-5 text-purple-300" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">Classes 4–12 + Entrances</div>
+                    <div className="text-[11px] text-slate-300 font-medium">CBSE • CISCE • IB • JEE • NEET</div>
+                  </div>
+                </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        Grade:
-                      </span>
-                      <select
-                        value={selectedClassGrade}
-                        onChange={(e) => setSelectedClassGrade(e.target.value)}
-                        aria-label="Select class grade"
-                        className="bg-white border border-slate-200 text-slate-900 text-xs font-bold rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
-                      >
-                        {[
-                          'Class 4',
-                          'Class 5',
-                          'Class 6',
-                          'Class 7',
-                          'Class 8',
-                          'Class 9',
-                          'Class 10',
-                          'Class 11',
-                          'Class 12',
-                        ].map((g) => (
-                          <option key={g} value={g}>
-                            {g}
-                          </option>
-                        ))}
-                      </select>
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600/30 border border-emerald-400/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">Instant Explanations</div>
+                    <div className="text-[11px] text-slate-300 font-medium">Socratic Hints &amp; Derivations</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-600/30 border border-amber-400/30 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-base sm:text-lg font-black tracking-tight text-white">10-Min Daily Drills</div>
+                    <div className="text-[11px] text-slate-300 font-medium">Cognitive Skill Gap Audits</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Three Domain Cards from Mockup */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-7">
+              {/* Domain 1: Assessment & Intelligence */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4 group hover:border-blue-300">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
+                      Domain 1
+                    </span>
+                    <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                      5 Free Qs / Subject
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <img
+                      src="/images/landing-domain-assessment.jpg"
+                      alt="Assessment and Intelligence"
+                      className="w-20 h-20 sm:w-22 sm:h-22 rounded-xl object-cover shrink-0 border border-slate-100 shadow-2xs"
+                    />
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                        Assessment &amp; Intelligence
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        School assessments, 6 analytical reasoning dimensions, and entrance mocks with instant server scoring.
+                      </p>
                     </div>
                   </div>
 
-                  {/* Subject Quick Launch Chips */}
-                  <div className="pt-2 border-t border-slate-200/80">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        Instant Subject Diagnostic (5 Qs Free):
-                      </span>
-                      <span className="text-[10px] text-blue-600 font-semibold">Instant Scoring</span>
+                  {/* Grade & Board Quick-Switch & Subject Chips */}
+                  <div className="pt-2 border-t border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <div className="flex items-center gap-1 font-semibold text-slate-500">
+                        <span>Board:</span>
+                        <select
+                          value={selectedBoardCode}
+                          onChange={(e) => setSelectedBoardCode(e.target.value)}
+                          className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-bold text-slate-800"
+                        >
+                          <option value="CBSE">CBSE</option>
+                          <option value="CISCE">CISCE</option>
+                          <option value="IB">IB</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center gap-1 font-semibold text-slate-500">
+                        <span>Grade:</span>
+                        <select
+                          value={selectedClassGrade}
+                          onChange={(e) => setSelectedClassGrade(e.target.value)}
+                          className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-bold text-slate-800"
+                        >
+                          {['Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((g) => (
+                            <option key={g} value={g}>{g}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
+
                     <div className="flex flex-wrap gap-1.5">
                       {[
-                        { code: 'math', label: 'Mathematics' },
+                        { code: 'math', label: 'Math' },
                         { code: 'science', label: 'Science' },
                         { code: 'english', label: 'English' },
                         { code: 'hindi', label: 'Hindi' },
@@ -235,129 +319,17 @@ export default function HomePage() {
                             setSelectedSubjectCode(s.code)
                             handleLaunchFreeDiagnostic(s.code)
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1 ${
-                            selectedSubjectCode === s.code
-                              ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-2xs font-bold'
-                              : 'bg-white border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600'
-                          }`}
+                          className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-blue-50/60 border border-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors"
                         >
-                          <span>{s.label}</span>
-                          <span className="text-[9px] text-blue-500">&rarr;</span>
+                          {s.label}
                         </button>
                       ))}
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Right Column: Hero Classroom Image with Safe Micro-Badges */}
-              <div className="lg:col-span-5 relative">
-                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm aspect-[16/10] sm:aspect-[4/3] max-h-64 sm:max-h-72 w-full bg-slate-100">
-                  <img
-                    src="/images/kids-classroom-hero.jpg"
-                    alt="School children happily learning together in a bright classroom"
-                    className="w-full h-full object-cover"
-                    loading="eager"
-                  />
-                  {/* Floating micro-badges with safe positioning */}
-                  <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-slate-200 shadow-xs flex items-center gap-1.5 text-[11px] font-bold text-slate-900">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Free Practice Diagnostic</span>
-                  </div>
-                  <div className="absolute bottom-2.5 right-2.5 bg-slate-900/90 backdrop-blur-xs px-2.5 py-1 rounded-lg text-white shadow-xs text-[11px] font-semibold">
-                    {selectedBoardCode} • {selectedClassGrade}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ===================================================================== */}
-            {/* 2B. CURRICULUM AUTHORITY & TRUST STATS STRIP */}
-            {/* ===================================================================== */}
-            <div className="mt-8 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-4 sm:p-5 text-white shadow-md border border-blue-800">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-2">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center shrink-0">
-                    <Calculator className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div>
-                    <div className="text-base sm:text-lg font-black tracking-tight text-white">3,000,000+</div>
-                    <div className="text-[11px] text-slate-300 font-medium">Verified Question Bank</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center shrink-0">
-                    <GraduationCap className="w-5 h-5 text-indigo-400" />
-                  </div>
-                  <div>
-                    <div className="text-base sm:text-lg font-black tracking-tight text-white">Classes 4–12 + Entrances</div>
-                    <div className="text-[11px] text-slate-300 font-medium">CBSE • CISCE • IB • JEE • NEET</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <div className="text-base sm:text-lg font-black tracking-tight text-white">Instant Explanations</div>
-                    <div className="text-[11px] text-slate-300 font-medium">Socratic Hints &amp; Derivations</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <div>
-                    <div className="text-base sm:text-lg font-black tracking-tight text-white">10-Min Daily Drills</div>
-                    <div className="text-[11px] text-slate-300 font-medium">Cognitive Skill Gap Audits</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ===================================================================== */}
-            {/* 3. THREE COMPACT LEARNING DOMAIN CARDS (UNIFIED PLATFORM ARCHITECTURE) */}
-            {/* ===================================================================== */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6">
-              {/* Domain 1: Assessment & Intelligence */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-3 group hover:border-blue-400">
-                <div className="space-y-2.5">
-                  <div className="relative rounded-xl overflow-hidden h-28 sm:h-32 w-full bg-slate-100 border border-slate-100">
-                    <img
-                      src="/images/kids-assessment-study.jpg"
-                      alt="Student taking diagnostic assessment"
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                    <Badge className="absolute top-2 right-2 bg-[#245BFF] text-white font-bold text-[10px] px-2 py-0.5 shadow-2xs">
-                      5 Free Qs / Subject
-                    </Badge>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#245BFF] mb-0.5">
-                      <Brain className="w-3.5 h-3.5" />
-                      <span>Domain 1</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Assessment &amp; Intelligence
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      School assessments, 6 analytical reasoning dimensions, and entrance mocks with instant server scoring.
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-50 rounded-lg p-2 border border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
-                    <span className="text-slate-400">Packs from:</span>
-                    <span className="font-bold text-slate-900">₹20 to ₹999</span>
-                  </div>
-                </div>
 
                 <Link href="/assessment" className="w-full">
-                  <Button className="w-full bg-[#245BFF] hover:bg-[#1D4ED8] text-white font-bold text-xs h-9 rounded-xl shadow-2xs flex items-center justify-center gap-1.5 transition-all">
+                  <Button className="w-full bg-[#245BFF] hover:bg-[#1D4ED8] text-white font-bold text-xs h-10 rounded-xl shadow-2xs flex items-center justify-center gap-1.5 transition-all">
                     <span>Explore Assessments</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
@@ -365,41 +337,50 @@ export default function HomePage() {
               </div>
 
               {/* Domain 2: Skill Development */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-3 group hover:border-indigo-400">
-                <div className="space-y-2.5">
-                  <div className="relative rounded-xl overflow-hidden h-28 sm:h-32 w-full bg-slate-100 border border-slate-100">
-                    <img
-                      src="/images/kids-skills-coding.jpg"
-                      alt="Students learning hands-on coding and technology"
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                    <Badge className="absolute top-2 right-2 bg-indigo-600 text-white font-bold text-[10px] px-2 py-0.5 shadow-2xs">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4 group hover:border-purple-300">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-0.5 rounded-full">
+                      Domain 2
+                    </span>
+                    <span className="text-[11px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
                       8 Practical Tracks
-                    </Badge>
+                    </span>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 mb-0.5">
-                      <Code className="w-3.5 h-3.5" />
-                      <span>Domain 2</span>
+                  <div className="flex items-start gap-3">
+                    <img
+                      src="/images/landing-domain-skills.jpg"
+                      alt="Skill Development"
+                      className="w-20 h-20 sm:w-22 sm:h-22 rounded-xl object-cover shrink-0 border border-slate-100 shadow-2xs"
+                    />
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
+                        Skill Development
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        Learn by building. Hands-on capstones across AI, coding, robotics, design, debate and digital workflows.
+                      </p>
                     </div>
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                      Skill Development
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      Learn by building. Hands-on capstones across AI, coding, robotics, design, debate and digital workflows.
-                    </p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-2 border border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
-                    <span className="text-slate-400">Monthly Tracks:</span>
-                    <span className="font-bold text-slate-900">₹999 to ₹4,999 / mo</span>
+                  {/* Skill Chips from Mockup */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Coding', 'AI', 'Robotics', 'Design', 'Debate', 'Projects'].map((track) => (
+                        <span
+                          key={track}
+                          className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-purple-50/60 border border-purple-100 text-purple-700"
+                        >
+                          {track}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 <Link href="/skills" className="w-full">
-                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-9 rounded-xl shadow-2xs flex items-center justify-center gap-1.5 transition-all">
+                  <Button className="w-full bg-[#6366F1] hover:bg-[#4F46E5] text-white font-bold text-xs h-10 rounded-xl shadow-2xs flex items-center justify-center gap-1.5 transition-all">
                     <span>Explore Skill Tracks</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
@@ -407,41 +388,50 @@ export default function HomePage() {
               </div>
 
               {/* Domain 3: Academic Learning */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-3 group hover:border-emerald-400">
-                <div className="space-y-2.5">
-                  <div className="relative rounded-xl overflow-hidden h-28 sm:h-32 w-full bg-slate-100 border border-slate-100">
-                    <img
-                      src="/images/kids-academic-reading.jpg"
-                      alt="Student reading school textbook with smiles"
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                    <Badge className="absolute top-2 right-2 bg-emerald-600 text-white font-bold text-[10px] px-2 py-0.5 shadow-2xs">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4 group hover:border-emerald-300">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                      Domain 3
+                    </span>
+                    <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                       Classes 4–12
-                    </Badge>
+                    </span>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 mb-0.5">
-                      <GraduationCap className="w-3.5 h-3.5" />
-                      <span>Domain 3</span>
+                  <div className="flex items-start gap-3">
+                    <img
+                      src="/images/landing-domain-academic.jpg"
+                      alt="Academic Learning"
+                      className="w-20 h-20 sm:w-22 sm:h-22 rounded-xl object-cover shrink-0 border border-slate-100 shadow-2xs"
+                    />
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                        Academic Learning
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        Calm, board-aligned learning. Step-by-step concept breakdowns, worked examples, and revision notes.
+                      </p>
                     </div>
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                      Academic Learning
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      Calm, board-aligned learning. Step-by-step concept breakdowns, worked examples, and revision notes.
-                    </p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-2 border border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
-                    <span className="text-slate-400">Class Passes:</span>
-                    <span className="font-bold text-slate-900">From ₹1,999 / mo</span>
+                  {/* Board Chips from Mockup */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <div className="flex flex-wrap gap-1.5">
+                      {['CBSE', 'CISCE', 'IB', 'JEE', 'NEET', 'Class 4–12'].map((b) => (
+                        <span
+                          key={b}
+                          className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-emerald-50/60 border border-emerald-100 text-emerald-700"
+                        >
+                          {b}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 <Link href="/academic" className="w-full">
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 rounded-xl shadow-2xs flex items-center justify-center gap-1.5 transition-all">
+                  <Button className="w-full bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs h-10 rounded-xl shadow-2xs flex items-center justify-center gap-1.5 transition-all">
                     <span>Browse Academic Lessons</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
@@ -452,7 +442,7 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* 4. TRANSPARENT PRICING MATRIX SUMMARY (HIGH CONTRAST & ZERO OVERCROWDING) */}
+        {/* 2. TRANSPARENT PRICING MATRIX FROM MOCKUP */}
         {/* ========================================================================= */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4" id="pricing">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -475,19 +465,33 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Assessment Tier */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-3 flex flex-col justify-between">
-              <div className="space-y-2">
-                <div>
-                  <span className="text-[11px] font-bold text-[#245BFF] uppercase">Domain 1</span>
-                  <h3 className="text-base font-bold text-slate-900 mt-0.5">Assessment Packs</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Pay per test or chapter pack.</p>
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+                      <FileText className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-[#245BFF] uppercase tracking-wider block">
+                        Domain 1
+                      </span>
+                      <h3 className="text-base font-bold text-slate-900 leading-none mt-0.5">
+                        Assessment Packs
+                      </h3>
+                      <p className="text-[11px] text-slate-500 mt-1">Pay per test or chapter pack.</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xl font-black text-slate-900">
+                      ₹20 <span className="text-xs text-slate-400 font-normal">to ₹999</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xl font-black text-slate-900">
-                  ₹20 <span className="text-xs text-slate-400 font-normal">to ₹999</span>
-                </div>
-                <ul className="text-xs text-slate-600 space-y-1.5 border-t border-slate-100 pt-3">
+
+                <ul className="text-xs text-slate-600 space-y-2 border-t border-slate-100 pt-3">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#245BFF] shrink-0" />
                     <span>5 Free questions per subject</span>
@@ -502,58 +506,90 @@ export default function HomePage() {
                   </li>
                 </ul>
               </div>
+
               <Link href="/assessment" className="block pt-2">
-                <Button className="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold h-9 rounded-xl transition-all shadow-2xs">
-                  View Assessments
+                <Button className="w-full bg-[#1E293B] hover:bg-[#0F172A] text-white text-xs font-bold h-9 rounded-xl transition-all shadow-2xs flex items-center justify-center gap-1.5">
+                  <span>View Assessments</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
               </Link>
             </div>
 
-            {/* Skill Development Tier */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-3 flex flex-col justify-between">
-              <div className="space-y-2">
-                <div>
-                  <span className="text-[11px] font-bold text-indigo-600 uppercase">Domain 2</span>
-                  <h3 className="text-base font-bold text-slate-900 mt-0.5">Skill Studio Tracks</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Hands-on capstones with rubric evaluation.</p>
+            {/* Skill Studio Tier */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center shrink-0">
+                      <Sparkles className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider block">
+                        Domain 2
+                      </span>
+                      <h3 className="text-base font-bold text-slate-900 leading-none mt-0.5">
+                        Skill Studio Tracks
+                      </h3>
+                      <p className="text-[11px] text-slate-500 mt-1">Hands-on capstones with rubric evaluation.</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xl font-black text-slate-900">
+                      ₹999 <span className="text-xs text-slate-400 font-normal">to ₹4,999 / mo</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xl font-black text-slate-900">
-                  ₹999 <span className="text-xs text-slate-400 font-normal">to ₹4,999 / mo</span>
-                </div>
-                <ul className="text-xs text-slate-600 space-y-1.5 border-t border-slate-100 pt-3">
+
+                <ul className="text-xs text-slate-600 space-y-2 border-t border-slate-100 pt-3">
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                     <span>Foundation Track from ₹999/mo</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                     <span>All-Access Studio at ₹1,999/mo</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                     <span>Portfolio projects &amp; rubrics</span>
                   </li>
                 </ul>
               </div>
+
               <Link href="/skills" className="block pt-2">
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold h-9 rounded-xl transition-all shadow-2xs">
-                  View Skill Tracks
+                <Button className="w-full bg-[#6366F1] hover:bg-[#4F46E5] text-white text-xs font-bold h-9 rounded-xl transition-all shadow-2xs flex items-center justify-center gap-1.5">
+                  <span>View Skill Tracks</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
               </Link>
             </div>
 
-            {/* Academic Passes Tier */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-3 flex flex-col justify-between">
-              <div className="space-y-2">
-                <div>
-                  <span className="text-[11px] font-bold text-emerald-600 uppercase">Domain 3</span>
-                  <h3 className="text-base font-bold text-slate-900 mt-0.5">Academic Class Passes</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Full verified textbook lessons &amp; tests.</p>
+            {/* Academic Class Passes Tier */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                      <GraduationCap className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider block">
+                        Domain 3
+                      </span>
+                      <h3 className="text-base font-bold text-slate-900 leading-none mt-0.5">
+                        Academic Class Passes
+                      </h3>
+                      <p className="text-[11px] text-slate-500 mt-1">Full verified textbook lessons &amp; tests.</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xl font-black text-slate-900">
+                      ₹1,999 <span className="text-xs text-slate-400 font-normal">to ₹5,199 / mo</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xl font-black text-slate-900">
-                  ₹1,999 <span className="text-xs text-slate-400 font-normal">to ₹5,199 / mo</span>
-                </div>
-                <ul className="text-xs text-slate-600 space-y-1.5 border-t border-slate-100 pt-3">
+
+                <ul className="text-xs text-slate-600 space-y-2 border-t border-slate-100 pt-3">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>Class 4 Pass starting at ₹1,999/mo</span>
@@ -568,9 +604,11 @@ export default function HomePage() {
                   </li>
                 </ul>
               </div>
+
               <Link href="/academic" className="block pt-2">
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-9 rounded-xl transition-all shadow-2xs">
-                  View Academic Lessons
+                <Button className="w-full bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold h-9 rounded-xl transition-all shadow-2xs flex items-center justify-center gap-1.5">
+                  <span>View Academic Lessons</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
               </Link>
             </div>
@@ -578,7 +616,7 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* 5. CLOSED-LOOP LEARNING CYCLE (HOW IT WORKS) */}
+        {/* 3. THE 4-STEP LEARNING CYCLE FROM MOCKUP */}
         {/* ========================================================================= */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-xs space-y-5">
@@ -605,22 +643,20 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
               {[
                 {
                   step: '01',
                   phase: 'Diagnose',
                   domain: 'Assessment & Intelligence',
                   desc: 'A 5-question test identifies the exact micro-gap in concept retention.',
-                  badge: 'Step 1',
                   color: 'border-blue-200 bg-blue-50/70 text-blue-700',
                 },
                 {
                   step: '02',
                   phase: 'Learn',
                   domain: 'Academic Learning',
-                  desc: 'Read clear concept breakdowns and verified step-by-step worked examples.',
-                  badge: 'Step 2',
+                  desc: 'Read clear concept breakdowns and verified step-by-step examples.',
                   color: 'border-emerald-200 bg-emerald-50/70 text-emerald-700',
                 },
                 {
@@ -628,32 +664,37 @@ export default function HomePage() {
                   phase: 'Build',
                   domain: 'Skill Development',
                   desc: 'Apply the concept in a practical coding or robotics project workshop.',
-                  badge: 'Step 3',
-                  color: 'border-indigo-200 bg-indigo-50/70 text-indigo-700',
+                  color: 'border-purple-200 bg-purple-50/70 text-purple-700',
                 },
                 {
                   step: '04',
                   phase: 'Master',
                   domain: 'Re-assessment',
                   desc: 'Re-test to verify retention, earn credits, and update your growth trajectory.',
-                  badge: 'Step 4',
-                  color: 'border-purple-200 bg-purple-50/70 text-purple-700',
+                  color: 'border-indigo-200 bg-indigo-50/70 text-indigo-700',
                 },
               ].map((step, idx) => (
                 <div
                   key={idx}
-                  className="bg-slate-50/80 border border-slate-200 rounded-xl p-3.5 space-y-2 flex flex-col justify-between"
+                  className="bg-slate-50/80 border border-slate-200 rounded-xl p-4 space-y-2 flex flex-col justify-between relative group hover:border-blue-300 transition-all"
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-base font-black text-slate-900">{step.step}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base font-black text-slate-900">{step.step}</span>
+                        <h4 className="text-xs font-bold text-slate-800">{step.domain}</h4>
+                      </div>
                       <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold border ${step.color}`}>
                         {step.phase}
                       </span>
                     </div>
-                    <h4 className="text-xs font-bold text-slate-800">{step.domain}</h4>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">{step.desc}</p>
+                    <p className="text-[11px] text-slate-500 leading-relaxed pt-1">{step.desc}</p>
                   </div>
+                  {idx < 3 && (
+                    <div className="hidden lg:block absolute -right-2.5 top-1/2 -translate-y-1/2 z-10 text-slate-400 font-bold">
+                      &rarr;
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -661,7 +702,7 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* 6. VERIFIED PLATFORM CAPABILITIES & FAQS ACCORDION */}
+        {/* 4. VERIFIED PLATFORM CAPABILITIES & FAQS ACCORDION */}
         {/* ========================================================================= */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <div className="text-center space-y-1.5">
@@ -707,7 +748,7 @@ export default function HomePage() {
           </div>
 
           {/* ======================================================================= */}
-          {/* 7. FINAL HIGH-CONVERTING CONVERSION CTA BANNER */}
+          {/* 5. FINAL HIGH-CONVERTING CONVERSION CTA BANNER */}
           {/* ======================================================================= */}
           <div className="bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-2xl p-6 sm:p-8 shadow-sm border border-blue-800 text-center space-y-4">
             <span className="inline-block text-[11px] uppercase tracking-wider font-bold text-blue-300 bg-blue-800/80 px-3 py-1 rounded-full border border-blue-700">
@@ -741,7 +782,7 @@ export default function HomePage() {
       </main>
 
       {/* ========================================================================= */}
-      {/* 8. CLEAN LIGHT-THEME PLATFORM FOOTER */}
+      {/* 6. CLEAN LIGHT-THEME PLATFORM FOOTER */}
       {/* ========================================================================= */}
       <footer className="border-t border-slate-200 bg-white text-slate-600 text-xs py-8 px-4 sm:px-6 lg:px-8" role="contentinfo">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
