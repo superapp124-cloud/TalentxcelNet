@@ -277,12 +277,12 @@ export default function HomePage() {
                   {/* Grade & Board Quick-Switch & Subject Chips */}
                   <div className="pt-2 border-t border-slate-100 space-y-2">
                     <div className="flex items-center justify-between text-[11px] gap-2">
-                      <div className="flex items-center gap-1 font-semibold text-slate-500">
-                        <span>Board:</span>
+                      <div className="flex items-center gap-1.5 font-semibold text-slate-500">
+                        <span className="text-[10px] uppercase font-bold tracking-wider">Board:</span>
                         <select
                           value={selectedBoardCode}
                           onChange={(e) => setSelectedBoardCode(e.target.value)}
-                          className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-bold text-slate-800"
+                          className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 shadow-2xs cursor-pointer focus:ring-1 focus:ring-blue-500"
                         >
                           <option value="CBSE">CBSE</option>
                           <option value="CISCE">CISCE</option>
@@ -290,12 +290,12 @@ export default function HomePage() {
                         </select>
                       </div>
 
-                      <div className="flex items-center gap-1 font-semibold text-slate-500">
-                        <span>Grade:</span>
+                      <div className="flex items-center gap-1.5 font-semibold text-slate-500">
+                        <span className="text-[10px] uppercase font-bold tracking-wider">Grade:</span>
                         <select
                           value={selectedClassGrade}
                           onChange={(e) => setSelectedClassGrade(e.target.value)}
-                          className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-bold text-slate-800"
+                          className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 shadow-2xs cursor-pointer focus:ring-1 focus:ring-blue-500"
                         >
                           {['Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((g) => (
                             <option key={g} value={g}>{g}</option>
@@ -304,7 +304,7 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {[
                         { code: 'math', label: 'Math' },
                         { code: 'science', label: 'Science' },
@@ -319,7 +319,7 @@ export default function HomePage() {
                             setSelectedSubjectCode(s.code)
                             handleLaunchFreeDiagnostic(s.code)
                           }}
-                          className="px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold bg-blue-50/80 border border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors active:scale-95"
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50/80 border border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors active:scale-95 shadow-2xs"
                         >
                           {s.label}
                         </button>
@@ -366,11 +366,11 @@ export default function HomePage() {
 
                   {/* Skill Chips from Mockup */}
                   <div className="pt-2 border-t border-slate-100">
-                    <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {['Coding', 'AI', 'Robotics', 'Design', 'Debate', 'Projects'].map((track) => (
                         <span
                           key={track}
-                          className="px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold bg-purple-50/80 border border-purple-200 text-purple-700"
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-50/80 border border-purple-200 text-purple-700 shadow-2xs"
                         >
                           {track}
                         </span>
@@ -417,11 +417,11 @@ export default function HomePage() {
 
                   {/* Board Chips from Mockup */}
                   <div className="pt-2 border-t border-slate-100">
-                    <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {['CBSE', 'CISCE', 'IB', 'JEE', 'NEET', 'Class 4–12'].map((b) => (
                         <span
                           key={b}
-                          className="px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold bg-emerald-50/80 border border-emerald-200 text-emerald-700"
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50/80 border border-emerald-200 text-emerald-700 shadow-2xs"
                         >
                           {b}
                         </span>

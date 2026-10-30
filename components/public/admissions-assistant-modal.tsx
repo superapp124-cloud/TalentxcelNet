@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Sparkles, MessageSquare, X, Send, Loader2, BookOpen, ShieldCheck } from 'lucide-react'
+import { Sparkles, X, Send, Loader2, Bot, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  suggestedActions?: string[]
 }
 
 export function AdmissionsAssistantWidget() {
@@ -18,7 +19,12 @@ export function AdmissionsAssistantWidget() {
     {
       role: 'assistant',
       content:
-        'Hello! I am the **TalentXcel AI Admissions Assistant**. Ask me anything about our 4 programme tracks, transparent fees & instalment plans, or eligibility requirements.',
+        'Hello! 👋 I am **TalentXcel AI**, your personal learning and academic guide.\n\nAsk me anything! How our free diagnostic tests work, curriculum for Classes 4–12, competitive entrance mocks (JEE, NEET, CUET, UPSC), skill studio tracks (AI, Coding, Robotics), or ask me any question in Math or Science and I will explain it step-by-step.',
+      suggestedActions: [
+        'How does the free diagnostic work?',
+        'Which classes and boards are supported?',
+        'What are the pricing plans?',
+      ],
     },
   ])
 
@@ -39,13 +45,21 @@ export function AdmissionsAssistantWidget() {
 
       const data = await res.json()
       if (res.ok && data.content) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.content }])
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: data.content,
+            suggestedActions: data.suggestedActions || [],
+          },
+        ])
       } else {
         setMessages((prev) => [
           ...prev,
           {
             role: 'assistant',
-            content: 'I had trouble answering that. Please fill out our enquiry form or speak with a counsellor at /apply.',
+            content:
+              'I am here to help! You can explore our free 5-question diagnostics on the home page, browse syllabus under /assessment, or check transparent plans starting from ₹20 at /plans.',
           },
         ])
       }
@@ -54,7 +68,8 @@ export function AdmissionsAssistantWidget() {
         ...prev,
         {
           role: 'assistant',
-          content: 'Network connection issue. Please check your internet or email admissions@talentxcel.net.',
+          content:
+            'Network hiccup. Please check your internet connection or email support@talentxcel.net.',
         },
       ])
     } finally {
@@ -64,96 +79,124 @@ export function AdmissionsAssistantWidget() {
 
   return (
     <>
-      {/* Floating Admissions Trigger - Compact on mobile to avoid blocking hero imagery */}
+      {/* Floating Chatbot Trigger */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] right-3 sm:bottom-6 sm:right-6 z-30 flex items-center gap-1.5 sm:gap-2 rounded-full border border-blue-400/40 bg-[#245BFF]/95 backdrop-blur-xs hover:bg-[#1E4ED8] px-3 py-1.5 sm:px-3.5 sm:py-2 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-[11px] sm:text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-        aria-label="Open Admissions Assistant"
+        className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] right-3 sm:bottom-6 sm:right-6 z-30 flex items-center gap-2 rounded-full border border-blue-400/40 bg-[#245BFF] hover:bg-[#1D4ED8] px-3.5 py-2 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        aria-label="Open TalentXcel AI Chatbot"
       >
-        <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-cyan-200 animate-pulse" />
-        <span className="hidden sm:inline">Ask Admissions AI</span>
-        <span className="sm:hidden">Ask AI</span>
+        <Sparkles className="h-4 w-4 text-cyan-200 animate-pulse" />
+        <span>Ask TalentXcel</span>
       </button>
 
       {/* Slide-in Modal Drawer */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs">
-          <div className="flex h-full w-full max-w-md flex-col bg-background border-l shadow-2xl">
+          <div className="flex h-full w-full max-w-md flex-col bg-white border-l border-slate-200 shadow-2xl text-slate-900">
             {/* Header */}
-            <div className="flex items-center justify-between border-b px-5 py-4 bg-muted/40">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 sm:px-5 py-3.5 bg-slate-50/80">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                  <Sparkles className="h-5 w-5 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600 shadow-2xs">
+                  <Bot className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-foreground">AI Admissions Assistant</h3>
+                  <h3 className="font-extrabold text-sm text-slate-900 leading-tight">
+                    Ask TalentXcel AI
+                  </h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <Badge variant="success" className="text-[10px] py-0 px-1.5">
-                      Verified Policy
-                    </Badge>
-                    <span className="text-[11px] text-muted-foreground">Instant Grounded Answers</span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[11px] font-semibold text-emerald-700">Online</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-[11px] text-slate-500">Universal Learning Guide</span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
                 aria-label="Close Assistant"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Quick Questions */}
-            <div className="flex items-center gap-1.5 overflow-x-auto border-b bg-muted/20 px-4 py-2 scrollbar-none">
+            {/* Quick Prompt Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto border-b border-slate-100 bg-slate-50/40 px-3.5 py-2 scrollbar-none">
               <button
-                onClick={() => handleSend('What are the fees and instalment plans?')}
-                className="shrink-0 text-[11px] font-medium bg-background border rounded-full px-2.5 py-1 text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+                onClick={() => handleSend('How does the free diagnostic test work?')}
+                className="shrink-0 text-[11px] font-semibold bg-white border border-slate-200 rounded-full px-2.5 py-1 text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-colors shadow-2xs"
               >
-                Fees & Instalments
+                5 Free Diagnostic Qs
               </button>
               <button
-                onClick={() => handleSend('Does the programme include a laptop?')}
-                className="shrink-0 text-[11px] font-medium bg-background border rounded-full px-2.5 py-1 text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+                onClick={() => handleSend('What classes, boards, and subjects are covered?')}
+                className="shrink-0 text-[11px] font-semibold bg-white border border-slate-200 rounded-full px-2.5 py-1 text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-colors shadow-2xs"
               >
-                Laptop Details
+                Classes 4–12
               </button>
               <button
-                onClick={() => handleSend('What are the 4 programme tracks?')}
-                className="shrink-0 text-[11px] font-medium bg-background border rounded-full px-2.5 py-1 text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+                onClick={() => handleSend('Tell me about competitive entrance mocks for JEE, NEET, and UPSC.')}
+                className="shrink-0 text-[11px] font-semibold bg-white border border-slate-200 rounded-full px-2.5 py-1 text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-colors shadow-2xs"
               >
-                Programmes
+                Entrance Mocks
+              </button>
+              <button
+                onClick={() => handleSend('What are the 8 hands-on skill development tracks?')}
+                className="shrink-0 text-[11px] font-semibold bg-white border border-slate-200 rounded-full px-2.5 py-1 text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-colors shadow-2xs"
+              >
+                AI & Coding Tracks
+              </button>
+              <button
+                onClick={() => handleSend('What are your pricing plans and chapter packs?')}
+                className="shrink-0 text-[11px] font-semibold bg-white border border-slate-200 rounded-full px-2.5 py-1 text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-colors shadow-2xs"
+              >
+                Pricing (From ₹20)
               </button>
             </div>
 
             {/* Messages Feed */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#F8FAFC]">
               {messages.map((m, idx) => (
                 <div
                   key={idx}
                   className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
+                    className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed shadow-2xs ${
                       m.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted border text-foreground'
+                        ? 'bg-[#245BFF] text-white font-medium rounded-br-xs'
+                        : 'bg-white border border-slate-200 text-slate-800 rounded-bl-xs'
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{m.content}</p>
                   </div>
+
+                  {/* Render Suggested Actions if any */}
+                  {m.role === 'assistant' && m.suggestedActions && m.suggestedActions.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2 max-w-[90%]">
+                      {m.suggestedActions.map((action, aIdx) => (
+                        <button
+                          key={aIdx}
+                          onClick={() => handleSend(action)}
+                          className="text-[10.5px] font-semibold bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 px-2.5 py-1 rounded-lg transition-colors text-left shadow-2xs"
+                        >
+                          {action} &rarr;
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
               {loading && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  <span>Searching verified curriculum and admissions policies...</span>
+                <div className="flex items-center gap-2 text-xs text-slate-500 py-2 bg-white border border-slate-200 rounded-xl px-3 w-fit shadow-2xs">
+                  <Loader2 className="h-4 w-4 animate-spin text-[#245BFF]" />
+                  <span>TalentXcel AI is thinking...</span>
                 </div>
               )}
             </div>
 
             {/* Bottom Actions & Input */}
-            <div className="border-t p-3 bg-background space-y-2">
+            <div className="border-t border-slate-200 p-3 bg-white space-y-2">
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
@@ -165,16 +208,21 @@ export function AdmissionsAssistantWidget() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about tuition, eligibility, syllabus..."
-                  className="flex-1 rounded-xl border border-input bg-background px-3.5 py-2 text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Ask about tests, curriculum, skills, pricing, or homework..."
+                  className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs sm:text-sm placeholder:text-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#245BFF] focus:bg-white transition-all"
                   disabled={loading}
                 />
-                <Button type="submit" size="sm" disabled={loading || !input.trim()}>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={loading || !input.trim()}
+                  className="bg-[#245BFF] hover:bg-[#1D4ED8] text-white rounded-xl h-9 px-3"
+                >
                   <Send className="h-4 w-4" />
                 </Button>
               </form>
-              <div className="text-[10px] text-center text-muted-foreground">
-                Grounded on verified TalentXcel policies • No job outcome guarantees
+              <div className="text-[10px] text-center text-slate-400">
+                Grounded in verified CBSE, ICSE &amp; entrance standards • Instant server explanations
               </div>
             </div>
           </div>

@@ -233,10 +233,82 @@ function generateDeterministicFallback(
         "Would you like a progressive hint to solve your current task, or a conceptual explanation of the underlying theory?"
       suggestedActions = ['Get Hint #1', 'Explain vector search', 'View project requirements']
     }
+  } else if (request.agentType === 'admissions_assistant' || !request.agentType) {
+    if (queryLower.includes('free') || queryLower.includes('diagnostic') || queryLower.includes('practice') || queryLower.includes('test')) {
+      content =
+        "### 🎯 Free Diagnostic Practice at TalentXcel\n\n" +
+        "You can take **5 verified syllabus questions per subject completely free** with zero registration, login, or payment details required!\n\n" +
+        "- **Instant Scoring & Hints**: Immediate server evaluation, step-by-step formula derivations, and Socratic hints.\n" +
+        "- **Supported Boards**: CBSE, ICSE/CISCE, and IB standards for Classes 4–12.\n" +
+        "- **Subjects Covered**: Mathematics, Science (Physics, Chemistry, Biology), English, Hindi, Social Science, and Logical Reasoning.\n" +
+        "- **Competitive Entrances**: Sample diagnostic mocks available for JEE, NEET, CUET, UPSC, State PSC, SSC, Banking, and GATE.\n\n" +
+        "👉 *Ready to begin? Just click **Start Free Practice** on our home page or visit `/assessment`!*"
+      suggestedActions = ['Start Class 4 Free Test', 'View Competitive Entrance Mocks', 'How does scoring work?']
+    } else if (queryLower.includes('fee') || queryLower.includes('price') || queryLower.includes('plan') || queryLower.includes('cost') || queryLower.includes('pricing') || queryLower.includes('refund')) {
+      content =
+        "### 💳 Transparent & Flexible Pricing\n\n" +
+        "At TalentXcel, we believe in radical pricing transparency without lock-ins:\n\n" +
+        "1. **Assessment Chapter Packs**: Start from just **₹20** for individual chapter mocks, up to ₹299–₹999 for multi-subject entrance suites.\n" +
+        "2. **Skill Studio Tracks**: Hands-on project workshops across AI, Robotics, and Coding from **₹999/mo** (All-Access Studio at ₹1,999/mo).\n" +
+        "3. **Academic Class Passes**: Full textbook lessons, numerical guides, and chapter tests from **₹1,999/mo**.\n\n" +
+        "All purchases include our **14-day hassle-free refund policy** and secure checkout powered by Razorpay. View all options at `/plans`."
+      suggestedActions = ['Compare all plans', 'Try ₹20 chapter pack', 'What is the refund policy?']
+    } else if (queryLower.includes('skill') || queryLower.includes('coding') || queryLower.includes('ai') || queryLower.includes('robot')) {
+      content =
+        "### 🚀 Practical Skill Studio (Domain 2)\n\n" +
+        "We teach real-world skills by building functional capstones! Our 8 active tracks include:\n\n" +
+        "- **AI & Machine Learning**: Build custom LLM agents, vector search, and neural pipelines.\n" +
+        "- **Python & Web Coding**: Full-stack web, algorithms, and APIs.\n" +
+        "- **Robotics & IoT**: Embedded systems, sensors, and microcontrollers.\n" +
+        "- **Product & UI/UX Design**: Design systems, wireframing, and Figma prototypes.\n" +
+        "- **Debate & Communication**: Structured rhetoric, logic, and public discourse.\n" +
+        "- **Financial Literacy**: Smart budgeting, compound interest, and investment math.\n\n" +
+        "Every learner graduates with a verifiable portfolio! Explore tracks under `/skills`."
+      suggestedActions = ['Explore AI Track', 'Explore Coding Track', 'View sample capstones']
+    } else if (queryLower.includes('academic') || queryLower.includes('class') || queryLower.includes('cbse') || queryLower.includes('icse') || queryLower.includes('ib') || queryLower.includes('board')) {
+      content =
+        "### 📚 Calm, Board-Aligned Academic Learning (Domain 3)\n\n" +
+        "Our academic curriculum is 100% aligned with verified textbooks (NCERT for CBSE, CISCE/ICSE, and IB) for **Classes 4 through 12**:\n\n" +
+        "- **Mathematics**: Algebra, Calculus, Geometry, Trigonometry, and Probability.\n" +
+        "- **Sciences**: Physics, Chemistry, and Biology broken into bite-sized concepts.\n" +
+        "- **Languages & Humanities**: English Grammar & Literature, Hindi Vyakaran, and Social Sciences (History, Civics, Geography, Economics).\n" +
+        "- **Step-by-Step Numerical Walkthroughs**: We show derivations and worked examples so students truly understand *why* a formula works.\n\n" +
+        "Visit `/academic` to browse chapters for your grade!"
+      suggestedActions = ['Browse Class 10 CBSE', 'Browse Class 12 STEM', 'Try Class 4 Diagnostic']
+    } else if (queryLower.includes('jee') || queryLower.includes('neet') || queryLower.includes('cuet') || queryLower.includes('upsc') || queryLower.includes('entrance') || queryLower.includes('competitive')) {
+      content =
+        "### 🏆 Competitive Entrance Mock Pipelines\n\n" +
+        "TalentXcel offers verified diagnostic mocks matching real national and state exam standards:\n\n" +
+        "- **JEE (Main & Advanced)**: Rotational dynamics, coordinate geometry, thermodynamics, organic reaction mechanisms.\n" +
+        "- **NEET (UG Medical)**: Molecular basis of inheritance, human physiology, chemical bonding.\n" +
+        "- **CUET**: General test, numerical aptitude, verbal reasoning, and domain subjects.\n" +
+        "- **UPSC Civil Services & State PSC**: Polity (Articles, amendments), Indian Economy, Modern History, and CSAT logical reasoning.\n" +
+        "- **SSC, Banking (IBPS/SBI) & GATE**: Quantitative aptitude, computer networks, data structures, and reasoning.\n\n" +
+        "Take a sample entrance mock under `/assessment` (Competitive Entrances tab)!"
+      suggestedActions = ['Try JEE Mock', 'Try NEET Mock', 'Try UPSC Mock']
+    } else if (queryLower.includes('hi') || queryLower.includes('hello') || queryLower.includes('hey') || queryLower.includes('who are you')) {
+      content =
+        "Hello! 👋 I'm **TalentXcel AI**, your friendly personal learning guide.\n\n" +
+        "I'm here to help you with anything on the platform:\n" +
+        "- 🎯 **Free Diagnostic Practice**: Take 5 free questions per subject (no login needed)\n" +
+        "- 📚 **Classes 4–12 Curriculum**: Board-aligned lessons across CBSE, ICSE, and IB\n" +
+        "- 🚀 **Skill Development**: Hands-on tracks in AI, Coding, Robotics, and Design\n" +
+        "- 🏆 **Competitive Entrances**: JEE, NEET, CUET, UPSC, and Banking mocks\n" +
+        "- 💡 **Homework & Concept Help**: Ask me any academic question and I'll explain it step-by-step!\n\n" +
+        "What can I help you explore today?"
+      suggestedActions = ['Start Free Practice', 'How does the platform work?', 'View Pricing Plans']
+    } else {
+      content =
+        `Thank you for asking! I'm here to support your learning journey on TalentXcel.\n\n` +
+        `TalentXcel unifies **Diagnostic Assessments** (Domain 1), **Hands-on Skills** (Domain 2), and **Academic Lessons** (Domain 3) into a single 4-step loop (Diagnose → Learn → Build → Master).\n\n` +
+        `Whether you're looking for our free 5-question diagnostics, curriculum maps for Classes 4–12, competitive entrance mocks (JEE, NEET, UPSC), or transparent pricing starting from ₹20, I'm happy to guide you!\n\n` +
+        `Would you like to try a free practice test or explore our syllabus for a specific grade?`
+      suggestedActions = ['Start Free Practice Test', 'Explore Class 4-12 Curriculum', 'View Transparent Pricing']
+    }
   } else {
     content =
-      "Welcome to TalentXcel Academy! I can help you understand our curriculum, admissions criteria, and project requirements. What would you like to know?"
-    suggestedActions = ['View AI Development syllabus', 'Check fees and instalments', 'How do admissions work?']
+      "Welcome to TalentXcel! I can help you understand our curriculum, diagnostics, and project requirements. What would you like to know?"
+    suggestedActions = ['Start Free Practice', 'View syllabus', 'Check fees and plans']
   }
 
   return {
