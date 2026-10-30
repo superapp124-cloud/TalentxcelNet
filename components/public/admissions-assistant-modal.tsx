@@ -64,13 +64,13 @@ export function AdmissionsAssistantWidget() {
 
   return (
     <>
-      {/* Floating Admissions Trigger - Repositioned to respect device safe-areas & avoid content overlap */}
+      {/* Floating Admissions Trigger - Compact on mobile to avoid blocking hero imagery */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 sm:bottom-6 sm:right-6 z-30 flex items-center gap-2 rounded-full border border-blue-400/40 bg-[#245BFF] hover:bg-[#1E4ED8] px-3.5 py-2 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] right-3 sm:bottom-6 sm:right-6 z-30 flex items-center gap-1.5 sm:gap-2 rounded-full border border-blue-400/40 bg-[#245BFF]/95 backdrop-blur-xs hover:bg-[#1E4ED8] px-3 py-1.5 sm:px-3.5 sm:py-2 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-[11px] sm:text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         aria-label="Open Admissions Assistant"
       >
-        <Sparkles className="h-4 w-4 text-cyan-200 animate-pulse" />
+        <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-cyan-200 animate-pulse" />
         <span className="hidden sm:inline">Ask Admissions AI</span>
         <span className="sm:hidden">Ask AI</span>
       </button>
