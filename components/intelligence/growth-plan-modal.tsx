@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { SEED_LEARNER_TRI_DOMAIN_PROGRESS } from '@/packages/core/src'
+import { SEED_LEARNER_TRI_DOMAIN_PROGRESS } from '@/packages/core/src/data/seed-catalog'
 
 interface GrowthPlanModalProps {
   isOpen: boolean

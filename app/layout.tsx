@@ -145,6 +145,22 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
       <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/images/landing-hero-students-mobile.webp"
+          type="image/webp"
+          media="(max-width: 1023px)"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/images/landing-hero-students.webp"
+          type="image/webp"
+          media="(min-width: 1024px)"
+          fetchPriority="high"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

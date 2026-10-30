@@ -64,10 +64,11 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all relative ${
+              aria-current={isActive ? 'page' : undefined}
+              className={`flex flex-col items-center justify-center py-1 px-3 min-w-[56px] min-h-[48px] rounded-xl transition-all relative ${
                 isActive
                   ? 'text-[#245BFF] font-bold'
-                  : 'text-slate-500 hover:text-slate-800 font-medium'
+                  : 'text-slate-600 hover:text-slate-900 font-medium'
               }`}
             >
               <div className="relative">
@@ -88,8 +89,9 @@ export function MobileBottomNav() {
 
         {/* Ask AI Chatbot Tab */}
         <button
+          type="button"
           onClick={handleOpenChat}
-          className="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-indigo-600 hover:text-indigo-700 font-bold transition-all relative active:scale-95"
+          className="flex flex-col items-center justify-center py-1 px-3 min-w-[56px] min-h-[48px] rounded-xl text-indigo-600 hover:text-indigo-700 font-bold transition-all relative active:scale-95 cursor-pointer"
           aria-label="Open Ask TalentXcel AI Chatbot"
         >
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">

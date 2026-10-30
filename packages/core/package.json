@@ -4,6 +4,7 @@
   "description": "TalentXcel Core domain types, curriculum models, and server-authoritative scoring engine",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "sideEffects": false,
   "scripts": {
     "build": "tsc",
     "test": "vitest run"

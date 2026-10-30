@@ -24,17 +24,15 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  SEED_CONFIDENTIAL_SOLUTIONS,
-  evaluateAssessmentAttempt,
-} from '@/packages/core/src'
+import { evaluateAssessmentAttempt } from '@/packages/core/src/scoring/evaluator'
+import { SEED_CONFIDENTIAL_SOLUTIONS } from '@/packages/core/src/data/seed-catalog'
 import type {
   AuthorizedQuestion,
   AssessmentBlueprint,
   AssessmentResult,
   SubmittedAnswer,
   ConfidentialQuestionSolution,
-} from '@/packages/core/src'
+} from '@/packages/core/src/types'
 
 interface TestRunnerModalProps {
   blueprint: AssessmentBlueprint | null

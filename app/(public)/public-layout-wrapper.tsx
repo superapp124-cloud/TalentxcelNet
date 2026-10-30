@@ -1,11 +1,17 @@
 'use client'
 
 import React from 'react'
+import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import { PublicNavbar } from '@/components/public/navbar'
 import { PublicFooter } from '@/components/public/footer'
-import { AdmissionsAssistantWidget } from '@/components/public/admissions-assistant-modal'
 import { MobileBottomNav } from '@/components/navigation/mobile-bottom-nav'
+
+// Dynamically import AdmissionsAssistantWidget with SSR disabled so it is never bundled in critical path
+const AdmissionsAssistantWidget = dynamic(
+  () => import('@/components/public/admissions-assistant-modal').then((m) => m.AdmissionsAssistantWidget),
+  { ssr: false }
+)
 
 export function PublicLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
