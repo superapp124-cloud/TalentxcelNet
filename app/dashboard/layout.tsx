@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar'
+import { DashboardLayoutClient } from '@/components/dashboard/dashboard-layout-client'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -21,7 +21,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const effectiveUser = user || {
     id: 'demo-learner-001',
-    email: 'talentxcelservices@gmail.com',
+    email: 'arshid.wani@gmail.com',
   }
 
   let profile: { full_name?: string | null; display_name?: string | null; avatar_url?: string | null } | null = null
@@ -46,7 +46,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     user?.user_metadata?.name ||
     profile?.display_name ||
     profile?.full_name
-  const displayName = rawName || email?.split('@')[0] || 'Learner'
+  const displayName = rawName || email?.split('@')[0] || 'Arshid'
   const avatarUrl =
     user?.user_metadata?.avatar_url ||
     user?.user_metadata?.picture ||
@@ -59,19 +59,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   )
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-slate-50/50 dark:bg-black">
-      <DashboardSidebar
-        user={{
-          id: effectiveUser.id,
-          email,
-          displayName,
-          avatarUrl,
-          isGoogleUser,
-        }}
-      />
-      <main className="flex-1 overflow-y-auto" id="dashboard-content">
-        {children}
-      </main>
-    </div>
+    <DashboardLayoutClient
+      user={{
+        id: effectiveUser.id,
+        email,
+        displayName,
+        avatarUrl,
+        isGoogleUser,
+      }}
+    >
+      {children}
+    </DashboardLayoutClient>
   )
 }

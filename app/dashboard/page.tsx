@@ -31,8 +31,7 @@ export default async function DashboardPage() {
     email: 'talentxcelservices@gmail.com',
   }
 
-  let profile = null
-  let enrolments = null
+  let profile: { full_name?: string | null; display_name?: string | null; avatar_url?: string | null } | null = null
 
   if (user) {
     const { data: prof } = (await supabase
@@ -41,19 +40,12 @@ export default async function DashboardPage() {
       .eq('id', user.id)
       .single()) as {
       data: {
-        full_name: string
+        full_name: string | null
         display_name: string | null
         avatar_url: string | null
       } | null
     }
     profile = prof
-
-    const { data: enr } = await supabase
-      .from('learning_enrolments')
-      .select('*, programmes(title, thumbnail_url)')
-      .eq('learner_id', user.id)
-      .eq('status', 'active')
-    enrolments = enr
   }
 
   const email = user?.email || effectiveUser.email
@@ -62,7 +54,7 @@ export default async function DashboardPage() {
     user?.user_metadata?.name ||
     profile?.display_name ||
     profile?.full_name
-  const displayName = rawName || email?.split('@')[0] || 'Learner'
+  const displayName = rawName || email?.split('@')[0] || 'Arshid'
   const avatarUrl =
     user?.user_metadata?.avatar_url ||
     user?.user_metadata?.picture ||
@@ -75,19 +67,14 @@ export default async function DashboardPage() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-neutral-950 py-6 sm:py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <UnifiedLearnerDashboard
-          user={{
-            id: effectiveUser.id,
-            email,
-            displayName,
-            avatarUrl,
-            isGoogleUser,
-          }}
-          enrolments={enrolments || []}
-        />
-      </div>
-    </div>
+    <UnifiedLearnerDashboard
+      user={{
+        id: effectiveUser.id,
+        email,
+        displayName,
+        avatarUrl,
+        isGoogleUser,
+      }}
+    />
   )
 }
