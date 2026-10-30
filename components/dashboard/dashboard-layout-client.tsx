@@ -18,7 +18,6 @@ export function DashboardLayoutClient({ user, children }: DashboardLayoutClientP
     setSelectedClass(newClass)
     if (typeof window !== 'undefined') {
       localStorage.setItem('talentxcel_active_target', newClass)
-      // Dispatch custom storage event so children can react immediately
       window.dispatchEvent(new Event('talentxcel_target_changed'))
     }
   }
@@ -33,8 +32,8 @@ export function DashboardLayoutClient({ user, children }: DashboardLayoutClientP
         onClassChange={handleClassChange}
       />
 
-      {/* 2. Workspace Layout: Sidebar + Main Content */}
-      <div className="flex-1 flex max-w-[1600px] w-full mx-auto">
+      {/* 2. Workspace Layout: Sidebar + Main Content (Compact and responsive) */}
+      <div className="flex-1 flex w-full max-w-[1400px] mx-auto">
         {/* Left Sidebar */}
         <DashboardSidebar
           user={user}
@@ -44,7 +43,7 @@ export function DashboardLayoutClient({ user, children }: DashboardLayoutClientP
 
         {/* Main Content Area */}
         <main
-          className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-12 overflow-y-auto"
+          className="flex-1 min-w-0 p-3 sm:p-5 lg:p-6 pb-20 lg:pb-10 overflow-y-auto"
           id="dashboard-content"
         >
           {children}

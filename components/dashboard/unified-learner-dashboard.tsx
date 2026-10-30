@@ -24,7 +24,6 @@ import {
   BarChart3,
   ShieldCheck,
   Check,
-  Layers,
   Crown,
   Laptop,
   Globe,
@@ -32,13 +31,11 @@ import {
   Cpu,
   Lightbulb,
   FlaskConical,
-  HelpCircle,
-  FileText,
-  Search,
+  Zap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import type {
   AuthorizedQuestion,
   AssessmentBlueprint,
@@ -384,8 +381,6 @@ interface UnifiedLearnerDashboardProps {
     avatarUrl?: string | null
     isGoogleUser?: boolean
   }
-  selectedTargetId?: string
-  onTargetChange?: (id: string) => void
 }
 
 function getSubjectIcon(name: string, colorClass: string) {
@@ -474,12 +469,9 @@ function renderStatusBadge(status: { text: string; type: string }) {
   }
 }
 
-export function UnifiedLearnerDashboard({
-  user,
-  selectedTargetId: parentTargetId,
-  onTargetChange: parentOnTargetChange,
-}: UnifiedLearnerDashboardProps) {
-  const [internalTargetId, setInternalTargetId] = useState<string>('class_10')
+export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) {
+  const [selectedTargetId, setSelectedTargetId] = useState<string>('class_10')
+  const [activeFilterChip, setActiveFilterChip] = useState<string>('Board Exams')
 
   // Test Runner Modal State
   const [isTestRunnerOpen, setIsTestRunnerOpen] = useState(false)
@@ -494,25 +486,27 @@ export function UnifiedLearnerDashboard({
   const [aiSources, setAiSources] = useState<Array<{ title: string; category: string }>>([])
   const [aiLoading, setAiLoading] = useState(false)
 
-  // Load target on mount
+  // Sync target with localStorage & topbar events
   useEffect(() => {
-    const saved = localStorage.getItem('talentxcel_active_target')
-    if (saved && DASHBOARD_TARGETS.some((t) => t.id === saved)) {
-      setInternalTargetId(saved)
+    const updateTarget = () => {
+      const saved = localStorage.getItem('talentxcel_active_target')
+      if (saved && DASHBOARD_TARGETS.some((t) => t.id === saved)) {
+        setSelectedTargetId(saved)
+      }
     }
+    updateTarget()
+
+    window.addEventListener('talentxcel_target_changed', updateTarget)
+    return () => window.removeEventListener('talentxcel_target_changed', updateTarget)
   }, [])
 
-  const selectedTargetId = parentTargetId || internalTargetId
   const activeTarget =
     DASHBOARD_TARGETS.find((t) => t.id === selectedTargetId) || DASHBOARD_TARGETS[0]
 
   const handleSelectTarget = (id: string) => {
-    setInternalTargetId(id)
+    setSelectedTargetId(id)
     if (typeof window !== 'undefined') {
       localStorage.setItem('talentxcel_active_target', id)
-    }
-    if (parentOnTargetChange) {
-      parentOnTargetChange(id)
     }
   }
 
@@ -561,12 +555,12 @@ export function UnifiedLearnerDashboard({
         if (data.sources) setAiSources(data.sources)
       } else {
         setAiResponse(
-          'Here is the step-by-step guidance: Break down the problem into given values, identify the relevant formula or theorem, and solve step by step.'
+          'Here is the step-by-step guidance: Identify given values, select the NCERT formula, and solve systematically.'
         )
       }
     } catch {
       setAiResponse(
-        'Step-by-step solution ready: For Real Numbers, apply Euclid lemma / prime factorization to determine HCF and LCM.'
+        'Step-by-step guidance ready: For Real Numbers, apply Euclid lemma / prime factorization to determine HCF and LCM.'
       )
     } finally {
       setAiLoading(false)
@@ -574,12 +568,12 @@ export function UnifiedLearnerDashboard({
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8 pb-16">
-      {/* 1. Hero Banner matching exact mock */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 sm:p-8 shadow-xs">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+    <div className="space-y-4 sm:space-y-6">
+      {/* 1. Hero Banner: Snug, High-Energy, Zero Empty Dead Spaces */}
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/90 dark:border-neutral-800 bg-gradient-to-r from-blue-50/70 via-white to-sky-50/60 dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-900 p-5 sm:p-7 shadow-xs">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-4">
+          <div className="space-y-3.5 flex-1 max-w-2xl">
             {/* Top Pill */}
             <div className="flex flex-wrap items-center gap-2">
               <Badge
@@ -595,7 +589,7 @@ export function UnifiedLearnerDashboard({
             </div>
 
             {/* Giant Title */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                 Learn. Practice. Improve.
               </h1>
@@ -609,76 +603,85 @@ export function UnifiedLearnerDashboard({
               3,000,000+ Questions • AI Diagnostics • NCERT Aligned • Class 4–12 • Competitive Exams
             </p>
 
-            {/* Filter Pills Strip */}
-            <div className="flex flex-wrap items-center gap-2 pt-2">
-              <Link
-                href="/dashboard/question-bank"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-900/40 hover:bg-amber-100/60 transition-colors"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-amber-600" />
-                Board Exams
-              </Link>
-              <Link
-                href="/assessment"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-900/40 hover:bg-emerald-100/60 transition-colors"
-              >
-                <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
-                JEE / NEET
-              </Link>
-              <Link
-                href="/skills"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 border border-teal-200/60 dark:border-teal-900/40 hover:bg-teal-100/60 transition-colors"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-                Skill Development
-              </Link>
-              <a
-                href="#ai-tutor"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-purple-800 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-900/40 hover:bg-purple-100/60 transition-colors"
-              >
-                <Brain className="w-3.5 h-3.5 text-purple-600" />
-                AI Tutor
-              </a>
-              <Link
-                href="/courses/ai-development"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-800 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/40 hover:bg-indigo-100/60 transition-colors"
-              >
-                <Code2 className="w-3.5 h-3.5 text-indigo-600" />
-                Project Labs
-              </Link>
+            {/* Quick Filter Pills Strip */}
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {[
+                { label: 'Board Exams', icon: BookOpen, color: 'text-amber-600 bg-amber-50 border-amber-200/60' },
+                { label: 'JEE / NEET', icon: GraduationCap, color: 'text-emerald-600 bg-emerald-50 border-emerald-200/60' },
+                { label: 'Skill Development', icon: Sparkles, color: 'text-teal-600 bg-teal-50 border-teal-200/60' },
+                { label: 'AI Tutor', icon: Brain, color: 'text-purple-600 bg-purple-50 border-purple-200/60' },
+                { label: 'Project Labs', icon: Code2, color: 'text-indigo-600 bg-indigo-50 border-indigo-200/60' },
+              ].map((chip) => {
+                const Icon = chip.icon
+                const isSelected = activeFilterChip === chip.label
+                return (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    onClick={() => {
+                      setActiveFilterChip(chip.label)
+                      if (chip.label === 'JEE / NEET') handleSelectTarget('class_12')
+                      if (chip.label === 'Board Exams') handleSelectTarget('class_10')
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      isSelected
+                        ? 'bg-[#0066FF] text-white shadow-xs'
+                        : `${chip.color} dark:bg-neutral-900 dark:border-neutral-800 hover:brightness-95`
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{chip.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Live Student Engagement Pulse Strip */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 font-bold border border-orange-200/60 dark:border-orange-900/40">
+                <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500 animate-pulse" />
+                4-Day Streak
+              </span>
+              <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 font-bold border border-blue-200/60 dark:border-blue-900/40">
+                <Zap className="w-3.5 h-3.5 text-blue-600" />
+                88% Accuracy
+              </span>
+              <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-200/60 dark:border-emerald-900/40">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                Instant Automated Grading
+              </span>
             </div>
           </div>
 
-          {/* Right Student Illustration Column */}
-          <div className="lg:col-span-5 flex items-center justify-center relative min-h-[220px]">
-            {/* Soft gradient circular glow */}
-            <div className="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-gradient-to-tr from-blue-100 via-sky-200 to-indigo-100 dark:from-blue-950/40 dark:via-sky-950/30 dark:to-indigo-950/40 -z-0" />
+          {/* Right Column: Clean Student Graphic & Floating Badges */}
+          <div className="relative shrink-0 flex items-center justify-center w-60 sm:w-72 h-48 sm:h-56">
+            {/* Soft Radial Glow */}
+            <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-blue-100 via-sky-200 to-indigo-100 dark:from-blue-950/50 dark:via-sky-950/40 dark:to-indigo-950/50 shadow-inner ring-4 ring-white/90 dark:ring-neutral-900 overflow-hidden flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/dashboard-hero-student.png"
+                alt="TalentXcel Student"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
 
             {/* Floating A+ Badge */}
-            <div className="absolute top-2 left-6 sm:left-10 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-lg ring-4 ring-white dark:ring-neutral-900">
+            <div className="absolute top-2 left-3 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-lg ring-4 ring-white dark:ring-neutral-900">
               A+
             </div>
 
             {/* Floating Bar Chart Badge */}
-            <div className="absolute top-6 right-8 sm:right-12 z-10 w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 border border-teal-200 dark:border-teal-800 shadow-sm flex items-center justify-center">
+            <div className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 border border-teal-200 dark:border-teal-800 shadow-sm flex items-center justify-center">
               <BarChart3 className="w-4 h-4" />
             </div>
 
             {/* Floating Lightbulb Badge */}
-            <div className="absolute top-16 right-2 sm:right-4 z-10 w-7 h-7 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-500 border border-amber-200 dark:border-amber-800 shadow-sm flex items-center justify-center">
+            <div className="absolute bottom-10 right-0 z-10 w-7 h-7 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-500 border border-amber-200 dark:border-amber-800 shadow-sm flex items-center justify-center">
               <Lightbulb className="w-3.5 h-3.5" />
             </div>
 
-            {/* Student Photo */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/dashboard-hero-student.png"
-              alt="TalentXcel Student"
-              className="relative z-0 h-44 sm:h-52 object-contain drop-shadow-md rounded-2xl"
-            />
-
             {/* Floating Pill: Personalised learning for stronger results */}
-            <div className="absolute -bottom-2 right-2 sm:right-6 z-10 px-3 py-1.5 rounded-full bg-white/95 dark:bg-neutral-900/95 border border-slate-200 dark:border-neutral-800 text-[11px] font-bold text-slate-800 dark:text-neutral-200 shadow-md flex items-center gap-1.5 backdrop-blur-sm whitespace-nowrap">
+            <div className="absolute -bottom-1 z-10 px-3 py-1 rounded-full bg-white/95 dark:bg-neutral-900/95 border border-slate-200/90 dark:border-neutral-800 text-[10px] sm:text-[11px] font-bold text-slate-800 dark:text-neutral-200 shadow-md flex items-center gap-1.5 backdrop-blur-sm whitespace-nowrap">
               <Sparkles className="w-3 h-3 text-amber-500 fill-amber-500" />
               <span>Personalised learning for stronger results</span>
             </div>
@@ -687,7 +690,7 @@ export function UnifiedLearnerDashboard({
       </div>
 
       {/* 2. Your Learning Path Section */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
@@ -706,21 +709,21 @@ export function UnifiedLearnerDashboard({
         </div>
 
         {/* Horizontal Scrolling Target Pills */}
-        <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           {DASHBOARD_TARGETS.map((target) => {
             const isSelected = target.id === selectedTargetId
             return (
               <button
                 key={target.id}
                 onClick={() => handleSelectTarget(target.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all shrink-0 ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                   isSelected
-                    ? 'bg-[#0066FF] text-white shadow-xs'
+                    ? 'bg-[#0066FF] text-white shadow-xs ring-2 ring-blue-600/20'
                     : 'bg-white dark:bg-neutral-900 border border-slate-200/90 dark:border-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-50 dark:hover:bg-neutral-800'
                 }`}
               >
                 <GraduationCap
-                  className={`w-4 h-4 ${
+                  className={`w-3.5 h-3.5 ${
                     isSelected ? 'text-white' : 'text-slate-500 dark:text-neutral-400'
                   }`}
                 />
@@ -739,10 +742,10 @@ export function UnifiedLearnerDashboard({
       </div>
 
       {/* 3. Recommended for Today Green Card */}
-      <div className="p-5 sm:p-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-white dark:to-neutral-950 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs">
-        <div className="space-y-1.5">
+      <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-white dark:to-neutral-950 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs">
+        <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <Badge variant="default" className="text-[10px] font-bold bg-[#10B981] text-white px-2.5 py-0.5">
+            <Badge variant="default" className="text-[10px] font-bold bg-[#10B981] text-white px-2 py-0.5">
               Recommended for Today
             </Badge>
             <span className="text-slate-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
@@ -752,7 +755,7 @@ export function UnifiedLearnerDashboard({
               <Sparkles className="w-3 h-3 text-emerald-600" /> Instant Automated Grading
             </span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">
             {activeTarget.dailyActionTitle}
           </h3>
           <p className="text-xs text-slate-600 dark:text-neutral-400 max-w-2xl leading-relaxed">
@@ -764,7 +767,7 @@ export function UnifiedLearnerDashboard({
           size="sm"
           onClick={() => handleLaunchSubjectTest(activeTarget.defaultSubject)}
           disabled={isLaunchingTest}
-          className="gap-2 bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-xs h-10 px-5 rounded-xl shadow-xs shrink-0 self-start md:self-auto"
+          className="gap-2 bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-xs h-9 px-4 rounded-xl shadow-xs shrink-0 self-start md:self-auto"
         >
           {isLaunchingTest ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -776,7 +779,7 @@ export function UnifiedLearnerDashboard({
       </div>
 
       {/* 4. Subject Diagnostics & Exam Practice Grid */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
             Subject Diagnostics &amp; Exam Practice — {activeTarget.label}
@@ -790,22 +793,23 @@ export function UnifiedLearnerDashboard({
         </div>
 
         {/* 4x2 Cards Grid on Desktop, 2 cols on Mobile */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-3.5">
           {activeTarget.subjects.map((subj) => (
             <Card
               key={subj.name}
-              className="border border-slate-200/80 dark:border-neutral-800 rounded-2xl bg-white dark:bg-neutral-950 hover:shadow-sm hover:border-blue-500/40 transition-all flex flex-col justify-between p-4"
+              onClick={() => handleLaunchSubjectTest(subj.code)}
+              className="border border-slate-200/80 dark:border-neutral-800 rounded-2xl bg-white dark:bg-neutral-950 hover:shadow-md hover:-translate-y-0.5 hover:border-blue-400 transition-all flex flex-col justify-between p-3.5 sm:p-4 cursor-pointer group"
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div
-                    className={`w-9 h-9 rounded-xl ${subj.iconBg} flex items-center justify-center shrink-0`}
+                    className={`w-9 h-9 rounded-xl ${subj.iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
                   >
                     {getSubjectIcon(subj.iconName, subj.iconColor)}
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 dark:text-neutral-600 shrink-0 mt-1" />
+                  <ChevronRight className="w-4 h-4 text-slate-300 dark:text-neutral-600 shrink-0 mt-1 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
                 </div>
-                <div className="mt-3">
+                <div className="mt-2.5">
                   <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
                     {subj.name}
                   </h3>
@@ -815,15 +819,11 @@ export function UnifiedLearnerDashboard({
                 </div>
               </div>
 
-              <div className="pt-3 mt-3 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between gap-1">
+              <div className="pt-2.5 mt-2.5 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between gap-1">
                 {renderStatusBadge(subj.statusBadge)}
-                <button
-                  type="button"
-                  onClick={() => handleLaunchSubjectTest(subj.code)}
-                  className="text-[11px] font-bold text-slate-700 dark:text-neutral-300 hover:text-[#0066FF] dark:hover:text-[#0066FF] transition-colors whitespace-nowrap"
-                >
+                <span className="text-[11px] font-bold text-slate-700 dark:text-neutral-300 group-hover:text-[#0066FF] transition-colors whitespace-nowrap">
                   Take Test →
-                </button>
+                </span>
               </div>
             </Card>
           ))}
@@ -831,10 +831,10 @@ export function UnifiedLearnerDashboard({
       </div>
 
       {/* 5. Question Bank Banner Strip */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-indigo-500/5 border border-purple-200/60 dark:border-purple-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-2xl bg-purple-500/20 flex items-center justify-center text-purple-600 shrink-0">
-            <Crown className="w-6 h-6 fill-purple-600/20" />
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-indigo-500/5 border border-purple-200/60 dark:border-purple-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 shadow-2xs">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-600 shrink-0">
+            <Crown className="w-5 h-5 fill-purple-600/20" />
           </div>
           <div className="space-y-0.5">
             <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
@@ -847,14 +847,14 @@ export function UnifiedLearnerDashboard({
         </div>
 
         <Link href="/dashboard/question-bank" className="shrink-0 self-start sm:self-auto">
-          <Button className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs h-9 px-4 rounded-xl gap-1.5 shadow-xs">
+          <Button className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs h-8 px-3.5 rounded-xl gap-1.5 shadow-xs">
             Explore Question Bank <ChevronRight className="w-3.5 h-3.5" />
           </Button>
         </Link>
       </div>
 
       {/* 6. Hands-On Learning & AI Tutor Grid */}
-      <div id="ai-tutor" className="space-y-4">
+      <div id="ai-tutor" className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
             Hands-On Learning &amp; AI Tutor
@@ -867,30 +867,30 @@ export function UnifiedLearnerDashboard({
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Left Card: Enterprise Grounded Knowledge Retrieval Engine (ProjectXcel) */}
           <div className="lg:col-span-6">
-            <Card className="border border-slate-200/80 dark:border-neutral-800 rounded-3xl p-5 sm:p-6 bg-white dark:bg-neutral-950 flex flex-col justify-between h-full shadow-2xs">
+            <Card className="border border-slate-200/80 dark:border-neutral-800 rounded-3xl p-4 sm:p-5 bg-white dark:bg-neutral-950 flex flex-col justify-between h-full shadow-2xs">
               <div className="space-y-3">
                 <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                   Enterprise Grounded Knowledge Retrieval Engine (ProjectXcel)
                 </h3>
 
                 {/* Badges */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-teal-700 bg-teal-50 border border-teal-200/80 dark:bg-teal-950/40 dark:text-teal-300">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-teal-700 bg-teal-50 border border-teal-200/80 dark:bg-teal-950/40 dark:text-teal-300">
                     Project-Based Learning
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 dark:bg-indigo-950/40 dark:text-indigo-300">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 dark:bg-indigo-950/40 dark:text-indigo-300">
                     Real-World Skills
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 dark:bg-blue-950/40 dark:text-blue-300">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 dark:bg-blue-950/40 dark:text-blue-300">
                     Mentor Support
                   </span>
                 </div>
 
                 {/* Checklist with 3D Laptop Graphic */}
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center justify-between pt-1">
                   <div className="space-y-2 text-xs font-medium text-slate-700 dark:text-neutral-300">
                     <div className="flex items-center gap-2 text-emerald-600">
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -918,13 +918,13 @@ export function UnifiedLearnerDashboard({
                     <img
                       src="/images/dashboard-laptop-illustration.png"
                       alt="Project Sandbox"
-                      className="w-20 h-16 object-contain drop-shadow-md"
+                      className="w-18 h-14 object-contain drop-shadow-md"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
+              <div className="pt-3 mt-3 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
                 <span className="text-[11px] text-slate-400">Task 2 of 5 Complete</span>
                 <Link href="/projects/rag-engine">
                   <Button
@@ -940,8 +940,8 @@ export function UnifiedLearnerDashboard({
 
           {/* Right Card: Ask Super AI Tutor */}
           <div className="lg:col-span-6">
-            <Card className="border border-slate-200/80 dark:border-neutral-800 rounded-3xl p-5 sm:p-6 bg-white dark:bg-neutral-950 flex flex-col justify-between h-full shadow-2xs">
-              <div className="space-y-3">
+            <Card className="border border-slate-200/80 dark:border-neutral-800 rounded-3xl p-4 sm:p-5 bg-white dark:bg-neutral-950 flex flex-col justify-between h-full shadow-2xs">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-blue-50 text-[#0066FF] flex items-center justify-center">
@@ -962,7 +962,7 @@ export function UnifiedLearnerDashboard({
 
                 {/* AI Output preview */}
                 {aiResponse && (
-                  <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-950/60 bg-blue-50/40 dark:bg-blue-950/20 text-xs text-slate-800 dark:text-neutral-200 leading-relaxed max-h-36 overflow-y-auto">
+                  <div className="p-2.5 rounded-xl border border-blue-100 dark:border-blue-950/60 bg-blue-50/40 dark:bg-blue-950/20 text-xs text-slate-800 dark:text-neutral-200 leading-relaxed max-h-32 overflow-y-auto">
                     <p className="whitespace-pre-wrap">{aiResponse}</p>
                     {aiSources.length > 0 && (
                       <div className="mt-1 pt-1 border-t border-blue-200/60 text-[10px] text-slate-500">
@@ -985,13 +985,13 @@ export function UnifiedLearnerDashboard({
                     value={aiQuestion}
                     onChange={(e) => setAiQuestion(e.target.value)}
                     placeholder="Ask a question or paste a problem..."
-                    className="w-full pl-3.5 pr-10 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#0066FF]"
+                    className="w-full pl-3.5 pr-10 py-2 text-xs rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#0066FF]"
                     disabled={aiLoading}
                   />
                   <button
                     type="submit"
                     disabled={aiLoading || !aiQuestion.trim()}
-                    className="absolute right-2 p-1.5 rounded-lg bg-[#0066FF] hover:bg-blue-700 text-white disabled:opacity-40 transition-colors"
+                    className="absolute right-1.5 p-1.5 rounded-lg bg-[#0066FF] hover:bg-blue-700 text-white disabled:opacity-40 transition-colors"
                   >
                     {aiLoading ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1002,7 +1002,7 @@ export function UnifiedLearnerDashboard({
                 </form>
 
                 {/* Suggestion Chips */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="flex flex-wrap gap-1.5 pt-0.5">
                   {[
                     'Explain concept',
                     'Solve this problem',

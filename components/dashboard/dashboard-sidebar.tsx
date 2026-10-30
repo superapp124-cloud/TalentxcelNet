@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -36,80 +36,107 @@ interface DashboardSidebarProps {
   onCloseMobile?: () => void
 }
 
-const navItems = [
+interface NavItem {
+  id: string
+  label: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  badge?: string | null
+  badgeColor?: string
+}
+
+const navItems: NavItem[] = [
   {
+    id: 'overview',
     label: 'Overview',
     href: '/dashboard',
     icon: LayoutDashboard,
     badge: null,
   },
   {
+    id: 'question-bank',
     label: 'Question Bank',
     href: '/dashboard/question-bank',
     icon: Calculator,
     badge: '3M+',
-    badgeColor: 'bg-blue-50 text-blue-600 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800',
+    badgeColor:
+      'bg-blue-50 text-blue-600 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800',
   },
   {
+    id: 'diagnostic',
     label: 'Diagnostic & Mocks',
     href: '/assessment',
     icon: Target,
     badge: 'New',
-    badgeColor: 'bg-emerald-50 text-emerald-600 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800',
+    badgeColor:
+      'bg-emerald-50 text-emerald-600 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800',
   },
   {
+    id: 'academic',
     label: 'Academic Lessons',
     href: '/academic',
     icon: GraduationCap,
     badge: 'Classes 4-12',
-    badgeColor: 'bg-purple-50 text-purple-600 border border-purple-200/60 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800',
+    badgeColor:
+      'bg-purple-50 text-purple-600 border border-purple-200/60 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800',
   },
   {
+    id: 'skills',
     label: 'Skill Development',
     href: '/skills',
     icon: Sparkles,
     badge: '8 Tracks',
-    badgeColor: 'bg-indigo-50 text-indigo-600 border border-indigo-200/60 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800',
+    badgeColor:
+      'bg-indigo-50 text-indigo-600 border border-indigo-200/60 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800',
   },
   {
+    id: 'projects',
     label: 'AI & Project Labs',
     href: '/courses/ai-development',
     icon: Code2,
     badge: 'Sandbox',
-    badgeColor: 'bg-purple-50 text-purple-600 border border-purple-200/60 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800',
+    badgeColor:
+      'bg-purple-50 text-purple-600 border border-purple-200/60 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800',
   },
   {
+    id: 'plans',
     label: 'Plans & Passes',
     href: '/plans',
     icon: CreditCard,
     badge: 'From ₹20',
-    badgeColor: 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800',
+    badgeColor:
+      'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800',
   },
   {
+    id: 'reports',
     label: 'Progress & Reports',
-    href: '/dashboard',
+    href: '/assessment#reports',
     icon: BarChart3,
     badge: null,
   },
   {
+    id: 'achievements',
     label: 'Achievements',
-    href: '/dashboard',
+    href: '/dashboard#achievements',
     icon: Award,
     badge: null,
   },
   {
+    id: 'bookmarks',
     label: 'My Bookmarks',
-    href: '/dashboard',
+    href: '/dashboard#bookmarks',
     icon: Bookmark,
     badge: null,
   },
   {
+    id: 'notes',
     label: 'Notes & Revision',
     href: '/academic',
     icon: FileText,
     badge: null,
   },
   {
+    id: 'settings',
     label: 'Settings',
     href: '/dashboard/settings',
     icon: Settings,
@@ -123,40 +150,68 @@ export function DashboardSidebar({
   onCloseMobile,
 }: DashboardSidebarProps) {
   const pathname = usePathname()
+  const [activeItem, setActiveItem] = useState<string>('overview')
+
+  const isNavActive = (item: NavItem) => {
+    if (item.id === 'overview') {
+      return pathname === '/dashboard' && activeItem === 'overview'
+    }
+    if (item.id === 'settings') {
+      return pathname.startsWith('/dashboard/settings')
+    }
+    if (item.id === 'question-bank') {
+      return pathname.startsWith('/dashboard/question-bank')
+    }
+    if (item.id === 'diagnostic') {
+      return pathname === '/assessment' && activeItem !== 'reports'
+    }
+    if (item.id === 'academic') {
+      return pathname === '/academic' && activeItem !== 'notes'
+    }
+    if (item.id === 'skills') {
+      return pathname.startsWith('/skills')
+    }
+    if (item.id === 'projects') {
+      return pathname.startsWith('/courses') || pathname.startsWith('/projects')
+    }
+    if (item.id === 'plans') {
+      return pathname.startsWith('/plans')
+    }
+    return activeItem === item.id
+  }
 
   const NavLinks = () => (
-    <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto" aria-label="Dashboard navigation">
+    <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto" aria-label="Dashboard navigation">
       {navItems.map((item) => {
         const Icon = item.icon
-        const isActive =
-          item.href === '/dashboard'
-            ? pathname === '/dashboard'
-            : pathname.startsWith(item.href)
+        const active = isNavActive(item)
 
         return (
           <Link
-            key={item.label}
+            key={item.id}
             href={item.href}
-            onClick={onCloseMobile}
+            onClick={() => {
+              setActiveItem(item.id)
+              if (onCloseMobile) onCloseMobile()
+            }}
             className={`group flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
-              isActive
+              active
                 ? 'bg-[#0066FF] text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100/80 dark:hover:bg-neutral-900 hover:text-slate-900 dark:hover:text-white'
+                : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <div className="flex items-center gap-3">
               <Icon
                 className={`h-4 w-4 shrink-0 transition-colors ${
-                  isActive ? 'text-white' : 'text-slate-400 dark:text-neutral-500 group-hover:text-blue-600'
+                  active ? 'text-white' : 'text-slate-400 dark:text-neutral-500 group-hover:text-blue-600'
                 }`}
-                aria-hidden="true"
               />
               <span className="truncate">{item.label}</span>
             </div>
             {item.badge && (
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
-                  isActive ? 'bg-white/20 text-white' : item.badgeColor
+                  active ? 'bg-white/20 text-white' : item.badgeColor
                 }`}
               >
                 {item.badge}
@@ -220,7 +275,7 @@ export function DashboardSidebar({
 
       {/* Desktop Fixed Sidebar */}
       <aside
-        className="hidden lg:flex w-60 flex-col shrink-0 border-r border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 min-h-[calc(100vh-4rem)] sticky top-16 select-none"
+        className="hidden lg:flex w-56 xl:w-60 flex-col shrink-0 border-r border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 min-h-[calc(100vh-4rem)] sticky top-16 select-none"
         aria-label="Dashboard navigation"
       >
         <NavLinks />
