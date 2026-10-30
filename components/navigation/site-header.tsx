@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -13,16 +13,109 @@ import {
   Menu,
   X,
   Calculator,
+  LayoutDashboard,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { createClient } from '@/lib/supabase/client'
 
 interface SiteHeaderProps {
   onOpenGrowthPlan?: () => void
 }
 
+interface CurrentUser {
+  id: string
+  email?: string
+  displayName?: string
+  avatarUrl?: string | null
+}
+
 export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    try {
+      const supabase = createClient()
+
+      // 1. Fast local session check (instant from cookies/storage)
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (mounted && session?.user) {
+          const user = session.user
+          const name =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            user.email?.split('@')[0] ||
+            'Learner'
+          const avatarUrl =
+            user.user_metadata?.avatar_url ||
+            user.user_metadata?.picture ||
+            null
+          setCurrentUser({
+            id: user.id,
+            email: user.email,
+            displayName: name,
+            avatarUrl,
+          })
+        }
+      })
+
+      // 2. Server verification check
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (mounted && user) {
+          const name =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            user.email?.split('@')[0] ||
+            'Learner'
+          const avatarUrl =
+            user.user_metadata?.avatar_url ||
+            user.user_metadata?.picture ||
+            null
+          setCurrentUser({
+            id: user.id,
+            email: user.email,
+            displayName: name,
+            avatarUrl,
+          })
+        }
+      })
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          if (!mounted) return
+          if (session?.user) {
+            const user = session.user
+            const name =
+              user.user_metadata?.full_name ||
+              user.user_metadata?.name ||
+              user.email?.split('@')[0] ||
+              'Learner'
+            const avatarUrl =
+              user.user_metadata?.avatar_url ||
+              user.user_metadata?.picture ||
+              null
+            setCurrentUser({
+              id: user.id,
+              email: user.email,
+              displayName: name,
+              avatarUrl,
+            })
+          } else {
+            setCurrentUser(null)
+          }
+        }
+      )
+
+      return () => {
+        mounted = false
+        subscription?.unsubscribe()
+      }
+    } catch {
+      // Fallback in environments without Supabase
+    }
+  }, [])
 
   const navLinks = [
     {
@@ -68,22 +161,25 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
   ]
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Brand Mark */}
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* Brand & Desktop Navigation */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 group focus:outline-none" aria-label="TalentXcel Home">
-            <img
-              src="/brand/talentxcel-logo.png"
-              alt="talentXcel"
-              width={140}
-              height={36}
-              className="h-8 sm:h-9 w-auto object-contain"
-            />
+          <Link
+            href="/"
+            className="flex items-center gap-2 group transition-opacity hover:opacity-95"
+            aria-label="TalentXcel Home"
+          >
+            <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+              TX
+            </div>
+            <span className="text-xl font-black tracking-tight text-slate-900">
+              talent<span className="text-blue-600 font-extrabold">Xcel</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold" aria-label="Main Navigation">
+          <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -136,12 +232,35 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
             <span>Growth Dashboard</span>
           </Link>
 
-          <Link
-            href="/auth/login"
-            className="text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-300 shadow-2xs h-8.5 px-3.5 rounded-xl transition-all inline-flex items-center justify-center"
-          >
-            Sign In
-          </Link>
+          {/* Dynamic Auth Button: Dashboard (if logged in) or Sign In (if logged out) */}
+          {currentUser ? (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-700 shadow-xs h-8.5 px-3.5 rounded-xl transition-all"
+            >
+              {currentUser.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={currentUser.avatarUrl}
+                  alt={currentUser.displayName || 'Learner'}
+                  referrerPolicy="no-referrer"
+                  className="w-5 h-5 rounded-full object-cover ring-1 ring-white/50"
+                />
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+                  {currentUser.displayName?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              )}
+              <span>Dashboard</span>
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-300 shadow-2xs h-8.5 px-3.5 rounded-xl transition-all inline-flex items-center justify-center"
+            >
+              Sign In
+            </Link>
+          )}
 
           <Link
             href="/assessment"
@@ -164,27 +283,16 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-150">
-          <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
-            <img
-              src="/brand/talentxcel-logo.png"
-              alt="talentXcel"
-              width={120}
-              height={28}
-              className="h-7 w-auto object-contain"
-            />
-            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Navigation</span>
-          </div>
-          <div className="space-y-1">
+        <div className="lg:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-5 space-y-3 shadow-lg">
+          <div className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                aria-current={link.active ? 'page' : undefined}
-                className={`flex items-center justify-between p-3 rounded-xl text-sm font-semibold transition-colors ${
+                className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold ${
                   link.active
-                    ? 'bg-blue-50 text-blue-900 font-bold'
+                    ? 'bg-blue-50 text-blue-700 font-bold'
                     : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
@@ -202,6 +310,25 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
           </div>
 
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+            {currentUser ? (
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs h-10 px-4 rounded-xl transition-colors shadow-2xs gap-2"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Go to My Dashboard ({currentUser.displayName}) →</span>
+              </Link>
+            ) : (
+              <Link
+                href="/auth/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs h-10 px-4 rounded-xl transition-colors shadow-2xs"
+              >
+                <span>Sign In to Your Account →</span>
+              </Link>
+            )}
+
             {onOpenGrowthPlan && (
               <button
                 type="button"
@@ -215,15 +342,6 @@ export function SiteHeader({ onOpenGrowthPlan }: SiteHeaderProps) {
                 <span>View Personalised Growth Plan</span>
               </button>
             )}
-
-            <Link
-              href="/admin/growth-analytics"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-start text-xs font-semibold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 h-10 px-4 rounded-xl transition-colors"
-            >
-              <TrendingUp className="w-4 h-4 mr-2 text-indigo-600" />
-              <span>Truthful Growth Telemetry</span>
-            </Link>
 
             <Link
               href="/assessment"

@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -37,6 +38,39 @@ const navLinks = [
 export function PublicNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<{ displayName: string; avatarUrl: string | null } | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    try {
+      const supabase = createClient()
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (mounted && session?.user) {
+          const u = session.user
+          const name = u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'Learner'
+          const avatarUrl = u.user_metadata?.avatar_url || u.user_metadata?.picture || null
+          setCurrentUser({ displayName: name, avatarUrl })
+        }
+      })
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!mounted) return
+        if (session?.user) {
+          const u = session.user
+          const name = u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'Learner'
+          const avatarUrl = u.user_metadata?.avatar_url || u.user_metadata?.picture || null
+          setCurrentUser({ displayName: name, avatarUrl })
+        } else {
+          setCurrentUser(null)
+        }
+      })
+      return () => {
+        mounted = false
+        subscription?.unsubscribe()
+      }
+    } catch {
+      // Fallback
+    }
+  }, [])
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#000000]/85 backdrop-blur-2xl transition-all">
@@ -112,15 +146,39 @@ export function PublicNavbar() {
 
         {/* Desktop CTA Pill Buttons */}
         <div className="hidden lg:flex items-center gap-3">
-          <Link href="/auth/login">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs font-medium rounded-full text-neutral-300 hover:text-white hover:bg-white/[0.08]"
-            >
-              Sign In
-            </Button>
-          </Link>
+          {currentUser ? (
+            <Link href="/dashboard">
+              <Button
+                size="sm"
+                className="rounded-full bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-semibold px-4 shadow-sm flex items-center gap-2"
+              >
+                {currentUser.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={currentUser.avatarUrl}
+                    alt={currentUser.displayName}
+                    referrerPolicy="no-referrer"
+                    className="w-4 h-4 rounded-full object-cover ring-1 ring-white/50"
+                  />
+                ) : (
+                  <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px] font-bold">
+                    {currentUser.displayName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span>Dashboard</span>
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/auth/login">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs font-medium rounded-full text-neutral-300 hover:text-white hover:bg-white/[0.08]"
+              >
+                Sign In
+              </Button>
+            </Link>
+          )}
           <Link href="/apply">
             <Button
               size="sm"
@@ -172,12 +230,20 @@ export function PublicNavbar() {
               </div>
             ))}
             <div className="flex gap-2.5 mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.08]">
-              <Link href="/auth/login" className="flex-1">
-                <Button variant="outline" size="sm" className="w-full rounded-full text-xs">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/apply" className="flex-1">
+              {currentUser ? (
+                <Link href="/dashboard" className="flex-1" onClick={() => setMobileOpen(false)}>
+                  <Button size="sm" className="w-full rounded-full bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-bold">
+                    Dashboard ({currentUser.displayName}) →
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/auth/login" className="flex-1" onClick={() => setMobileOpen(false)}>
+                  <Button variant="outline" size="sm" className="w-full rounded-full text-xs">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
+              <Link href="/apply" className="flex-1" onClick={() => setMobileOpen(false)}>
                 <Button size="sm" className="w-full rounded-full bg-neutral-900 text-white dark:bg-white dark:text-black text-xs">
                   Apply Now
                 </Button>

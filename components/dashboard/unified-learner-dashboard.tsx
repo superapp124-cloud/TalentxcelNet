@@ -659,7 +659,7 @@ export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) 
             <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-blue-100 via-sky-200 to-indigo-100 dark:from-blue-950/50 dark:via-sky-950/40 dark:to-indigo-950/50 shadow-inner ring-4 ring-white/90 dark:ring-neutral-900 overflow-hidden flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/dashboard-hero-student.png"
+                src="/images/dashboard-hero-student-v2.png"
                 alt="TalentXcel Student"
                 className="w-full h-full object-cover object-top"
               />
