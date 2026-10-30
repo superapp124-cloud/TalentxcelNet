@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Users, Phone, Mail, Clock, CheckCircle2, UserCheck, Filter, Download } from 'lucide-react'
+import { Users, Phone, Mail, Clock, CheckCircle2, UserCheck, Filter, Download, Inbox, Database } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,66 +12,20 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
-const fallbackLeads = [
-  {
-    id: 'lead-001',
-    full_name: 'Priya Sharma',
-    email: 'priya.sharma@example.in',
-    phone: '+91 98765 43210',
-    programme_interest: 'AI Development & Automation',
-    status: 'counselling_scheduled',
-    source: 'Website Form (Google Ads)',
-    assigned_counsellor: 'Rahul Mehta',
-    created_at: '2026-10-16T10:30:00Z',
-  },
-  {
-    id: 'lead-002',
-    full_name: 'Aditya Verma',
-    email: 'aditya.verma@example.com',
-    phone: '+91 98112 23344',
-    programme_interest: 'AI Development & Automation',
-    status: 'application_submitted',
-    source: 'Direct Portal Apply',
-    assigned_counsellor: 'Anjali Desai',
-    created_at: '2026-10-16T09:15:00Z',
-  },
-  {
-    id: 'lead-003',
-    full_name: 'Dr. Sameer Joshi',
-    email: 'sameer.j@healthclinic.in',
-    phone: '+91 98220 11928',
-    programme_interest: 'Healthcare Technology',
-    status: 'admitted',
-    source: 'Referral (Alumni)',
-    assigned_counsellor: 'Rahul Mehta',
-    created_at: '2026-10-15T16:45:00Z',
-  },
-  {
-    id: 'lead-004',
-    full_name: 'Meenakshi Iyer',
-    email: 'm.iyer@enterprises.org',
-    phone: '+91 97654 32109',
-    programme_interest: 'Entrepreneurship & Small-Business Digitization',
-    status: 'enrolled',
-    source: 'MSME Growth Summit',
-    assigned_counsellor: 'Anjali Desai',
-    created_at: '2026-10-14T11:20:00Z',
-  },
-  {
-    id: 'lead-005',
-    full_name: 'Kavita Sundaram (Guardian)',
-    email: 'kavita.s@guardian.in',
-    phone: '+91 99887 76655',
-    programme_interest: 'School Foundation (Class 8 → 9)',
-    status: 'counselling_completed',
-    source: 'Parent Network Forum',
-    assigned_counsellor: 'Deepak Rao',
-    created_at: '2026-10-13T14:10:00Z',
-  },
-]
+interface LeadRecord {
+  id: string
+  full_name: string
+  email: string
+  phone: string
+  programme_interest: string
+  status: string
+  source: string
+  assigned_counsellor: string
+  created_at: string
+}
 
 export default async function AdmissionsCRMPage() {
-  let displayLeads = fallbackLeads
+  let displayLeads: LeadRecord[] = []
 
   try {
     const supabase = await createClient()
@@ -79,13 +33,14 @@ export default async function AdmissionsCRMPage() {
       .from('leads')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(25)
+      .limit(50)
 
     if (!error && dbLeads && dbLeads.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       displayLeads = dbLeads.map((item: any) => ({
         id: item.id,
-        full_name: item.full_name,
-        email: item.email,
+        full_name: item.full_name || 'Enquiry Candidate',
+        email: item.email || 'N/A',
         phone: item.phone || 'Not provided',
         programme_interest: item.programme_interest || 'General Admissions',
         status: item.status || 'new_enquiry',
@@ -95,7 +50,7 @@ export default async function AdmissionsCRMPage() {
       }))
     }
   } catch (err) {
-    console.warn('[Admissions CRM] Supabase read fallback active:', err)
+    console.warn('[Admissions CRM] Supabase query failed:', err)
   }
 
   const getStatusBadge = (status: string) => {
@@ -125,103 +80,106 @@ export default async function AdmissionsCRMPage() {
             Admissions CRM & Funnel Operations
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Lead capture pipeline, 13-stage workflow tracking, counsellor assignments, and verified enrolment records.
+            Real PostgreSQL candidate registry. Zero mock data.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-            <Filter className="h-3.5 w-3.5" /> Filter Stages
-          </Button>
-          <Button size="sm" className="gap-1.5 text-xs">
-            <Download className="h-3.5 w-3.5" /> Export Leads CSV
-          </Button>
+          <Badge variant="outline" className="gap-1.5 text-xs text-emerald-600 border-emerald-300 py-1">
+            <Database className="w-3.5 h-3.5" />
+            Live Supabase Pipeline
+          </Badge>
         </div>
       </div>
 
-      {/* KPI Funnel Overview */}
+      {/* KPI Funnel Overview (Real Counts) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="p-4">
+        <Card className="p-4 border border-slate-200 dark:border-neutral-800">
           <div className="text-xs text-muted-foreground font-semibold">Active Prospects</div>
-          <div className="text-2xl font-bold text-foreground mt-1">{displayLeads.length}</div>
+          <div className="text-2xl font-black text-foreground mt-1">{displayLeads.length}</div>
         </Card>
-        <Card className="p-4">
+        <Card className="p-4 border border-slate-200 dark:border-neutral-800">
           <div className="text-xs text-muted-foreground font-semibold">Counselling Scheduled</div>
-          <div className="text-2xl font-bold text-amber-500 mt-1">
+          <div className="text-2xl font-black text-amber-500 mt-1">
             {displayLeads.filter((l) => l.status.includes('counselling')).length}
           </div>
         </Card>
-        <Card className="p-4">
+        <Card className="p-4 border border-slate-200 dark:border-neutral-800">
           <div className="text-xs text-muted-foreground font-semibold">Applications Submitted</div>
-          <div className="text-2xl font-bold text-indigo-500 mt-1">
+          <div className="text-2xl font-black text-indigo-500 mt-1">
             {displayLeads.filter((l) => l.status === 'application_submitted' || l.status === 'admitted').length}
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="text-xs text-muted-foreground font-semibold">Enrolled Cohort 1</div>
-          <div className="text-2xl font-bold text-green-500 mt-1">
+        <Card className="p-4 border border-slate-200 dark:border-neutral-800">
+          <div className="text-xs text-muted-foreground font-semibold">Enrolled Learners</div>
+          <div className="text-2xl font-black text-emerald-500 mt-1">
             {displayLeads.filter((l) => l.status === 'enrolled').length}
           </div>
         </Card>
       </div>
 
       {/* Leads Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">Admissions Candidate Registry</CardTitle>
+      <Card className="border border-slate-200 dark:border-neutral-800">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base font-semibold">
+            Admissions Candidate Registry ({displayLeads.length} total)
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
-          <table className="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr className="border-b bg-muted/40 text-xs font-semibold text-muted-foreground uppercase">
-                <th className="p-4">Applicant</th>
-                <th className="p-4">Programme Track</th>
-                <th className="p-4">Pipeline Status</th>
-                <th className="p-4">Assigned Counsellor</th>
-                <th className="p-4">Lead Source</th>
-                <th className="p-4">Received</th>
-                <th className="p-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {displayLeads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="p-4">
-                    <div className="font-semibold text-foreground">{lead.full_name}</div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                      <span>{lead.email}</span>
-                      <span>•</span>
-                      <span>{lead.phone}</span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-xs font-medium text-foreground">{lead.programme_interest}</td>
-                  <td className="p-4">
-                    {getStatusBadge(lead.status)}
-                  </td>
-                  <td className="p-4 text-xs">
-                    <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                      <UserCheck className="h-3.5 w-3.5 text-primary" /> {lead.assigned_counsellor}
-                    </span>
-                  </td>
-                  <td className="p-4 text-xs text-muted-foreground">{lead.source}</td>
-                  <td className="p-4 text-xs text-muted-foreground">
-                    {new Date(lead.created_at).toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </td>
-                  <td className="p-4 text-right space-x-2">
-                    <Button variant="outline" size="sm" className="text-xs h-7">
-                      Schedule Call
-                    </Button>
-                    <Button size="sm" className="text-xs h-7">
-                      Review File
-                    </Button>
-                  </td>
+          {displayLeads.length > 0 ? (
+            <table className="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr className="border-b bg-muted/40 text-xs font-semibold text-muted-foreground uppercase">
+                  <th className="p-4">Applicant</th>
+                  <th className="p-4">Programme Track</th>
+                  <th className="p-4">Pipeline Status</th>
+                  <th className="p-4">Assigned Counsellor</th>
+                  <th className="p-4">Lead Source</th>
+                  <th className="p-4">Received</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y">
+                {displayLeads.map((lead) => (
+                  <tr key={lead.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="p-4">
+                      <div className="font-semibold text-foreground">{lead.full_name}</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
+                        <span>{lead.email}</span>
+                        {lead.phone && (
+                          <>
+                            <span>•</span>
+                            <span>{lead.phone}</span>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-4 text-xs font-medium text-foreground">{lead.programme_interest}</td>
+                    <td className="p-4">{getStatusBadge(lead.status)}</td>
+                    <td className="p-4 text-xs">
+                      <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                        <UserCheck className="h-3.5 w-3.5 text-primary" /> {lead.assigned_counsellor}
+                      </span>
+                    </td>
+                    <td className="p-4 text-xs text-muted-foreground">{lead.source}</td>
+                    <td className="p-4 text-xs text-muted-foreground">
+                      {new Date(lead.created_at).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="py-16 text-center space-y-3">
+              <Inbox className="w-10 h-10 mx-auto text-slate-400" />
+              <h3 className="text-base font-bold text-foreground">No Enquiry Records Yet</h3>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                No mock data is being displayed. As soon as visitors submit applications on <code>/apply</code> or free practice tests on <code>/assessment</code>, real records will be displayed here in real time.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

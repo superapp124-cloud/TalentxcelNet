@@ -380,6 +380,9 @@ interface UnifiedLearnerDashboardProps {
     displayName?: string
     avatarUrl?: string | null
     isGoogleUser?: boolean
+    streakDays?: number
+    accuracyPercentage?: number
+    testsCompleted?: number
   }
 }
 
@@ -640,15 +643,21 @@ export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) 
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
               <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 font-bold border border-orange-200/60 dark:border-orange-900/40">
                 <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500 animate-pulse" />
-                4-Day Streak
+                {user.testsCompleted && user.testsCompleted > 0
+                  ? `${user.streakDays || 1}-Day Streak`
+                  : 'Daily Study Streak'}
               </span>
               <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 font-bold border border-blue-200/60 dark:border-blue-900/40">
                 <Zap className="w-3.5 h-3.5 text-blue-600" />
-                88% Accuracy
+                {user.accuracyPercentage !== undefined
+                  ? `${user.accuracyPercentage}% Accuracy`
+                  : 'Diagnostic Ready'}
               </span>
               <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-200/60 dark:border-emerald-900/40">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                Instant Automated Grading
+                {user.testsCompleted && user.testsCompleted > 0
+                  ? `${user.testsCompleted} Test${user.testsCompleted > 1 ? 's' : ''} Completed`
+                  : 'Instant Automated Grading'}
               </span>
             </div>
           </div>
