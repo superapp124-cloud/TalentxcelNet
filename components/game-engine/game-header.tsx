@@ -94,19 +94,16 @@ export function GameHeader({
               <ArrowLeft className="w-4 h-4" />
             </button>
 
-            {/* Official Brand Logo: Emblem + Wordmark */}
+            {/* Official Brand Logo: Emblem Only */}
             <Link
               href="/"
-              className="flex items-center gap-2 group transition-transform active:scale-[0.98]"
+              className="flex items-center group transition-transform active:scale-[0.95]"
               aria-label="TalentXcel Home"
             >
               <TalentXcelEmblem
                 className="h-7 w-7 text-white group-hover:scale-105 transition-transform duration-200"
                 pixelSize={28}
               />
-              <span className="font-semibold text-[17px] tracking-tight text-white font-sans leading-none inline-flex items-baseline">
-                talent<span className="font-extrabold text-[#0080FF]">X</span>cel
-              </span>
             </Link>
           </div>
 
