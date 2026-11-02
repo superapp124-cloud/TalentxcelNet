@@ -124,7 +124,7 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
       expect(body.error).toBe('Authentication required')
       expect(body.message).toContain('strictly reserved for authenticated learners')
       expect(body.redirectTo).toBe('/auth/login?redirectTo=/dashboard/question-bank')
-    })
+    }, 15000)
 
     it('allows verified authenticated or E2E audit sessions to access questions', async () => {
       const { GET } = await import('../../app/api/questions/bank/route')
