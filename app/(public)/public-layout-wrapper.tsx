@@ -17,6 +17,7 @@ export function PublicLayoutWrapper({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const isPlatformRoute =
     pathname === '/' ||
+    pathname.startsWith('/game') ||
     pathname.startsWith('/assessment') ||
     pathname.startsWith('/skills') ||
     pathname.startsWith('/academic') ||

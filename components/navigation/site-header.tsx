@@ -27,6 +27,7 @@ import {
   X,
   LayoutDashboard,
   CheckCircle2,
+  Gamepad2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { TalentXcelEmblem } from '@/components/brand/logo'
@@ -69,6 +70,15 @@ const NAVIGATION_CATEGORIES: NavCategory[] = [
     dropdownWidth: 'w-[520px]',
     gridCols: 'grid-cols-2',
     items: [
+      {
+        title: 'Universal Game Arena',
+        description: 'Every subject & chapter gamified: Math Quest, Science Lab, Word Arena & Coding.',
+        href: '/game',
+        icon: Gamepad2,
+        iconBg: 'bg-purple-50 text-purple-600',
+        iconColor: 'text-purple-600',
+        badge: 'New Game',
+      },
       {
         title: 'Diagnostic Assessments',
         description: 'Server-verified curriculum assessments with instant gap derivations.',

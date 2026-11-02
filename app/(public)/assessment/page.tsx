@@ -32,6 +32,7 @@ import {
   GraduationCap,
   Play,
   RotateCcw,
+  Gamepad2,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -418,6 +419,23 @@ export default function AssessmentPage() {
                 <span>★ 40 Pts</span>
               </div>
             </div>
+          </div>
+
+          {/* Mode Switcher Strip: Formal Assessment vs Game-Based Learning */}
+          <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-2xl bg-slate-100 border border-slate-200 text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="px-3 py-1 rounded-xl bg-white text-slate-900 font-bold shadow-2xs border border-slate-200 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                Formal Assessment Mode (Proctored &amp; Curriculum-Timed)
+              </span>
+            </div>
+            <Link
+              href="/game"
+              className="px-3 py-1 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-extrabold shadow-xs flex items-center gap-1.5 transition-all active:scale-95"
+            >
+              <Gamepad2 className="w-3.5 h-3.5" />
+              <span>Switch to Gamified Arena (Math Quest, Lab &amp; XP) →</span>
+            </Link>
           </div>
 
           {/* App-Style Hero Daily Challenge Banner */}

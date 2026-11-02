@@ -32,6 +32,7 @@ import {
   Lightbulb,
   FlaskConical,
   Zap,
+  Gamepad2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -790,6 +791,57 @@ export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) 
           )}
           Start 5-Min Diagnostic
         </Button>
+      </div>
+
+      {/* 3.5. Universal Gamified Learning Engine Arena Card */}
+      <div className="relative overflow-hidden p-5 rounded-3xl border border-purple-500/30 bg-gradient-to-r from-[#1e1b4b] via-[#2e1065] to-[#0f172a] text-white shadow-lg">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-radial from-purple-500/20 to-transparent pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-xs">
+                Gamified Learning Engine
+              </span>
+              <span className="text-purple-300 text-xs font-semibold">
+                Every Subject • Every Chapter • A Different Game
+              </span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5 text-purple-400" />
+              <span>Universal Game Arena: Classes 4–12</span>
+            </h3>
+            <p className="text-xs text-purple-200/80 max-w-2xl leading-relaxed">
+              Step into Math Quest, Science Lab, Word Arena, World Explorer, Code Builder, and Logic Arena. Earn XP, collect power-ups, defeat boss challenges, and master curriculum concepts through mobile-first interactive gameplay.
+            </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-300">
+                Math Quest
+              </span>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
+                Science Lab
+              </span>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-400/30 text-amber-300">
+                Word Arena
+              </span>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-cyan-500/20 border border-cyan-400/30 text-cyan-300">
+                Code Builder
+              </span>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-pink-500/20 border border-pink-400/30 text-pink-300">
+                Logic Arena
+              </span>
+            </div>
+          </div>
+
+          <Link href="/game">
+            <Button
+              className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black text-xs sm:text-sm h-11 px-5 rounded-2xl shadow-xl hover:shadow-purple-500/25 shrink-0 self-start md:self-auto ring-2 ring-white/20 active:scale-[0.98] transition-all"
+            >
+              <Gamepad2 className="h-4 w-4" />
+              Enter Game Arena
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* 4. Subject Diagnostics & Exam Practice Grid */}
