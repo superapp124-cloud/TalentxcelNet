@@ -19,6 +19,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Clean up any partial/stale tables from prior test runs (Safe idempotency)
+DROP TABLE IF EXISTS public.academic_parent_reports CASCADE;
+DROP TABLE IF EXISTS public.academic_revision_plans CASCADE;
+DROP TABLE IF EXISTS public.academic_exam_calendar CASCADE;
+DROP TABLE IF EXISTS public.academic_doubt_sessions CASCADE;
+DROP TABLE IF EXISTS public.student_error_dna CASCADE;
+DROP TABLE IF EXISTS public.academic_mastery_events CASCADE;
+DROP TABLE IF EXISTS public.student_mastery CASCADE;
+DROP TABLE IF EXISTS public.academic_assessment_attempts CASCADE;
+DROP TABLE IF EXISTS public.academic_student_guardians CASCADE;
+DROP TABLE IF EXISTS public.academic_exam_concepts CASCADE;
+DROP TABLE IF EXISTS public.academic_curriculum_concepts CASCADE;
+DROP TABLE IF EXISTS public.academic_prerequisites CASCADE;
+DROP TABLE IF EXISTS public.academic_concepts CASCADE;
+DROP TABLE IF EXISTS public.academic_topics CASCADE;
+DROP TABLE IF EXISTS public.academic_chapters CASCADE;
+DROP TABLE IF EXISTS public.academic_subjects CASCADE;
+DROP TABLE IF EXISTS public.academic_examinations CASCADE;
+DROP TABLE IF EXISTS public.academic_curricula CASCADE;
+DROP TABLE IF EXISTS public.academic_programs CASCADE;
+DROP TABLE IF EXISTS public.academic_boards CASCADE;
+
 -- ============================================================================
 -- 1. ACADEMIC BOARDS & EDUCATION AUTHORITIES
 -- ============================================================================
