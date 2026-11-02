@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { TalentXcelEmblem } from '@/components/brand/logo'
 import { ALL_COMMERCIAL_PRODUCTS, calculateCommercialOrderSummary } from '@/packages/core/src/data/product-catalog'
 import type { CommercialProduct, CommercialOrderSummary, LearnerEntitlement } from '@/packages/core/src/types'
 
@@ -220,9 +221,7 @@ export function RazorpayCheckoutModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 bg-slate-50 border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-              TX
-            </div>
+            <TalentXcelEmblem className="w-7 h-7 text-slate-900" pixelSize={28} />
             <div>
               <h3 className="text-sm font-bold text-slate-900">
                 {isSuccess ? 'Payment Successful' : 'Secure Checkout'}
