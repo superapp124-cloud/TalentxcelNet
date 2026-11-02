@@ -10,6 +10,71 @@ export interface DiagnosticAssessmentPackage {
   solutions: ConfidentialQuestionSolution[]
 }
 
+/**
+ * Automatically balances and shuffles question options so correct answers
+ * are evenly distributed across A, B, C, and D, completely eliminating
+ * the "all Option A" bias while preserving solution pointers and step derivations.
+ */
+export function shuffleAndBalanceOptions(
+  questions: AuthorizedQuestion[],
+  solutions: ConfidentialQuestionSolution[],
+  seed?: number
+): { questions: AuthorizedQuestion[]; solutions: ConfidentialQuestionSolution[] } {
+  const currentSeed = seed !== undefined ? Math.abs(seed) : Math.floor(Math.random() * 1000000)
+
+  const solutionsMap = new Map<string, ConfidentialQuestionSolution>()
+  solutions.forEach((s) => solutionsMap.set(s.questionId, s))
+
+  // Balanced target slot rotation across questions to guarantee uniform distribution:
+  // Q0: index 1 (B), Q1: index 3 (D), Q2: index 0 (A), Q3: index 2 (C), Q4: index 1 (B)...
+  const slotPermutation = [1, 3, 0, 2] // B, D, A, C
+
+  const shuffledQuestions = questions.map((q, qIndex) => {
+    if (!q.options || q.options.length <= 1) return q
+
+    const sol = solutionsMap.get(q.id)
+    const correctId = sol?.correctOptionIds?.[0] || q.options[0]?.id
+
+    // Find the correct option and the distractor options
+    const correctOpt = q.options.find((opt) => opt.id === correctId) || q.options[0]
+    const distractors = q.options.filter((opt) => opt.id !== correctOpt.id)
+
+    // Deterministic distractor permutation based on seed + qIndex
+    const distractorOrder = [...distractors].sort((a, b) => {
+      const charSumA = a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+      const charSumB = b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+      return ((charSumA + currentSeed + qIndex) % 17) - ((charSumB + currentSeed + qIndex) % 17)
+    })
+
+    // Target slot for correct answer: rotates across [1, 3, 0, 2] offset by attempt seed
+    const seedOffset = Math.floor(currentSeed / (qIndex + 1)) % q.options.length
+    const targetCorrectIndex = (slotPermutation[qIndex % slotPermutation.length] + seedOffset) % q.options.length
+
+    const newOptions = new Array(q.options.length)
+    newOptions[targetCorrectIndex] = correctOpt
+
+    let distractorIdx = 0
+    for (let i = 0; i < q.options.length; i++) {
+      if (i !== targetCorrectIndex) {
+        newOptions[i] = distractorOrder[distractorIdx++] || distractors[0]
+      }
+    }
+
+    const labels = ['A', 'B', 'C', 'D', 'E', 'F']
+    const relabeledOptions = newOptions.map((opt, idx) => ({
+      ...opt,
+      label: labels[idx] || String.fromCharCode(65 + idx),
+    }))
+
+    return {
+      ...q,
+      options: relabeledOptions,
+    }
+  })
+
+  return { questions: shuffledQuestions, solutions }
+}
+
 // ============================================================================
 // 1. REASONING DIMENSION ASSESSMENTS (6 DISTINCT DIMENSIONS)
 // ============================================================================
@@ -968,7 +1033,8 @@ export function getHindiClassQuestions(classNumber: number): { questions: Author
 export function getClassDiagnosticPackage(
   classNumber: number,
   subjectCode: string,
-  boardCode: string = 'CBSE'
+  boardCode: string = 'CBSE',
+  attemptSeed?: number
 ): DiagnosticAssessmentPackage {
   const cls = Math.max(3, Math.min(12, classNumber))
   const subj = subjectCode.toLowerCase()
@@ -976,14 +1042,19 @@ export function getClassDiagnosticPackage(
   // 1. HINDI: Returns 100% authentic Devnagari Hindi questions for all classes
   if (subj.includes('hin')) {
     const hindiData = getHindiClassQuestions(cls)
+    const { questions: balancedQ, solutions: balancedS } = shuffleAndBalanceOptions(
+      hindiData.questions,
+      hindiData.solutions,
+      attemptSeed
+    )
     const blueprint: AssessmentBlueprint = {
       id: `bp_diag_c${cls}_hindi`,
       title: `Class ${cls} Hindi Diagnostic (हिंदी व्याकरण एवं साहित्य • ${boardCode})`,
       subjectId: `subj_c${cls}_hindi`,
       chapterId: 'diagnostic_hindi_core',
       durationMinutes: 10,
-      totalQuestions: hindiData.questions.length,
-      totalMarks: hindiData.questions.length * 2,
+      totalQuestions: balancedQ.length,
+      totalMarks: balancedQ.length * 2,
       negativeMarkingRatio: 0,
       passingPercentage: 60,
       rewardCreditAmount: 20,
@@ -991,7 +1062,7 @@ export function getClassDiagnosticPackage(
       category: 'academic',
       difficulty: 'medium',
     }
-    return { blueprint, questions: hindiData.questions, solutions: hindiData.solutions }
+    return { blueprint, questions: balancedQ, solutions: balancedS }
   }
 
   // 2. MATHEMATICS: Differentiated questions for each class
@@ -1443,6 +1514,166 @@ export function getClassDiagnosticPackage(
             { id: `opt_m${cls}_5c`, label: 'C', text: '12π cm²' },
             { id: `opt_m${cls}_5d`, label: 'D', text: '27π cm²' },
           ],
+        },
+        {
+          id: `q_m${cls}_06`,
+          topicId: 'Real Numbers (Prime Factorisation & HCF)',
+          questionType: 'single_choice',
+          questionText: 'Find the HCF of 96 and 404 by the prime factorisation method.',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_6a`, label: 'A', text: '4' },
+            { id: `opt_m${cls}_6b`, label: 'B', text: '8' },
+            { id: `opt_m${cls}_6c`, label: 'C', text: '12' },
+            { id: `opt_m${cls}_6d`, label: 'D', text: '2' },
+          ],
+        },
+        {
+          id: `q_m${cls}_07`,
+          topicId: 'Polynomials & Zeroes Relations',
+          questionType: 'single_choice',
+          questionText: 'If α and β are the zeroes of the quadratic polynomial f(x) = x² - 5x + 6, find the value of (α + β - αβ).',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_7a`, label: 'A', text: '-1' },
+            { id: `opt_m${cls}_7b`, label: 'B', text: '1' },
+            { id: `opt_m${cls}_7c`, label: 'C', text: '5' },
+            { id: `opt_m${cls}_7d`, label: 'D', text: '6' },
+          ],
+        },
+        {
+          id: `q_m${cls}_08`,
+          topicId: 'Pair of Linear Equations in Two Variables',
+          questionType: 'single_choice',
+          questionText: 'For what value of k will the system of equations kx + 3y = k - 3 and 12x + ky = k possess infinitely many solutions?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'hard',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_8a`, label: 'A', text: 'k = 6' },
+            { id: `opt_m${cls}_8b`, label: 'B', text: 'k = -6' },
+            { id: `opt_m${cls}_8c`, label: 'C', text: 'k = 3' },
+            { id: `opt_m${cls}_8d`, label: 'D', text: 'k = 12' },
+          ],
+        },
+        {
+          id: `q_m${cls}_09`,
+          topicId: 'Triangles & Thales Theorem (BPT)',
+          questionType: 'single_choice',
+          questionText: 'In ΔABC, DE || BC intersecting AB at D and AC at E. If AD = 1.5 cm, DB = 3 cm, and AE = 1 cm, calculate length EC.',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_9a`, label: 'A', text: '2 cm' },
+            { id: `opt_m${cls}_9b`, label: 'B', text: '1.5 cm' },
+            { id: `opt_m${cls}_9c`, label: 'C', text: '3 cm' },
+            { id: `opt_m${cls}_9d`, label: 'D', text: '4.5 cm' },
+          ],
+        },
+        {
+          id: `q_m${cls}_10`,
+          topicId: 'Circles & Tangents',
+          questionType: 'single_choice',
+          questionText: 'A tangent PQ at point P of a circle of radius 5 cm meets a line through center O at point Q such that OQ = 12 cm. Find length PQ.',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_10a`, label: 'A', text: '√119 cm' },
+            { id: `opt_m${cls}_10b`, label: 'B', text: '13 cm' },
+            { id: `opt_m${cls}_10c`, label: 'C', text: '17 cm' },
+            { id: `opt_m${cls}_10d`, label: 'D', text: '8.5 cm' },
+          ],
+        },
+        {
+          id: `q_m${cls}_11`,
+          topicId: 'Heights & Distances (Trigonometry Applications)',
+          questionType: 'single_choice',
+          questionText: 'A vertical pole of length 6 m casts a shadow 2√3 m long on the ground. What is the sun’s elevation angle at that instant?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_11a`, label: 'A', text: '60°' },
+            { id: `opt_m${cls}_11b`, label: 'B', text: '30°' },
+            { id: `opt_m${cls}_11c`, label: 'C', text: '45°' },
+            { id: `opt_m${cls}_11d`, label: 'D', text: '90°' },
+          ],
+        },
+        {
+          id: `q_m${cls}_12`,
+          topicId: 'Probability & Standard Deck of Cards',
+          questionType: 'single_choice',
+          questionText: 'One card is drawn from a well-shuffled pack of 52 playing cards. What is the probability of drawing a face card (Jack, Queen, or King)?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_12a`, label: 'A', text: '3/13' },
+            { id: `opt_m${cls}_12b`, label: 'B', text: '1/13' },
+            { id: `opt_m${cls}_12c`, label: 'C', text: '4/13' },
+            { id: `opt_m${cls}_12d`, label: 'D', text: '1/4' },
+          ],
+        },
+        {
+          id: `q_m${cls}_13`,
+          topicId: 'Statistics & Central Tendency Relationship',
+          questionType: 'single_choice',
+          questionText: 'Which empirical relationship correctly links Mean, Median, and Mode for a moderately skewed frequency distribution?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_13a`, label: 'A', text: '3 Median = Mode + 2 Mean' },
+            { id: `opt_m${cls}_13b`, label: 'B', text: 'Mode = 3 Mean - 2 Median' },
+            { id: `opt_m${cls}_13c`, label: 'C', text: 'Mean = 3 Median - 2 Mode' },
+            { id: `opt_m${cls}_13d`, label: 'D', text: '2 Median = Mode + 3 Mean' },
+          ],
+        },
+        {
+          id: `q_m${cls}_14`,
+          topicId: 'Arithmetic Progressions (Sum of n Terms)',
+          questionType: 'single_choice',
+          questionText: 'Calculate the sum of the first 10 terms of the arithmetic progression: 2, 7, 12, ...',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_14a`, label: 'A', text: '245' },
+            { id: `opt_m${cls}_14b`, label: 'B', text: '250' },
+            { id: `opt_m${cls}_14c`, label: 'C', text: '235' },
+            { id: `opt_m${cls}_14d`, label: 'D', text: '260' },
+          ],
+        },
+        {
+          id: `q_m${cls}_15`,
+          topicId: 'Coordinate Geometry (Section Formula)',
+          questionType: 'single_choice',
+          questionText: 'Find the ratio in which the y-axis divides the line segment joining the points A(5, -6) and B(-1, -4).',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'hard',
+          language: 'en',
+          options: [
+            { id: `opt_m${cls}_15a`, label: 'A', text: '5 : 1' },
+            { id: `opt_m${cls}_15b`, label: 'B', text: '1 : 5' },
+            { id: `opt_m${cls}_15c`, label: 'C', text: '2 : 3' },
+            { id: `opt_m${cls}_15d`, label: 'D', text: '3 : 2' },
+          ],
         }
       )
 
@@ -1480,6 +1711,76 @@ export function getClassDiagnosticPackage(
           correctOptionIds: [`opt_m${cls}_5a`],
           solutionSteps: ['1. Surface Area = 4πr² = 4π(3)² = 4π × 9 = 36π cm².'],
           explanation: 'Sphere surface area formula.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_06`,
+          correctOptionIds: [`opt_m${cls}_6a`],
+          solutionSteps: ['1. 96 = 2⁵ × 3.', '2. 404 = 2² × 101.', '3. HCF = 2² = 4.'],
+          explanation: 'Prime factorisation yields HCF = 4.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_07`,
+          correctOptionIds: [`opt_m${cls}_7a`],
+          solutionSteps: ['1. α + β = -(-5)/1 = 5.', '2. αβ = 6/1 = 6.', '3. (α + β) - αβ = 5 - 6 = -1.'],
+          explanation: 'Vieta relationships between coefficients and zeroes.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_08`,
+          correctOptionIds: [`opt_m${cls}_8a`],
+          solutionSteps: ['1. Condition for infinite solutions: a₁/a₂ = b₁/b₂ = c₁/c₂.', '2. k/12 = 3/k → k² = 36 → k = ±6.', '3. Testing in c₁/c₂: 3/6 = (6-3)/6 = 1/2 (valid for k = 6).'],
+          explanation: 'System has coincident lines when k = 6.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_09`,
+          correctOptionIds: [`opt_m${cls}_9a`],
+          solutionSteps: ['1. Thales Theorem: AD/DB = AE/EC.', '2. 1.5/3 = 1/EC → 1/2 = 1/EC → EC = 2 cm.'],
+          explanation: 'Basic Proportionality Theorem.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_10`,
+          correctOptionIds: [`opt_m${cls}_10a`],
+          solutionSteps: ['1. Radius is perpendicular to tangent at point of contact: OP ⊥ PQ.', '2. In right ΔOPQ: PQ = √(OQ² - OP²) = √(12² - 5²) = √(144 - 25) = √119 cm.'],
+          explanation: 'Pythagoras theorem on circle tangent.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_11`,
+          correctOptionIds: [`opt_m${cls}_11a`],
+          solutionSteps: ['1. tan θ = Height / Shadow = 6 / (2√3) = 3/√3 = √3.', '2. tan 60° = √3, hence elevation angle is 60°.'],
+          explanation: 'Trigonometric ratio tan θ = height/base.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_12`,
+          correctOptionIds: [`opt_m${cls}_12a`],
+          solutionSteps: ['1. Total face cards = 4 Jacks + 4 Queens + 4 Kings = 12.', '2. Total cards = 52. Probability = 12/52 = 3/13.'],
+          explanation: 'Classical probability definition.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_13`,
+          correctOptionIds: [`opt_m${cls}_13a`],
+          solutionSteps: ['1. Karl Pearson empirical relationship: Mode = 3 Median - 2 Mean, which rearranges to 3 Median = Mode + 2 Mean.'],
+          explanation: 'Empirical formula linking central tendency metrics.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_14`,
+          correctOptionIds: [`opt_m${cls}_14a`],
+          solutionSteps: ['1. a = 2, d = 7 - 2 = 5, n = 10.', '2. S₁₀ = (10/2)[2(2) + (10 - 1)×5] = 5[4 + 45] = 5 × 49 = 245.'],
+          explanation: 'Sum of n terms of an arithmetic sequence.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_m${cls}_15`,
+          correctOptionIds: [`opt_m${cls}_15a`],
+          solutionSteps: ['1. On y-axis, x = 0.', '2. Section formula: x = (k·x₂ + 1·x₁)/(k + 1) → 0 = (k(-1) + 1(5))/(k + 1) → -k + 5 = 0 → k = 5.', '3. Ratio is 5 : 1.'],
+          explanation: 'Coordinate geometry section formula on axis intersection.',
           reviewStatus: 'verified',
         }
       )
@@ -1808,6 +2109,166 @@ export function getClassDiagnosticPackage(
             { id: `opt_s${cls}_5c`, label: 'C', text: 'Displacement Reaction' },
             { id: `opt_s${cls}_5d`, label: 'D', text: 'Double Displacement Reaction' },
           ],
+        },
+        {
+          id: `q_s${cls}_06`,
+          topicId: 'Light & Refraction Index',
+          questionType: 'single_choice',
+          questionText: 'The absolute refractive index of diamond with respect to air is 2.42. What is the speed of light in diamond? (Speed of light in air = 3 × 10⁸ m/s)',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_6a`, label: 'A', text: '1.24 × 10⁸ m/s' },
+            { id: `opt_s${cls}_6b`, label: 'B', text: '2.42 × 10⁸ m/s' },
+            { id: `opt_s${cls}_6c`, label: 'C', text: '7.26 × 10⁸ m/s' },
+            { id: `opt_s${cls}_6d`, label: 'D', text: '1.50 × 10⁸ m/s' },
+          ],
+        },
+        {
+          id: `q_s${cls}_07`,
+          topicId: 'Human Eye & Vision Correction',
+          questionType: 'single_choice',
+          questionText: 'A person cannot clearly see objects situated beyond 1.2 meters (Myopia). Which type of corrective lens must be prescribed by an optometrist?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_7a`, label: 'A', text: 'Concave lens of appropriate power' },
+            { id: `opt_s${cls}_7b`, label: 'B', text: 'Convex lens of appropriate power' },
+            { id: `opt_s${cls}_7c`, label: 'C', text: 'Bifocal cylindrical lens' },
+            { id: `opt_s${cls}_7d`, label: 'D', text: 'Plano-convex lens' },
+          ],
+        },
+        {
+          id: `q_s${cls}_08`,
+          topicId: 'Magnetic Effects of Electric Current',
+          questionType: 'single_choice',
+          questionText: 'In Fleming’s Left-Hand Rule for a current-carrying conductor in a magnetic field, what does the outstretched thumb represent?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_8a`, label: 'A', text: 'Direction of mechanical force (motion) on conductor' },
+            { id: `opt_s${cls}_8b`, label: 'B', text: 'Direction of magnetic flux lines' },
+            { id: `opt_s${cls}_8c`, label: 'C', text: 'Direction of electric current flow' },
+            { id: `opt_s${cls}_8d`, label: 'D', text: 'Direction of induced electromotive force' },
+          ],
+        },
+        {
+          id: `q_s${cls}_09`,
+          topicId: 'Carbon Compounds & Functional Groups',
+          questionType: 'single_choice',
+          questionText: 'Identify the functional group present in ethanoic acid (CH₃COOH):',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_9a`, label: 'A', text: 'Carboxylic acid group (-COOH)' },
+            { id: `opt_s${cls}_9b`, label: 'B', text: 'Aldehyde group (-CHO)' },
+            { id: `opt_s${cls}_9c`, label: 'C', text: 'Ketone group (>C=O)' },
+            { id: `opt_s${cls}_9d`, label: 'D', text: 'Alcohol group (-OH)' },
+          ],
+        },
+        {
+          id: `q_s${cls}_10`,
+          topicId: 'Metals & Non-Metals (Physical Properties)',
+          questionType: 'single_choice',
+          questionText: 'Which of the following metallic elements exists in a liquid state at room temperature (25°C)?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_10a`, label: 'A', text: 'Mercury (Hg)' },
+            { id: `opt_s${cls}_10b`, label: 'B', text: 'Sodium (Na)' },
+            { id: `opt_s${cls}_10c`, label: 'C', text: 'Lead (Pb)' },
+            { id: `opt_s${cls}_10d`, label: 'D', text: 'Zinc (Zn)' },
+          ],
+        },
+        {
+          id: `q_s${cls}_11`,
+          topicId: 'Life Processes (Excretion & Renal System)',
+          questionType: 'single_choice',
+          questionText: 'What is the microscopic structural and filtration unit of the human kidney?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_11a`, label: 'A', text: 'Nephron' },
+            { id: `opt_s${cls}_11b`, label: 'B', text: 'Neuron' },
+            { id: `opt_s${cls}_11c`, label: 'C', text: 'Alveolus' },
+            { id: `opt_s${cls}_11d`, label: 'D', text: 'Ureter' },
+          ],
+        },
+        {
+          id: `q_s${cls}_12`,
+          topicId: 'Control & Coordination (Nervous System)',
+          questionType: 'single_choice',
+          questionText: 'The microscopic junction between two adjacent neurons where nerve impulses are transmitted via chemical neurotransmitters is called a:',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_12a`, label: 'A', text: 'Synapse' },
+            { id: `opt_s${cls}_12b`, label: 'B', text: 'Axon hillock' },
+            { id: `opt_s${cls}_12c`, label: 'C', text: 'Dendritic spine' },
+            { id: `opt_s${cls}_12d`, label: 'D', text: 'Node of Ranvier' },
+          ],
+        },
+        {
+          id: `q_s${cls}_13`,
+          topicId: 'Reproduction in Organisms',
+          questionType: 'single_choice',
+          questionText: 'Under favorable conditions, unicellular Amoeba reproduces primarily through which asexual reproduction method?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_13a`, label: 'A', text: 'Binary Fission' },
+            { id: `opt_s${cls}_13b`, label: 'B', text: 'Budding' },
+            { id: `opt_s${cls}_13c`, label: 'C', text: 'Spore Formation' },
+            { id: `opt_s${cls}_13d`, label: 'D', text: 'Vegetative Propagation' },
+          ],
+        },
+        {
+          id: `q_s${cls}_14`,
+          topicId: 'Heredity & Genetics Foundations',
+          questionType: 'single_choice',
+          questionText: 'Gregor Johann Mendel established the fundamental laws of genetic inheritance through his experiments on which plant?',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'easy',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_14a`, label: 'A', text: 'Garden pea (Pisum sativum)' },
+            { id: `opt_s${cls}_14b`, label: 'B', text: 'Sweet pea (Lathyrus odoratus)' },
+            { id: `opt_s${cls}_14c`, label: 'C', text: 'Mustard plant (Brassica nigra)' },
+            { id: `opt_s${cls}_14d`, label: 'D', text: 'Gram plant (Cicer arietinum)' },
+          ],
+        },
+        {
+          id: `q_s${cls}_15`,
+          topicId: 'Electricity & Joule’s Heating Law',
+          questionType: 'single_choice',
+          questionText: 'An electric heater of resistance 20 Ω carries a current of 5 A. Calculate the total thermal energy (heat) generated in 30 seconds.',
+          marks: 2,
+          negativeMarkingRatio: 0,
+          difficulty: 'medium',
+          language: 'en',
+          options: [
+            { id: `opt_s${cls}_15a`, label: 'A', text: '15,000 J (15 kJ)' },
+            { id: `opt_s${cls}_15b`, label: 'B', text: '3,000 J (3 kJ)' },
+            { id: `opt_s${cls}_15c`, label: 'C', text: '7,500 J (7.5 kJ)' },
+            { id: `opt_s${cls}_15d`, label: 'D', text: '30,000 J (30 kJ)' },
+          ],
         }
       )
 
@@ -1845,6 +2306,76 @@ export function getClassDiagnosticPackage(
           correctOptionIds: [`opt_s${cls}_5a`],
           solutionSteps: ['1. Two elements combine to form a single compound: combination reaction.'],
           explanation: 'Synthesis of water from hydrogen and oxygen.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_06`,
+          correctOptionIds: [`opt_s${cls}_6a`],
+          solutionSteps: ['1. Refractive index n = c / v.', '2. v = (3 × 10⁸ m/s) / 2.42 ≈ 1.24 × 10⁸ m/s.'],
+          explanation: 'Refractive index formula: v = c/n.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_07`,
+          correctOptionIds: [`opt_s${cls}_7a`],
+          solutionSteps: ['1. Myopia causes incoming light rays to focus in front of the retina.', '2. A diverging (concave) lens spreads the rays onto the retina.'],
+          explanation: 'Concave lens corrects nearsightedness.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_08`,
+          correctOptionIds: [`opt_s${cls}_8a`],
+          solutionSteps: ['1. Forefinger = Field (B), Center finger = Current (I), Thumb = Force/Motion (F).'],
+          explanation: 'Fleming’s Left Hand Rule gives force direction.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_09`,
+          correctOptionIds: [`opt_s${cls}_9a`],
+          solutionSteps: ['1. Ethanoic acid (acetic acid) has the -COOH carboxyl group.'],
+          explanation: 'Carboxylic acids contain -COOH.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_10`,
+          correctOptionIds: [`opt_s${cls}_10a`],
+          solutionSteps: ['1. Mercury (Hg, atomic number 80) is the only transition metal liquid at STP.'],
+          explanation: 'Mercury is liquid at room temperature.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_11`,
+          correctOptionIds: [`opt_s${cls}_11a`],
+          solutionSteps: ['1. Each human kidney has ~1,000,000 nephrons that filter blood and form urine.'],
+          explanation: 'Nephron is the renal functional unit.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_12`,
+          correctOptionIds: [`opt_s${cls}_12a`],
+          solutionSteps: ['1. Synapse connects the axon terminal of one neuron to the dendrite of the next.'],
+          explanation: 'Synaptic gap transmits neurotransmitters.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_13`,
+          correctOptionIds: [`opt_s${cls}_13a`],
+          solutionSteps: ['1. Amoeba undergoes mitosis and splits into two identical daughter cells: binary fission.'],
+          explanation: 'Binary fission is primary asexual mode in Amoeba.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_14`,
+          correctOptionIds: [`opt_s${cls}_14a`],
+          solutionSteps: ['1. Mendel conducted monohybrid and dihybrid crosses on Pisum sativum (garden pea).'],
+          explanation: 'Mendel selected garden pea for genetic inheritance studies.',
+          reviewStatus: 'verified',
+        },
+        {
+          questionId: `q_s${cls}_15`,
+          correctOptionIds: [`opt_s${cls}_15a`],
+          solutionSteps: ['1. Joule’s Law of Heating: H = I²Rt.', '2. H = (5 A)² × 20 Ω × 30 s = 25 × 600 = 15,000 J = 15 kJ.'],
+          explanation: 'Thermal dissipation formula: H = I²Rt.',
           reviewStatus: 'verified',
         }
       )
@@ -2460,14 +2991,41 @@ export function getClassDiagnosticPackage(
     )
   }
 
+  // 1. Dynamic Question Sampling from Pool (if pool has more than 5 questions)
+  let selectedQuestions = questions
+  let selectedSolutions = solutions
+
+  if (questions.length > 5) {
+    const effectiveSeed = attemptSeed !== undefined ? Math.abs(attemptSeed) : Math.floor(Date.now() / 30000)
+    const stepCount = 5
+    const numSets = Math.ceil(questions.length / stepCount)
+    const setIndex = effectiveSeed % numSets
+    const startIdx = (setIndex * stepCount) % questions.length
+
+    selectedQuestions = []
+    for (let i = 0; i < stepCount; i++) {
+      selectedQuestions.push(questions[(startIdx + i) % questions.length])
+    }
+
+    const selectedIds = new Set(selectedQuestions.map((q) => q.id))
+    selectedSolutions = solutions.filter((s) => selectedIds.has(s.questionId))
+  }
+
+  // 2. Eliminate Option A Bias: Shuffle and evenly balance options across A, B, C, D
+  const { questions: balancedQuestions, solutions: balancedSolutions } = shuffleAndBalanceOptions(
+    selectedQuestions,
+    selectedSolutions,
+    attemptSeed
+  )
+
   const blueprint: AssessmentBlueprint = {
     id: `bp_diag_c${cls}_${subj}`,
     title: `Class ${cls} ${subj.toUpperCase()} Diagnostic Assessment (${boardCode})`,
     subjectId: `subj_c${cls}_${subj}`,
     chapterId: 'diagnostic_core',
     durationMinutes: 10,
-    totalQuestions: questions.length,
-    totalMarks: questions.length * 2,
+    totalQuestions: balancedQuestions.length,
+    totalMarks: balancedQuestions.reduce((sum, q) => sum + (q.marks || 2), 0),
     negativeMarkingRatio: 0,
     passingPercentage: 60,
     rewardCreditAmount: 20,
@@ -2476,7 +3034,7 @@ export function getClassDiagnosticPackage(
     difficulty: 'medium',
   }
 
-  return { blueprint, questions, solutions }
+  return { blueprint, questions: balancedQuestions, solutions: balancedSolutions }
 }
 
 // ============================================================================
@@ -2485,7 +3043,8 @@ export function getClassDiagnosticPackage(
 
 export function getCompetitiveExamDiagnosticPackage(
   examCode: string,
-  examName?: string
+  examName?: string,
+  attemptSeed?: number
 ): DiagnosticAssessmentPackage {
   const code = (examCode || 'JEE').toUpperCase().trim()
   const questions: AuthorizedQuestion[] = []
@@ -3462,14 +4021,20 @@ export function getCompetitiveExamDiagnosticPackage(
     )
   }
 
+  const { questions: balancedQuestions, solutions: balancedSolutions } = shuffleAndBalanceOptions(
+    questions,
+    solutions,
+    attemptSeed
+  )
+
   const blueprint: AssessmentBlueprint = {
     id: `bp_comp_${code.toLowerCase()}`,
     title: examName || `${code} Official Diagnostic Mock Test`,
     subjectId: `subj_comp_${code.toLowerCase()}`,
     chapterId: 'mock_pipeline',
     durationMinutes: code === 'JEE' || code === 'NEET' ? 15 : 10,
-    totalQuestions: questions.length,
-    totalMarks: questions.reduce((sum, q) => sum + (q.marks || 2), 0),
+    totalQuestions: balancedQuestions.length,
+    totalMarks: balancedQuestions.reduce((sum, q) => sum + (q.marks || 2), 0),
     negativeMarkingRatio: code === 'JEE' || code === 'NEET' ? 0.25 : code === 'UPSC' || code === 'STATE_PSC' || code === 'GATE' ? 0.33 : 0,
     passingPercentage: 50,
     rewardCreditAmount: 30,
@@ -3478,5 +4043,5 @@ export function getCompetitiveExamDiagnosticPackage(
     difficulty: code === 'JEE' || code === 'UPSC' || code === 'GATE' ? 'hard' : 'medium',
   }
 
-  return { blueprint, questions, solutions }
+  return { blueprint, questions: balancedQuestions, solutions: balancedSolutions }
 }

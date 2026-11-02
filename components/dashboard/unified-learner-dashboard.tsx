@@ -41,6 +41,7 @@ import type {
   AssessmentBlueprint,
   ConfidentialQuestionSolution,
 } from '@/packages/core/src/types'
+import { RazorpayCheckoutModal } from '@/components/commerce/razorpay-checkout-modal'
 
 // Dynamic import for modal to keep initial bundle lean
 const TestRunnerModal = dynamic(
@@ -483,6 +484,10 @@ export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) 
   const [activeSolutions, setActiveSolutions] = useState<ConfidentialQuestionSolution[]>([])
   const [isLaunchingTest, setIsLaunchingTest] = useState(false)
 
+  // Checkout Modal State
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
+  const [checkoutProductId, setCheckoutProductId] = useState<string | null>(null)
+
   // AI Tutor State
   const [aiQuestion, setAiQuestion] = useState('')
   const [aiResponse, setAiResponse] = useState<string | null>(null)
@@ -519,7 +524,7 @@ export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) 
     try {
       const { getClassDiagnosticPackage } = await import('@/lib/assessment/class-diagnostic-engine')
       const grade = activeTarget.gradeNum || 10
-      const pkg = getClassDiagnosticPackage(grade, subjectCode, 'CBSE')
+      const pkg = getClassDiagnosticPackage(grade, subjectCode, 'CBSE', Date.now())
       setActiveBlueprint(pkg.blueprint)
       setActiveQuestions(pkg.questions)
       setActiveSolutions(pkg.solutions)
@@ -1041,8 +1046,24 @@ export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) 
           solutions={activeSolutions}
           isOpen={isTestRunnerOpen}
           onClose={() => setIsTestRunnerOpen(false)}
+          onUnlockPaidPack={(prodId) => {
+            setIsTestRunnerOpen(false)
+            setCheckoutProductId(prodId)
+            setIsCheckoutOpen(true)
+          }}
         />
       )}
+
+      {/* Razorpay Checkout Modal */}
+      <RazorpayCheckoutModal
+        isOpen={isCheckoutOpen}
+        productId={checkoutProductId}
+        onClose={() => setIsCheckoutOpen(false)}
+        onSuccess={(entitlement) => {
+          setIsCheckoutOpen(false)
+          alert(`Access granted for ${entitlement.productId}! Valid until ${new Date(entitlement.validUntil).toLocaleDateString()}.`)
+        }}
+      />
     </div>
   )
 }

@@ -21,11 +21,18 @@ import {
   ShieldCheck,
   Zap,
   TrendingUp,
+  Flame,
+  Star,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  Trophy,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { evaluateAssessmentAttempt } from '@/packages/core/src/scoring/evaluator'
 import { SEED_CONFIDENTIAL_SOLUTIONS } from '@/packages/core/src/data/seed-catalog'
+import { shuffleAndBalanceOptions } from '@/lib/assessment/class-diagnostic-engine'
 import type {
   AuthorizedQuestion,
   AssessmentBlueprint,
@@ -33,6 +40,114 @@ import type {
   SubmittedAnswer,
   ConfidentialQuestionSolution,
 } from '@/packages/core/src/types'
+
+// ============================================================================
+// CLIENT-SIDE SYNTHESIZED WEB AUDIO ENGINE (ZERO EXTERNAL ASSETS / ZERO LATENCY)
+// ============================================================================
+class WebAudioFX {
+  private ctx: AudioContext | null = null
+
+  private getContext(): AudioContext | null {
+    if (typeof window === 'undefined') return null
+    try {
+      if (!this.ctx) {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+        if (AudioCtx) {
+          this.ctx = new AudioCtx()
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {})
+      }
+      return this.ctx
+    } catch {
+      return null
+    }
+  }
+
+  playCorrect(streak: number = 1) {
+    try {
+      const ctx = this.getContext()
+      if (!ctx) return
+      const now = ctx.currentTime
+
+      const baseFreq = streak >= 3 ? 587.33 : 523.25 // D5 or C5
+      const highFreq = streak >= 3 ? 783.99 : 659.25 // G5 or E5
+
+      const osc1 = ctx.createOscillator()
+      const osc2 = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      osc1.type = 'sine'
+      osc2.type = 'sine'
+
+      osc1.frequency.setValueAtTime(baseFreq, now)
+      osc2.frequency.setValueAtTime(highFreq, now + 0.08)
+
+      gain.gain.setValueAtTime(0.15, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35)
+
+      osc1.connect(gain)
+      osc2.connect(gain)
+      gain.connect(ctx.destination)
+
+      osc1.start(now)
+      osc1.stop(now + 0.12)
+      osc2.start(now + 0.08)
+      osc2.stop(now + 0.35)
+    } catch {}
+  }
+
+  playWrong() {
+    try {
+      const ctx = this.getContext()
+      if (!ctx) return
+      const now = ctx.currentTime
+
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(220, now)
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.22)
+
+      gain.gain.setValueAtTime(0.12, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+
+      osc.start(now)
+      osc.stop(now + 0.22)
+    } catch {}
+  }
+
+  playFanfare() {
+    try {
+      const ctx = this.getContext()
+      if (!ctx) return
+      const now = ctx.currentTime
+      const notes = [523.25, 659.25, 783.99, 1046.5] // C5, E5, G5, C6
+
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(freq, now + idx * 0.09)
+        gain.gain.setValueAtTime(0.15, now + idx * 0.09)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.25)
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.start(now + idx * 0.09)
+        osc.stop(now + idx * 0.09 + 0.25)
+      })
+    } catch {}
+  }
+}
+
+const audioFX = new WebAudioFX()
 
 interface TestRunnerModalProps {
   blueprint: AssessmentBlueprint | null
@@ -59,6 +174,21 @@ export function TestRunnerModal({
 
   // Mobile drawer toggle for step-by-step guidance
   const [isMobileGuidanceOpen, setIsMobileGuidanceOpen] = useState(false)
+
+  // Gaming Engine State
+  const [streak, setStreak] = useState<number>(0)
+  const [maxStreak, setMaxStreak] = useState<number>(0)
+  const [totalXp, setTotalXp] = useState<number>(0)
+  const [isMuted, setIsMuted] = useState<boolean>(false)
+  const [attemptRound, setAttemptRound] = useState<number>(1)
+  const [floatingFeedback, setFloatingFeedback] = useState<{
+    text: string
+    isCorrect: boolean
+    id: number
+  } | null>(null)
+
+  // Local active questions guaranteed to have options shuffled and balanced across A, B, C, D
+  const [activeQuestionsList, setActiveQuestionsList] = useState<AuthorizedQuestion[]>([])
 
   // Parent Lead Form state
   const [leadStudentName, setLeadStudentName] = useState('')
@@ -87,8 +217,20 @@ export function TestRunnerModal({
       setTimeRemainingSeconds(blueprint.durationMinutes * 60)
       setLeadSubmitted(false)
       setIsMobileGuidanceOpen(false)
+      setStreak(0)
+      setMaxStreak(0)
+      setTotalXp(0)
+      setFloatingFeedback(null)
+
+      // Guarantee balanced options across A, B, C, D (eliminating Option A bias completely)
+      if (questions && questions.length > 0) {
+        const { questions: balanced } = shuffleAndBalanceOptions(questions, solutions || [])
+        setActiveQuestionsList(balanced)
+      } else {
+        setActiveQuestionsList([])
+      }
     }
-  }, [isOpen, blueprint])
+  }, [isOpen, blueprint, questions, solutions])
 
   // Timer countdown
   useEffect(() => {
@@ -107,7 +249,9 @@ export function TestRunnerModal({
     return () => clearInterval(timer)
   }, [isOpen, blueprint, assessmentResult])
 
-  if (!isOpen || !blueprint || questions.length === 0) return null
+  const activeList = activeQuestionsList.length > 0 ? activeQuestionsList : questions
+
+  if (!isOpen || !blueprint || activeList.length === 0) return null
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -116,14 +260,78 @@ export function TestRunnerModal({
   }
 
   const handleSelectOption = (questionId: string, optionId: string) => {
+    // Only register initial choice per question so learners cannot exploit streak points
+    if (userSelectedAnswers[questionId]) return
+
     setUserSelectedAnswers((prev) => ({
       ...prev,
       [questionId]: optionId,
     }))
+
+    const sol = solutionsMap.get(questionId)
+    const isCorrect = sol ? sol.correctOptionIds.includes(optionId) : false
+
+    if (isCorrect) {
+      const nextStreak = streak + 1
+      setStreak(nextStreak)
+      setMaxStreak((prevMax) => Math.max(prevMax, nextStreak))
+
+      const comboBonus = nextStreak >= 2 ? (nextStreak - 1) * 50 : 0
+      const earnedScore = 100 + comboBonus
+      setTotalXp((prev) => prev + earnedScore)
+
+      if (!isMuted) {
+        audioFX.playCorrect(nextStreak)
+      }
+
+      setFloatingFeedback({
+        text:
+          nextStreak >= 4
+            ? `👑 +${earnedScore} XP • ${nextStreak}x ULTRA COMBO!`
+            : nextStreak >= 2
+            ? `🔥 +${earnedScore} XP • ${nextStreak}x STREAK!`
+            : `✓ +${earnedScore} XP!`,
+        isCorrect: true,
+        id: Date.now(),
+      })
+    } else {
+      setStreak(0)
+      if (!isMuted) {
+        audioFX.playWrong()
+      }
+
+      setFloatingFeedback({
+        text: 'Streak Reset • Review Concept Below!',
+        isCorrect: false,
+        id: Date.now(),
+      })
+    }
+  }
+
+  const handleRestartFreshAttempt = () => {
+    const nextRound = attemptRound + 1
+    setAttemptRound(nextRound)
+    setCurrentQuestionIndex(0)
+    setUserSelectedAnswers({})
+    setAssessmentResult(null)
+    setTimeRemainingSeconds(blueprint.durationMinutes * 60)
+    setStreak(0)
+    setTotalXp(0)
+    setFloatingFeedback(null)
+
+    // Reshuffle question options using new attempt seed
+    if (questions && questions.length > 0) {
+      const { questions: balanced } = shuffleAndBalanceOptions(
+        questions,
+        solutions || [],
+        Date.now() + nextRound * 1000
+      )
+      setActiveQuestionsList(balanced)
+    }
   }
 
   const handleSubmitAssessment = () => {
-    const submittedAnswers: SubmittedAnswer[] = questions.map((q) => ({
+    const submittedAnswers: SubmittedAnswer[] = activeList.map((q) => ({
       questionId: q.id,
       selectedOptionIds: userSelectedAnswers[q.id] ? [userSelectedAnswers[q.id]] : [],
       timeSpentSeconds: 30,
@@ -133,12 +341,16 @@ export function TestRunnerModal({
       attemptId: `att_run_${Date.now()}`,
       blueprint,
       learnerId: 'anonymous_learner',
-      questions,
+      questions: activeList,
       solutions: solutionsMap,
       submittedAnswers,
     })
 
     setAssessmentResult(result)
+
+    if (!isMuted) {
+      audioFX.playFanfare()
+    }
 
     // Save completed status locally
     try {
@@ -163,6 +375,8 @@ export function TestRunnerModal({
           blueprintId: blueprint.id,
           scoreObtained: result.scoreObtained,
           percentage: result.percentage,
+          totalXpEarned: totalXp,
+          maxStreakAchieved: maxStreak,
         },
       }),
     }).catch(() => {})
@@ -195,7 +409,7 @@ export function TestRunnerModal({
     }
   }
 
-  const currentQ = questions[currentQuestionIndex]
+  const currentQ = activeList[currentQuestionIndex]
   const currentSolution = currentQ ? solutionsMap.get(currentQ.id) : null
   const selectedOptId = currentQ ? userSelectedAnswers[currentQ.id] : undefined
   const isSelectedOptCorrect =
@@ -203,7 +417,7 @@ export function TestRunnerModal({
       ? currentSolution.correctOptionIds.includes(selectedOptId)
       : false
 
-  const progressPercentage = Math.round(((currentQuestionIndex + 1) / questions.length) * 100)
+  const progressPercentage = Math.round(((currentQuestionIndex + 1) / activeList.length) * 100)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
@@ -220,15 +434,41 @@ export function TestRunnerModal({
             </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {!assessmentResult && (
               <>
+                {/* Live Combo Streak Pill */}
+                {streak > 1 && (
+                  <div className="flex items-center gap-1 px-2.5 py-1 bg-amber-500 text-slate-950 rounded-lg text-xs font-black shadow-xs animate-bounce">
+                    <Flame className="w-3.5 h-3.5 fill-current" />
+                    <span>{streak}x COMBO!</span>
+                  </div>
+                )}
+
+                {/* Live XP Pill */}
+                <div className="flex items-center gap-1 px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-bold shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>{totalXp} XP</span>
+                </div>
+
+                {/* Live Countdown Timer */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-slate-700 text-xs font-semibold shadow-2xs">
                   <Clock className="w-3.5 h-3.5 text-blue-600" />
                   <span>{formatTimer(timeRemainingSeconds)}</span>
                 </div>
+
+                {/* Audio Mute/Unmute Toggle */}
+                <button
+                  onClick={() => setIsMuted(!isMuted)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+                  title={isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
+                  aria-label="Toggle Sound Effects"
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4 text-slate-400" /> : <Volume2 className="w-4 h-4 text-blue-600" />}
+                </button>
+
                 <span className="text-xs font-bold text-slate-700 hidden sm:inline">
-                  {currentQuestionIndex + 1} / {questions.length}
+                  {currentQuestionIndex + 1} / {activeList.length}
                 </span>
               </>
             )}
@@ -256,24 +496,61 @@ export function TestRunnerModal({
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {assessmentResult ? (
-            /* SCORECARD & EVALUATION VIEW WITH LOGIQIDS-STYLE PARENT REPORT HOOK */
+            /* SCORECARD & EVALUATION VIEW WITH GAMIFIED 3-STAR MASTERY AND ₹499 HIGHLIGHT */
             <div className="max-w-3xl mx-auto space-y-6">
-              {/* Header Score Card */}
+              {/* Arcade Header Score Card with 3-Star Rating */}
               <div className="text-center space-y-3 pb-6 border-b border-slate-100">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 mb-1 shadow-sm">
-                  <Award className="w-8 h-8" />
+                {/* 3-Star Animation Meter */}
+                <div className="flex items-center justify-center gap-2 pt-1">
+                  {[1, 2, 3].map((starIdx) => {
+                    const starThreshold = starIdx === 1 ? 0 : starIdx === 2 ? 60 : 80
+                    const hasStar = assessmentResult.percentage >= starThreshold
+                    return (
+                      <div
+                        key={starIdx}
+                        className={`p-2 sm:p-2.5 rounded-2xl transition-all duration-300 ${
+                          hasStar
+                            ? 'bg-amber-100 text-amber-500 scale-110 shadow-sm ring-2 ring-amber-400/30'
+                            : 'bg-slate-100 text-slate-300'
+                        }`}
+                      >
+                        <Star className={`w-7 h-7 sm:w-8 sm:h-8 ${hasStar ? 'fill-amber-400' : 'fill-none'}`} />
+                      </div>
+                    )
+                  })}
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {assessmentResult.passed ? 'Diagnostic Completed Successfully!' : 'Diagnostic Completed'}
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
-                  Server-Validated Curriculum Performance &amp; Cognitive Breakdown • Zero Login Required
-                </p>
+
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-black uppercase tracking-wider">
+                    <Trophy className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>
+                      {assessmentResult.percentage >= 80
+                        ? 'Mastery Level: CBSE Grandmaster'
+                        : assessmentResult.percentage >= 60
+                        ? 'Skilled Level: Analytical Challenger'
+                        : 'Foundational Level: Concept Builder'}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    {assessmentResult.passed ? 'Level Conquered Successfully!' : 'Diagnostic Attempt Completed'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
+                    Full Cognitive Derivations &amp; NCERT Syllabus Breakdown • Instant Verified Scoring
+                  </p>
+                </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
                   <Badge className="bg-emerald-600 text-white text-xs px-3 py-1 font-bold">
                     Score: {assessmentResult.scoreObtained} / {assessmentResult.maxMarks} Marks ({assessmentResult.percentage}%)
                   </Badge>
+                  <Badge className="bg-indigo-600 text-white text-xs px-3 py-1 font-bold">
+                    ⭐ +{totalXp > 0 ? totalXp : assessmentResult.correctCount * 100} XP Earned
+                  </Badge>
+                  {maxStreak > 1 && (
+                    <Badge className="bg-amber-500 text-slate-950 text-xs px-3 py-1 font-black">
+                      🔥 Best Streak: {maxStreak}x Combo
+                    </Badge>
+                  )}
                   <Badge className="bg-blue-600 text-white text-xs px-3 py-1 font-bold">
                     ✓ {assessmentResult.correctCount} Correct • ✕ {assessmentResult.incorrectCount} Incorrect
                   </Badge>
@@ -375,58 +652,93 @@ export function TestRunnerModal({
                 )}
               </div>
 
-              {/* Day 1 Paid Entitlement Direct Unlock */}
-              <div className="p-5 bg-gradient-to-br from-blue-50/70 to-indigo-50/70 rounded-2xl border border-blue-200 space-y-3">
+              {/* Day 1 Paid Entitlement Direct Unlock (WITH HIGHLY PROMINENT ₹499 PLUS PACK) */}
+              <div className="p-5 bg-gradient-to-br from-blue-50/90 via-indigo-50/70 to-slate-50 rounded-2xl border-2 border-blue-200 space-y-3.5 shadow-xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <Badge className="bg-blue-600 text-white text-[10px]">Instant Unlock</Badge>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">
-                      Want 25 more full-length chapter mock tests and detailed percentile rankings?
+                    <Badge className="bg-blue-600 text-white text-[10px] font-bold">Instant Assessment Access</Badge>
+                    <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">
+                      Unlock Full-Length Chapter Mock Tests &amp; AI Diagnostic Analytics
                     </h4>
                   </div>
-                  <Link href="/plans" onClick={onClose} className="text-xs text-blue-600 font-semibold hover:underline">
-                    All Plans →
+                  <Link href="/plans" onClick={onClose} className="text-xs text-blue-600 font-bold hover:underline flex items-center gap-1">
+                    All Plans <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+                  {/* ₹20 Single Mock */}
                   <button
                     onClick={() => {
                       onClose()
                       onUnlockPaidPack?.('prod_assess_single')
                     }}
-                    className="p-3 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-left transition-all shadow-2xs"
+                    className="p-3.5 bg-white hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 rounded-xl text-left transition-all shadow-2xs hover:shadow-xs group"
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-xs text-slate-900">Single Test</span>
-                      <span className="text-xs font-black text-blue-600">₹20</span>
+                      <span className="text-xs font-black text-slate-700">₹20</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 mt-1">1 Full Chapter Mock • Instant Unlock</p>
+                    <p className="text-[10px] text-slate-500 mt-1 line-clamp-1">1 Full Chapter Mock • Instant</p>
+                    <div className="mt-2 text-[10px] font-bold text-blue-600 flex items-center gap-0.5">
+                      Unlock Now <ChevronRight className="w-3 h-3" />
+                    </div>
                   </button>
+
+                  {/* ₹299 Starter Pack */}
                   <button
                     onClick={() => {
                       onClose()
                       onUnlockPaidPack?.('prod_assess_starter')
                     }}
-                    className="p-3 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-left transition-all shadow-2xs"
+                    className="p-3.5 bg-white hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 rounded-xl text-left transition-all shadow-2xs hover:shadow-xs group"
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-xs text-slate-900">Starter Pack</span>
-                      <span className="text-xs font-black text-blue-600">₹299</span>
+                      <span className="text-xs font-black text-slate-700">₹299</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 mt-1">5 Full Tests across subjects • 30 Days</p>
+                    <p className="text-[10px] text-slate-500 mt-1 line-clamp-1">5 Full Tests across subjects • 30d</p>
+                    <div className="mt-2 text-[10px] font-bold text-blue-600 flex items-center gap-0.5">
+                      Unlock Now <ChevronRight className="w-3 h-3" />
+                    </div>
                   </button>
+
+                  {/* ₹499 Plus Pack (MOST POPULAR HIGHLIGHTED) */}
                   <button
                     onClick={() => {
                       onClose()
                       onUnlockPaidPack?.('prod_assess_plus')
                     }}
-                    className="p-3 bg-blue-100/60 hover:bg-blue-200/60 border border-blue-300 rounded-xl text-left transition-all shadow-2xs"
+                    className="relative p-3.5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white border-2 border-blue-400 rounded-xl text-left transition-all shadow-md hover:shadow-lg hover:scale-[1.02] ring-2 ring-blue-500/30 group"
+                  >
+                    <div className="absolute -top-2.5 right-3 bg-amber-400 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                      ⭐ Most Popular
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="font-black text-xs text-white">Plus Pack</span>
+                      <span className="text-sm font-black text-amber-300">₹499</span>
+                    </div>
+                    <p className="text-[10px] text-blue-100 mt-1 line-clamp-1 font-medium">12 Full Tests + Aptitude • 60 Days</p>
+                    <div className="mt-2 text-[10px] font-black text-white bg-white/20 hover:bg-white/30 rounded-lg py-1 px-2 text-center flex items-center justify-center gap-1">
+                      Unlock Plus (₹499) <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </button>
+
+                  {/* ₹999 Annual Pro Pass */}
+                  <button
+                    onClick={() => {
+                      onClose()
+                      onUnlockPaidPack?.('prod_assess_pro')
+                    }}
+                    className="p-3.5 bg-white hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 rounded-xl text-left transition-all shadow-2xs hover:shadow-xs group"
                   >
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-xs text-blue-900">Plus Pack</span>
-                      <span className="text-xs font-black text-blue-700">₹499</span>
+                      <span className="font-bold text-xs text-slate-900">Annual Pass</span>
+                      <span className="text-xs font-black text-slate-700">₹999</span>
                     </div>
-                    <p className="text-[10px] text-blue-800 mt-1">12 Tests + Analytical Aptitude • 60 Days</p>
+                    <p className="text-[10px] text-slate-500 mt-1 line-clamp-1">Unlimited Mock Tests • 365 Days</p>
+                    <div className="mt-2 text-[10px] font-bold text-blue-600 flex items-center gap-0.5">
+                      Unlock Now <ChevronRight className="w-3 h-3" />
+                    </div>
                   </button>
                 </div>
               </div>
@@ -460,7 +772,7 @@ export function TestRunnerModal({
                       </div>
 
                       <p className="font-medium text-slate-800">
-                        {questions.find((q) => q.id === ev.questionId)?.questionText || `Question ${idx + 1}`}
+                        {activeList.find((q) => q.id === ev.questionId)?.questionText || `Question ${idx + 1}`}
                       </p>
 
                       <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-1">
@@ -472,32 +784,71 @@ export function TestRunnerModal({
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end">
-                <Button onClick={onClose} className="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs">
+              <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                <Button
+                  onClick={handleRestartFreshAttempt}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Play Another Round (Fresh Questions)</span>
+                </Button>
+
+                <Button onClick={onClose} variant="outline" className="text-slate-700 font-semibold text-xs border-slate-300">
                   Close Scorecard
                 </Button>
               </div>
             </div>
           ) : (
-            /* ACTIVE SPLIT-SCREEN & MOBILE OPTIMIZED TEST RUNNER */
+            /* ACTIVE SPLIT-SCREEN & GAMIFIED TEST RUNNER */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
               {/* Left Column: Question & Options */}
               <div className="lg:col-span-7 space-y-5">
                 <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-2xs space-y-4">
                   <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="font-bold text-blue-600 uppercase tracking-wider">
-                      Question {currentQuestionIndex + 1} of {questions.length}
+                    <span className="font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>Question {currentQuestionIndex + 1} of {activeList.length}</span>
+                      {streak >= 2 && (
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
+                          🔥 {streak}x
+                        </span>
+                      )}
                     </span>
                     <span className="font-semibold text-slate-600 truncate max-w-[200px]">
                       {currentQ.topicId}
                     </span>
                   </div>
 
+                  {/* Floating Gamified Score Feedback Banner */}
+                  {floatingFeedback && (
+                    <div
+                      key={floatingFeedback.id}
+                      className={`p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold animate-in fade-in slide-in-from-top-1 duration-150 ${
+                        floatingFeedback.isCorrect
+                          ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
+                          : 'bg-amber-50 text-amber-900 border-amber-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {floatingFeedback.isCorrect ? (
+                          <Flame className="w-4 h-4 text-amber-600 fill-amber-500" />
+                        ) : (
+                          <Zap className="w-4 h-4 text-amber-600" />
+                        )}
+                        <span>{floatingFeedback.text}</span>
+                      </div>
+                      {floatingFeedback.isCorrect && streak >= 2 && (
+                        <Badge className="bg-amber-500 text-slate-950 font-black text-[10px] px-2 py-0">
+                          COMBO BONUS
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                     {currentQ.questionText}
                   </h3>
 
-                  {/* Finger-friendly Options (LogIQids Mobile Benchmark: min-height 52px) */}
+                  {/* Finger-friendly Options with Balanced Shuffling */}
                   <div className="space-y-3 pt-2">
                     {currentQ.options.map((opt) => {
                       const isSelected = selectedOptId === opt.id
@@ -506,10 +857,13 @@ export function TestRunnerModal({
                       let optClass = 'bg-white border-slate-200 text-slate-800 hover:border-blue-400 active:scale-[0.99]'
                       if (isSelected) {
                         if (isCorrect) {
-                          optClass = 'bg-emerald-50 border-emerald-500 text-emerald-950 font-medium ring-2 ring-emerald-500/20'
+                          optClass = 'bg-emerald-50 border-emerald-500 text-emerald-950 font-medium ring-2 ring-emerald-500/30'
                         } else {
-                          optClass = 'bg-blue-50 border-blue-500 text-blue-950 font-medium ring-2 ring-blue-500/20'
+                          optClass = 'bg-rose-50 border-rose-500 text-rose-950 font-medium ring-2 ring-rose-500/30'
                         }
+                      } else if (selectedOptId && isCorrect) {
+                        // After answering wrong, reveal the correct option subtly
+                        optClass = 'bg-emerald-50/40 border-emerald-300 text-emerald-900 border-dashed'
                       }
 
                       return (
@@ -524,7 +878,9 @@ export function TestRunnerModal({
                                 isSelected && isCorrect
                                   ? 'bg-emerald-600 text-white'
                                   : isSelected
-                                  ? 'bg-blue-600 text-white'
+                                  ? 'bg-rose-600 text-white'
+                                  : selectedOptId && isCorrect
+                                  ? 'bg-emerald-500 text-white'
                                   : 'bg-slate-100 text-slate-600'
                               }`}
                             >
@@ -536,6 +892,11 @@ export function TestRunnerModal({
                           {isSelected && isCorrect && (
                             <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 ml-2">
                               <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            </div>
+                          )}
+                          {isSelected && !isCorrect && (
+                            <div className="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0 ml-2">
+                              <X className="w-3.5 h-3.5 stroke-[3]" />
                             </div>
                           )}
                         </button>
@@ -556,7 +917,7 @@ export function TestRunnerModal({
                         <>
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-bold text-emerald-950">Correct!</p>
+                            <p className="font-bold text-emerald-950">Correct! Keep the streak going!</p>
                             <p className="text-emerald-800 mt-0.5">{currentSolution?.explanation}</p>
                           </div>
                         </>
@@ -618,7 +979,7 @@ export function TestRunnerModal({
                     </Button>
 
                     <div className="flex items-center gap-1">
-                      {questions.map((q, idx) => {
+                      {activeList.map((q, idx) => {
                         const isAnswered = !!userSelectedAnswers[q.id]
                         const isCurrent = idx === currentQuestionIndex
                         return (
@@ -627,7 +988,7 @@ export function TestRunnerModal({
                             onClick={() => setCurrentQuestionIndex(idx)}
                             className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
                               isCurrent
-                                ? 'bg-slate-900 text-white'
+                                ? 'bg-slate-900 text-white scale-105 shadow-xs'
                                 : isAnswered
                                 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
@@ -639,12 +1000,12 @@ export function TestRunnerModal({
                       })}
                     </div>
 
-                    {currentQuestionIndex < questions.length - 1 ? (
+                    {currentQuestionIndex < activeList.length - 1 ? (
                       <Button
                         size="sm"
                         onClick={() =>
                           setCurrentQuestionIndex((prev) =>
-                            Math.min(questions.length - 1, prev + 1)
+                            Math.min(activeList.length - 1, prev + 1)
                           )
                         }
                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"

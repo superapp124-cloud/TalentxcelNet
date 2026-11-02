@@ -68,7 +68,7 @@ export default function HomePage() {
     const code = typeof subjCode === 'string' ? subjCode : selectedSubjectCode
     const classNum = parseInt(selectedClassGrade.replace('Class ', ''), 10) || 4
     const { getClassDiagnosticPackage } = await import('@/lib/assessment/class-diagnostic-engine')
-    const pkg = getClassDiagnosticPackage(classNum, code, selectedBoardCode)
+    const pkg = getClassDiagnosticPackage(classNum, code, selectedBoardCode, Date.now())
     setActiveBlueprint(pkg.blueprint)
     setActiveQuestions(pkg.questions)
     setActiveSolutions(pkg.solutions)
