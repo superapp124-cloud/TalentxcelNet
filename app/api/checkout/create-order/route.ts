@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       orderNumber,
       summary,
       razorpayOrderId: rzpOrder.id,
-      razorpayKeyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+      razorpayKeyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
       isMock: rzpOrder.isMock ?? false,
       product: {
         id: product.id,
