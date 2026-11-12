@@ -8,20 +8,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { headers, cookies } = await import('next/headers')
-  const headerList = await headers()
-  const cookieStore = await cookies()
-  const isE2EAudit =
-    headerList.get('x-e2e-audit') === '1' ||
-    cookieStore.get('e2e_audit')?.value === '1'
-
-  if (!user && !isE2EAudit) {
+  if (!user) {
     redirect('/auth/login')
-  }
-
-  const effectiveUser = user || {
-    id: 'demo-learner-001',
-    email: 'arshid.wani@gmail.com',
   }
 
   let profile: { full_name?: string | null; display_name?: string | null; avatar_url?: string | null } | null = null
@@ -40,7 +28,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     profile = prof
   }
 
-  const email = user?.email || effectiveUser.email
+  const email = user.email
   const rawName =
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
@@ -61,7 +49,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <DashboardLayoutClient
       user={{
-        id: effectiveUser.id,
+        id: user.id,
         email,
         displayName,
         avatarUrl,

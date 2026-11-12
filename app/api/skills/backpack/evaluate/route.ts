@@ -34,8 +34,25 @@ function generateUnpredictableCertificateId(): string {
   return id
 }
 
+const MIN_CERTIFICATE_SECRET_LENGTH = 32
+
+/** Returns the configured signing secret or null; never supplies a fallback. */
+export function getCertificateSigningSecret(): string | null {
+  const configured = process.env.CERTIFICATE_SIGNING_SECRET
+  if (!configured || configured.length < MIN_CERTIFICATE_SECRET_LENGTH) return null
+  return configured
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const signingSecret = getCertificateSigningSecret()
+    if (!signingSecret) {
+      return NextResponse.json(
+        { success: false, error: 'CERTIFICATE_SIGNING_UNAVAILABLE' },
+        { status: 503 }
+      )
+    }
+
     const body = await req.json()
     const parsed = backpackSubmissionSchema.safeParse(body)
 
@@ -77,8 +94,6 @@ export async function POST(req: NextRequest) {
     // 3. Construct Canonical Certificate Payload
     const certificateId = generateUnpredictableCertificateId()
     const issuedAt = new Date().toISOString()
-    const secret = process.env.CERTIFICATE_SIGNING_SECRET || 'dev_talentxcel_secret_key_2026'
-
     const canonicalPayload: CanonicalCertificatePayload = {
       certificateId,
       learnerDisplayName: submission.learnerDisplayName,
@@ -96,7 +111,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Cryptographic HMAC-SHA256 Signing
-    const signature = signCertificatePayload(canonicalPayload, secret)
+    const signature = signCertificatePayload(canonicalPayload, signingSecret)
 
     // 5. Register in Verification Registry for /verify/:id lookup
     registerLifeSkillCertificate({

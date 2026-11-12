@@ -6,8 +6,13 @@
 
 import { createHmac, randomBytes } from 'crypto'
 
-const CONSENT_SECRET = process.env.PARENT_CONSENT_SECRET || process.env.CERTIFICATE_SIGNING_SECRET || 'dev_consent_secret_talentxcel_2026'
 const TOKEN_TTL_MS = 30 * 60 * 1000 // 30 minutes validity
+const MIN_CONSENT_SECRET_LENGTH = 32
+
+export function getConsentSigningSecret(): string | null {
+  const configured = process.env.PARENT_CONSENT_SECRET?.trim()
+  return configured && configured.length >= MIN_CONSENT_SECRET_LENGTH ? configured : null
+}
 
 export interface ConsentChallenge {
   challengeId: string
@@ -58,6 +63,9 @@ export function verifyChallengeAndCreateToken(input: {
   affirmativeConsent: boolean
   parentEmail?: string
 }): { success: true; consentToken: string; expiresAt: string } | { success: false; error: string } {
+  const consentSecret = getConsentSigningSecret()
+  if (!consentSecret) return { success: false, error: 'CONSENT_SIGNING_UNAVAILABLE' }
+
   const challenge = ACTIVE_CHALLENGES.get(input.challengeId)
 
   if (!challenge) {
@@ -83,7 +91,7 @@ export function verifyChallengeAndCreateToken(input: {
   // Generate parent email hash if email provided (pseudonymization)
   let parentEmailHash: string | undefined = undefined
   if (input.parentEmail && input.parentEmail.trim()) {
-    parentEmailHash = createHmac('sha256', CONSENT_SECRET)
+    parentEmailHash = createHmac('sha256', consentSecret)
       .update(input.parentEmail.trim().toLowerCase())
       .digest('hex')
       .slice(0, 16)
@@ -101,7 +109,7 @@ export function verifyChallengeAndCreateToken(input: {
 
   const payloadStr = JSON.stringify(payload)
   const base64Payload = Buffer.from(payloadStr).toString('base64url')
-  const signature = createHmac('sha256', CONSENT_SECRET).update(base64Payload).digest('base64url')
+  const signature = createHmac('sha256', consentSecret).update(base64Payload).digest('base64url')
 
   const consentToken = `${base64Payload}.${signature}`
 
@@ -120,10 +128,8 @@ export function verifyParentConsentToken(token: string): { valid: boolean; error
     return { valid: false, error: 'MISSING_TOKEN' }
   }
 
-  // Allow synthetic dev/test token for unit testing
-  if (token.startsWith('parent_consent_token_valid') || token.startsWith('parent_consent_valid_token')) {
-    return { valid: true }
-  }
+  const consentSecret = getConsentSigningSecret()
+  if (!consentSecret) return { valid: false, error: 'CONSENT_SIGNING_UNAVAILABLE' }
 
   const parts = token.split('.')
   if (parts.length !== 2) {
@@ -133,7 +139,7 @@ export function verifyParentConsentToken(token: string): { valid: boolean; error
   const [base64Payload, signature] = parts
 
   // 1. Verify HMAC Signature
-  const expectedSig = createHmac('sha256', CONSENT_SECRET).update(base64Payload).digest('base64url')
+  const expectedSig = createHmac('sha256', consentSecret).update(base64Payload).digest('base64url')
   if (signature !== expectedSig) {
     return { valid: false, error: 'INVALID_SIGNATURE' }
   }

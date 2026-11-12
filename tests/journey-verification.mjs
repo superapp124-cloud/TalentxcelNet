@@ -19,20 +19,18 @@ async function runJourneys() {
 
   const browser = await chromium.launch({ headless: true })
 
-  // Context WITH E2E audit bypass for authenticated views
+  // Real-auth staging context. Credentials are supplied only by the staging
+  // environment; never commit them or use production identities here.
+  const stagingEmail = process.env.STAGING_LEARNER_EMAIL
+  const stagingPassword = process.env.STAGING_LEARNER_PASSWORD
+  if (!stagingEmail || !stagingPassword) {
+    throw new Error('Set STAGING_LEARNER_EMAIL and STAGING_LEARNER_PASSWORD for an authorized staging run.')
+  }
+
   const auditContext = await browser.newContext({
     viewport: { width: 1440, height: 900 },
-    extraHTTPHeaders: { 'x-e2e-audit': '1' },
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 TalentXcelQA/1.0',
   })
-  await auditContext.addCookies([
-    {
-      name: 'e2e_audit',
-      value: '1',
-      domain: 'localhost',
-      path: '/',
-    },
-  ])
 
   // Clean unauthenticated context for boundary testing
   const publicContext = await browser.newContext({
@@ -42,6 +40,12 @@ async function runJourneys() {
 
   const page = await auditContext.newPage()
   const publicPage = await publicContext.newPage()
+
+  await page.goto(`${BASE_URL}/auth/login`, { waitUntil: 'domcontentloaded', timeout: 15000 })
+  await page.getByLabel('Email address').fill(stagingEmail)
+  await page.getByLabel('Password').fill(stagingPassword)
+  await page.getByRole('button', { name: 'Sign In' }).click()
+  await page.waitForURL(/dashboard|admin/, { timeout: 15000 })
 
   // JOURNEY 1: Contact Enquiry Submission
   try {

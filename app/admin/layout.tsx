@@ -12,6 +12,7 @@ import {
   Compass,
 } from 'lucide-react'
 import { Logo } from '@/components/brand/logo'
+import { requireAdminPage } from '@/lib/auth/server-access'
 
 const navItems = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
@@ -25,7 +26,8 @@ const navItems = [
   { label: 'Super AI Analytics', href: '/admin/ai-analytics', icon: Cpu },
 ]
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await requireAdminPage('/admin')
   return (
     <div className="flex min-h-screen bg-neutral-50 dark:bg-black">
       {/* Admin Sidebar */}

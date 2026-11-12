@@ -3,6 +3,9 @@ import { POST } from '../../app/api/skills/backpack/evaluate/route'
 import { verifyCertificate } from '../../lib/lms/certificate-service'
 import { NextRequest } from 'next/server'
 
+// Test-only value; production must provide CERTIFICATE_SIGNING_SECRET explicitly.
+process.env.CERTIFICATE_SIGNING_SECRET = 'test-only-certificate-secret-for-unit-tests-2026'
+
 describe('Backpack Assessment & Evaluation API End-to-End (/api/skills/backpack/evaluate)', () => {
   it('evaluates a complete valid submission, generates HMAC signature, and registers verifiable credential', async () => {
     const payload = {

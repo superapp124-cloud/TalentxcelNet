@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
+import { ACADEMIC_CLASSES, getCurriculumChapters } from '@/packages/core/src'
+import type { BoardCode } from '@/packages/core/src'
 
 const BASE = 'https://talentxcel.net'
 
 /**
  * Verified, indexable blog article slugs — sourced from the static
  * `articles` array in app/(public)/blog/page.tsx.
- * Update this list when new articles are published.
  */
 const BLOG_SLUGS = [
   'building-resilient-ai-agents',
@@ -18,11 +19,9 @@ const BLOG_SLUGS = [
 /**
  * Verified programme detail pages — sourced from the route structure
  * and programme slugs used in app/(public)/programmes/[slug]/page.tsx.
- * Includes the hardcoded class-9-foundation page and the dynamic
- * slugs referenced from the homepage programmes array.
  */
 const PROGRAMME_SLUGS = [
-  'class-9-foundation',       // dedicated static page
+  'class-9-foundation',
   'ai-development',
   'competitive-exams',
   'school-foundation',
@@ -36,10 +35,36 @@ const PROGRAMME_SLUGS = [
 ] as const
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  // Generate programmatic practice URLs for all classes, subjects & chapters
+  const practiceUrls: MetadataRoute.Sitemap = []
+
+  const BOARDS: BoardCode[] = ['CBSE', 'CISCE']
+
+  for (const board of BOARDS) {
+    for (const cls of ACADEMIC_CLASSES) {
+      for (const subj of cls.subjects) {
+        const chapters = getCurriculumChapters(cls.classNumber, subj.code, board)
+        for (const ch of chapters) {
+          practiceUrls.push({
+            url: `${BASE}/practice/${board.toLowerCase()}/class-${cls.classNumber}/${subj.code}/${ch.id}`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.9,
+          })
+        }
+      }
+    }
+  }
+
   return [
     // ── Core public pages ────────────────────────────────────────────
     {
       url: BASE,
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+    {
+      url: `${BASE}/practice`,
       changeFrequency: 'daily',
       priority: 1.0,
     },
@@ -156,15 +181,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly' as const,
       priority: 0.6,
     })),
-
-    // ── EXCLUDED (not listed here) ─────────────────────────────────────
-    // /auth/login, /auth/register, /auth/verify-email — authentication
-    // /dashboard — protected learner workspace
-    // /admin/* — administration panel
-    // /api/* — API endpoints
-    // /courses/[programmeId] — authenticated course workspace
-    // /projects/[projectId] — authenticated project workspace
-    // /verify/[certificateNumber] — utility / transient pages
-    // /faq — kept out; no faq page metadata found, reassess when content matures
+    // ── Programmatic Practice Tests & Solution Pages ─────────────────
+    ...practiceUrls,
   ]
 }

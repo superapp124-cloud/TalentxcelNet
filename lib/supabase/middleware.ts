@@ -1,13 +1,12 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
-import { isSuperAdminEmail } from '@/lib/auth/permissions'
+import { getSupabaseConfig } from '@/lib/supabase/config'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wvuvriewskvvievacida.supabase.co'
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_2OGNulCHMN3ID-W8eRermg_28PD1wuM'
+  const { url, anonKey } = getSupabaseConfig()
 
   const supabase = createServerClient<Database>(
     url,
@@ -56,27 +55,16 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/auth/login') ||
     request.nextUrl.pathname.startsWith('/auth/register')
 
-  const isLocalHost = host.includes('localhost') || host.includes('127.0.0.1')
-  const isPreview = request.nextUrl.searchParams.get('preview') === '1'
-  const isLocalE2EAudit =
-    (process.env.NODE_ENV !== 'production' || isLocalHost) &&
-    (request.headers.get('x-e2e-audit') === '1' ||
-      request.cookies.get('e2e_audit')?.value === '1' ||
-      isPreview)
-  const adminCookie = request.cookies.get('talentxcel_super_admin')?.value
-  const isSuperAdminCookie = isSuperAdminEmail(adminCookie)
-  const isSuperAdminUser = isSuperAdminEmail(user?.email) || isSuperAdminCookie
-
-  if (isAcademyRoute && !user && !isLocalE2EAudit && !isSuperAdminUser) {
+  if (isAcademyRoute && !user) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/auth/login'
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (isAuthRoute && (user || isSuperAdminCookie)) {
+  if (isAuthRoute && user) {
     const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = isSuperAdminCookie ? '/admin/question-bank' : '/dashboard'
+    redirectUrl.pathname = '/dashboard'
     return NextResponse.redirect(redirectUrl)
   }
 

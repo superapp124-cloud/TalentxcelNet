@@ -53,20 +53,8 @@ describe('Role Hierarchy', () => {
     })
   })
 
-  describe('Super Admin Whitelist', () => {
-    it('recognizes arsh.wani@gmail.com and talentxcelservices@gmail.com as super admins', async () => {
-      const { isSuperAdminEmail, isAdmin } = await import('@/lib/auth/permissions')
-      expect(isSuperAdminEmail('arsh.wani@gmail.com')).toBe(true)
-      expect(isSuperAdminEmail('ARSH.WANI@GMAIL.COM')).toBe(true)
-      expect(isSuperAdminEmail('talentxcelservices@gmail.com')).toBe(true)
-      expect(isSuperAdminEmail('admin@talentxcel.net')).toBe(true)
-      expect(isSuperAdminEmail('talentxcelservices@gmail.ocm')).toBe(false)
-      expect(isSuperAdminEmail('random.student@example.com')).toBe(false)
-
-      // isAdmin elevated check
-      expect(isAdmin('learner', 'arsh.wani@gmail.com')).toBe(true)
-      expect(isAdmin('learner', 'talentxcelservices@gmail.com')).toBe(true)
-      expect(isAdmin('learner', 'random.student@example.com')).toBe(false)
-    })
+  it('never elevates a role based on email identity', () => {
+    expect(isAdmin('learner')).toBe(false)
+    expect(isAdmin('academy_admin')).toBe(true)
   })
 })

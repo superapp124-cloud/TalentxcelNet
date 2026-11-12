@@ -4,13 +4,25 @@ import {
   clearParentObservationsForTesting,
 } from '../../lib/lms/parent-observation-service'
 import { registerLifeSkillCertificate, verifyCertificate } from '../../lib/lms/certificate-service'
+import { generateParentChallenge, verifyChallengeAndCreateToken } from '../../lib/auth/parent-consent-service'
+
+process.env.PARENT_CONSENT_SECRET = 'test-only-parent-consent-secret-2026'
 
 describe('Parent Observation Service (Parent-reported Home Practice)', () => {
   const TEST_CERT_ID = 'TX-LS-2026-C4-TEST001'
-  const VALID_CONSENT_TOKEN = 'parent_consent_token_valid_for_testing_123'
+  let validConsentToken: string
 
   beforeEach(() => {
     clearParentObservationsForTesting()
+    const challenge = generateParentChallenge()
+    const numbers = challenge.questionText.match(/\d+/g)!
+    const consent = verifyChallengeAndCreateToken({
+      challengeId: challenge.challengeId,
+      answer: Number(numbers[0]) * Number(numbers[1]),
+      affirmativeConsent: true,
+    })
+    if (!consent.success) throw new Error('Test consent setup failed')
+    validConsentToken = consent.consentToken
     // Seed a completed digital lab certificate
     registerLifeSkillCertificate({
       certificateNumber: TEST_CERT_ID,
@@ -28,7 +40,7 @@ describe('Parent Observation Service (Parent-reported Home Practice)', () => {
     const result = submitParentObservation({
       certificateId: TEST_CERT_ID,
       daysReported: 5,
-      consentToken: VALID_CONSENT_TOKEN,
+      consentToken: validConsentToken,
       notes: 'Aarav packed his school bag independently after dinner.',
     })
 
@@ -48,14 +60,14 @@ describe('Parent Observation Service (Parent-reported Home Practice)', () => {
     submitParentObservation({
       certificateId: TEST_CERT_ID,
       daysReported: 4,
-      consentToken: VALID_CONSENT_TOKEN,
+      consentToken: validConsentToken,
     })
 
     // Revision submission: 7 days
     const revised = submitParentObservation({
       certificateId: TEST_CERT_ID,
       daysReported: 7,
-      consentToken: VALID_CONSENT_TOKEN,
+      consentToken: validConsentToken,
       notes: 'Completed full week over weekend.',
     })
 
@@ -74,7 +86,7 @@ describe('Parent Observation Service (Parent-reported Home Practice)', () => {
     const res = submitParentObservation({
       certificateId: TEST_CERT_ID,
       daysReported: 10, // Invalid! Max 7 days in a school week
-      consentToken: VALID_CONSENT_TOKEN,
+      consentToken: validConsentToken,
     })
 
     expect(res.success).toBe(false)
@@ -87,7 +99,7 @@ describe('Parent Observation Service (Parent-reported Home Practice)', () => {
     const res = submitParentObservation({
       certificateId: 'NON_EXISTENT_CERT_ID',
       daysReported: 5,
-      consentToken: VALID_CONSENT_TOKEN,
+      consentToken: validConsentToken,
     })
 
     expect(res.success).toBe(false)

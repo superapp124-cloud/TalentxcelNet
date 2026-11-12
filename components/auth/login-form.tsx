@@ -52,7 +52,6 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -92,28 +91,6 @@ export function LoginForm() {
         router.push(redirectTo)
         router.refresh()
         return
-      }
-
-      // If Supabase Auth encounters a schema/DB error or user isn't in GoTrue yet:
-      // Check admin login fallback for verified Super Admin credentials
-      if (values.password === 'Admin#123') {
-        try {
-          const adminRes = await fetch('/api/auth/admin-login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: values.email, password: values.password }),
-          })
-          const adminData = await adminRes.json()
-          if (adminData.success) {
-            toast.success('Welcome back, Super Admin!')
-            const dest = redirectTo && redirectTo !== '/dashboard' ? redirectTo : '/admin/question-bank'
-            router.push(dest)
-            router.refresh()
-            return
-          }
-        } catch {
-          // Fall through to error display
-        }
       }
 
       if (error.message.includes('Invalid login credentials')) {
@@ -221,33 +198,6 @@ export function LoginForm() {
         {isLoading ? 'Signing in...' : 'Sign In'}
       </Button>
 
-      <div className="pt-3 border-t border-slate-100 dark:border-neutral-800 text-center">
-        <p className="text-[11px] text-slate-400 mb-1.5 font-medium">
-          Quick Admin Fill (Default: <code className="text-slate-600 dark:text-slate-300 font-mono">Admin#123</code>)
-        </p>
-        <div className="flex flex-wrap gap-1.5 justify-center">
-          <button
-            type="button"
-            onClick={() => {
-              setValue('email', 'arsh.wani@gmail.com')
-              setValue('password', 'Admin#123')
-            }}
-            className="text-[11px] px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors font-medium"
-          >
-            arsh.wani@gmail.com
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setValue('email', 'talentxcelservices@gmail.com')
-              setValue('password', 'Admin#123')
-            }}
-            className="text-[11px] px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-colors font-medium"
-          >
-            talentxcelservices@gmail.com
-          </button>
-        </div>
-      </div>
       </form>
     </div>
   )

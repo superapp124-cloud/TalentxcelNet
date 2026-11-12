@@ -1,9 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   generateParentChallenge,
   verifyChallengeAndCreateToken,
   verifyParentConsentToken,
+  getConsentSigningSecret,
 } from '../../lib/auth/parent-consent-service'
+
+process.env.PARENT_CONSENT_SECRET = 'test-only-parent-consent-secret-2026'
 
 describe('Parent Consent Service (DPDPA 2023 Adult Gate)', () => {
   it('generates an arithmetic adult challenge with valid question text and ID', () => {
@@ -90,6 +93,34 @@ describe('Parent Consent Service (DPDPA 2023 Adult Gate)', () => {
       const verified = verifyParentConsentToken(tamperedToken)
       expect(verified.valid).toBe(false)
       expect(verified.error).toBe('INVALID_SIGNATURE')
+    }
+  })
+
+  it('fails closed when the consent secret is missing or weak', () => {
+    delete process.env.PARENT_CONSENT_SECRET
+    expect(getConsentSigningSecret()).toBeNull()
+    process.env.CERTIFICATE_SIGNING_SECRET = 'certificate-only-secret-that-must-not-be-reused'
+    expect(getConsentSigningSecret()).toBeNull()
+    delete process.env.CERTIFICATE_SIGNING_SECRET
+    process.env.PARENT_CONSENT_SECRET = 'short'
+    expect(getConsentSigningSecret()).toBeNull()
+    process.env.PARENT_CONSENT_SECRET = 'test-only-parent-consent-secret-2026'
+  })
+
+  it('rejects an expired signed token', () => {
+    const challenge = generateParentChallenge()
+    const numbers = challenge.questionText.match(/\d+/g)!
+    const result = verifyChallengeAndCreateToken({
+      challengeId: challenge.challengeId,
+      answer: parseInt(numbers[0], 10) * parseInt(numbers[1], 10),
+      affirmativeConsent: true,
+    })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      vi.useFakeTimers()
+      vi.setSystemTime(Date.now() + 31 * 60 * 1000)
+      expect(verifyParentConsentToken(result.consentToken)).toEqual({ valid: false, error: 'TOKEN_EXPIRED' })
+      vi.useRealTimers()
     }
   })
 })

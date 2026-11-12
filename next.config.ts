@@ -1,5 +1,11 @@
 import type { NextConfig } from 'next'
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase configuration. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY before build/start.')
+}
+
 const nextConfig: NextConfig = {
   // Security headers
   async headers() {
@@ -18,7 +24,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.razorpay.com https://checkout.razorpay.com https://cdn.razorpay.com https://static.cloudflareinsights.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wvuvriewskvvievacida.supabase.co'} https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com https://cloudflareinsights.com`,
+              `connect-src 'self' ${supabaseUrl} https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com https://cloudflareinsights.com`,
               "img-src 'self' data: blob: https:",
               "media-src 'self' blob: data: https:",
               "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://*.razorpay.com https://api.razorpay.com",
@@ -54,8 +60,8 @@ const nextConfig: NextConfig = {
     serverActions: { allowedOrigins: ['talentxcel.net', 'academy.talentxcel.net', 'ai.talentxcel.net', 'localhost:3000'] },
   },
   env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wvuvriewskvvievacida.supabase.co',
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_2OGNulCHMN3ID-W8eRermg_28PD1wuM',
+    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://talentxcel.net',
     NEXT_PUBLIC_ACADEMY_URL: process.env.NEXT_PUBLIC_ACADEMY_URL || 'https://academy.talentxcel.net',
     NEXT_PUBLIC_AI_URL: process.env.NEXT_PUBLIC_AI_URL || 'https://ai.talentxcel.net',

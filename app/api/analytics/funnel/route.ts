@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { recordFunnelEvent, getTruthfulGrowthMetrics } from '@/lib/commerce/entitlements'
+import { getServerAccess } from '@/lib/auth/server-access'
 
 const eventSchema = z.object({
   eventName: z.enum([
@@ -38,6 +39,10 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
+    const access = await getServerAccess('admin')
+    if (!access.authorization.allowed) {
+      return NextResponse.json({ error: access.authorization.status === 401 ? 'Authentication required' : 'Insufficient permissions' }, { status: access.authorization.status })
+    }
     const metrics = getTruthfulGrowthMetrics()
     return NextResponse.json(metrics)
   } catch (err) {

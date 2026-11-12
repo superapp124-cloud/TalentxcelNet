@@ -122,11 +122,10 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
 
       const body = await res.json()
       expect(body.error).toBe('Authentication required')
-      expect(body.message).toContain('strictly reserved for authenticated learners')
       expect(body.redirectTo).toBe('/auth/login?redirectTo=/dashboard/question-bank')
     }, 15000)
 
-    it('allows verified authenticated or E2E audit sessions to access questions', async () => {
+    it('rejects the former E2E bypass even when its header is supplied', async () => {
       const { GET } = await import('../../app/api/questions/bank/route')
       const req = new Request('http://localhost:3000/api/questions/bank?classNumber=10&chapterId=math_c10_ch04&limit=5', {
         headers: {
@@ -134,15 +133,10 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
         },
       })
       const res = await GET(req)
-      expect(res.status).toBe(200)
+      expect(res.status).toBe(401)
 
       const body = await res.json()
-      expect(body.success).toBe(true)
-      expect(body.classNumber).toBe(10)
-      expect(body.chapterId).toBe('math_c10_ch04')
-      expect(body.questions.length).toBe(5)
-      expect(body.total).toBe(2000)
-      expect(body.summary.totalQuestionsCount).toBe(200000)
+      expect(body.error).toBe('Authentication required')
     })
   })
 })

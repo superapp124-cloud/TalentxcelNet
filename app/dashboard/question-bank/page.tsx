@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { requireLearnerPage } from '@/lib/auth/server-access'
 import {
   MATH_CLASSES_TAXONOMY,
   getMathQuestionsForClassAndChapter,
@@ -14,33 +14,8 @@ export const metadata: Metadata = {
 }
 
 export default async function MathQuestionBankPage() {
-  let user = null
-  let isE2EAudit = false
-
-  try {
-    const { headers, cookies } = await import('next/headers')
-    const headerList = await headers()
-    const cookieStore = await cookies()
-    const isLocalHost = Boolean(headerList.get('host')?.includes('localhost') || headerList.get('host')?.includes('127.0.0.1'))
-    const isPreview = Boolean(isLocalHost && (headerList.get('referer')?.includes('preview=1') || cookieStore.get('preview_mode')?.value === '1'))
-    isE2EAudit = Boolean(
-      headerList.get('x-e2e-audit') === '1' ||
-      cookieStore.get('e2e_audit')?.value === '1' ||
-      isPreview
-    )
-
-    if (!isE2EAudit) {
-      const supabase = await createClient()
-      const { data } = await supabase.auth.getUser()
-      user = data?.user || null
-    }
-  } catch {
-    user = null
-  }
-
-  const { isSuperAdminEmail } = await import('@/lib/auth/permissions')
-  const isSuperAdmin = isSuperAdminEmail(user?.email)
-  const isAuthenticated = Boolean(user || isE2EAudit || isSuperAdmin)
+  const { user } = await requireLearnerPage('/dashboard/question-bank')
+  const isAuthenticated = true
   const defaultClass = 10
   const initialChapterId = 'math_c10_ch01'
 
@@ -62,7 +37,7 @@ export default async function MathQuestionBankPage() {
         taxonomy={MATH_CLASSES_TAXONOMY}
         summary={summary}
         isAuthenticated={isAuthenticated}
-        userEmail={user?.email || (isE2EAudit ? 'e2e.tester@talentxcel.net' : null)}
+        userEmail={user?.email || null}
       />
     </div>
   )
