@@ -146,15 +146,32 @@ export function InteractiveQuestionView({
                 )}
               </div>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowGate(true)}
-                className="text-xs font-semibold text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900 hover:bg-blue-50"
-              >
-                <Sparkles className="h-3.5 w-3.5 mr-1" />
-                Unlock Step-by-Step AI Proof
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowGate(true)}
+                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900 hover:bg-blue-50"
+                >
+                  <Sparkles className="h-3.5 w-3.5 mr-1" />
+                  Unlock Step-by-Step AI Proof
+                </Button>
+
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                    `Can you solve this question? "${questionText.slice(0, 90)}..." Try it here: https://talentxcel.net/question/${questionId}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5"
+                  >
+                    <span>Share on WhatsApp</span>
+                  </Button>
+                </a>
+              </div>
             </div>
           )}
         </div>

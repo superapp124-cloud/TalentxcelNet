@@ -36,6 +36,7 @@ const PROGRAMME_SLUGS = [
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const practiceUrls: MetadataRoute.Sitemap = []
+  const ncertSolutionUrls: MetadataRoute.Sitemap = []
   const questionUrls: MetadataRoute.Sitemap = []
   const formulaUrls: MetadataRoute.Sitemap = []
 
@@ -58,7 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // 2. Programmatic Practice & Question URLs
+  // 2. Programmatic Practice, NCERT Solutions & Questions
   const BOARDS: BoardCode[] = ['CBSE', 'CISCE']
 
   for (const board of BOARDS) {
@@ -66,7 +67,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       for (const subj of cls.subjects) {
         const chapters = getCurriculumChapters(cls.classNumber, subj.code, board)
         for (const ch of chapters) {
-          // Chapter Hub URL
+          // Chapter Diagnostic Hub URL
           practiceUrls.push({
             url: `${BASE}/practice/${board.toLowerCase()}/class-${cls.classNumber}/${subj.code}/${ch.id}`,
             lastModified: new Date(),
@@ -74,8 +75,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 0.9,
           })
 
-          // First 3 high-intent question URLs per chapter for immediate indexing
-          for (let qIdx = 1; qIdx <= 3; qIdx++) {
+          // NCERT Solution Hub (CBSE)
+          if (board === 'CBSE') {
+            ncertSolutionUrls.push({
+              url: `${BASE}/solutions/ncert/class-${cls.classNumber}/${subj.code}/${ch.id}`,
+              lastModified: new Date(),
+              changeFrequency: 'weekly',
+              priority: 0.9,
+            })
+          }
+
+          // Dense Question Bank Shards (Up to 25 questions per chapter for high index density)
+          const qCount = cls.classNumber >= 9 ? 25 : 15
+          for (let qIdx = 1; qIdx <= qCount; qIdx++) {
             const qId = `${ch.id}_q${String(qIdx).padStart(4, '0')}`
             questionUrls.push({
               url: `${BASE}/question/${qId}`,
@@ -218,6 +230,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...formulaUrls,
     // ── Programmatic Practice Chapter Pages ─────────────────────────
     ...practiceUrls,
+    // ── NCERT Chapter Solutions Pages ───────────────────────────────
+    ...ncertSolutionUrls,
     // ── Programmatic Question & Verified Solution Pages ─────────────
     ...questionUrls,
   ]
