@@ -35,10 +35,30 @@ const PROGRAMME_SLUGS = [
 ] as const
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Generate programmatic practice URLs for all classes, subjects & chapters
   const practiceUrls: MetadataRoute.Sitemap = []
   const questionUrls: MetadataRoute.Sitemap = []
+  const formulaUrls: MetadataRoute.Sitemap = []
 
+  // 1. Formula & Quick Revision Sheets
+  formulaUrls.push({
+    url: `${BASE}/formulas`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.95,
+  })
+
+  for (const cls of ACADEMIC_CLASSES) {
+    for (const subj of cls.subjects) {
+      formulaUrls.push({
+        url: `${BASE}/formulas/class-${cls.classNumber}/${subj.code}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.9,
+      })
+    }
+  }
+
+  // 2. Programmatic Practice & Question URLs
   const BOARDS: BoardCode[] = ['CBSE', 'CISCE']
 
   for (const board of BOARDS) {
@@ -194,6 +214,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly' as const,
       priority: 0.6,
     })),
+    // ── High-Volume Formula & Cheat Sheets ──────────────────────────
+    ...formulaUrls,
     // ── Programmatic Practice Chapter Pages ─────────────────────────
     ...practiceUrls,
     // ── Programmatic Question & Verified Solution Pages ─────────────
