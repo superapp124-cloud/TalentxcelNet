@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { ACADEMIC_CLASSES, getCurriculumChapters } from '@/packages/core/src'
 import type { BoardCode } from '@/packages/core/src'
+import { COMPETITIVE_EXAMS } from '@/lib/competitive/exam-data'
 
 const BASE = 'https://talentxcel.net'
 
@@ -40,6 +41,38 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const ncertSolutionUrls: MetadataRoute.Sitemap = []
   const questionUrls: MetadataRoute.Sitemap = []
   const formulaUrls: MetadataRoute.Sitemap = []
+  const competitiveUrls: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE}/competitive`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE}/competitive/ssb/psychological-battery`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+  ]
+
+  for (const exam of COMPETITIVE_EXAMS) {
+    competitiveUrls.push({
+      url: `${BASE}/competitive/${exam.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.95,
+    })
+
+    for (const sec of exam.sections) {
+      competitiveUrls.push({
+        url: `${BASE}/competitive/${exam.slug}/${sec.id}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.95,
+      })
+    }
+  }
 
   // 1. Formula & Quick Revision Sheets
   formulaUrls.push({
@@ -235,6 +268,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly' as const,
       priority: 0.6,
     })),
+    // ── Competitive & SSB Exam Hubs & Tests ─────────────────────────
+    ...competitiveUrls,
     // ── Class-Level Pillar Hubs (Class 11, 12, etc.) ─────────────────
     ...classHubUrls,
     // ── High-Volume Formula & Cheat Sheets ──────────────────────────
