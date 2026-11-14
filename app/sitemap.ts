@@ -35,6 +35,7 @@ const PROGRAMME_SLUGS = [
 ] as const
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const classHubUrls: MetadataRoute.Sitemap = []
   const practiceUrls: MetadataRoute.Sitemap = []
   const ncertSolutionUrls: MetadataRoute.Sitemap = []
   const questionUrls: MetadataRoute.Sitemap = []
@@ -54,16 +55,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
         url: `${BASE}/formulas/class-${cls.classNumber}/${subj.code}`,
         lastModified: new Date(),
         changeFrequency: 'weekly',
-        priority: 0.9,
+        priority: cls.classNumber >= 11 ? 1.0 : 0.9,
       })
     }
   }
 
-  // 2. Programmatic Practice, NCERT Solutions & Questions
+  // 2. Programmatic Class Hubs, Practice, NCERT Solutions & Questions
   const BOARDS: BoardCode[] = ['CBSE', 'CISCE']
 
   for (const board of BOARDS) {
     for (const cls of ACADEMIC_CLASSES) {
+      // Class Level Pillar Hub (e.g. /practice/cbse/class-12)
+      classHubUrls.push({
+        url: `${BASE}/practice/${board.toLowerCase()}/class-${cls.classNumber}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: cls.classNumber >= 11 ? 1.0 : 0.95,
+      })
+
       for (const subj of cls.subjects) {
         const chapters = getCurriculumChapters(cls.classNumber, subj.code, board)
         for (const ch of chapters) {
@@ -72,7 +81,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             url: `${BASE}/practice/${board.toLowerCase()}/class-${cls.classNumber}/${subj.code}/${ch.id}`,
             lastModified: new Date(),
             changeFrequency: 'weekly',
-            priority: 0.9,
+            priority: cls.classNumber >= 11 ? 0.95 : 0.9,
           })
 
           // NCERT Solution Hub (CBSE)
@@ -81,19 +90,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
               url: `${BASE}/solutions/ncert/class-${cls.classNumber}/${subj.code}/${ch.id}`,
               lastModified: new Date(),
               changeFrequency: 'weekly',
-              priority: 0.9,
+              priority: cls.classNumber >= 11 ? 0.95 : 0.9,
             })
           }
 
-          // Dense Question Bank Shards (Up to 25 questions per chapter for high index density)
-          const qCount = cls.classNumber >= 9 ? 25 : 15
+          // Dense Question Bank Shards (Up to 35 questions for Class 11/12, 20 for 9/10, 10 for middle)
+          const qCount = cls.classNumber >= 11 ? 35 : cls.classNumber >= 9 ? 20 : 10
           for (let qIdx = 1; qIdx <= qCount; qIdx++) {
             const qId = `${ch.id}_q${String(qIdx).padStart(4, '0')}`
             questionUrls.push({
               url: `${BASE}/question/${qId}`,
               lastModified: new Date(),
               changeFrequency: 'monthly',
-              priority: 0.8,
+              priority: cls.classNumber >= 11 ? 0.85 : 0.8,
             })
           }
         }
@@ -226,6 +235,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly' as const,
       priority: 0.6,
     })),
+    // ── Class-Level Pillar Hubs (Class 11, 12, etc.) ─────────────────
+    ...classHubUrls,
     // ── High-Volume Formula & Cheat Sheets ──────────────────────────
     ...formulaUrls,
     // ── Programmatic Practice Chapter Pages ─────────────────────────
