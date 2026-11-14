@@ -17,7 +17,7 @@ console.log(`\x1b[36m===========================================================
 console.log(`\x1b[32m🚀 TALENTXCEL GOOGLE SEARCH CONSOLE & INDEXING ENGINE\x1b[0m`)
 console.log(`\x1b[36m==============================================================\x1b[0m`)
 console.log(`Service Account: \x1b[33m${keyData.client_email}\x1b[0m`)
-console.log(`Project ID:      \x1b[33${keyData.project_id}\x1b[0m`)
+console.log(`Project ID:      \x1b[33m${keyData.project_id}\x1b[0m`)
 console.log(`Target Site:     \x1b[33m${SITE_DOMAIN}\x1b[0m`)
 console.log(`Sitemap Target:  \x1b[33m${SITEMAP_URL}\x1b[0m\n`)
 
@@ -64,18 +64,22 @@ async function run() {
     }
 
     // 3. Check Indexing API for Core Landing URLs
-    console.log('\n3. Triggering Google Indexing API for Core & Practice Hubs...')
+    console.log('\n3. Triggering Google Indexing API for Core, Competitive & Practice Hubs...')
     const highPriorityUrls = [
       'https://talentxcel.net',
+      'https://talentxcel.net/competitive',
+      'https://talentxcel.net/competitive/ssb-oir',
+      'https://talentxcel.net/competitive/ssb-oir/verbal-reasoning',
+      'https://talentxcel.net/competitive/ssb/psychological-battery',
+      'https://talentxcel.net/competitive/nda',
+      'https://talentxcel.net/competitive/cds',
+      'https://talentxcel.net/competitive/ssc-cgl',
       'https://talentxcel.net/practice',
+      'https://talentxcel.net/practice/cbse/class-12',
+      'https://talentxcel.net/practice/cbse/class-11',
+      'https://talentxcel.net/formulas',
       'https://talentxcel.net/assessment',
-      'https://talentxcel.net/skills',
       'https://talentxcel.net/academic',
-      'https://talentxcel.net/plans',
-      'https://talentxcel.net/practice/cbse/class-10/science/sci_c10_ch01',
-      'https://talentxcel.net/practice/cbse/class-10/math/math_c10_ch01',
-      'https://talentxcel.net/practice/cbse/class-9/science/sci_c9_ch01',
-      'https://talentxcel.net/practice/cbse/class-9/math/math_c9_ch01',
     ]
 
     let submittedCount = 0
