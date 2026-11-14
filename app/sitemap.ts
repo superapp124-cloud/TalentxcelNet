@@ -37,6 +37,7 @@ const PROGRAMME_SLUGS = [
 export default function sitemap(): MetadataRoute.Sitemap {
   // Generate programmatic practice URLs for all classes, subjects & chapters
   const practiceUrls: MetadataRoute.Sitemap = []
+  const questionUrls: MetadataRoute.Sitemap = []
 
   const BOARDS: BoardCode[] = ['CBSE', 'CISCE']
 
@@ -45,12 +46,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       for (const subj of cls.subjects) {
         const chapters = getCurriculumChapters(cls.classNumber, subj.code, board)
         for (const ch of chapters) {
+          // Chapter Hub URL
           practiceUrls.push({
             url: `${BASE}/practice/${board.toLowerCase()}/class-${cls.classNumber}/${subj.code}/${ch.id}`,
             lastModified: new Date(),
             changeFrequency: 'weekly',
             priority: 0.9,
           })
+
+          // First 3 high-intent question URLs per chapter for immediate indexing
+          for (let qIdx = 1; qIdx <= 3; qIdx++) {
+            const qId = `${ch.id}_q${String(qIdx).padStart(4, '0')}`
+            questionUrls.push({
+              url: `${BASE}/question/${qId}`,
+              lastModified: new Date(),
+              changeFrequency: 'monthly',
+              priority: 0.8,
+            })
+          }
         }
       }
     }
@@ -181,7 +194,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly' as const,
       priority: 0.6,
     })),
-    // ── Programmatic Practice Tests & Solution Pages ─────────────────
+    // ── Programmatic Practice Chapter Pages ─────────────────────────
     ...practiceUrls,
+    // ── Programmatic Question & Verified Solution Pages ─────────────
+    ...questionUrls,
   ]
 }
