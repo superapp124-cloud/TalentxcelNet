@@ -649,6 +649,183 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================================= */}
+        {/* 1.5. 2026 BOARD & COMPETITIVE EXAMINATION PRACTICE HUBS */}
+        {/* ========================================================================= */}
+        <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 space-y-4" id="exam-hubs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+            <div>
+              <span className="text-[11px] sm:text-xs font-bold text-[#059669] uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                2026 Board &amp; Entrance Exam Season
+              </span>
+              <h2 className="text-base sm:text-xl font-bold text-slate-900">
+                Chapter-Wise Practice Tests &amp; Competitive Entrance Mocks
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/practice"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200 transition-colors"
+              >
+                All Classes (4–12) →
+              </Link>
+              <Link
+                href="/competitive"
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 transition-colors"
+              >
+                SSB &amp; Entrance Mocks →
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Senior Secondary Classes 11 & 12 */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs space-y-3 flex flex-col justify-between hover:border-blue-300 transition-colors">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded-md">
+                    Classes 11 &amp; 12
+                  </span>
+                  <span className="text-[10px] text-slate-600 font-semibold">CBSE &amp; ISC</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Senior Secondary Board &amp; Entrance
+                </h3>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Physics, Chemistry, Maths &amp; Biology chapter tests calibrated for Board distinctions and NEET/JEE foresight.
+                </p>
+                <div className="pt-1 flex flex-wrap gap-1.5 text-[10px]">
+                  <Link href="/practice/cbse/class-12" className="px-2 py-1 rounded bg-slate-50 hover:bg-blue-50 text-slate-700 font-medium border border-slate-200">
+                    Class 12 CBSE
+                  </Link>
+                  <Link href="/practice/cbse/class-11" className="px-2 py-1 rounded bg-slate-50 hover:bg-blue-50 text-slate-700 font-medium border border-slate-200">
+                    Class 11 CBSE
+                  </Link>
+                  <Link href="/practice/cisce/class-12" className="px-2 py-1 rounded bg-slate-50 hover:bg-blue-50 text-slate-700 font-medium border border-slate-200">
+                    Class 12 ISC
+                  </Link>
+                </div>
+              </div>
+              <Link
+                href="/practice/cbse/class-12"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 pt-1"
+              >
+                <span>Explore Class 12 Test Series</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* Card 2: Secondary Board Classes 9 & 10 */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs space-y-3 flex flex-col justify-between hover:border-emerald-300 transition-colors">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded-md">
+                    Classes 9 &amp; 10
+                  </span>
+                  <span className="text-[10px] text-slate-600 font-semibold">100% NCERT</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Secondary Board Exam Dominance
+                </h3>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Chapter-wise MCQs, textbook exercise solutions, and high-frequency board questions with instant derivations.
+                </p>
+                <div className="pt-1 flex flex-wrap gap-1.5 text-[10px]">
+                  <Link href="/practice/cbse/class-10" className="px-2 py-1 rounded bg-slate-50 hover:bg-emerald-50 text-slate-700 font-medium border border-slate-200">
+                    Class 10 CBSE
+                  </Link>
+                  <Link href="/practice/cbse/class-9" className="px-2 py-1 rounded bg-slate-50 hover:bg-emerald-50 text-slate-700 font-medium border border-slate-200">
+                    Class 9 CBSE
+                  </Link>
+                  <Link href="/practice/cisce/class-10" className="px-2 py-1 rounded bg-slate-50 hover:bg-emerald-50 text-slate-700 font-medium border border-slate-200">
+                    Class 10 ICSE
+                  </Link>
+                </div>
+              </div>
+              <Link
+                href="/practice/cbse/class-10"
+                className="text-xs font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1 pt-1"
+              >
+                <span>Explore Class 10 Practice</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* Card 3: Armed Forces SSB & Defence */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs space-y-3 flex flex-col justify-between hover:border-amber-300 transition-colors">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider bg-amber-50 px-2 py-0.5 rounded-md">
+                    Armed Forces
+                  </span>
+                  <span className="text-[10px] text-slate-600 font-semibold">SSB • NDA • CDS</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  SSB OIR &amp; Psychological Simulator
+                </h3>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Stage-I OIR verbal/non-verbal reasoning tests, 15s WAT drills, 60 SRT real dilemmas, and PPDT story templates.
+                </p>
+                <div className="pt-1 flex flex-wrap gap-1.5 text-[10px]">
+                  <Link href="/competitive/ssb-oir" className="px-2 py-1 rounded bg-slate-50 hover:bg-amber-50 text-slate-700 font-medium border border-slate-200">
+                    SSB OIR Test
+                  </Link>
+                  <Link href="/competitive/ssb/psychological-battery" className="px-2 py-1 rounded bg-slate-50 hover:bg-amber-50 text-slate-700 font-medium border border-slate-200">
+                    WAT &amp; SRT Drill
+                  </Link>
+                  <Link href="/competitive/nda" className="px-2 py-1 rounded bg-slate-50 hover:bg-amber-50 text-slate-700 font-medium border border-slate-200">
+                    NDA (UPSC)
+                  </Link>
+                </div>
+              </div>
+              <Link
+                href="/competitive/ssb-oir"
+                className="text-xs font-bold text-amber-600 hover:text-amber-700 inline-flex items-center gap-1 pt-1"
+              >
+                <span>Start Free SSB OIR Test</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* Card 4: Formulas & Quick Revision */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs space-y-3 flex flex-col justify-between hover:border-purple-300 transition-colors">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider bg-purple-50 px-2 py-0.5 rounded-md">
+                    Quick Revision
+                  </span>
+                  <span className="text-[10px] text-slate-600 font-semibold">1-Page Cheats</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Formula &amp; Concept Cheat Sheets
+                </h3>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  High-yield formulas, derivation shortcuts, and chemical reaction roadmaps for rapid pre-board and entrance recall.
+                </p>
+                <div className="pt-1 flex flex-wrap gap-1.5 text-[10px]">
+                  <Link href="/formulas/class-10/math" className="px-2 py-1 rounded bg-slate-50 hover:bg-purple-50 text-slate-700 font-medium border border-slate-200">
+                    Class 10 Math
+                  </Link>
+                  <Link href="/formulas/class-12/math" className="px-2 py-1 rounded bg-slate-50 hover:bg-purple-50 text-slate-700 font-medium border border-slate-200">
+                    Class 12 Math
+                  </Link>
+                  <Link href="/formulas" className="px-2 py-1 rounded bg-slate-50 hover:bg-purple-50 text-slate-700 font-medium border border-slate-200">
+                    All Formulas
+                  </Link>
+                </div>
+              </div>
+              <Link
+                href="/formulas"
+                className="text-xs font-bold text-purple-600 hover:text-purple-700 inline-flex items-center gap-1 pt-1"
+              >
+                <span>View All Formula Sheets</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
         {/* 2. TRANSPARENT PRICING MATRIX */}
         {/* ========================================================================= */}
         <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 space-y-3.5 sm:space-y-4" id="pricing">
