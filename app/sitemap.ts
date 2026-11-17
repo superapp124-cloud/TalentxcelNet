@@ -56,6 +56,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
+  const toolsUrls: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE}/tools`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE}/tools/cbse-cgpa-calculator`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE}/tools/ssb-eligibility-calculator`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+  ]
+
   for (const exam of COMPETITIVE_EXAMS) {
     competitiveUrls.push({
       url: `${BASE}/competitive/${exam.slug}`,
@@ -270,6 +291,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     // ── Competitive & SSB Exam Hubs & Tests ─────────────────────────
     ...competitiveUrls,
+    // ── Free Academic & Entrance Calculators ─────────────────────────
+    ...toolsUrls,
     // ── Class-Level Pillar Hubs (Class 11, 12, etc.) ─────────────────
     ...classHubUrls,
     // ── High-Volume Formula & Cheat Sheets ──────────────────────────
