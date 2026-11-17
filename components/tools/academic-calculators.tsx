@@ -38,9 +38,9 @@ export function CbseCgpaCalculator() {
           <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 text-[10px] uppercase font-bold">
             CBSE Official Multiplier (9.5)
           </Badge>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
             CBSE Class 10 CGPA to Percentage Calculator
-          </h2>
+          </h1>
         </div>
         <span className="text-xs font-semibold text-slate-400">Class 10 Board Metric</span>
       </div>
@@ -160,9 +160,9 @@ export function SsbAgeEligibilityCalculator() {
           <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] uppercase font-bold">
             UPSC &amp; Armed Forces Rules
           </Badge>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
             SSB &amp; Armed Forces Age Eligibility Calculator
-          </h2>
+          </h1>
         </div>
         <span className="text-xs font-semibold text-slate-400">NDA • CDS • AFCAT</span>
       </div>
