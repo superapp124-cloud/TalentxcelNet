@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { FormulaActionButtons } from '@/components/academic/formula-actions'
 import {
   ACADEMIC_CLASSES,
   getCurriculumChapters,
@@ -131,7 +132,20 @@ export default async function FormulaSheetPage({ params }: PageProps) {
 
         {/* Hero */}
         <header className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Print only header */}
+          <div className="hidden print:block border-b-2 border-slate-800 pb-3 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xl font-black text-slate-900 tracking-tight">TalentXcel.net</span>
+                <span className="text-xs text-slate-600 block">Board & Competitive Examination Learning Vault</span>
+              </div>
+              <div className="text-right text-xs text-slate-500">
+                Official 2026 Revision Sheet • Scan/Visit: https://talentxcel.net
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
             <Badge className="bg-amber-500 text-slate-950 text-xs font-black uppercase">
               <Zap className="h-3 w-3 mr-1" />
               Quick Revision Vault
@@ -149,9 +163,17 @@ export default async function FormulaSheetPage({ params }: PageProps) {
             Class {classNum} {subjectName} Formulas & Key Concepts Cheat-Sheet
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl print:text-xs">
             The definitive chapter-by-chapter formula sheet, core definitions, and quick revision notes. Use this cheat-sheet for rapid board exam revision, numerical problem-solving, and diagnostic test preparation.
           </p>
+
+          <div className="pt-2">
+            <FormulaActionButtons
+              classNum={classNum}
+              subjectName={subjectName}
+              subjectCode={subject}
+            />
+          </div>
         </header>
 
         {/* Chapters Formula Grid */}
@@ -159,7 +181,7 @@ export default async function FormulaSheetPage({ params }: PageProps) {
           {chapters.map((ch) => (
             <div
               key={ch.id}
-              className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4"
+              className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 print:border-slate-300 print:shadow-none print:break-inside-avoid print:p-4 print:my-2"
             >
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
                 <div>
@@ -212,7 +234,7 @@ export default async function FormulaSheetPage({ params }: PageProps) {
         </div>
 
         {/* Bottom CTA */}
-        <div className="rounded-3xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-8 text-white text-center space-y-4 shadow-xl">
+        <div className="rounded-3xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-8 text-white text-center space-y-4 shadow-xl print:hidden">
           <h3 className="text-xl sm:text-2xl font-black">
             Master All {chapters.length} Chapters with Unlimited Adaptive Practice
           </h3>
