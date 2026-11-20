@@ -18,9 +18,10 @@ import {
   getTruthfulGrowthMetrics,
 } from '../../lib/commerce/entitlements'
 import {
-  claimWebhookEvent,
-  markWebhookProcessed,
-  recordWebhookFailure,
+  acquireWebhookLease,
+  completeWebhookProcessing,
+  failWebhookProcessing,
+  expireWebhookLeaseForTesting,
   resetWebhookIdempotencyClaimsForTesting,
 } from '../../lib/commerce/webhook-idempotency'
 import { POST as verifyPaymentPOST } from '../../app/api/checkout/verify-payment/route'
@@ -481,29 +482,159 @@ describe('Webhook Authentication, Durable Idempotency & Failure Handling (/api/c
     expect(data2.note).toBe('duplicate_event_ignored')
   })
 
+  it('enforces mutual exclusion between concurrent workers on the same event (prevents double processing)', async () => {
+    const eventId = `evt_concurrent_${Date.now()}`
+    const worker1 = 'worker_node_instance_1'
+    const worker2 = 'worker_node_instance_2'
+
+    // Worker 1 acquires exclusive lease
+    const lease1 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: worker1,
+      leaseSeconds: 60,
+    })
+    expect(lease1.outcome).toBe('acquired')
+    expect(lease1.leaseOwner).toBe(worker1)
+
+    // Worker 2 attempts concurrent processing while Worker 1 is still processing -> MUST BE REJECTED AS BUSY
+    const lease2 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: worker2,
+      leaseSeconds: 60,
+    })
+    expect(lease2.outcome).toBe('busy')
+    expect(lease2.leaseOwner).toBe(worker1)
+
+    // Worker 1 successfully finishes and marks complete
+    await completeWebhookProcessing({
+      provider: 'razorpay',
+      eventId,
+      workerId: worker1,
+    })
+
+    // Now Worker 2 or any subsequent delivery sees it is already processed
+    const lease3 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: worker2,
+      leaseSeconds: 60,
+    })
+    expect(lease3.outcome).toBe('already_processed')
+  })
+
   it('allows retrying a failed webhook and marks processed only after success', async () => {
     const eventId = `evt_retry_${Date.now()}`
+    const worker1 = 'worker_retry_1'
 
-    // 1. Initial claim
-    const claim1 = await claimWebhookEvent('razorpay', eventId, 'payment.captured', { id: eventId })
-    expect(claim1.claimed).toBe(true)
-    expect(claim1.alreadyProcessed).toBe(false)
+    // 1. Initial lease acquisition
+    const lease1 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: worker1,
+    })
+    expect(lease1.outcome).toBe('acquired')
 
     // 2. Failure occurs during processing
-    await recordWebhookFailure('razorpay', eventId, 'Connection timeout')
+    await failWebhookProcessing({
+      provider: 'razorpay',
+      eventId,
+      workerId: worker1,
+      errorMessage: 'Database timeout',
+    })
 
-    // 3. Retry delivery arrives
-    const claim2 = await claimWebhookEvent('razorpay', eventId, 'payment.captured', { id: eventId })
-    expect(claim2.claimed).toBe(true)
-    expect(claim2.alreadyProcessed).toBe(false)
+    // 3. Retry delivery arrives (can be different worker instance)
+    const worker2 = 'worker_retry_2'
+    const lease2 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: worker2,
+    })
+    expect(lease2.outcome).toBe('acquired')
+    expect(lease2.leaseOwner).toBe(worker2)
 
     // 4. Retry succeeds and marks processed
-    await markWebhookProcessed('razorpay', eventId, claim2.recordId)
+    await completeWebhookProcessing({
+      provider: 'razorpay',
+      eventId,
+      workerId: worker2,
+    })
 
-    // 5. Subsequent delivery is recognized as duplicate
-    const claim3 = await claimWebhookEvent('razorpay', eventId, 'payment.captured', { id: eventId })
-    expect(claim3.claimed).toBe(false)
-    expect(claim3.alreadyProcessed).toBe(true)
+    // 5. Subsequent delivery is recognized as already processed
+    const lease3 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: 'worker_retry_3',
+    })
+    expect(lease3.outcome).toBe('already_processed')
+  })
+
+  it('safely re-acquires lease when a previous worker crashes and its lease expires', async () => {
+    const eventId = `evt_crash_${Date.now()}`
+    const deadWorker = 'worker_crashed_999'
+    const recoveryWorker = 'worker_recovery_111'
+
+    // Dead worker acquired lease
+    const lease1 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: deadWorker,
+      leaseSeconds: 10,
+    })
+    expect(lease1.outcome).toBe('acquired')
+
+    // Simulate dead worker timeout/crash where lease expires
+    expireWebhookLeaseForTesting('razorpay', eventId)
+
+    // Recovery worker safely claims the expired lease
+    const lease2 = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: recoveryWorker,
+      leaseSeconds: 60,
+    })
+    expect(lease2.outcome).toBe('acquired')
+    expect(lease2.leaseOwner).toBe(recoveryWorker)
+  })
+
+  it('strictly rejects completion if worker does not own the active lease', async () => {
+    const eventId = `evt_unauthorized_complete_${Date.now()}`
+    const legitimateWorker = 'worker_legit'
+    const unauthorizedWorker = 'worker_rogue'
+
+    await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: legitimateWorker,
+    })
+
+    // Unauthorized worker tries to mark it complete
+    await expect(
+      completeWebhookProcessing({
+        provider: 'razorpay',
+        eventId,
+        workerId: unauthorizedWorker,
+      })
+    ).rejects.toThrow('Lease lock not held')
   })
 
   it('returns retryable HTTP 500 when database operation fails during webhook processing', async () => {

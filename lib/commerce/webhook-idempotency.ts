@@ -1,201 +1,230 @@
 import { createClient } from '@/lib/supabase/server'
+import { randomBytes } from 'crypto'
 
-export interface WebhookClaimResult {
-  claimed: boolean
-  alreadyProcessed: boolean
-  recordId?: string
+export type WebhookLeaseOutcome = 'acquired' | 'already_processed' | 'busy'
+
+export interface WebhookLeaseResult {
+  outcome: WebhookLeaseOutcome
+  claimId: string
+  leaseOwner: string
 }
 
-interface DurableClaimEntry {
-  id: string
+interface MockLeaseEntry {
+  claimId: string
   provider: string
   eventId: string
   eventType: string
-  processed: boolean
-  processedAt?: string
-  error?: string
-  createdAt: string
+  status: 'processing' | 'processed' | 'failed'
+  leaseOwner: string
+  leaseExpiresAt: number // timestamp ms
+  retryCount: number
 }
 
-// In-process fallback cache for fast lookups, test runners, and transient store
-const DURABLE_WEBHOOK_CLAIMS = new Map<string, DurableClaimEntry>()
+// In-process mock store implementing identical atomic leasing semantics for test runners
+const MOCK_LEASE_STORE = new Map<string, MockLeaseEntry>()
+
+export function generateWorkerId(): string {
+  const pid = typeof process !== 'undefined' && process.pid ? process.pid : 'srv'
+  return `worker_${pid}_${randomBytes(6).toString('hex')}`
+}
 
 /**
- * Atomically claims a webhook event in the persistent database (`payment_webhook_events`).
- *
- * Guarantees:
- * 1. If an event was already successfully processed (`processed = true`), returns `alreadyProcessed: true`.
- * 2. If an event is retried after a previous failure (`processed = false`), returns `claimed: true` to allow retry.
- * 3. Handles concurrent instances via PostgreSQL unique constraint `UNIQUE(provider, event_id)`.
+ * Atomically acquires an exclusive processing lease for an incoming webhook event.
+ * In production/staging, invokes PostgreSQL RPC `acquire_webhook_processing_lease` using row-level locking.
+ * Fails closed with an error on database unavailability — never silently falls back in production.
  */
-export async function claimWebhookEvent(
+export async function acquireWebhookLease(params: {
+  provider: string
+  eventId: string
+  eventType: string
+  payload: Record<string, unknown>
+  workerId: string
+  leaseSeconds?: number
+}): Promise<WebhookLeaseResult> {
+  const { provider, eventId, eventType, payload, workerId, leaseSeconds = 60 } = params
+
+  // In test runner without live Postgres, use the strict in-memory state machine
+  if (process.env.NODE_ENV === 'test' && !process.env.TEST_USE_LIVE_DB) {
+    return acquireMockWebhookLease(provider, eventId, eventType, workerId, leaseSeconds)
+  }
+
+  // Production & Staging: Atomic PostgreSQL RPC call with FOR UPDATE row locks
+  const supabase = await createClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('acquire_webhook_processing_lease', {
+    p_provider: provider,
+    p_event_id: eventId,
+    p_event_type: eventType,
+    p_payload: payload,
+    p_worker_id: workerId,
+    p_lease_seconds: leaseSeconds,
+  })
+
+  if (error) {
+    console.error(`[Webhook Lease] Error acquiring lease for ${provider}:${eventId}:`, error)
+    throw new Error(`Database lease acquisition failed: ${error.message}`)
+  }
+
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row || !row.outcome) {
+    throw new Error(`Unexpected lease acquisition response from database: ${JSON.stringify(data)}`)
+  }
+
+  return {
+    outcome: row.outcome as WebhookLeaseOutcome,
+    claimId: row.claim_id,
+    leaseOwner: row.lease_owner || workerId,
+  }
+}
+
+/**
+ * Marks webhook processing completed and verified durably in PostgreSQL.
+ * Throws if the database write is not confirmed.
+ */
+export async function completeWebhookProcessing(params: {
+  provider: string
+  eventId: string
+  workerId: string
+}): Promise<void> {
+  const { provider, eventId, workerId } = params
+
+  if (process.env.NODE_ENV === 'test' && !process.env.TEST_USE_LIVE_DB) {
+    completeMockWebhookProcessing(provider, eventId, workerId)
+    return
+  }
+
+  const supabase = await createClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: success, error } = await (supabase.rpc as any)('complete_webhook_processing', {
+    p_provider: provider,
+    p_event_id: eventId,
+    p_worker_id: workerId,
+  })
+
+  if (error || !success) {
+    throw new Error(
+      `Failed to confirm durable webhook completion in database: ${error?.message || 'Row not updated'}`
+    )
+  }
+}
+
+/**
+ * Releases the lease and marks status as failed so subsequent provider retries can acquire it.
+ */
+export async function failWebhookProcessing(params: {
+  provider: string
+  eventId: string
+  workerId: string
+  errorMessage: string
+}): Promise<void> {
+  const { provider, eventId, workerId, errorMessage } = params
+
+  if (process.env.NODE_ENV === 'test' && !process.env.TEST_USE_LIVE_DB) {
+    failMockWebhookProcessing(provider, eventId, workerId, errorMessage)
+    return
+  }
+
+  try {
+    const supabase = await createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.rpc as any)('fail_webhook_processing', {
+      p_provider: provider,
+      p_event_id: eventId,
+      p_worker_id: workerId,
+      p_error: errorMessage,
+    })
+  } catch (err) {
+    console.warn(`[Webhook Lease] Warning: failed to mark lease as failed in database:`, err)
+  }
+}
+
+// ============================================================================
+// IN-MEMORY MOCK LEASING IMPLEMENTATION (For Unit / Integration Testing)
+// ============================================================================
+
+function acquireMockWebhookLease(
   provider: string,
   eventId: string,
   eventType: string,
-  payload: Record<string, unknown>
-): Promise<WebhookClaimResult> {
-  const cacheKey = `${provider}:${eventId}`
-  const cached = DURABLE_WEBHOOK_CLAIMS.get(cacheKey)
+  workerId: string,
+  leaseSeconds: number
+): WebhookLeaseResult {
+  const key = `${provider}:${eventId}`
+  const now = Date.now()
+  const leaseExpiresAt = now + leaseSeconds * 1000
 
-  if (cached && cached.processed) {
-    return { claimed: false, alreadyProcessed: true, recordId: cached.id }
+  const existing = MOCK_LEASE_STORE.get(key)
+  if (!existing) {
+    const claimId = `claim_${now}_${Math.random().toString(36).substring(2, 7)}`
+    MOCK_LEASE_STORE.set(key, {
+      claimId,
+      provider,
+      eventId,
+      eventType,
+      status: 'processing',
+      leaseOwner: workerId,
+      leaseExpiresAt,
+      retryCount: 0,
+    })
+    return { outcome: 'acquired', claimId, leaseOwner: workerId }
   }
 
-  // 1. Try PostgreSQL database claim
-  try {
-    const supabase = await createClient()
-
-    // Check if record exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing, error: selectErr } = await (supabase.from('payment_webhook_events') as any)
-      .select('id, processed')
-      .eq('provider', provider)
-      .eq('event_id', eventId)
-      .maybeSingle()
-
-    if (existing && !selectErr) {
-      if (existing.processed) {
-        if (cached) cached.processed = true
-        return { claimed: false, alreadyProcessed: true, recordId: existing.id }
-      }
-      return { claimed: true, alreadyProcessed: false, recordId: existing.id }
-    }
-
-    // Insert new pending claim
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: inserted, error: insertErr } = await (supabase.from('payment_webhook_events') as any)
-      .insert({
-        provider,
-        event_id: eventId,
-        event_type: eventType,
-        payload,
-        processed: false,
-      })
-      .select('id')
-      .single()
-
-    if (inserted && !insertErr) {
-      DURABLE_WEBHOOK_CLAIMS.set(cacheKey, {
-        id: inserted.id,
-        provider,
-        eventId,
-        eventType,
-        processed: false,
-        createdAt: new Date().toISOString(),
-      })
-      return { claimed: true, alreadyProcessed: false, recordId: inserted.id }
-    }
-
-    // Handle race condition where another instance inserted simultaneously (Postgres 23505)
-    if (insertErr?.code === '23505') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: raceExisting } = await (supabase.from('payment_webhook_events') as any)
-        .select('id, processed')
-        .eq('provider', provider)
-        .eq('event_id', eventId)
-        .single()
-
-      if (raceExisting?.processed) {
-        return { claimed: false, alreadyProcessed: true, recordId: raceExisting.id }
-      }
-      return { claimed: true, alreadyProcessed: false, recordId: raceExisting?.id }
-    }
-  } catch (dbErr) {
-    // Database fallback (e.g. test environment or transient DB offline)
+  // Case A: Already processed
+  if (existing.status === 'processed') {
+    return { outcome: 'already_processed', claimId: existing.claimId, leaseOwner: existing.leaseOwner }
   }
 
-  // 2. Fallback memory ledger claim
-  if (cached) {
-    if (cached.processed) {
-      return { claimed: false, alreadyProcessed: true, recordId: cached.id }
-    }
-    return { claimed: true, alreadyProcessed: false, recordId: cached.id }
+  // Case B: In processing with active, unexpired lease -> BUSY
+  if (existing.status === 'processing' && existing.leaseExpiresAt > now) {
+    return { outcome: 'busy', claimId: existing.claimId, leaseOwner: existing.leaseOwner }
   }
 
-  const newId = `claim_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
-  DURABLE_WEBHOOK_CLAIMS.set(cacheKey, {
-    id: newId,
-    provider,
-    eventId,
-    eventType,
-    processed: false,
-    createdAt: new Date().toISOString(),
-  })
+  // Case C: Failed or lease expired -> acquire for retry
+  existing.status = 'processing'
+  existing.leaseOwner = workerId
+  existing.leaseExpiresAt = leaseExpiresAt
+  existing.retryCount += 1
 
-  // Keep memory cache bounded to 10,000 entries
-  if (DURABLE_WEBHOOK_CLAIMS.size > 10000) {
-    const firstKey = DURABLE_WEBHOOK_CLAIMS.keys().next().value
-    if (firstKey) DURABLE_WEBHOOK_CLAIMS.delete(firstKey)
-  }
-
-  return { claimed: true, alreadyProcessed: false, recordId: newId }
+  return { outcome: 'acquired', claimId: existing.claimId, leaseOwner: workerId }
 }
 
-/**
- * Marks a webhook event as successfully processed ONLY after all business operations succeed.
- */
-export async function markWebhookProcessed(
-  provider: string,
-  eventId: string,
-  recordId?: string
-): Promise<void> {
-  const cacheKey = `${provider}:${eventId}`
-  const cached = DURABLE_WEBHOOK_CLAIMS.get(cacheKey)
-  if (cached) {
-    cached.processed = true
-    cached.processedAt = new Date().toISOString()
-    cached.error = undefined
+function completeMockWebhookProcessing(provider: string, eventId: string, workerId: string): void {
+  const key = `${provider}:${eventId}`
+  const existing = MOCK_LEASE_STORE.get(key)
+  if (!existing || existing.leaseOwner !== workerId || existing.status !== 'processing') {
+    throw new Error('Failed to confirm durable webhook completion in database: Lease lock not held')
   }
-
-  try {
-    const supabase = await createClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('payment_webhook_events') as any)
-      .update({
-        processed: true,
-        processed_at: new Date().toISOString(),
-        error: null,
-      })
-      .eq('provider', provider)
-      .eq('event_id', eventId)
-  } catch {
-    // Database sync fallback
-  }
+  existing.status = 'processed'
 }
 
-/**
- * Records a failure in processing. Keeps `processed = false` so that future retries are permitted.
- */
-export async function recordWebhookFailure(
+function failMockWebhookProcessing(
   provider: string,
   eventId: string,
+  workerId: string,
   errorMessage: string
-): Promise<void> {
-  const cacheKey = `${provider}:${eventId}`
-  const cached = DURABLE_WEBHOOK_CLAIMS.get(cacheKey)
-  if (cached) {
-    cached.processed = false
-    cached.error = errorMessage
-  }
-
-  try {
-    const supabase = await createClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('payment_webhook_events') as any)
-      .update({
-        processed: false,
-        error: errorMessage,
-      })
-      .eq('provider', provider)
-      .eq('event_id', eventId)
-  } catch {
-    // Database sync fallback
+): void {
+  const key = `${provider}:${eventId}`
+  const existing = MOCK_LEASE_STORE.get(key)
+  if (existing && existing.leaseOwner === workerId) {
+    existing.status = 'failed'
+    // Expire lease immediately so retry can acquire
+    existing.leaseExpiresAt = Date.now() - 1000
   }
 }
 
-/**
- * Test helper to clear idempotency claims between test runs
- */
 export function resetWebhookIdempotencyClaimsForTesting(): void {
-  DURABLE_WEBHOOK_CLAIMS.clear()
+  MOCK_LEASE_STORE.clear()
+}
+
+/**
+ * Test helper to simulate an expired lease for timeout recovery testing
+ */
+export function expireWebhookLeaseForTesting(provider: string, eventId: string): void {
+  const key = `${provider}:${eventId}`
+  const existing = MOCK_LEASE_STORE.get(key)
+  if (existing) {
+    existing.leaseExpiresAt = Date.now() - 5000
+  }
 }

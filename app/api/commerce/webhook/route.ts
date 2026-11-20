@@ -3,9 +3,10 @@ import { verifyWebhookSignature } from '@/lib/commerce/razorpay'
 import { createClient } from '@/lib/supabase/server'
 import { revokeEntitlement } from '@/lib/commerce/entitlements'
 import {
-  claimWebhookEvent,
-  markWebhookProcessed,
-  recordWebhookFailure,
+  acquireWebhookLease,
+  completeWebhookProcessing,
+  failWebhookProcessing,
+  generateWorkerId,
 } from '@/lib/commerce/webhook-idempotency'
 
 const MAX_WEBHOOK_PAYLOAD_BYTES = 128 * 1024 // 128 KB
@@ -95,12 +96,31 @@ export async function POST(req: NextRequest) {
     const eventId =
       event.id || `${event.event}_${event.payload?.payment?.entity?.id || Date.now()}`
 
-    // 4. Durable Database-Backed Idempotency Claim
-    const claim = await claimWebhookEvent('razorpay', eventId, event.event || 'unknown', event)
-    if (!claim.claimed && claim.alreadyProcessed) {
+    // 4. Atomic Distributed Processing Lease (Mutex & Concurrency Protection)
+    const workerId = generateWorkerId()
+    const lease = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: event.event || 'unknown',
+      payload: event,
+      workerId,
+      leaseSeconds: 60,
+    })
+
+    if (lease.outcome === 'already_processed') {
       return NextResponse.json(
         { status: 'ok', received: true, note: 'duplicate_event_ignored' },
         { status: 200 }
+      )
+    }
+
+    if (lease.outcome === 'busy') {
+      return NextResponse.json(
+        {
+          error: 'Webhook event is currently being processed by another worker instance',
+          retryAfterSeconds: 5,
+        },
+        { status: 409 }
       )
     }
 
@@ -222,16 +242,25 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 6. Mark Processed ONLY after successful business logic execution
-      await markWebhookProcessed('razorpay', eventId, claim.recordId)
+      // 6. Complete and verify durable completion in database
+      await completeWebhookProcessing({
+        provider: 'razorpay',
+        eventId,
+        workerId,
+      })
 
       return NextResponse.json({ status: 'ok', received: true })
     } catch (opErr: unknown) {
       const errMsg = opErr instanceof Error ? opErr.message : 'Unknown database execution error'
       console.error(`[Commerce Webhook] Operation failure for event ${eventId}:`, errMsg)
 
-      // Record failure; event remains unprocessed so future provider retries can be processed
-      await recordWebhookFailure('razorpay', eventId, errMsg)
+      // Release lease and mark failed so future provider retries can be processed
+      await failWebhookProcessing({
+        provider: 'razorpay',
+        eventId,
+        workerId,
+        errorMessage: errMsg,
+      })
 
       return NextResponse.json(
         { error: 'Webhook processing failed, retry requested', details: errMsg },
