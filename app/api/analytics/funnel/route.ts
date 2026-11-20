@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { recordFunnelEvent, getTruthfulGrowthMetrics } from '@/lib/commerce/entitlements'
 import { getServerAccess } from '@/lib/auth/server-access'
+import { parseJsonWithLimit, ANALYTICS_MAX_PAYLOAD_BYTES } from '@/lib/security/request-validator'
 
 const eventSchema = z.object({
   eventName: z.enum([
@@ -16,15 +17,24 @@ const eventSchema = z.object({
     'entitlement_activated',
   ]),
   domain: z.enum(['assessment', 'skill', 'academic']).optional(),
-  userId: z.string().optional(),
-  sessionId: z.string(),
-  metadata: z.record(z.unknown()).optional(),
+  userId: z.string().max(128).optional(),
+  sessionId: z.string().min(1).max(128),
+  metadata: z
+    .record(z.string().max(64), z.unknown())
+    .refine((obj) => Object.keys(obj).length <= 20, {
+      message: 'metadata cannot exceed 20 properties',
+    })
+    .optional(),
 })
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const parsed = eventSchema.safeParse(body)
+    const parseResult = await parseJsonWithLimit(req, ANALYTICS_MAX_PAYLOAD_BYTES)
+    if (!parseResult.success) {
+      return parseResult.errorResponse
+    }
+
+    const parsed = eventSchema.safeParse(parseResult.data)
 
     if (!parsed.success) {
       return NextResponse.json({ error: 'Invalid event format' }, { status: 400 })

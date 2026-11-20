@@ -86,6 +86,37 @@ export function SocraticEvaluatorDemo() {
         ])
       }
     }
+
+    // Sync attempt & error DNA to Supabase backend
+    fetch('/api/academic/assessment-attempt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assessmentType: 'simulation_challenge',
+        referenceId: challenge.id,
+        subjectCode: challenge.subjectId,
+        totalQuestions: 1,
+        correctAnswers: opt.isCorrect ? 1 : 0,
+        scorePercentage: opt.isCorrect ? 100 : 0,
+        durationSeconds: 45,
+        conceptId: challenge.subjectId === 'physics' ? 'conc_phys_univ_gravitation' : undefined,
+        evaluations: [
+          {
+            questionId: challenge.id,
+            isCorrect: opt.isCorrect,
+            userAnswer: [opt.text],
+            correctAnswer: [challenge.options.find((o) => o.isCorrect)?.text || ''],
+            conceptId: challenge.subjectId === 'physics' ? 'conc_phys_univ_gravitation' : undefined,
+            errorType: opt.errorType === 'calculation' ? 'calculation_slip' : 'conceptual_misunderstanding',
+            questionStem: challenge.title,
+            explanation: opt.diagnosisDetail || 'Conceptual physics deduction.',
+            remedial: opt.remedialPrescription || 'Review inverse-square law.',
+          },
+        ],
+      }),
+    }).catch((err) => {
+      console.warn('[Socratic Demo] Attempt sync note:', err)
+    })
   }
 
   const handleReset = () => {

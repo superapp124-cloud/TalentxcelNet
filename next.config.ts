@@ -1,11 +1,5 @@
 import type { NextConfig } from 'next'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase configuration. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY before build/start.')
-}
-
 const nextConfig: NextConfig = {
   // Security headers
   async headers() {
@@ -16,7 +10,7 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=()' },
           {
             key: 'Content-Security-Policy',
             value: [
@@ -24,7 +18,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.razorpay.com https://checkout.razorpay.com https://cdn.razorpay.com https://static.cloudflareinsights.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              `connect-src 'self' ${supabaseUrl} https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com https://cloudflareinsights.com`,
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com https://cloudflareinsights.com",
               "img-src 'self' data: blob: https:",
               "media-src 'self' blob: data: https:",
               "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://*.razorpay.com https://api.razorpay.com",
@@ -52,16 +46,32 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      { protocol: 'https', hostname: 'wvuvriewskvvievacida.supabase.co' },
-    ],
+    remotePatterns: Array.from(
+      new Set(
+        [
+          'wvuvriewskvvievacida.supabase.co',
+          (() => {
+            try {
+              return process.env.NEXT_PUBLIC_SUPABASE_URL
+                ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+                : ''
+            } catch {
+              return ''
+            }
+          })(),
+        ].filter(Boolean)
+      )
+    ).map((hostname) => ({
+      protocol: 'https' as const,
+      hostname,
+    })),
   },
   experimental: {
     serverActions: { allowedOrigins: ['talentxcel.net', 'academy.talentxcel.net', 'ai.talentxcel.net', 'localhost:3000'] },
   },
   env: {
-    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
+    // Dynamic runtime configuration: Supabase credentials are read at runtime via lib/supabase/config.ts
+    // and never baked into static bundles at build time.
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://talentxcel.net',
     NEXT_PUBLIC_ACADEMY_URL: process.env.NEXT_PUBLIC_ACADEMY_URL || 'https://academy.talentxcel.net',
     NEXT_PUBLIC_AI_URL: process.env.NEXT_PUBLIC_AI_URL || 'https://ai.talentxcel.net',

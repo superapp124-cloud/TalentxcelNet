@@ -25,6 +25,11 @@ import {
   Languages,
   Globe,
   SlidersHorizontal,
+  Brain,
+  Compass,
+  Users,
+  Target,
+  Zap,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -33,6 +38,11 @@ import { LessonReaderModal } from '@/components/academic/lesson-reader-modal'
 import { TestRunnerModal } from '@/components/assessment/test-runner-modal'
 import { GrowthPlanModal } from '@/components/intelligence/growth-plan-modal'
 import { RazorpayCheckoutModal } from '@/components/commerce/razorpay-checkout-modal'
+import { LivingSkillRadar } from '@/components/academic/living-skill-radar'
+import { InteractiveCurriculumCockpit } from '@/components/academic/interactive-curriculum-cockpit'
+import { SocraticEvaluatorDemo } from '@/components/academic/socratic-evaluator-demo'
+import { SnapSolveMentor } from '@/components/academic/snap-solve-mentor'
+import { ParentIntelligencePreview } from '@/components/academic/parent-intelligence-preview'
 import {
   SEED_BOARDS,
   ACADEMIC_CLASSES,
@@ -51,6 +61,8 @@ import type {
   AcademicPassProduct,
 } from '@/packages/core/src'
 
+export type AcademicTab = 'curriculum' | 'mastery' | 'socratic' | 'labs' | 'parent' | 'passes'
+
 function AcademicBrowserContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -60,7 +72,10 @@ function AcademicBrowserContent() {
   const initialBoard = (searchParams.get('board') as BoardCode) || 'CBSE'
   const initialClassNum = Number(searchParams.get('class')) || 10
   const initialSubject = searchParams.get('subject') || 'math'
-  const initialTab = searchParams.get('tab') === 'passes' ? 'passes' : 'curriculum'
+  
+  const validTabs: AcademicTab[] = ['curriculum', 'mastery', 'socratic', 'labs', 'parent', 'passes']
+  const queryTab = searchParams.get('tab') as AcademicTab
+  const initialTab: AcademicTab = validTabs.includes(queryTab) ? queryTab : 'curriculum'
 
   const [selectedBoardCode, setSelectedBoardCode] = useState<BoardCode>(
     ['CBSE', 'CISCE', 'IB'].includes(initialBoard) ? initialBoard : 'CBSE'
@@ -70,7 +85,8 @@ function AcademicBrowserContent() {
   )
   const [selectedSubjectCode, setSelectedSubjectCode] = useState<string>(initialSubject)
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeTab, setActiveTab] = useState<'curriculum' | 'passes'>(initialTab)
+  const [activeTab, setActiveTab] = useState<AcademicTab>(initialTab)
+  const [socraticSubTab, setSocraticSubTab] = useState<'snap_solve' | 'error_dna'>('snap_solve')
 
   // Sync state to URL without full page reload
   useEffect(() => {
@@ -78,7 +94,7 @@ function AcademicBrowserContent() {
     params.set('board', selectedBoardCode)
     params.set('class', String(selectedClassNumber))
     params.set('subject', selectedSubjectCode)
-    if (activeTab === 'passes') params.set('tab', 'passes')
+    if (activeTab !== 'curriculum') params.set('tab', activeTab)
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
   }, [selectedBoardCode, selectedClassNumber, selectedSubjectCode, activeTab, router, pathname])
 
@@ -243,29 +259,73 @@ function AcademicBrowserContent() {
             </div>
           </div>
 
-          {/* Navigation Category Tabs */}
+          {/* Navigation Category Tabs — The 5 Pillars of TalentXcel Academy */}
           <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-slate-100 scrollbar-none text-xs font-bold">
             <button
               onClick={() => setActiveTab('curriculum')}
-              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 activeTab === 'curriculum'
                   ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Curriculum Browser &amp; Lessons</span>
+              <span>1. Curriculum &amp; Lessons</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('mastery')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeTab === 'mastery'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>2. Mastery Engine &amp; Radar</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('socratic')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeTab === 'socratic'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <Brain className="w-3.5 h-3.5" />
+              <span>3. AI Socratic Doubt Mentor</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('labs')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeTab === 'labs'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <FlaskConical className="w-3.5 h-3.5" />
+              <span>4. Discovery Labs</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('parent')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeTab === 'parent'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>5. Parent Intelligence</span>
             </button>
             <button
               onClick={() => setActiveTab('passes')}
-              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 activeTab === 'passes'
                   ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <CreditCard className="w-3.5 h-3.5" />
-              <span>Class Passes (Classes 4–12)</span>
+              <span>Class Passes</span>
               <span className="text-[10px] bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full font-bold">
                 From ₹1,999/mo
               </span>
@@ -276,6 +336,54 @@ function AcademicBrowserContent() {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+        {/* Daily Student Learning Journey Roadmap */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-bold">
+                  The Complete Daily Cycle
+                </Badge>
+                <span className="text-[11px] text-slate-500 font-medium">Why TalentXcel Replaces Conventional Tuition</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 mt-1">
+                Your Child&apos;s Daily Learning Operating System
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 max-w-sm sm:text-right">
+              From school return at 3:30 PM to night doubt resolution at 9:30 PM — full discipline, mastery tracking, and parental transparency.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            {[
+              { time: '3:30 PM', title: 'Daily Plan', desc: 'Personalized plan targeting school schedule & weaknesses', icon: Target, color: 'text-blue-600 bg-blue-50', onClick: () => setActiveTab('mastery') },
+              { time: '4:00 PM', title: 'Concept Lab', desc: '60FPS interactive simulations & step-by-step derivations', icon: Sparkles, color: 'text-cyan-600 bg-cyan-50', onClick: () => setActiveTab('labs') },
+              { time: '5:00 PM', title: 'Adaptive Test', desc: 'Diagnostics measuring conceptual mastery, not memorization', icon: Award, color: 'text-amber-600 bg-amber-50', onClick: () => chapters[0] && handleLaunchPractice(chapters[0].id) },
+              { time: '7:00 PM', title: 'Error DNA Sprint', desc: 'Targeted exercises correcting diagnosed sign & formula slips', icon: Brain, color: 'text-rose-600 bg-rose-50', onClick: () => { setActiveTab('socratic'); setSocraticSubTab('error_dna') } },
+              { time: '9:30 PM', title: 'Snap & Solve', desc: 'Upload handwritten doubt; get Socratic hints & twin verification', icon: Zap, color: 'text-emerald-600 bg-emerald-50', onClick: () => { setActiveTab('socratic'); setSocraticSubTab('snap_solve') } },
+              { time: 'Sun 6:00 PM', title: 'Parent Intelligence', desc: 'Weekly evidence-based progress report sent directly to parents', icon: ShieldCheck, color: 'text-purple-600 bg-purple-50', onClick: () => setActiveTab('parent') },
+            ].map((step, idx) => (
+              <button
+                key={idx}
+                onClick={step.onClick}
+                className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all border border-slate-100 space-y-1.5 flex flex-col justify-between text-left group cursor-pointer"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-[10px] font-black text-slate-400 group-hover:text-slate-600">{step.time}</span>
+                  <div className={`w-6 h-6 rounded-lg ${step.color} flex items-center justify-center shrink-0`}>
+                    <step.icon className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">{step.title}</h4>
+                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5">{step.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* ========================================================================= */}
         {/* TAB 1: CURRICULUM BROWSER */}
         {/* ========================================================================= */}
@@ -532,7 +640,157 @@ function AcademicBrowserContent() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 2: CLASS MONTHLY PASSES */}
+        {/* TAB 2: MASTERY ENGINE & LIVING SKILL RADAR */}
+        {/* ========================================================================= */}
+        {activeTab === 'mastery' && (
+          <section className="space-y-12">
+            <LivingSkillRadar onEnrolClick={() => setActiveTab('passes')} />
+            <InteractiveCurriculumCockpit
+              onEnrolClick={() => setActiveTab('passes')}
+              onTryLabClick={() => setActiveTab('labs')}
+            />
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 3: AI SOCRATIC DOUBT MENTOR & ERROR DNA */}
+        {/* ========================================================================= */}
+        {activeTab === 'socratic' && (
+          <section className="space-y-6">
+            {/* Sub-tab Switcher */}
+            <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-slate-100 dark:bg-neutral-900 rounded-2xl max-w-xl mx-auto border border-slate-200 dark:border-neutral-800">
+              <button
+                onClick={() => setSocraticSubTab('snap_solve')}
+                className={`flex-1 py-2 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                  socraticSubTab === 'snap_solve'
+                    ? 'bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Snap &amp; Solve AI Mentor</span>
+                <Badge variant="outline" className="text-[9px] border-emerald-500/30 text-emerald-600 dark:text-emerald-400 py-0 px-1">
+                  Pillar 2
+                </Badge>
+              </button>
+
+              <button
+                onClick={() => setSocraticSubTab('error_dna')}
+                className={`flex-1 py-2 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                  socraticSubTab === 'error_dna'
+                    ? 'bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Brain className="w-3.5 h-3.5 text-rose-500" />
+                <span>Error DNA Diagnostic Lab</span>
+              </button>
+            </div>
+
+            {socraticSubTab === 'snap_solve' ? (
+              <SnapSolveMentor />
+            ) : (
+              <SocraticEvaluatorDemo />
+            )}
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 4: INTERACTIVE DISCOVERY LABS */}
+        {/* ========================================================================= */}
+        {activeTab === 'labs' && (
+          <section className="space-y-6">
+            <div className="text-center space-y-2 max-w-3xl mx-auto">
+              <Badge variant="outline" className="border-blue-500/30 text-blue-600">
+                Pillar 3: Active Experimentation vs Passive Memorization
+              </Badge>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Interactive Concept Discovery Labs
+              </h2>
+              <p className="text-sm text-slate-600">
+                Conventional tuitions rely on chalkboards and rote formulas. TalentXcel students manipulate real physics variables, balance chemical reactions, and observe wave optics in real-time.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Lab 1: Optics Lab */}
+              <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 text-white p-6 shadow-xl flex flex-col justify-between space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-[#0080FF] text-white text-[10px] font-bold">Class 10 Physics</Badge>
+                    <span className="text-[10px] font-extrabold text-cyan-300">60FPS Ray Tracing</span>
+                  </div>
+                  <h3 className="text-xl font-black">Light &amp; Ray-Tracing Lab</h3>
+                  <p className="text-xs text-blue-200 leading-relaxed">
+                    Interactive optical bench with movable candles, concave/convex mirrors, lens formula calculator, and the Laser Vault Heist gamified challenge.
+                  </p>
+                </div>
+                <Link href="/academic/optics-lab" className="block w-full">
+                  <Button className="w-full bg-[#0080FF] hover:bg-blue-600 text-white font-extrabold text-xs h-10 rounded-xl gap-2 cursor-pointer">
+                    <Sparkles className="w-4 h-4 text-cyan-300" />
+                    <span>Launch Optics Lab →</span>
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Lab 2: Gravitational Sandbox */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-purple-100 text-purple-800 text-[10px] font-bold">Class 9 Physics</Badge>
+                    <span className="text-[10px] font-bold text-slate-400">Inverse Square Law</span>
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900">Gravitation &amp; Orbital Force</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Vary distance between planetary masses to visualize non-linear gravitational drop-off and eliminate the common 2r vs 4r calculation trap.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setActiveTab('socratic')}
+                  variant="outline"
+                  className="w-full text-xs font-bold h-10 rounded-xl gap-2 cursor-pointer"
+                >
+                  <Brain className="w-4 h-4 text-purple-600" />
+                  <span>Try Gravitation Challenge →</span>
+                </Button>
+              </div>
+
+              {/* Lab 3: Quadratic Parabola Explorer */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-amber-100 text-amber-800 text-[10px] font-bold">Class 10 Math</Badge>
+                    <span className="text-[10px] font-bold text-slate-400">Geometry of Algebra</span>
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900">Quadratic Parabola &amp; Roots</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Watch parabolas translate vertically and observe real-time roots vanish as Discriminant D transitions from positive to zero to negative.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setActiveTab('curriculum')}
+                  variant="outline"
+                  className="w-full text-xs font-bold h-10 rounded-xl gap-2 cursor-pointer"
+                >
+                  <BookOpen className="w-4 h-4 text-amber-600" />
+                  <span>Explore Quadratic Chapter →</span>
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 5: SUNDAY PARENT INTELLIGENCE */}
+        {/* ========================================================================= */}
+        {activeTab === 'parent' && (
+          <section className="space-y-6">
+            <ParentIntelligencePreview onEnrolClick={() => setActiveTab('passes')} />
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 6: CLASS MONTHLY PASSES */}
         {/* ========================================================================= */}
         {activeTab === 'passes' && (
           <section className="space-y-6">

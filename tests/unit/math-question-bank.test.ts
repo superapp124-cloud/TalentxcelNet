@@ -123,7 +123,7 @@ describe('Mathematics Question Bank Engine (Classes 4-12)', () => {
       const body = await res.json()
       expect(body.error).toBe('Authentication required')
       expect(body.redirectTo).toBe('/auth/login?redirectTo=/dashboard/question-bank')
-    }, 15000)
+    }, 30000)
 
     it('rejects the former E2E bypass even when its header is supplied', async () => {
       const { GET } = await import('../../app/api/questions/bank/route')

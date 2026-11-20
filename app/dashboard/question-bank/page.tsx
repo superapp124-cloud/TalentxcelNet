@@ -7,6 +7,8 @@ import {
 } from '@talentxcel/core'
 import { MathQuestionBankClient } from '@/components/math/math-question-bank-client'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Universal Question Bank (Classes 4–12) — TalentXcel',
   description:

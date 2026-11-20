@@ -9,18 +9,24 @@ import {
   type CanonicalCertificatePayload,
 } from '@/packages/core/src/skills-engine/backpack-evaluator'
 import { registerLifeSkillCertificate } from '@/lib/lms/certificate-service'
+import { parseJsonWithLimit, SKILLS_MAX_PAYLOAD_BYTES } from '@/lib/security/request-validator'
 
 const backpackSubmissionSchema = z.object({
-  packedItemIds: z.array(z.string()),
-  itemPlacements: z.record(z.enum(['back', 'middle', 'front'])).default({}),
+  packedItemIds: z.array(z.string().min(1).max(64)).max(50),
+  itemPlacements: z
+    .record(z.string().max(64), z.enum(['back', 'middle', 'front']))
+    .refine((obj) => Object.keys(obj).length <= 50, {
+      message: 'itemPlacements cannot exceed 50 entries',
+    })
+    .default({}),
   answers: z.object({
-    placementOptionId: z.string().optional(),
-    routineOptionId: z.string().optional(),
+    placementOptionId: z.string().max(64).optional(),
+    routineOptionId: z.string().max(64).optional(),
     placementAttempts: z.number().int().min(1).max(2).default(1),
     routineAttempts: z.number().int().min(1).max(2).default(1),
   }),
   learnerDisplayName: z.string().min(1).max(40).optional().default('Aarav W.'),
-  parentConsentToken: z.string().optional(),
+  parentConsentToken: z.string().max(512).optional(),
 })
 
 // Unpredictable 128-bit Base32 certificate ID generator
@@ -53,8 +59,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const body = await req.json()
-    const parsed = backpackSubmissionSchema.safeParse(body)
+    const parseResult = await parseJsonWithLimit(req, SKILLS_MAX_PAYLOAD_BYTES)
+    if (!parseResult.success) {
+      return parseResult.errorResponse
+    }
+
+    const parsed = backpackSubmissionSchema.safeParse(parseResult.data)
 
     if (!parsed.success) {
       return NextResponse.json(

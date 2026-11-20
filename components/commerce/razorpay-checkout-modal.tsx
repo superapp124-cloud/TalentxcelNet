@@ -34,6 +34,31 @@ interface RazorpayCheckoutModalProps {
   initialEmail?: string
 }
 
+// Helper function to reliably load Razorpay checkout script
+function loadRazorpayCheckoutScript(): Promise<boolean> {
+  if (typeof window === 'undefined') return Promise.resolve(false)
+  if (window.Razorpay) return Promise.resolve(true)
+
+  return new Promise((resolve) => {
+    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null
+    if (existing) {
+      if (window.Razorpay) return resolve(true)
+      existing.addEventListener('load', () => resolve(true), { once: true })
+      existing.addEventListener('error', () => resolve(false), { once: true })
+      setTimeout(() => resolve(Boolean(window.Razorpay)), 3000)
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.async = true
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+    setTimeout(() => resolve(Boolean(window.Razorpay)), 5000)
+  })
+}
+
 export function RazorpayCheckoutModal({
   isOpen,
   onClose,
@@ -120,8 +145,8 @@ export function RazorpayCheckoutModal({
 
       const { orderNumber, razorpayOrderId, razorpayKeyId, isMock } = data
 
-      // 2. If sandbox mock / dev mode without live keys:
-      if (isMock || !window.Razorpay) {
+      // 2. Only if server explicitly flagged order as simulated sandbox mock (no live keys configured):
+      if (isMock) {
         // Perform simulated sandbox checkout verification
         const mockPaymentId = `pay_mock_${Date.now()}`
         const mockSignature = `mock_sig_${orderNumber}_${mockPaymentId}`
@@ -151,7 +176,13 @@ export function RazorpayCheckoutModal({
         return
       }
 
-      // 3. Real Razorpay Standard Checkout
+      // 3. For live orders, ensure Razorpay SDK script is loaded
+      const isScriptLoaded = await loadRazorpayCheckoutScript()
+      if (!isScriptLoaded || !window.Razorpay) {
+        throw new Error('Razorpay checkout window could not load. Please check your connection or disable ad-blockers and try again.')
+      }
+
+      // 4. Real Razorpay Standard Checkout Popup
       const rzpOptions = {
         key: razorpayKeyId,
         amount: summary.totalPayablePaise,
