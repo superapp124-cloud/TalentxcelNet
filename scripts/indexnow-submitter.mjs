@@ -2,7 +2,6 @@
 // Programmatic IndexNow Submitter & Batching Engine (Bing, Copilot, Yahoo, Naver, Seznam)
 
 import {
-  BASE_URL,
   getCoreSitemapUrls,
   getCompetitiveSitemapUrls,
   getToolsSitemapUrls,
