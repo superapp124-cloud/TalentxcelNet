@@ -85,3 +85,59 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* ==========================================================================
+   Print Styles for Clean High-Yield Formula Sheets & Offline Revision
+   ========================================================================== */
+@media print {
+  @page {
+    margin: 12mm 15mm;
+    size: A4 portrait;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide navigation, buttons, and decorative elements */
+  nav,
+  header:not(.print-header),
+  footer,
+  aside,
+  button,
+  .print\:hidden,
+  [data-print-hidden='true'] {
+    display: none !important;
+  }
+
+  /* Reveal print-specific elements */
+  .print\:block {
+    display: block !important;
+  }
+
+  .print\:flex {
+    display: flex !important;
+  }
+
+  /* Prevent awkward page breaks */
+  h1, h2, h3, h4, .print\:break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* High contrast borders & clean backgrounds */
+  .border, [class*='border-'] {
+    border-color: #cbd5e1 !important;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}
