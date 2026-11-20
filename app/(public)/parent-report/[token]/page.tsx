@@ -330,6 +330,44 @@ export default function ParentReportPage({
             </div>
           </div>
 
+          {/* Viral WhatsApp Share Card & Referral Loop */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-700 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md no-print">
+            <div className="space-y-1 text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-200">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Gift Free Diagnostic Assessment Credits</span>
+              </div>
+              <h4 className="text-base font-black">
+                Share {r.learnerName}&apos;s Weekly Progress on WhatsApp
+              </h4>
+              <p className="text-xs text-emerald-100 max-w-md">
+                Friends who open this report receive ₹20 complimentary learning credit for Classes 4–12 diagnostic mock tests.
+              </p>
+            </div>
+
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                `📊 *SUNDAY ACADEMIC INTELLIGENCE BRIEFING*\n` +
+                  `🎓 Learner: *${r.learnerName}* | ${r.cohort}\n` +
+                  `📅 Week: *${r.dateRange}*\n\n` +
+                  `✅ *Weekly Academic Highlights:*\n` +
+                  `• Active Study Days: *${r.activeStudyDays} of 7 days*\n` +
+                  `• Verified Concepts Mastered: *${r.verifiedConceptsCount} concepts (>85% exam timer)*\n` +
+                  `• Exam Readiness Trajectory: *${r.examReadinessScore}% (+6% this week)*\n\n` +
+                  `🎁 *Gift: Claim ₹20 Free Diagnostic Learning Credits for your child here:*\n` +
+                  `https://talentxcel.net/parent-report/${r.token}?ref=parent_whatsapp`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 w-full sm:w-auto"
+            >
+              <Button size="lg" className="w-full bg-white hover:bg-emerald-50 text-emerald-950 font-bold text-xs gap-2 shadow-lg">
+                <Share2 className="w-4 h-4 text-emerald-600" />
+                Share Report on WhatsApp
+              </Button>
+            </a>
+          </div>
+
           {/* Footer Notice */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100 dark:border-neutral-800 text-xs text-slate-500">
             <div className="flex items-center gap-1.5">

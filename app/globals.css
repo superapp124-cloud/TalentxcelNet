@@ -88,6 +88,29 @@ body {
 
 
 /* ==========================================================================
+   Core Web Vitals & Zero-CLS Layout Stabilization
+   ========================================================================== */
+.math-block,
+.katex-display,
+.formula-card,
+.question-container {
+  contain-intrinsic-size: 0 48px;
+  content-visibility: auto;
+}
+
+.katex {
+  font-size: 1.05em;
+  text-rendering: optimizeLegibility;
+}
+
+.katex-display {
+  margin: 0.75em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+}
+
+/* ==========================================================================
    Print Styles for Clean High-Yield Formula Sheets & Offline Revision
    ========================================================================== */
 @media print {

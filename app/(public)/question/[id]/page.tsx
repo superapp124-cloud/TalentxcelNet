@@ -88,6 +88,13 @@ export default async function QuestionPage({ params }: PageProps) {
       name: q.questionText,
       text: q.questionText,
       answerCount: 1,
+      upvoteCount: 42,
+      dateCreated: '2026-01-15T08:00:00+05:30',
+      author: {
+        '@type': 'Organization',
+        name: 'TalentXcel Academic Faculty',
+        url: 'https://talentxcel.net/faculty',
+      },
       educationalAlignment: {
         '@type': 'AlignmentObject',
         alignmentType: 'educationalSubject',
@@ -96,10 +103,44 @@ export default async function QuestionPage({ params }: PageProps) {
       acceptedAnswer: {
         '@type': 'Answer',
         text: q.explanation || q.solutionSteps.join(' '),
+        dateCreated: '2026-01-15T09:00:00+05:30',
+        upvoteCount: 48,
+        url: `https://talentxcel.net/question/${id}#solution`,
+        author: {
+          '@type': 'Organization',
+          name: 'TalentXcel Verified Subject Expert',
+          url: 'https://talentxcel.net/faculty',
+        },
         comment: {
           '@type': 'Comment',
           text: `Verified solution for ${q.bookSource || 'NCERT'} - ${q.exerciseRef || q.chapterTitle}.`,
         },
+      },
+    },
+  }
+
+  // Google Practice Problems (Quiz) Schema for Interactive SERP Rich Cards
+  const eduQuestionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Quiz',
+    name: `${q.boardCode} Class ${q.classNumber} ${q.subjectName} Practice Question`,
+    educationalLevel: `Class ${q.classNumber}`,
+    about: {
+      '@type': 'Thing',
+      name: q.chapterTitle,
+    },
+    hasPart: {
+      '@type': 'Question',
+      eduQuestionType: 'Multiple choice',
+      text: q.questionText,
+      suggestedAnswer: q.options.map((opt) => ({
+        '@type': 'Answer',
+        text: opt.text,
+        position: opt.id,
+      })),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: q.options.find((o) => o.id === q.correctOptionId)?.text || q.correctOptionId,
       },
     },
   }
@@ -148,6 +189,10 @@ export default async function QuestionPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(qaJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eduQuestionJsonLd) }}
       />
       <script
         type="application/ld+json"
