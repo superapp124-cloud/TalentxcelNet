@@ -3,21 +3,26 @@ import { z } from 'zod'
 import { verifyPaymentSignature } from '@/lib/commerce/razorpay'
 import { grantEntitlement, recordFunnelEvent } from '@/lib/commerce/entitlements'
 import { ALL_COMMERCIAL_PRODUCTS } from '@/packages/core/src/data/product-catalog'
+import { parseJsonWithLimit, DEFAULT_MAX_PAYLOAD_BYTES } from '@/lib/security/request-validator'
 
 const verifyPaymentSchema = z.object({
-  orderNumber: z.string(),
-  razorpayOrderId: z.string(),
-  razorpayPaymentId: z.string(),
-  razorpaySignature: z.string(),
-  productId: z.string(),
-  customerEmail: z.string().optional(),
-  userId: z.string().optional(),
+  orderNumber: z.string().min(1).max(128),
+  razorpayOrderId: z.string().min(1).max(128),
+  razorpayPaymentId: z.string().min(1).max(128),
+  razorpaySignature: z.string().min(1).max(256),
+  productId: z.string().min(1).max(64),
+  customerEmail: z.string().email().max(128).optional(),
+  userId: z.string().max(128).optional(),
 })
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const parsed = verifyPaymentSchema.safeParse(body)
+    const parseResult = await parseJsonWithLimit(req, DEFAULT_MAX_PAYLOAD_BYTES)
+    if (!parseResult.success) {
+      return parseResult.errorResponse
+    }
+
+    const parsed = verifyPaymentSchema.safeParse(parseResult.data)
 
     if (!parsed.success) {
       return NextResponse.json(

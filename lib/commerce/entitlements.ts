@@ -12,10 +12,14 @@ import type {
 
 // In-memory fallback cache for development, fast reads, and sandbox testing
 const MEMORY_ENTITLEMENTS = new Map<string, LearnerEntitlement>()
+const FULFILLED_ORDERS = new Map<string, LearnerEntitlement>()
+const FULFILLED_PAYMENTS = new Map<string, LearnerEntitlement>()
 const MEMORY_FUNNEL_EVENTS: FunnelAnalyticsEvent[] = []
 
 /**
- * Grants paid entitlement server-side after cryptographically verified payment
+ * Grants paid entitlement server-side after cryptographically verified payment.
+ * Enforces idempotency: replayed requests for already fulfilled orders or payments
+ * return the existing active entitlement without duplicate credit activation.
  */
 export async function grantEntitlement(params: {
   orderNumber: string
@@ -26,6 +30,15 @@ export async function grantEntitlement(params: {
   notes?: Record<string, string>
 }): Promise<LearnerEntitlement> {
   const { orderNumber, paymentId, productId, userId, email } = params
+
+  // 0. Idempotency check: return existing entitlement on replayed verification
+  if (orderNumber && FULFILLED_ORDERS.has(orderNumber)) {
+    return FULFILLED_ORDERS.get(orderNumber)!
+  }
+  if (paymentId && FULFILLED_PAYMENTS.has(paymentId)) {
+    return FULFILLED_PAYMENTS.get(paymentId)!
+  }
+
   const product = ALL_COMMERCIAL_PRODUCTS[productId]
 
   if (!product) {
@@ -54,6 +67,8 @@ export async function grantEntitlement(params: {
   const cacheKey = `${effectiveUserId}_${product.id}`
   MEMORY_ENTITLEMENTS.set(cacheKey, entitlement)
   MEMORY_ENTITLEMENTS.set(effectiveUserId, entitlement)
+  if (orderNumber) FULFILLED_ORDERS.set(orderNumber, entitlement)
+  if (paymentId) FULFILLED_PAYMENTS.set(paymentId, entitlement)
 
   // Sync to database if available
   try {
@@ -170,6 +185,60 @@ export async function getActiveEntitlements(
   }
 
   return active
+}
+
+/**
+ * Revokes an entitlement upon payment refund, failure, or chargeback
+ */
+export async function revokeEntitlement(params: {
+  orderNumber?: string
+  paymentId?: string
+  userId?: string
+  reason?: 'refunded' | 'failed' | 'chargeback' | 'expired'
+}): Promise<boolean> {
+  const { orderNumber, paymentId, userId, reason = 'refunded' } = params
+  let target: LearnerEntitlement | undefined
+
+  if (orderNumber && FULFILLED_ORDERS.has(orderNumber)) {
+    target = FULFILLED_ORDERS.get(orderNumber)
+  } else if (paymentId && FULFILLED_PAYMENTS.has(paymentId)) {
+    target = FULFILLED_PAYMENTS.get(paymentId)
+  } else if (userId && MEMORY_ENTITLEMENTS.has(userId)) {
+    target = MEMORY_ENTITLEMENTS.get(userId)
+  }
+
+  if (target) {
+    target.isActive = false
+    target.attemptsRemaining = 0
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Consumes one attempt from a granted entitlement.
+ * Returns false if expired, deactivated, or zero attempts remain.
+ */
+export function consumeEntitlementAttempt(entitlementId: string): boolean {
+  for (const ent of MEMORY_ENTITLEMENTS.values()) {
+    if (ent.id === entitlementId) {
+      if (!ent.isActive || new Date(ent.validUntil) <= new Date()) {
+        return false
+      }
+      if (ent.attemptsRemaining === 0) {
+        return false
+      }
+      if (ent.attemptsRemaining > 0) {
+        ent.attemptsRemaining -= 1
+        if (ent.attemptsRemaining === 0) {
+          ent.isActive = false
+        }
+      }
+      return true
+    }
+  }
+  return false
 }
 
 /**

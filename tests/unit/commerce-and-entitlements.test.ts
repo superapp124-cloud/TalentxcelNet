@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import crypto from 'crypto'
+import { NextRequest } from 'next/server'
 import {
   ASSESSMENT_PRODUCTS,
   SKILL_PRODUCTS,
@@ -11,9 +12,13 @@ import { verifyPaymentSignature, verifyWebhookSignature } from '../../lib/commer
 import {
   grantEntitlement,
   getActiveEntitlements,
+  revokeEntitlement,
+  consumeEntitlementAttempt,
   recordFunnelEvent,
   getTruthfulGrowthMetrics,
 } from '../../lib/commerce/entitlements'
+import { POST as verifyPaymentPOST } from '../../app/api/checkout/verify-payment/route'
+import { POST as webhookPOST } from '../../app/api/commerce/webhook/route'
 
 describe('TalentXcel Day-1 Commercial Product Catalog', () => {
   it('validates all mandated Assessment & Intelligence products and price points', () => {
@@ -127,7 +132,7 @@ describe('Server-Authoritative Price and GST Calculations', () => {
   })
 })
 
-describe('Cryptographic Razorpay Signature Verification', () => {
+describe('Cryptographic Razorpay Signature Verification & Tamper Resistance', () => {
   const secret = 'test_razorpay_secret_12345'
   const orderId = 'order_tx_test_98765'
   const paymentId = 'pay_tx_test_12345'
@@ -148,6 +153,30 @@ describe('Cryptographic Razorpay Signature Verification', () => {
     expect(isValid).toBe(false)
   })
 
+  it('strictly rejects valid signature paired with the WRONG order ID (tampered order binding)', () => {
+    // Generate valid signature for orderId A
+    const validSignatureForOrderA = crypto
+      .createHmac('sha256', secret)
+      .update(`${orderId}|${paymentId}`)
+      .digest('hex')
+
+    // Attacker submits this signature for orderId B
+    const tamperedOrderId = 'order_tx_attacker_modified_99999'
+    const isValid = verifyPaymentSignature(tamperedOrderId, paymentId, validSignatureForOrderA, secret)
+    expect(isValid).toBe(false)
+  })
+
+  it('strictly rejects valid signature paired with the WRONG payment ID', () => {
+    const validSignature = crypto
+      .createHmac('sha256', secret)
+      .update(`${orderId}|${paymentId}`)
+      .digest('hex')
+
+    const swappedPaymentId = 'pay_tx_different_payment_77777'
+    const isValid = verifyPaymentSignature(orderId, swappedPaymentId, validSignature, secret)
+    expect(isValid).toBe(false)
+  })
+
   it('verifies raw webhook HMAC SHA256 signature', () => {
     const webhookPayload = JSON.stringify({ event: 'payment.captured', entity: { id: paymentId } })
     const validWebhookSig = crypto
@@ -158,13 +187,25 @@ describe('Cryptographic Razorpay Signature Verification', () => {
     const isValid = verifyWebhookSignature(webhookPayload, validWebhookSig, secret)
     expect(isValid).toBe(true)
   })
+
+  it('rejects tampered webhook payload even with original signature', () => {
+    const originalPayload = JSON.stringify({ event: 'payment.captured', amount: 2400 })
+    const validWebhookSig = crypto
+      .createHmac('sha256', secret)
+      .update(originalPayload)
+      .digest('hex')
+
+    const tamperedPayload = JSON.stringify({ event: 'payment.captured', amount: 240000 })
+    const isValid = verifyWebhookSignature(tamperedPayload, validWebhookSig, secret)
+    expect(isValid).toBe(false)
+  })
 })
 
-describe('Server-Side Entitlement Granting & Funnel Reporting', () => {
+describe('Server-Side Entitlement Granting, Idempotency & Lifecycle', () => {
   it('grants entitlement with correct validity timestamp and attempts', async () => {
     const entitlement = await grantEntitlement({
-      orderNumber: `TX-ORD-${Date.now()}`,
-      paymentId: 'pay_test_verified_123',
+      orderNumber: `TX-ORD-${Date.now()}-grant`,
+      paymentId: `pay_test_verified_${Date.now()}`,
       productId: 'prod_assess_plus',
       email: 'student@example.com',
     })
@@ -174,18 +215,43 @@ describe('Server-Side Entitlement Granting & Funnel Reporting', () => {
     expect(entitlement.attemptsRemaining).toBe(12)
     expect(entitlement.isActive).toBe(true)
 
-    // Check validity date is ~60 days from now
     const validUntilDate = new Date(entitlement.validUntil)
     const expectedDiffDays = Math.round((validUntilDate.getTime() - Date.now()) / (24 * 3600 * 1000))
     expect(expectedDiffDays).toBeGreaterThanOrEqual(59)
     expect(expectedDiffDays).toBeLessThanOrEqual(61)
   })
 
+  it('guarantees idempotency on replayed payment verification requests (no duplicate credits)', async () => {
+    const orderNumber = `TX-ORD-REPLAY-${Date.now()}`
+    const paymentId = `pay_replay_test_${Date.now()}`
+
+    // First grant
+    const firstGrant = await grantEntitlement({
+      orderNumber,
+      paymentId,
+      productId: 'prod_assess_single',
+      email: 'replay_test@example.com',
+    })
+
+    // Second replayed grant (e.g. user refreshed or replayed API call)
+    const secondGrant = await grantEntitlement({
+      orderNumber,
+      paymentId,
+      productId: 'prod_assess_single',
+      email: 'replay_test@example.com',
+    })
+
+    // Assert same entitlement returned without creating new ID or doubling credits
+    expect(secondGrant.id).toBe(firstGrant.id)
+    expect(secondGrant.attemptsRemaining).toBe(firstGrant.attemptsRemaining)
+    expect(secondGrant.grantedAt).toBe(firstGrant.grantedAt)
+  })
+
   it('retrieves active entitlements and excludes expired ones', async () => {
     const userId = `learner_test_${Date.now()}`
     await grantEntitlement({
       orderNumber: `TX-ORD-${Date.now()}-1`,
-      paymentId: 'pay_test_verified_456',
+      paymentId: `pay_test_verified_${Date.now()}_1`,
       productId: 'prod_skill_foundation_monthly',
       userId,
     })
@@ -193,6 +259,58 @@ describe('Server-Side Entitlement Granting & Funnel Reporting', () => {
     const entitlements = await getActiveEntitlements(userId)
     expect(entitlements.length).toBeGreaterThanOrEqual(1)
     expect(entitlements.some((e) => e.productId === 'prod_skill_foundation_monthly')).toBe(true)
+  })
+
+  it('strictly revokes entitlement when payment is refunded or charged back', async () => {
+    const refundOrder = `TX-ORD-REFUND-${Date.now()}`
+    const refundPayment = `pay_refund_${Date.now()}`
+    const refundUser = `user_refund_${Date.now()}`
+
+    const ent = await grantEntitlement({
+      orderNumber: refundOrder,
+      paymentId: refundPayment,
+      productId: 'prod_assess_starter',
+      userId: refundUser,
+    })
+    expect(ent.isActive).toBe(true)
+
+    // Revoke entitlement upon refund
+    const revoked = await revokeEntitlement({
+      orderNumber: refundOrder,
+      reason: 'refunded',
+    })
+    expect(revoked).toBe(true)
+
+    // User should have zero active entitlements
+    const active = await getActiveEntitlements(refundUser)
+    expect(active.length).toBe(0)
+  })
+
+  it('enforces attempt exhaustion and deactivates single-use entitlements', async () => {
+    const singleOrder = `TX-ORD-SINGLE-${Date.now()}`
+    const singleUser = `user_single_${Date.now()}`
+
+    const ent = await grantEntitlement({
+      orderNumber: singleOrder,
+      paymentId: `pay_single_${Date.now()}`,
+      productId: 'prod_assess_single', // 1 attempt allowed
+      userId: singleUser,
+    })
+    expect(ent.attemptsRemaining).toBe(1)
+
+    // Consume attempt 1
+    const consumed1 = consumeEntitlementAttempt(ent.id)
+    expect(consumed1).toBe(true)
+    expect(ent.attemptsRemaining).toBe(0)
+    expect(ent.isActive).toBe(false)
+
+    // Attempt 2 must be rejected
+    const consumed2 = consumeEntitlementAttempt(ent.id)
+    expect(consumed2).toBe(false)
+
+    // Query active entitlements must exclude it
+    const active = await getActiveEntitlements(singleUser)
+    expect(active.length).toBe(0)
   })
 
   it('records funnel events and outputs truthful growth metrics without fake padding', async () => {
@@ -214,8 +332,53 @@ describe('Server-Side Entitlement Granting & Funnel Reporting', () => {
     const metrics = getTruthfulGrowthMetrics()
     expect(metrics.measuredActuals.freeTestsStarted).toBeGreaterThanOrEqual(1)
     expect(metrics.measuredActuals.freeTestsCompleted).toBeGreaterThanOrEqual(1)
-    // Mathematical benchmark clearly demarcated
     expect(metrics.ambitionScaleTargets.day30UserTarget).toBe(1000000)
     expect(metrics.ambitionScaleTargets.dailyTargetRunRate).toBe(33333)
+  })
+})
+
+describe('Webhook Idempotency and Event Deduplication (/api/commerce/webhook)', () => {
+  it('deduplicates replayed webhook events without re-executing side effects', async () => {
+    const eventId = `evt_test_dedup_${Date.now()}`
+    const payload = {
+      id: eventId,
+      event: 'payment.captured',
+      payload: {
+        payment: {
+          entity: {
+            id: `pay_webhook_${Date.now()}`,
+            amount: 2400,
+            notes: {
+              orderNumber: `ORD-HOOK-${Date.now()}`,
+            },
+          },
+        },
+      },
+    }
+
+    const req1 = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    const res1 = await webhookPOST(req1)
+    expect(res1.status).toBe(200)
+    const data1 = await res1.json()
+    expect(data1.status).toBe('ok')
+    expect(data1.note).toBeUndefined()
+
+    // Second duplicate webhook delivery
+    const req2 = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    const res2 = await webhookPOST(req2)
+    expect(res2.status).toBe(200)
+    const data2 = await res2.json()
+    expect(data2.status).toBe('ok')
+    expect(data2.note).toBe('duplicate_event_ignored')
   })
 })

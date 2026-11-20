@@ -9,11 +9,12 @@ import {
 import { POST as backpackEvaluatePOST } from '../../app/api/skills/backpack/evaluate/route'
 import { POST as assessmentAttemptPOST } from '../../app/api/academic/assessment-attempt/route'
 import { POST as funnelPOST } from '../../app/api/analytics/funnel/route'
+import { POST as verifyPaymentPOST } from '../../app/api/checkout/verify-payment/route'
 
 process.env.CERTIFICATE_SIGNING_SECRET = 'test-only-certificate-secret-for-unit-tests-2026'
 
 describe('Defense-in-Depth Payload Size & Zod Collection Limits (GHSA-mrhx-c7xc-m3w5)', () => {
-  describe('parseJsonWithLimit utility', () => {
+  describe('parseJsonWithLimit utility & streaming reader', () => {
     it('accepts valid JSON under payload limit', async () => {
       const payload = { test: 'safe', count: 42 }
       const body = JSON.stringify(payload)
@@ -53,19 +54,63 @@ describe('Defense-in-Depth Payload Size & Zod Collection Limits (GHSA-mrhx-c7xc-
       }
     })
 
-    it('rejects when actual stream content exceeds limit even if header is omitted (HTTP 413)', async () => {
-      const largeData = 'x'.repeat(2048)
-      const req = new NextRequest('http://localhost:3000/api/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: largeData }),
+    it('strictly validates Content-Length header as non-negative integer and rejects malformed values (HTTP 400)', async () => {
+      const malformedHeaders = ['1024abc', '-50', '10.5', '0x10', 'NaN', '1000 2000']
+      for (const badLength of malformedHeaders) {
+        const req = new NextRequest('http://localhost:3000/api/test', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': badLength,
+          },
+          body: JSON.stringify({ a: 1 }),
+        })
+
+        const res = await parseJsonWithLimit(req, 2048)
+        expect(res.success).toBe(false)
+        if (!res.success) {
+          expect(res.errorResponse.status).toBe(400)
+          const json = await res.errorResponse.json()
+          expect(json.error).toBe('Invalid Content-Length header')
+        }
+      }
+    })
+
+    it('cancels stream early when incoming chunks exceed limit even if Content-Length is missing or understated (HTTP 413)', async () => {
+      let cancelled = false
+      // Create a ReadableStream that tracks whether reader.cancel was called
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          // Push first chunk of 600 bytes
+          controller.enqueue(new Uint8Array(600))
+          // Push second chunk of 600 bytes (total 1200 bytes, exceeding 1000 byte limit)
+          controller.enqueue(new Uint8Array(600))
+          // Push third chunk that should never be read due to early cancellation
+          controller.enqueue(new Uint8Array(600))
+          controller.close()
+        },
+        cancel() {
+          cancelled = true
+        },
       })
 
-      const res = await parseJsonWithLimit(req, 1024)
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Deliberately understated or absent header
+          'Content-Length': '500',
+        },
+        body: stream,
+        duplex: 'half',
+      } as any)
+
+      const res = await parseJsonWithLimit(req, 1000)
       expect(res.success).toBe(false)
       if (!res.success) {
         expect(res.errorResponse.status).toBe(413)
       }
+      expect(cancelled).toBe(true)
     })
 
     it('rejects malformed non-JSON payloads with HTTP 400', async () => {
@@ -82,6 +127,59 @@ describe('Defense-in-Depth Payload Size & Zod Collection Limits (GHSA-mrhx-c7xc-
         const json = await res.errorResponse.json()
         expect(json.error).toBe('Invalid JSON payload')
       }
+    })
+
+    it('rejects empty request body with HTTP 400', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '   ',
+      })
+
+      const res = await parseJsonWithLimit(req, 1024)
+      expect(res.success).toBe(false)
+      if (!res.success) {
+        expect(res.errorResponse.status).toBe(400)
+      }
+    })
+  })
+
+  describe('/api/checkout/verify-payment streaming limits & bounds', () => {
+    it('rejects oversized verification request with HTTP 413', async () => {
+      const paddedPayload = {
+        orderNumber: 'ORD-123',
+        razorpayOrderId: 'order_123',
+        razorpayPaymentId: 'pay_123',
+        razorpaySignature: 'sig_123',
+        productId: 'prod_assess_single',
+        junk: 'x'.repeat(600 * 1024), // 600 KB exceeds DEFAULT_MAX_PAYLOAD_BYTES (512 KB)
+      }
+
+      const req = new NextRequest('http://localhost:3000/api/checkout/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paddedPayload),
+      })
+
+      const res = await verifyPaymentPOST(req)
+      expect(res.status).toBe(413)
+    })
+
+    it('rejects missing or invalid fields in verify-payment with HTTP 400', async () => {
+      const invalidPayload = {
+        orderNumber: 'ORD-123',
+        // Missing razorpayOrderId, razorpayPaymentId, razorpaySignature
+        productId: 'prod_assess_single',
+      }
+
+      const req = new NextRequest('http://localhost:3000/api/checkout/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(invalidPayload),
+      })
+
+      const res = await verifyPaymentPOST(req)
+      expect(res.status).toBe(400)
     })
   })
 
