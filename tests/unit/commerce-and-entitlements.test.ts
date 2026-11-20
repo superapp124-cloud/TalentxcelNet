@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import crypto from 'crypto'
 import { NextRequest } from 'next/server'
 import {
@@ -17,6 +17,12 @@ import {
   recordFunnelEvent,
   getTruthfulGrowthMetrics,
 } from '../../lib/commerce/entitlements'
+import {
+  claimWebhookEvent,
+  markWebhookProcessed,
+  recordWebhookFailure,
+  resetWebhookIdempotencyClaimsForTesting,
+} from '../../lib/commerce/webhook-idempotency'
 import { POST as verifyPaymentPOST } from '../../app/api/checkout/verify-payment/route'
 import { POST as webhookPOST } from '../../app/api/commerce/webhook/route'
 
@@ -154,13 +160,11 @@ describe('Cryptographic Razorpay Signature Verification & Tamper Resistance', ()
   })
 
   it('strictly rejects valid signature paired with the WRONG order ID (tampered order binding)', () => {
-    // Generate valid signature for orderId A
     const validSignatureForOrderA = crypto
       .createHmac('sha256', secret)
       .update(`${orderId}|${paymentId}`)
       .digest('hex')
 
-    // Attacker submits this signature for orderId B
     const tamperedOrderId = 'order_tx_attacker_modified_99999'
     const isValid = verifyPaymentSignature(tamperedOrderId, paymentId, validSignatureForOrderA, secret)
     expect(isValid).toBe(false)
@@ -225,7 +229,6 @@ describe('Server-Side Entitlement Granting, Idempotency & Lifecycle', () => {
     const orderNumber = `TX-ORD-REPLAY-${Date.now()}`
     const paymentId = `pay_replay_test_${Date.now()}`
 
-    // First grant
     const firstGrant = await grantEntitlement({
       orderNumber,
       paymentId,
@@ -233,7 +236,6 @@ describe('Server-Side Entitlement Granting, Idempotency & Lifecycle', () => {
       email: 'replay_test@example.com',
     })
 
-    // Second replayed grant (e.g. user refreshed or replayed API call)
     const secondGrant = await grantEntitlement({
       orderNumber,
       paymentId,
@@ -241,7 +243,6 @@ describe('Server-Side Entitlement Granting, Idempotency & Lifecycle', () => {
       email: 'replay_test@example.com',
     })
 
-    // Assert same entitlement returned without creating new ID or doubling credits
     expect(secondGrant.id).toBe(firstGrant.id)
     expect(secondGrant.attemptsRemaining).toBe(firstGrant.attemptsRemaining)
     expect(secondGrant.grantedAt).toBe(firstGrant.grantedAt)
@@ -274,14 +275,12 @@ describe('Server-Side Entitlement Granting, Idempotency & Lifecycle', () => {
     })
     expect(ent.isActive).toBe(true)
 
-    // Revoke entitlement upon refund
     const revoked = await revokeEntitlement({
       orderNumber: refundOrder,
       reason: 'refunded',
     })
     expect(revoked).toBe(true)
 
-    // User should have zero active entitlements
     const active = await getActiveEntitlements(refundUser)
     expect(active.length).toBe(0)
   })
@@ -293,22 +292,19 @@ describe('Server-Side Entitlement Granting, Idempotency & Lifecycle', () => {
     const ent = await grantEntitlement({
       orderNumber: singleOrder,
       paymentId: `pay_single_${Date.now()}`,
-      productId: 'prod_assess_single', // 1 attempt allowed
+      productId: 'prod_assess_single',
       userId: singleUser,
     })
     expect(ent.attemptsRemaining).toBe(1)
 
-    // Consume attempt 1
     const consumed1 = consumeEntitlementAttempt(ent.id)
     expect(consumed1).toBe(true)
     expect(ent.attemptsRemaining).toBe(0)
     expect(ent.isActive).toBe(false)
 
-    // Attempt 2 must be rejected
     const consumed2 = consumeEntitlementAttempt(ent.id)
     expect(consumed2).toBe(false)
 
-    // Query active entitlements must exclude it
     const active = await getActiveEntitlements(singleUser)
     expect(active.length).toBe(0)
   })
@@ -337,48 +333,218 @@ describe('Server-Side Entitlement Granting, Idempotency & Lifecycle', () => {
   })
 })
 
-describe('Webhook Idempotency and Event Deduplication (/api/commerce/webhook)', () => {
-  it('deduplicates replayed webhook events without re-executing side effects', async () => {
-    const eventId = `evt_test_dedup_${Date.now()}`
-    const payload = {
+describe('Webhook Authentication, Durable Idempotency & Failure Handling (/api/commerce/webhook)', () => {
+  const webhookSecret = 'test_webhook_signing_secret_99999'
+
+  beforeEach(() => {
+    resetWebhookIdempotencyClaimsForTesting()
+    process.env.RAZORPAY_WEBHOOK_SECRET = webhookSecret
+  })
+
+  it('fails closed with HTTP 500 when RAZORPAY_WEBHOOK_SECRET is unconfigured (never processes unsigned events)', async () => {
+    delete process.env.RAZORPAY_WEBHOOK_SECRET
+
+    const payload = JSON.stringify({ event: 'payment.captured', id: 'evt_no_secret' })
+    const req = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+    })
+
+    const res = await webhookPOST(req)
+    expect(res.status).toBe(500)
+    const data = await res.json()
+    expect(data.error).toContain('RAZORPAY_WEBHOOK_SECRET is unconfigured')
+  })
+
+  it('strictly rejects webhook with HTTP 400 when x-razorpay-signature header is missing', async () => {
+    const payload = JSON.stringify({ event: 'payment.captured', id: 'evt_no_sig' })
+    const req = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+    })
+
+    const res = await webhookPOST(req)
+    expect(res.status).toBe(400)
+    const data = await res.json()
+    expect(data.error).toContain('Missing x-razorpay-signature header')
+  })
+
+  it('strictly rejects webhook with HTTP 400 when x-razorpay-signature is forged or invalid', async () => {
+    const payload = JSON.stringify({ event: 'payment.captured', id: 'evt_bad_sig' })
+    const req = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-razorpay-signature': 'forged_signature_1234567890abcdef1234567890abcdef',
+      },
+      body: payload,
+    })
+
+    const res = await webhookPOST(req)
+    expect(res.status).toBe(400)
+    const data = await res.json()
+    expect(data.error).toContain('Invalid webhook signature')
+  })
+
+  it('authenticates valid signature, processes event, and marks processed', async () => {
+    const eventId = `evt_valid_proc_${Date.now()}`
+    const payload = JSON.stringify({
       id: eventId,
       event: 'payment.captured',
       payload: {
         payment: {
           entity: {
-            id: `pay_webhook_${Date.now()}`,
+            id: `pay_unit_${Date.now()}`,
             amount: 2400,
             notes: {
-              orderNumber: `ORD-HOOK-${Date.now()}`,
+              orderNumber: `ORD-UNIT-${Date.now()}`,
             },
           },
         },
       },
-    }
-
-    const req1 = new NextRequest('http://localhost:3000/api/commerce/webhook', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
     })
 
+    const validSig = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(payload)
+      .digest('hex')
+
+    const req = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-razorpay-signature': validSig,
+      },
+      body: payload,
+    })
+
+    const res = await webhookPOST(req)
+    expect(res.status).toBe(200)
+    const data = await res.json()
+    expect(data.status).toBe('ok')
+    expect(data.received).toBe(true)
+  })
+
+  it('durably deduplicates replayed webhook deliveries without repeating side effects', async () => {
+    const eventId = `evt_dedup_${Date.now()}`
+    const payload = JSON.stringify({
+      id: eventId,
+      event: 'payment.captured',
+      payload: {
+        payment: {
+          entity: {
+            id: `pay_dedup_${Date.now()}`,
+            amount: 2400,
+            notes: {
+              orderNumber: `ORD-DEDUP-${Date.now()}`,
+            },
+          },
+        },
+      },
+    })
+
+    const validSig = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(payload)
+      .digest('hex')
+
+    // First delivery
+    const req1 = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-razorpay-signature': validSig,
+      },
+      body: payload,
+    })
     const res1 = await webhookPOST(req1)
     expect(res1.status).toBe(200)
     const data1 = await res1.json()
     expect(data1.status).toBe('ok')
     expect(data1.note).toBeUndefined()
 
-    // Second duplicate webhook delivery
+    // Second replayed delivery
     const req2 = new NextRequest('http://localhost:3000/api/commerce/webhook', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-razorpay-signature': validSig,
+      },
+      body: payload,
     })
-
     const res2 = await webhookPOST(req2)
     expect(res2.status).toBe(200)
     const data2 = await res2.json()
     expect(data2.status).toBe('ok')
     expect(data2.note).toBe('duplicate_event_ignored')
+  })
+
+  it('allows retrying a failed webhook and marks processed only after success', async () => {
+    const eventId = `evt_retry_${Date.now()}`
+
+    // 1. Initial claim
+    const claim1 = await claimWebhookEvent('razorpay', eventId, 'payment.captured', { id: eventId })
+    expect(claim1.claimed).toBe(true)
+    expect(claim1.alreadyProcessed).toBe(false)
+
+    // 2. Failure occurs during processing
+    await recordWebhookFailure('razorpay', eventId, 'Connection timeout')
+
+    // 3. Retry delivery arrives
+    const claim2 = await claimWebhookEvent('razorpay', eventId, 'payment.captured', { id: eventId })
+    expect(claim2.claimed).toBe(true)
+    expect(claim2.alreadyProcessed).toBe(false)
+
+    // 4. Retry succeeds and marks processed
+    await markWebhookProcessed('razorpay', eventId, claim2.recordId)
+
+    // 5. Subsequent delivery is recognized as duplicate
+    const claim3 = await claimWebhookEvent('razorpay', eventId, 'payment.captured', { id: eventId })
+    expect(claim3.claimed).toBe(false)
+    expect(claim3.alreadyProcessed).toBe(true)
+  })
+
+  it('returns retryable HTTP 500 when database operation fails during webhook processing', async () => {
+    process.env.TEST_SIMULATE_DB_FAILURE = 'true'
+
+    const eventId = `evt_db_fail_${Date.now()}`
+    const payload = JSON.stringify({
+      id: eventId,
+      event: 'payment.captured',
+      payload: {
+        payment: {
+          entity: {
+            id: `pay_fail_${Date.now()}`,
+            amount: 2400,
+            notes: { orderNumber: `ORD-FAIL-${Date.now()}` },
+          },
+        },
+      },
+    })
+
+    const validSig = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(payload)
+      .digest('hex')
+
+    const req = new NextRequest('http://localhost:3000/api/commerce/webhook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-razorpay-signature': validSig,
+      },
+      body: payload,
+    })
+
+    const res = await webhookPOST(req)
+    // Must return HTTP 500 so Razorpay retries
+    expect(res.status).toBe(500)
+    const data = await res.json()
+    expect(data.error).toContain('Webhook processing failed, retry requested')
+
+    // Clean up
+    delete process.env.TEST_SIMULATE_DB_FAILURE
   })
 })
