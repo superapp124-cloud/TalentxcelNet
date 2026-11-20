@@ -14,6 +14,9 @@ export default function robots(): MetadataRoute.Robots {
         '/projects/',
       ],
     },
-    sitemap: 'https://talentxcel.net/sitemap.xml',
+    sitemap: [
+      'https://talentxcel.net/sitemap.xml',
+      'https://talentxcel.net/sitemap-index.xml',
+    ],
   }
 }
