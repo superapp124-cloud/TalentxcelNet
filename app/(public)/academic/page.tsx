@@ -41,6 +41,7 @@ import { RazorpayCheckoutModal } from '@/components/commerce/razorpay-checkout-m
 import { LivingSkillRadar } from '@/components/academic/living-skill-radar'
 import { InteractiveCurriculumCockpit } from '@/components/academic/interactive-curriculum-cockpit'
 import { SocraticEvaluatorDemo } from '@/components/academic/socratic-evaluator-demo'
+import { SnapSolveMentor } from '@/components/academic/snap-solve-mentor'
 import { ParentIntelligencePreview } from '@/components/academic/parent-intelligence-preview'
 import {
   SEED_BOARDS,
@@ -85,6 +86,7 @@ function AcademicBrowserContent() {
   const [selectedSubjectCode, setSelectedSubjectCode] = useState<string>(initialSubject)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<AcademicTab>(initialTab)
+  const [socraticSubTab, setSocraticSubTab] = useState<'snap_solve' | 'error_dna'>('snap_solve')
 
   // Sync state to URL without full page reload
   useEffect(() => {
@@ -355,25 +357,29 @@ function AcademicBrowserContent() {
 
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             {[
-              { time: '3:30 PM', title: 'Daily Plan', desc: 'Personalized plan targeting school schedule & weaknesses', icon: Target, color: 'text-blue-600 bg-blue-50' },
-              { time: '4:00 PM', title: 'Concept Lab', desc: '60FPS interactive simulations & step-by-step derivations', icon: Sparkles, color: 'text-cyan-600 bg-cyan-50' },
-              { time: '5:00 PM', title: 'Adaptive Test', desc: 'Diagnostics measuring conceptual mastery, not memorization', icon: Award, color: 'text-amber-600 bg-amber-50' },
-              { time: '7:00 PM', title: 'Error DNA Sprint', desc: 'Targeted exercises correcting diagnosed sign & formula slips', icon: Brain, color: 'text-rose-600 bg-rose-50' },
-              { time: '9:30 PM', title: 'Snap & Solve', desc: 'Upload handwritten doubt; get Socratic hints & twin verification', icon: Zap, color: 'text-emerald-600 bg-emerald-50' },
-              { time: 'Sun 6:00 PM', title: 'Parent Intelligence', desc: 'Weekly evidence-based progress report sent directly to parents', icon: ShieldCheck, color: 'text-purple-600 bg-purple-50' },
+              { time: '3:30 PM', title: 'Daily Plan', desc: 'Personalized plan targeting school schedule & weaknesses', icon: Target, color: 'text-blue-600 bg-blue-50', onClick: () => setActiveTab('mastery') },
+              { time: '4:00 PM', title: 'Concept Lab', desc: '60FPS interactive simulations & step-by-step derivations', icon: Sparkles, color: 'text-cyan-600 bg-cyan-50', onClick: () => setActiveTab('labs') },
+              { time: '5:00 PM', title: 'Adaptive Test', desc: 'Diagnostics measuring conceptual mastery, not memorization', icon: Award, color: 'text-amber-600 bg-amber-50', onClick: () => chapters[0] && handleLaunchPractice(chapters[0].id) },
+              { time: '7:00 PM', title: 'Error DNA Sprint', desc: 'Targeted exercises correcting diagnosed sign & formula slips', icon: Brain, color: 'text-rose-600 bg-rose-50', onClick: () => { setActiveTab('socratic'); setSocraticSubTab('error_dna') } },
+              { time: '9:30 PM', title: 'Snap & Solve', desc: 'Upload handwritten doubt; get Socratic hints & twin verification', icon: Zap, color: 'text-emerald-600 bg-emerald-50', onClick: () => { setActiveTab('socratic'); setSocraticSubTab('snap_solve') } },
+              { time: 'Sun 6:00 PM', title: 'Parent Intelligence', desc: 'Weekly evidence-based progress report sent directly to parents', icon: ShieldCheck, color: 'text-purple-600 bg-purple-50', onClick: () => setActiveTab('parent') },
             ].map((step, idx) => (
-              <div key={idx} className="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5 flex flex-col justify-between">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black text-slate-400">{step.time}</span>
+              <button
+                key={idx}
+                onClick={step.onClick}
+                className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all border border-slate-100 space-y-1.5 flex flex-col justify-between text-left group cursor-pointer"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-[10px] font-black text-slate-400 group-hover:text-slate-600">{step.time}</span>
                   <div className={`w-6 h-6 rounded-lg ${step.color} flex items-center justify-center shrink-0`}>
                     <step.icon className="w-3.5 h-3.5" />
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-900">{step.title}</h4>
+                  <h4 className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">{step.title}</h4>
                   <p className="text-[10px] text-slate-500 leading-tight mt-0.5">{step.desc}</p>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -651,7 +657,41 @@ function AcademicBrowserContent() {
         {/* ========================================================================= */}
         {activeTab === 'socratic' && (
           <section className="space-y-6">
-            <SocraticEvaluatorDemo />
+            {/* Sub-tab Switcher */}
+            <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-slate-100 dark:bg-neutral-900 rounded-2xl max-w-xl mx-auto border border-slate-200 dark:border-neutral-800">
+              <button
+                onClick={() => setSocraticSubTab('snap_solve')}
+                className={`flex-1 py-2 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                  socraticSubTab === 'snap_solve'
+                    ? 'bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Snap &amp; Solve AI Mentor</span>
+                <Badge variant="outline" className="text-[9px] border-emerald-500/30 text-emerald-600 dark:text-emerald-400 py-0 px-1">
+                  Pillar 2
+                </Badge>
+              </button>
+
+              <button
+                onClick={() => setSocraticSubTab('error_dna')}
+                className={`flex-1 py-2 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                  socraticSubTab === 'error_dna'
+                    ? 'bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Brain className="w-3.5 h-3.5 text-rose-500" />
+                <span>Error DNA Diagnostic Lab</span>
+              </button>
+            </div>
+
+            {socraticSubTab === 'snap_solve' ? (
+              <SnapSolveMentor />
+            ) : (
+              <SocraticEvaluatorDemo />
+            )}
           </section>
         )}
 
