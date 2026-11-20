@@ -363,6 +363,39 @@ export function TestRunnerModal({
       // ignore
     }
 
+    // Sync to Supabase academic intelligence engine (Attempts, Mastery & Error DNA)
+    fetch('/api/academic/assessment-attempt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assessmentType: 'chapter_diagnostic',
+        referenceId: blueprint.id,
+        subjectCode: blueprint.subjectId,
+        totalQuestions: activeList.length,
+        correctAnswers: result.correctCount,
+        scorePercentage: result.percentage,
+        durationSeconds: Math.max(10, (blueprint.durationMinutes * 60) - timeRemainingSeconds),
+        conceptId: activeList[0]?.topicId ? `conc_${activeList[0].topicId}` : undefined,
+        evaluations: result.evaluations.map((ev) => {
+          const q = activeList.find((item) => item.id === ev.questionId)
+          return {
+            questionId: ev.questionId,
+            isCorrect: ev.isCorrect,
+            userAnswer: ev.userAnswer,
+            correctAnswer: ev.correctAnswer,
+            conceptId: q?.topicId ? `conc_${q.topicId}` : undefined,
+            errorType: 'conceptual_misunderstanding',
+            questionStem: q?.questionText || `Question ${ev.questionId}`,
+            explanation: ev.explanation,
+            remedial: ev.keyPoint || 'Review core chapter principles and definitions.',
+          }
+        }),
+        weakTopics: result.weakTopics,
+      }),
+    }).catch((err) => {
+      console.warn('[Test Runner] Diagnostic sync warning:', err)
+    })
+
     // Telemetry log
     fetch('/api/analytics/funnel', {
       method: 'POST',
