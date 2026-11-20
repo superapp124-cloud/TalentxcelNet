@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { parseJsonWithLimit, ASSESSMENT_MAX_PAYLOAD_BYTES } from '@/lib/security/request-validator'
 
 const evaluationItemSchema = z.object({
-  questionId: z.string(),
+  questionId: z.string().min(1).max(128),
   isCorrect: z.boolean(),
-  userAnswer: z.array(z.string()).default([]),
-  correctAnswer: z.array(z.string()).default([]),
-  conceptId: z.string().optional(),
+  userAnswer: z.array(z.string().max(200)).max(20).default([]),
+  correctAnswer: z.array(z.string().max(200)).max(20).default([]),
+  conceptId: z.string().max(128).optional(),
   errorType: z.enum([
     'conceptual_misunderstanding',
     'formula_selection_error',
@@ -20,9 +21,9 @@ const evaluationItemSchema = z.object({
     'memory_recall_failure',
     'guessing_strategy_error',
   ]).optional(),
-  questionStem: z.string().optional(),
-  explanation: z.string().optional(),
-  remedial: z.string().optional(),
+  questionStem: z.string().max(2000).optional(),
+  explanation: z.string().max(4000).optional(),
+  remedial: z.string().max(4000).optional(),
 })
 
 const attemptSchema = z.object({
@@ -34,26 +35,30 @@ const attemptSchema = z.object({
     'snap_solve_twin',
     'simulation_exam',
   ]).default('chapter_diagnostic'),
-  referenceId: z.string().default('general_diagnostic'),
-  subjectCode: z.string().default('math'),
+  referenceId: z.string().min(1).max(128).default('general_diagnostic'),
+  subjectCode: z.string().min(1).max(64).default('math'),
   classNumber: z.number().optional(),
-  totalQuestions: z.number().min(1),
-  correctAnswers: z.number().min(0),
+  totalQuestions: z.number().min(1).max(100),
+  correctAnswers: z.number().min(0).max(100),
   scorePercentage: z.number().min(0).max(100),
-  durationSeconds: z.number().min(0).default(0),
-  conceptId: z.string().optional(),
-  evaluations: z.array(evaluationItemSchema).default([]),
+  durationSeconds: z.number().min(0).max(86400).default(0),
+  conceptId: z.string().max(128).optional(),
+  evaluations: z.array(evaluationItemSchema).max(100).default([]),
   weakTopics: z.array(z.object({
-    topicId: z.string(),
-    topicName: z.string(),
-    accuracy: z.number(),
-  })).default([]),
+    topicId: z.string().min(1).max(128),
+    topicName: z.string().min(1).max(200),
+    accuracy: z.number().min(0).max(100),
+  })).max(50).default([]),
 })
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const parsed = attemptSchema.safeParse(body)
+    const parseResult = await parseJsonWithLimit(req, ASSESSMENT_MAX_PAYLOAD_BYTES)
+    if (!parseResult.success) {
+      return parseResult.errorResponse
+    }
+
+    const parsed = attemptSchema.safeParse(parseResult.data)
 
     if (!parsed.success) {
       return NextResponse.json(

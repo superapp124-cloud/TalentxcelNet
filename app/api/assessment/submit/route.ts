@@ -3,10 +3,15 @@ import { z } from 'zod'
 import { evaluateQuizSubmission } from '@/lib/lms/assessment-service'
 import { issueCertificate } from '@/lib/lms/certificate-service'
 import { createClient } from '@/lib/supabase/server'
+import { parseJsonWithLimit, ASSESSMENT_MAX_PAYLOAD_BYTES } from '@/lib/security/request-validator'
 
 const submissionSchema = z.object({
-  answers: z.record(z.string(), z.number()),
-  programmeTitle: z.string().default('AI Development & Automation'),
+  answers: z
+    .record(z.string().min(1).max(64), z.number().int().min(0).max(10))
+    .refine((obj) => Object.keys(obj).length <= 100, {
+      message: 'answers cannot exceed 100 questions',
+    }),
+  programmeTitle: z.string().min(1).max(128).default('AI Development & Automation'),
 })
 
 export async function POST(req: NextRequest) {
@@ -20,8 +25,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const body = await req.json()
-    const parsed = submissionSchema.safeParse(body)
+    const parseResult = await parseJsonWithLimit(req, ASSESSMENT_MAX_PAYLOAD_BYTES)
+    if (!parseResult.success) {
+      return parseResult.errorResponse
+    }
+
+    const parsed = submissionSchema.safeParse(parseResult.data)
     if (!parsed.success) {
       return NextResponse.json({ error: 'Invalid assessment submission' }, { status: 400 })
     }
