@@ -58,6 +58,24 @@ export default function ToolsIndexPage() {
         name: 'SSB Armed Forces Age Eligibility Calculator',
         url: 'https://talentxcel.net/tools/ssb-eligibility-calculator',
       },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Class 10 & 12 Board Percentage Calculator',
+        url: 'https://talentxcel.net/tools/board-percentage-calculator',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'CBSE Best-of-Five Marks Calculator',
+        url: 'https://talentxcel.net/tools/cbse-best-of-five-calculator',
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: 'JEE Main & NEET Rank vs Percentile Predictor',
+        url: 'https://talentxcel.net/tools/jee-neet-rank-predictor',
+      },
     ],
   }
 
@@ -70,6 +88,33 @@ export default function ToolsIndexPage() {
       category: 'School Board Metrics',
       icon: Calculator,
       color: 'blue',
+    },
+    {
+      title: 'Class 10 & 12 Board Percentage Calculator',
+      description: 'Calculate aggregate marks, percentage, division, and distinction classification across CBSE, ICSE, and State Boards.',
+      badge: 'All Boards Aligned',
+      href: '/tools/board-percentage-calculator',
+      category: 'School Board Metrics',
+      icon: Award,
+      color: 'emerald',
+    },
+    {
+      title: 'CBSE Best-of-Five Marks Calculator',
+      description: 'Compute Class 10 aggregate percentage using official CBSE best-of-5 subject selection with automatic skill subject replacement.',
+      badge: 'CBSE Statutory Rule',
+      href: '/tools/cbse-best-of-five-calculator',
+      category: 'School Board Metrics',
+      icon: Zap,
+      color: 'indigo',
+    },
+    {
+      title: 'JEE Main & NEET Rank vs Percentile Predictor',
+      description: 'Estimate your All India Rank (AIR), expected category cutoff, and NIT/AIIMS college admission tier based on NTA percentile or NEET score.',
+      badge: 'NTA Cutoff Calibrated',
+      href: '/tools/jee-neet-rank-predictor',
+      category: 'Competitive Entrance Exams',
+      icon: TrendingUp,
+      color: 'rose',
     },
     {
       title: 'SSB Armed Forces Age Eligibility Calculator',

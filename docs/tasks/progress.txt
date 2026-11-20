@@ -26,14 +26,41 @@
   - Implemented `@media print` styling in `app/globals.css` with A4 page margins, print color adjustments, automatic navbar/footer suppression, and break-inside avoidance for physical prints and clean PDF saving.
   - Verified `FormulaActionButtons` 1-click browser print integration, WhatsApp pre-filled study group message, Telegram share, and clipboard copy.
   - Verified live compilation and rendering on local server with HTTP 200.
-- [ ] [TASK-04] Viral Interactive Calculators Expansion (Board %, Best-of-Five, JEE/NEET Predictor)
+- [x] [TASK-04] Viral Interactive Calculators Expansion (Board %, Best-of-Five, JEE/NEET Predictor)
+  - Completed on 2026-11-20.
+  - Implemented 3 new viral academic calculators:
+    1. `BoardPercentageCalculator` (`/tools/board-percentage-calculator`): Class 10/12 aggregate marks, percentage, division, and distinction indicators across CBSE, ICSE, and State Boards.
+    2. `CbseBestOfFiveCalculator` (`/tools/cbse-best-of-five-calculator`): Statutory CBSE best-of-5 protocol with mandatory language retention and automatic skill/vocational subject replacement.
+    3. `JeeNeetRankPredictor` (`/tools/jee-neet-rank-predictor`): Accurate All India Rank (AIR) and admission college tier prediction for JEE Main (~14.5L candidates) and NEET UG (~24L candidates).
+  - Added `WebApplication` and `HowTo` JSON-LD structured schemas to each calculator page.
+  - Added viral WhatsApp sharing with pre-filled result messages.
+  - Verified with 4 new unit tests in `tests/unit/academic-calculators.test.ts` (all pass).
+- [ ] [TASK-05] Core Web Vitals & Chrome DevTools Performance Profiling (sub-100ms TTFB, 0 CLS, <1.2s LCP)
 - [x] [TASK-03] High-Yield Printable Formula Cheat Sheets & Viral PDF Generation (@media print + WhatsApp share)
   - Completed on 2026-11-20.
   - Implemented `@media print` styling in `app/globals.css` with A4 page margins, print color adjustments, automatic navbar/footer suppression, and break-inside avoidance for physical prints and clean PDF saving.
   - Verified `FormulaActionButtons` 1-click browser print integration, WhatsApp pre-filled study group message, Telegram share, and clipboard copy.
   - Verified live compilation and rendering on local server with HTTP 200.
-- [ ] [TASK-04] Viral Interactive Calculators Expansion (Board %, Best-of-Five, JEE/NEET Predictor)
-- [ ] [TASK-04] Viral Interactive Calculators Expansion (Board %, Best-of-Five, JEE/NEET Predictor)
+- [x] [TASK-04] Viral Interactive Calculators Expansion (Board %, Best-of-Five, JEE/NEET Predictor)
+  - Completed on 2026-11-20.
+  - Implemented 3 new viral academic calculators:
+    1. `BoardPercentageCalculator` (`/tools/board-percentage-calculator`): Class 10/12 aggregate marks, percentage, division, and distinction indicators across CBSE, ICSE, and State Boards.
+    2. `CbseBestOfFiveCalculator` (`/tools/cbse-best-of-five-calculator`): Statutory CBSE best-of-5 protocol with mandatory language retention and automatic skill/vocational subject replacement.
+    3. `JeeNeetRankPredictor` (`/tools/jee-neet-rank-predictor`): Accurate All India Rank (AIR) and admission college tier prediction for JEE Main (~14.5L candidates) and NEET UG (~24L candidates).
+  - Added `WebApplication` and `HowTo` JSON-LD structured schemas to each calculator page.
+  - Added viral WhatsApp sharing with pre-filled result messages.
+  - Verified with 4 new unit tests in `tests/unit/academic-calculators.test.ts` (all pass).
+- [ ] [TASK-05] Core Web Vitals & Chrome DevTools Performance Profiling (sub-100ms TTFB, 0 CLS, <1.2s LCP)
+- [x] [TASK-04] Viral Interactive Calculators Expansion (Board %, Best-of-Five, JEE/NEET Predictor)
+  - Completed on 2026-11-20.
+  - Implemented 3 new viral academic calculators:
+    1. `BoardPercentageCalculator` (`/tools/board-percentage-calculator`): Class 10/12 aggregate marks, percentage, division, and distinction indicators across CBSE, ICSE, and State Boards.
+    2. `CbseBestOfFiveCalculator` (`/tools/cbse-best-of-five-calculator`): Statutory CBSE best-of-5 protocol with mandatory language retention and automatic skill/vocational subject replacement.
+    3. `JeeNeetRankPredictor` (`/tools/jee-neet-rank-predictor`): Accurate All India Rank (AIR) and admission college tier prediction for JEE Main (~14.5L candidates) and NEET UG (~24L candidates).
+  - Added `WebApplication` and `HowTo` JSON-LD structured schemas to each calculator page.
+  - Added viral WhatsApp sharing with pre-filled result messages.
+  - Verified with 4 new unit tests in `tests/unit/academic-calculators.test.ts` (all pass).
+- [ ] [TASK-05] Core Web Vitals & Chrome DevTools Performance Profiling (sub-100ms TTFB, 0 CLS, <1.2s LCP)
 - [ ] [TASK-05] Core Web Vitals & Chrome DevTools Performance Profiling (sub-100ms TTFB, 0 CLS, <1.2s LCP)
 - [ ] [TASK-06] QAPage & Quiz Rich Results Schema Expansion
 - [ ] [TASK-07] WhatsApp Diagnostic Referral Loop Integration
