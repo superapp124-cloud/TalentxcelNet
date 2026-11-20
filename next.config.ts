@@ -46,23 +46,25 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      { protocol: 'https', hostname: 'wvuvriewskvvievacida.supabase.co' },
-      ...(process.env.NEXT_PUBLIC_SUPABASE_URL
-        ? [
-            {
-              protocol: 'https' as const,
-              hostname: (() => {
-                try {
-                  return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname
-                } catch {
-                  return 'wvuvriewskvvievacida.supabase.co'
-                }
-              })(),
-            },
-          ]
-        : []),
-    ],
+    remotePatterns: Array.from(
+      new Set(
+        [
+          'wvuvriewskvvievacida.supabase.co',
+          (() => {
+            try {
+              return process.env.NEXT_PUBLIC_SUPABASE_URL
+                ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+                : ''
+            } catch {
+              return ''
+            }
+          })(),
+        ].filter(Boolean)
+      )
+    ).map((hostname) => ({
+      protocol: 'https' as const,
+      hostname,
+    })),
   },
   experimental: {
     serverActions: { allowedOrigins: ['talentxcel.net', 'academy.talentxcel.net', 'ai.talentxcel.net', 'localhost:3000'] },

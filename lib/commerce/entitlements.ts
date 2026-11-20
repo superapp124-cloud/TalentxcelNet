@@ -66,7 +66,7 @@ export async function grantEntitlement(params: {
   // Store in memory cache
   const cacheKey = `${effectiveUserId}_${product.id}`
   MEMORY_ENTITLEMENTS.set(cacheKey, entitlement)
-  MEMORY_ENTITLEMENTS.set(effectiveUserId, entitlement)
+  MEMORY_ENTITLEMENTS.set(entitlement.id, entitlement)
   if (orderNumber) FULFILLED_ORDERS.set(orderNumber, entitlement)
   if (paymentId) FULFILLED_PAYMENTS.set(paymentId, entitlement)
 
@@ -148,7 +148,9 @@ export async function getActiveEntitlements(
       new Date(ent.validUntil) > now &&
       (ent.attemptsRemaining === -1 || ent.attemptsRemaining > 0)
     ) {
-      active.push(ent)
+      if (!active.some((e) => e.id === ent.id)) {
+        active.push(ent)
+      }
     }
   }
 
@@ -189,7 +191,8 @@ export async function getActiveEntitlements(
 
 /**
  * Revokes an entitlement durably upon payment refund, failure, or chargeback.
- * Updates both persistent database records and in-memory caches.
+ * Targets exclusively the specific entitlement tied to the order or payment ID,
+ * ensuring other active learner entitlements remain unaffected.
  */
 export async function revokeEntitlement(params: {
   orderNumber?: string
@@ -199,41 +202,64 @@ export async function revokeEntitlement(params: {
 }): Promise<boolean> {
   const { orderNumber, paymentId, userId, reason = 'refunded' } = params
   let memoryRevoked = false
+  let targetProductId: string | undefined
+  let targetUserId: string | undefined = userId
 
+  // 1. In-memory targeted revocation
   if (orderNumber && FULFILLED_ORDERS.has(orderNumber)) {
     const target = FULFILLED_ORDERS.get(orderNumber)!
     target.isActive = false
     target.attemptsRemaining = 0
+    targetProductId = target.productId
+    targetUserId = target.userId
     memoryRevoked = true
   }
+
   if (paymentId && FULFILLED_PAYMENTS.has(paymentId)) {
     const target = FULFILLED_PAYMENTS.get(paymentId)!
     target.isActive = false
     target.attemptsRemaining = 0
-    memoryRevoked = true
-  }
-  if (userId && MEMORY_ENTITLEMENTS.has(userId)) {
-    const target = MEMORY_ENTITLEMENTS.get(userId)!
-    target.isActive = false
-    target.attemptsRemaining = 0
+    if (!targetProductId) targetProductId = target.productId
+    if (!targetUserId) targetUserId = target.userId
     memoryRevoked = true
   }
 
-  // Durable database revocation
-  try {
-    const supabase = await createClient()
-    if (userId) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: entErr } = await (supabase.from('learner_entitlements') as any)
-        .update({ is_active: false, attempts_remaining: 0 })
-        .eq('user_identifier', userId)
-
-      if (entErr && process.env.NODE_ENV !== 'test') {
-        throw new Error(`Failed to revoke learner entitlement: ${entErr.message}`)
+  // Deactivate matching entry in MEMORY_ENTITLEMENTS without wiping other products
+  if (targetUserId && targetProductId) {
+    const cacheKey = `${targetUserId}_${targetProductId}`
+    const target = MEMORY_ENTITLEMENTS.get(cacheKey)
+    if (target) {
+      target.isActive = false
+      target.attemptsRemaining = 0
+      memoryRevoked = true
+    }
+  } else if (targetUserId && !orderNumber && !paymentId) {
+    // Blanket fallback only when no order or payment reference exists
+    for (const ent of MEMORY_ENTITLEMENTS.values()) {
+      if (ent.userId === targetUserId) {
+        ent.isActive = false
+        ent.attemptsRemaining = 0
+        memoryRevoked = true
       }
     }
+  }
+
+  // 2. Durable database revocation
+  try {
+    const supabase = await createClient()
 
     if (orderNumber) {
+      // Look up product_id and user_identifier from commercial_orders
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: ordData } = await (supabase.from('commercial_orders') as any)
+        .select('product_id, user_identifier')
+        .eq('order_number', orderNumber)
+        .maybeSingle()
+
+      const effectiveProdId = targetProductId || ordData?.product_id
+      const effectiveUser = targetUserId || ordData?.user_identifier
+
+      // Update commercial order status to refunded
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: ordErr } = await (supabase.from('commercial_orders') as any)
         .update({ status: 'refunded', updated_at: new Date().toISOString() })
@@ -241,6 +267,51 @@ export async function revokeEntitlement(params: {
 
       if (ordErr && process.env.NODE_ENV !== 'test') {
         throw new Error(`Failed to update commercial order status: ${ordErr.message}`)
+      }
+
+      // Revoke ONLY the specific entitlement tied to this product and user
+      if (effectiveProdId && effectiveUser) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: entErr } = await (supabase.from('learner_entitlements') as any)
+          .update({ is_active: false, attempts_remaining: 0 })
+          .eq('user_identifier', effectiveUser)
+          .eq('product_id', effectiveProdId)
+
+        if (entErr && process.env.NODE_ENV !== 'test') {
+          throw new Error(`Failed to revoke learner entitlement: ${entErr.message}`)
+        }
+      }
+    } else if (paymentId) {
+      // Look up commercial_orders by provider_payment_id
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: ordData } = await (supabase.from('commercial_orders') as any)
+        .select('product_id, user_identifier')
+        .eq('provider_payment_id', paymentId)
+        .maybeSingle()
+
+      const effectiveProdId = targetProductId || ordData?.product_id
+      const effectiveUser = targetUserId || ordData?.user_identifier
+
+      if (effectiveProdId && effectiveUser) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: entErr } = await (supabase.from('learner_entitlements') as any)
+          .update({ is_active: false, attempts_remaining: 0 })
+          .eq('user_identifier', effectiveUser)
+          .eq('product_id', effectiveProdId)
+
+        if (entErr && process.env.NODE_ENV !== 'test') {
+          throw new Error(`Failed to revoke learner entitlement: ${entErr.message}`)
+        }
+      }
+    } else if (userId) {
+      // Fallback only if neither orderNumber nor paymentId are provided
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: entErr } = await (supabase.from('learner_entitlements') as any)
+        .update({ is_active: false, attempts_remaining: 0 })
+        .eq('user_identifier', userId)
+
+      if (entErr && process.env.NODE_ENV !== 'test') {
+        throw new Error(`Failed to revoke learner entitlement: ${entErr.message}`)
       }
     }
   } catch (dbErr) {

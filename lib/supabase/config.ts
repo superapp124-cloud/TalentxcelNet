@@ -1,11 +1,13 @@
 type SupabaseConfig = { url: string; anonKey: string }
 
 export function getSupabaseConfig(): SupabaseConfig {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
-  if (!url || !anonKey) {
-    throw new Error('Supabase configuration is missing. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.')
-  }
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ||
+    'https://wvuvriewskvvievacida.supabase.co'
+  const anonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
+    'sb_publishable_2OGNulCHMN3ID-W8eRermg_28PD1wuM'
+
   try {
     new URL(url)
   } catch {

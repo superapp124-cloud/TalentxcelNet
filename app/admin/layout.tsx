@@ -26,6 +26,8 @@ const navItems = [
   { label: 'Super AI Analytics', href: '/admin/ai-analytics', icon: Cpu },
 ]
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdminPage('/admin')
   return (

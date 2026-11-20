@@ -7,6 +7,7 @@ import {
   completeWebhookProcessing,
   failWebhookProcessing,
   generateWorkerId,
+  executeAtomicPaymentCaptured,
 } from '@/lib/commerce/webhook-idempotency'
 
 const MAX_WEBHOOK_PAYLOAD_BYTES = 128 * 1024 // 128 KB
@@ -135,80 +136,14 @@ export async function POST(req: NextRequest) {
     // 5. Execute Business Operations (Fails with 5xx on error so provider retries)
     try {
       if (event.event === 'payment.captured' || event.event === 'order.paid') {
-        if (process.env.TEST_SIMULATE_DB_FAILURE === 'true') {
-          throw new Error('Database connection failed during order update')
-        }
-
-        try {
-          const supabase = await createClient()
-
-          // Update order status to paid
-          if (orderNumber) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error: orderErr } = await (supabase.from('orders') as any)
-              .update({
-                status: 'paid',
-                updated_at: new Date().toISOString(),
-              })
-              .eq('order_number', orderNumber)
-
-            if (orderErr) {
-              throw new Error(`Failed to update order status: ${orderErr.message}`)
-            }
-          }
-
-          // Insert audit payment transaction
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: txErr } = await (supabase.from('payment_transactions') as any).insert({
-            amount_cents: amountPaise,
-            status: 'succeeded',
-            provider: 'razorpay',
-            transaction_reference: paymentId,
-            metadata: {
-              orderNumber,
-              userId,
-              programmeSlug,
-              event: event.event,
-            },
-          })
-
-          if (txErr) {
-            throw new Error(`Failed to record payment transaction: ${txErr.message}`)
-          }
-
-          // Activate learner enrolment
-          if (userId && programmeSlug) {
-            const { data: prog } = (await supabase
-              .from('programmes')
-              .select('id')
-              .eq('slug', programmeSlug)
-              .maybeSingle()) as { data: { id: string } | null }
-
-            const programmeId = prog?.id || '00000000-0000-0000-0000-000000000001'
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error: enrolErr } = await (supabase.from('learning_enrolments') as any).upsert(
-              {
-                learner_id: userId,
-                programme_id: programmeId,
-                status: 'active',
-                progress_percentage: 0,
-              },
-              { onConflict: 'learner_id,programme_id' }
-            )
-
-            if (enrolErr) {
-              throw new Error(`Failed to upsert learner enrolment: ${enrolErr.message}`)
-            }
-          }
-        } catch (dbErr: any) {
-          if (process.env.NODE_ENV === 'test') {
-            // In unit test runner without live network connection, allow business logic fallback
-          } else {
-            // In staging & production, fail-closed: rethrow so 5xx is returned and Razorpay retries
-            throw dbErr
-          }
-        }
+        await executeAtomicPaymentCaptured({
+          orderNumber,
+          paymentId,
+          userId,
+          programmeSlug,
+          amountPaise,
+          eventName: event.event,
+        })
       } else if (event.event === 'payment.failed') {
         try {
           const supabase = await createClient()
@@ -255,12 +190,16 @@ export async function POST(req: NextRequest) {
       console.error(`[Commerce Webhook] Operation failure for event ${eventId}:`, errMsg)
 
       // Release lease and mark failed so future provider retries can be processed
-      await failWebhookProcessing({
-        provider: 'razorpay',
-        eventId,
-        workerId,
-        errorMessage: errMsg,
-      })
+      try {
+        await failWebhookProcessing({
+          provider: 'razorpay',
+          eventId,
+          workerId,
+          errorMessage: errMsg,
+        })
+      } catch (leaseErr) {
+        console.error(`[Commerce Webhook] Error releasing lease after operation failure:`, leaseErr)
+      }
 
       return NextResponse.json(
         { error: 'Webhook processing failed, retry requested', details: errMsg },

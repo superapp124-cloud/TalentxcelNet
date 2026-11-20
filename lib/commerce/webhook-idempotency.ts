@@ -112,32 +112,84 @@ export async function completeWebhookProcessing(params: {
 
 /**
  * Releases the lease and marks status as failed so subsequent provider retries can acquire it.
+ * Verifies the database RPC execution and throws if the lease cannot be released.
  */
 export async function failWebhookProcessing(params: {
   provider: string
   eventId: string
   workerId: string
   errorMessage: string
-}): Promise<void> {
+}): Promise<boolean> {
   const { provider, eventId, workerId, errorMessage } = params
 
   if (process.env.NODE_ENV === 'test' && !process.env.TEST_USE_LIVE_DB) {
-    failMockWebhookProcessing(provider, eventId, workerId, errorMessage)
-    return
+    return failMockWebhookProcessing(provider, eventId, workerId, errorMessage)
   }
 
-  try {
-    const supabase = await createClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.rpc as any)('fail_webhook_processing', {
-      p_provider: provider,
-      p_event_id: eventId,
-      p_worker_id: workerId,
-      p_error: errorMessage,
-    })
-  } catch (err) {
-    console.warn(`[Webhook Lease] Warning: failed to mark lease as failed in database:`, err)
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: success, error } = await (supabase.rpc as any)('fail_webhook_processing', {
+    p_provider: provider,
+    p_event_id: eventId,
+    p_worker_id: workerId,
+    p_error: errorMessage,
+  })
+
+  if (error) {
+    console.error(`[Webhook Lease] Error marking lease as failed:`, error)
+    throw new Error(`Failed to record webhook failure in database: ${error.message}`)
   }
+
+  if (!success) {
+    console.warn(`[Webhook Lease] Warning: fail_webhook_processing affected 0 rows for ${provider}:${eventId}`)
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Executes payment captured side effects within an atomic PostgreSQL transaction.
+ */
+export async function executeAtomicPaymentCaptured(params: {
+  orderNumber?: string
+  paymentId: string
+  userId?: string
+  programmeSlug?: string
+  amountPaise: number
+  eventName?: string
+}): Promise<{ success: boolean; order_number?: string; payment_id: string }> {
+  const { orderNumber = '', paymentId, userId = '', programmeSlug = '', amountPaise, eventName = 'payment.captured' } = params
+
+  if (process.env.TEST_SIMULATE_DB_FAILURE === 'true') {
+    throw new Error('Database connection failed during payment capture transaction')
+  }
+
+  if (process.env.NODE_ENV === 'test' && !process.env.TEST_USE_LIVE_DB) {
+    return {
+      success: true,
+      order_number: orderNumber,
+      payment_id: paymentId,
+    }
+  }
+
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('apply_payment_captured_transaction', {
+    p_order_number: orderNumber,
+    p_payment_id: paymentId,
+    p_user_id: userId,
+    p_programme_slug: programmeSlug,
+    p_amount_cents: amountPaise,
+    p_event_name: eventName,
+  })
+
+  if (error) {
+    console.error(`[Commerce] Atomic payment captured transaction failed:`, error)
+    throw new Error(`Payment transaction execution failed: ${error.message}`)
+  }
+
+  return data || { success: true, order_number: orderNumber, payment_id: paymentId }
 }
 
 // ============================================================================
@@ -203,15 +255,17 @@ function failMockWebhookProcessing(
   provider: string,
   eventId: string,
   workerId: string,
-  errorMessage: string
-): void {
+  _errorMessage: string
+): boolean {
   const key = `${provider}:${eventId}`
   const existing = MOCK_LEASE_STORE.get(key)
-  if (existing && existing.leaseOwner === workerId) {
-    existing.status = 'failed'
-    // Expire lease immediately so retry can acquire
-    existing.leaseExpiresAt = Date.now() - 1000
+  if (!existing || existing.leaseOwner !== workerId) {
+    throw new Error('Failed to record webhook failure in database: Lease lock not held by caller')
   }
+  existing.status = 'failed'
+  // Expire lease immediately so retry can acquire
+  existing.leaseExpiresAt = Date.now() - 1000
+  return true
 }
 
 export function resetWebhookIdempotencyClaimsForTesting(): void {

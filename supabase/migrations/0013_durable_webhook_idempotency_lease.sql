@@ -1,5 +1,6 @@
 -- Migration 0013: Durable Webhook Idempotency Leasing & State Machine
--- Guarantees atomic, exclusive event claims, concurrent worker safety, and replay protection.
+-- Guarantees atomic, exclusive event claims, concurrent worker safety, replay protection,
+-- and atomic payment-captured transactional writes.
 
 CREATE TABLE IF NOT EXISTS payment_webhook_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -24,12 +25,13 @@ CREATE INDEX IF NOT EXISTS idx_payment_webhook_events_lookup
 CREATE INDEX IF NOT EXISTS idx_payment_webhook_events_lease
   ON payment_webhook_events(status, lease_expires_at);
 
--- RLS: Enabled for security, with server/service role access
+-- RLS: Enabled for strict security, restricted exclusively to service_role (no public access)
 ALTER TABLE payment_webhook_events ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "webhooks_service_access" ON payment_webhook_events;
-CREATE POLICY "webhooks_service_access" ON payment_webhook_events
-  FOR ALL TO public
+DROP POLICY IF EXISTS "webhooks_service_role" ON payment_webhook_events;
+CREATE POLICY "webhooks_service_role" ON payment_webhook_events
+  FOR ALL TO service_role
   USING (true)
   WITH CHECK (true);
 
@@ -50,6 +52,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_now TIMESTAMPTZ := NOW();
@@ -132,6 +135,7 @@ CREATE OR REPLACE FUNCTION complete_webhook_processing(
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_updated INT;
@@ -162,6 +166,7 @@ CREATE OR REPLACE FUNCTION fail_webhook_processing(
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_updated INT;
@@ -179,3 +184,107 @@ BEGIN
   RETURN v_updated > 0;
 END;
 $$;
+
+-- RPC 4: Transactionally atomic payment captured execution
+-- Combines order status update, idempotent payment transaction insert, and enrolment upsert
+CREATE OR REPLACE FUNCTION apply_payment_captured_transaction(
+  p_order_number TEXT,
+  p_payment_id TEXT,
+  p_user_id TEXT,
+  p_programme_slug TEXT,
+  p_amount_cents INT,
+  p_event_name TEXT DEFAULT 'payment.captured'
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_programme_id UUID;
+  v_now TIMESTAMPTZ := NOW();
+BEGIN
+  -- 1. Update order status to paid (if order_number provided)
+  IF p_order_number IS NOT NULL AND p_order_number <> '' THEN
+    UPDATE orders
+    SET status = 'paid', updated_at = v_now
+    WHERE order_number = p_order_number;
+  END IF;
+
+  -- 2. Insert payment transaction with transaction_reference idempotency
+  INSERT INTO payment_transactions (
+    amount_cents,
+    status,
+    provider,
+    transaction_reference,
+    metadata,
+    created_at
+  )
+  VALUES (
+    p_amount_cents,
+    'succeeded',
+    'razorpay',
+    p_payment_id,
+    jsonb_build_object(
+      'orderNumber', p_order_number,
+      'userId', p_user_id,
+      'programmeSlug', p_programme_slug,
+      'event', p_event_name
+    ),
+    v_now
+  )
+  ON CONFLICT (transaction_reference) DO NOTHING;
+
+  -- 3. Upsert learning enrolment (if user and programme provided)
+  IF p_user_id IS NOT NULL AND p_user_id <> '' AND p_programme_slug IS NOT NULL AND p_programme_slug <> '' THEN
+    SELECT id INTO v_programme_id
+    FROM programmes
+    WHERE slug = p_programme_slug
+    LIMIT 1;
+
+    IF v_programme_id IS NULL THEN
+      v_programme_id := '00000000-0000-0000-0000-000000000001'::UUID;
+    END IF;
+
+    INSERT INTO learning_enrolments (
+      learner_id,
+      programme_id,
+      status,
+      progress_percentage,
+      created_at,
+      updated_at
+    )
+    VALUES (
+      p_user_id,
+      v_programme_id,
+      'active',
+      0,
+      v_now,
+      v_now
+    )
+    ON CONFLICT (learner_id, programme_id)
+    DO UPDATE SET
+      status = 'active',
+      updated_at = v_now;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'order_number', p_order_number,
+    'payment_id', p_payment_id
+  );
+END;
+$$;
+
+-- Security Hardening: Revoke public execution on all SECURITY DEFINER RPCs and grant to service_role
+REVOKE ALL ON FUNCTION acquire_webhook_processing_lease(TEXT, TEXT, TEXT, JSONB, TEXT, INT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION acquire_webhook_processing_lease(TEXT, TEXT, TEXT, JSONB, TEXT, INT) TO service_role;
+
+REVOKE ALL ON FUNCTION complete_webhook_processing(TEXT, TEXT, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION complete_webhook_processing(TEXT, TEXT, TEXT) TO service_role;
+
+REVOKE ALL ON FUNCTION fail_webhook_processing(TEXT, TEXT, TEXT, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION fail_webhook_processing(TEXT, TEXT, TEXT, TEXT) TO service_role;
+
+REVOKE ALL ON FUNCTION apply_payment_captured_transaction(TEXT, TEXT, TEXT, TEXT, INT, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION apply_payment_captured_transaction(TEXT, TEXT, TEXT, TEXT, INT, TEXT) TO service_role;

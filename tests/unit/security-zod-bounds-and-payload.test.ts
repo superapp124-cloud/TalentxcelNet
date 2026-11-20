@@ -1,11 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { NextRequest } from 'next/server'
-import {
-  parseJsonWithLimit,
-  DEFAULT_MAX_PAYLOAD_BYTES,
-  ANALYTICS_MAX_PAYLOAD_BYTES,
-  SKILLS_MAX_PAYLOAD_BYTES,
-} from '../../lib/security/request-validator'
+import { parseJsonWithLimit } from '../../lib/security/request-validator'
 import { POST as backpackEvaluatePOST } from '../../app/api/skills/backpack/evaluate/route'
 import { POST as assessmentAttemptPOST } from '../../app/api/academic/assessment-attempt/route'
 import { POST as funnelPOST } from '../../app/api/analytics/funnel/route'
@@ -103,7 +98,7 @@ describe('Defense-in-Depth Payload Size & Zod Collection Limits (GHSA-mrhx-c7xc-
         },
         body: stream,
         duplex: 'half',
-      } as any)
+      } as unknown as ConstructorParameters<typeof NextRequest>[1])
 
       const res = await parseJsonWithLimit(req, 1000)
       expect(res.success).toBe(false)

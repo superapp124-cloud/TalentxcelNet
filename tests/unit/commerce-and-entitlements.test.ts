@@ -2,9 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import crypto from 'crypto'
 import { NextRequest } from 'next/server'
 import {
-  ASSESSMENT_PRODUCTS,
-  SKILL_PRODUCTS,
-  ACADEMIC_PRODUCTS,
   ALL_COMMERCIAL_PRODUCTS,
   calculateCommercialOrderSummary,
 } from '../../packages/core/src/data/product-catalog'
@@ -23,8 +20,8 @@ import {
   failWebhookProcessing,
   expireWebhookLeaseForTesting,
   resetWebhookIdempotencyClaimsForTesting,
+  executeAtomicPaymentCaptured,
 } from '../../lib/commerce/webhook-idempotency'
-import { POST as verifyPaymentPOST } from '../../app/api/checkout/verify-payment/route'
 import { POST as webhookPOST } from '../../app/api/commerce/webhook/route'
 
 describe('TalentXcel Day-1 Commercial Product Catalog', () => {
@@ -677,5 +674,103 @@ describe('Webhook Authentication, Durable Idempotency & Failure Handling (/api/c
 
     // Clean up
     delete process.env.TEST_SIMULATE_DB_FAILURE
+  })
+
+  it('targeted refund revokes only the entitlement tied to the refunded order, preserving other learner products', async () => {
+    const learnerId = `learner_multi_${Date.now()}`
+    const orderA = `ORD-MULTI-A-${Date.now()}`
+    const orderB = `ORD-MULTI-B-${Date.now()}`
+
+    // Grant Product A (Single Assessment: 1 attempt)
+    const entA = await grantEntitlement({
+      orderNumber: orderA,
+      paymentId: `pay_A_${Date.now()}`,
+      productId: 'prod_assess_single',
+      userId: learnerId,
+    })
+    expect(entA.isActive).toBe(true)
+    expect(entA.attemptsRemaining).toBe(1)
+
+    // Grant Product B (Plus Assessment Pack: 12 attempts)
+    const entB = await grantEntitlement({
+      orderNumber: orderB,
+      paymentId: `pay_B_${Date.now()}`,
+      productId: 'prod_assess_plus',
+      userId: learnerId,
+    })
+    expect(entB.isActive).toBe(true)
+    expect(entB.attemptsRemaining).toBe(12)
+
+    // Verify learner has 2 active entitlements
+    let active = await getActiveEntitlements(learnerId)
+    expect(active.length).toBe(2)
+
+    // Refund Order A
+    const revoked = await revokeEntitlement({
+      orderNumber: orderA,
+      userId: learnerId,
+      reason: 'refunded',
+    })
+    expect(revoked).toBe(true)
+
+    // Assert: Product A is revoked, but Product B REMAINS ACTIVE with 12 attempts intact
+    active = await getActiveEntitlements(learnerId)
+    expect(active.length).toBe(1)
+    expect(active[0].productId).toBe('prod_assess_plus')
+    expect(active[0].attemptsRemaining).toBe(12)
+    expect(active[0].isActive).toBe(true)
+  })
+
+  it('rejects lease failure requests from unauthorized workers not holding the lease', async () => {
+    const eventId = `evt_fail_auth_${Date.now()}`
+    const worker1 = 'worker_auth_1'
+    const worker2 = 'worker_auth_2'
+
+    // Worker 1 acquires lease
+    const claim = await acquireWebhookLease({
+      provider: 'razorpay',
+      eventId,
+      eventType: 'payment.captured',
+      payload: { id: eventId },
+      workerId: worker1,
+    })
+    expect(claim.outcome).toBe('acquired')
+
+    // Worker 2 attempts to fail worker 1's lease -> MUST REJECT
+    await expect(
+      failWebhookProcessing({
+        provider: 'razorpay',
+        eventId,
+        workerId: worker2,
+        errorMessage: 'Unauthorized fail attempt',
+      })
+    ).rejects.toThrow(/Lease lock not held/)
+
+    // Worker 1 fails its own lease -> MUST SUCCEED
+    const success = await failWebhookProcessing({
+      provider: 'razorpay',
+      eventId,
+      workerId: worker1,
+      errorMessage: 'Authorized worker failed task',
+    })
+    expect(success).toBe(true)
+  })
+
+  it('executes atomic payment captured transactions idempotently', async () => {
+    const orderNum = `ORD-ATOMIC-${Date.now()}`
+    const payId = `pay_atomic_${Date.now()}`
+
+    const result = await executeAtomicPaymentCaptured({
+      orderNumber: orderNum,
+      paymentId: payId,
+      userId: 'usr_atomic_test',
+      programmeSlug: 'class-10-foundation',
+      amountPaise: 2400,
+      eventName: 'payment.captured',
+    })
+
+    expect(result.success).toBe(true)
+    expect(result.order_number).toBe(orderNum)
+    expect(result.payment_id).toBe(payId)
   })
 })

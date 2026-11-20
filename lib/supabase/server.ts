@@ -8,7 +8,15 @@ export async function createClient() {
   let cookieStore: any = null
   try {
     cookieStore = await cookies()
-  } catch {
+  } catch (err: unknown) {
+    // If Next.js threw a dynamic server usage bailout, rethrow to preserve dynamic rendering
+    if (
+      err &&
+      typeof err === 'object' &&
+      ('digest' in err || ('message' in err && String((err as Error).message).includes('Dynamic server usage')))
+    ) {
+      throw err
+    }
     // Request cookie store is not available in server-to-server webhooks or test runner contexts
   }
 
