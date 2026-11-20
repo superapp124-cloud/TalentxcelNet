@@ -90,6 +90,8 @@ export default async function QuestionPage({ params }: PageProps) {
       answerCount: 1,
       upvoteCount: 42,
       dateCreated: '2026-01-15T08:00:00+05:30',
+      datePublished: '2026-01-15T08:00:00+05:30',
+      dateModified: '2026-11-20T10:00:00+05:30',
       author: {
         '@type': 'Organization',
         name: 'TalentXcel Academic Faculty',
@@ -104,6 +106,8 @@ export default async function QuestionPage({ params }: PageProps) {
         '@type': 'Answer',
         text: q.explanation || q.solutionSteps.join(' '),
         dateCreated: '2026-01-15T09:00:00+05:30',
+        datePublished: '2026-01-15T09:00:00+05:30',
+        dateModified: '2026-11-20T10:00:00+05:30',
         upvoteCount: 48,
         url: `https://talentxcel.net/question/${id}#solution`,
         author: {
