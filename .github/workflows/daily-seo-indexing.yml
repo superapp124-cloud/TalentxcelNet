@@ -1,0 +1,40 @@
+name: Daily SEO Indexing & Crawl Trigger
+
+on:
+  schedule:
+    # Run every day at 04:00 UTC (09:30 AM IST)
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  indexnow:
+    name: Submit IndexNow & GSC Pings
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Ping Search Engine Sitemaps
+        run: |
+          echo "Pinging Google & Bing Sitemaps..."
+          curl -s -o /dev/null -w "Bing Sitemap Ping HTTP Status: %{http_code}\n" "https://www.bing.com/ping?sitemap=https%3A%2F%2Ftalentxcel.net%2Fsitemap.xml" || true
+          curl -s -o /dev/null -w "Bing Index Sitemap Ping HTTP Status: %{http_code}\n" "https://www.bing.com/ping?sitemap=https%3A%2F%2Ftalentxcel.net%2Fsitemap-index.xml" || true
+
+      - name: Run Programmatic IndexNow Submitter
+        run: node scripts/indexnow-submitter.mjs
+        continue-on-error: true

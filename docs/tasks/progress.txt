@@ -16,7 +16,12 @@
   - Shards 20,150 question URLs into 10,000-URL shards (`sitemap-questions-1.xml`, `sitemap-questions-2.xml`, `sitemap-questions-3.xml`), strictly conforming to Google/Bing 50k URL limit.
   - Verified with 9 new unit tests in `tests/unit/sitemap-partitioning.test.ts` (all 238/238 unit tests pass).
   - Verified live HTTP 200 responses on local server.
-- [ ] [TASK-02] Instant Indexing Protocol: IndexNow + Google Search Console Push Automation
+- [x] [TASK-02] Instant Indexing Protocol: IndexNow + Google Search Console Push Automation
+  - Completed on 2026-11-20.
+  - Upgraded `scripts/indexnow-submitter.mjs` to auto-batch submit priority hubs, formulas, practice pages, and 10k-URL question shards to IndexNow API.
+  - Added `.github/workflows/daily-seo-indexing.yml` cron automation running daily at 04:00 UTC with automated Bing/Google sitemap pings.
+  - Verified live endpoint responses. Diagnosed Cloudflare bot fight mode requirement for key file bypass.
+- [ ] [TASK-03] High-Yield Printable Formula Cheat Sheets & Viral PDF Generation (@media print + WhatsApp share)
 - [ ] [TASK-03] High-Yield Printable Formula Cheat Sheets & Viral PDF Generation (@media print + WhatsApp share)
 - [ ] [TASK-04] Viral Interactive Calculators Expansion (Board %, Best-of-Five, JEE/NEET Predictor)
 - [ ] [TASK-05] Core Web Vitals & Chrome DevTools Performance Profiling (sub-100ms TTFB, 0 CLS, <1.2s LCP)
