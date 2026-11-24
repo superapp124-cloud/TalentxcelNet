@@ -88,6 +88,7 @@ async function run() {
     const highPriorityUrls = [
       'https://talentxcel.net',
       'https://talentxcel.net/practice',
+      'https://talentxcel.net/challenge',
       'https://talentxcel.net/competitive',
       'https://talentxcel.net/competitive/ssb-oir',
       'https://talentxcel.net/competitive/ssb-oir/verbal-reasoning',

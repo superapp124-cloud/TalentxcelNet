@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { NcertActionBar } from '@/components/solutions/ncert-action-bar'
 import {
   ACADEMIC_CLASSES,
   getCurriculumChapters,
@@ -178,6 +179,13 @@ export default async function NcertChapterSolutionsPage({ params }: PageProps) {
                 View Chapter Formula Sheet
               </Button>
             </Link>
+
+            <NcertActionBar
+              classNum={classNum}
+              subjectName={subjectName}
+              chapterTitle={cleanTitle}
+              chapterUrl={`https://talentxcel.net/solutions/ncert/class-${classNum}/${subject}/${chapter.id}`}
+            />
           </div>
         </header>
 
@@ -246,6 +254,53 @@ export default async function NcertChapterSolutionsPage({ params }: PageProps) {
             })}
           </div>
         </div>
+
+        {/* Full Syllabus NCERT Chapters Highway */}
+        <section className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                All NCERT Textbook Chapters — Class {classNum} {subjectName}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Exercise-by-exercise solutions, formulas, and video explanations for the complete syllabus
+              </p>
+            </div>
+            <Link
+              href={`/formulas/class-${classNum}/${subject}`}
+              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 shrink-0"
+            >
+              Formula Sheet <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+            {chapters.map((ch) => {
+              const isCurrent = ch.id === chapter.id
+              return (
+                <Link
+                  key={ch.id}
+                  href={`/solutions/ncert/class-${classNum}/${subject}/${ch.id}`}
+                  className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between group ${
+                    isCurrent
+                      ? 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-400 dark:border-blue-700 font-semibold'
+                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-500'
+                  }`}
+                >
+                  <div className="min-w-0 pr-2">
+                    <span className="text-[10px] font-bold text-blue-600 uppercase block">
+                      Chapter {ch.chapterNumber}
+                    </span>
+                    <span className="text-xs text-slate-800 dark:text-slate-200 truncate block group-hover:text-blue-600 transition-colors">
+                      {ch.title.split(':')[0]}
+                    </span>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 shrink-0 group-hover:translate-x-0.5 transition-all" />
+                </Link>
+              )
+            })}
+          </div>
+        </section>
 
         {/* Bottom Banner */}
         <div className="rounded-3xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-8 text-white text-center space-y-4 shadow-xl">

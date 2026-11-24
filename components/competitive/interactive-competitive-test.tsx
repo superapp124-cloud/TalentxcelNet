@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { RazorpayCheckoutModal } from '@/components/commerce/razorpay-checkout-modal'
 import type { CompetitiveQuestion } from '@/lib/competitive/exam-data'
 
 interface InteractiveCompetitiveTestProps {
@@ -42,6 +43,8 @@ export function InteractiveCompetitiveTest({
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(timeLimitMinutes * 60)
   const [isTimerRunning, setIsTimerRunning] = useState(true)
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [checkoutProductId, setCheckoutProductId] = useState<string | null>(null)
 
   // Countdown timer
   useEffect(() => {
@@ -89,10 +92,10 @@ export function InteractiveCompetitiveTest({
   const isCurrentCorrect = isCurrentSubmitted && currentChosen === currentQ.correctIndex
 
   const shareUrl = `https://talentxcel.net/competitive/${examSlug}`
-  const shareText = `I just tested my skills on ${sectionTitle} for ${examTitle} on TalentXcel! Can you beat my score? Try it free here: ${shareUrl}`
+  const shareText = `⚡ I just tested my skills on ${sectionTitle} for ${examTitle} on TalentXcel! Can you beat my score? Try the timed mock test here:\n👉 ${shareUrl}`
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6 pb-20 sm:pb-8">
       {/* Test Status Banner */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900 text-white border border-slate-800 shadow-lg">
         <div className="space-y-1">
@@ -120,46 +123,22 @@ export function InteractiveCompetitiveTest({
         </div>
       </div>
 
-      {/* Question Navigation Bubbles */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {questions.map((q, idx) => {
-          const isDone = submittedQuestions[q.id]
-          const isRight = isDone && selectedAnswers[q.id] === q.correctIndex
-          const isWrong = isDone && !isRight
-          const isActive = activeQuestionIndex === idx
-
-          let bg = 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-          if (isActive) bg = 'ring-2 ring-blue-600 bg-blue-50 text-blue-700 font-bold'
-          if (isRight) bg = 'bg-emerald-600 text-white font-bold'
-          if (isWrong) bg = 'bg-rose-600 text-white font-bold'
-
-          return (
-            <button
-              key={q.id}
-              onClick={() => setActiveQuestionIndex(idx)}
-              className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 text-xs transition-all ${bg}`}
-            >
-              {idx + 1}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Main Active Question Box */}
+      {/* Main Question Surface */}
       <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs uppercase font-semibold">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Pattern Drill • {currentQ.patternYear || 'Standard Pattern'}
+            </span>
+            <Badge variant="outline" className="text-[10px] capitalize">
               {currentQ.difficulty}
             </Badge>
-            {currentQ.patternYear && (
-              <Badge className="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 text-[10px]">
-                {currentQ.patternYear}
-              </Badge>
-            )}
           </div>
-          <div className="text-xs font-semibold text-slate-500">
-            +{currentQ.marks} Marks {currentQ.negativeMarks > 0 && `| -${currentQ.negativeMarks} Neg`}
+          <div className="flex items-center gap-2 text-xs font-bold">
+            <span className="text-emerald-600 dark:text-emerald-400">+{currentQ.marks} Marks</span>
+            {currentQ.negativeMarks > 0 && (
+              <span className="text-rose-500 font-normal">(-{currentQ.negativeMarks} Negative)</span>
+            )}
           </div>
         </div>
 
@@ -168,7 +147,7 @@ export function InteractiveCompetitiveTest({
           {currentQ.questionText}
         </h3>
 
-        {/* Options */}
+        {/* Options Grid */}
         <div className="grid grid-cols-1 gap-3">
           {currentQ.options.map((option, optIdx) => {
             const isSelected = currentChosen === optIdx
@@ -308,23 +287,31 @@ export function InteractiveCompetitiveTest({
         </a>
       </div>
 
-      {/* Freemium Unlock Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-xl space-y-4">
+      {/* Freemium Unlock Banner with 1-Click Instant UPI Pass (₹49) */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-xl space-y-4">
         <div className="flex items-center gap-2 text-xs font-semibold text-amber-300">
           <Trophy className="h-4 w-4" />
           Full {examTitle} Test Series & Question Bank
         </div>
-        <h3 className="text-lg sm:text-xl font-extrabold">
-          Get Instant Access to 500+ Official Exam Questions & Socratic Video Proofs
+        <h3 className="text-lg sm:text-2xl font-extrabold tracking-tight">
+          Instant Access to 500+ Official Exam Questions, Scoring & Step Derivations
         </h3>
         <p className="text-xs sm:text-sm text-blue-100 max-w-2xl leading-relaxed">
-          Create your free account today to receive ₹20 bonus learning credit, unlock complete All-India rank percentiles, and download high-yield PDF cheat sheets.
+          Unlock the full timed test series, All-India rank percentiles, and high-yield PDF cheat sheets with instant UPI unlock or free sign up.
         </p>
         <div className="pt-2 flex flex-wrap items-center gap-3">
+          <Button
+            onClick={() => setCheckoutProductId('prod_assess_preboard_49')}
+            className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black shadow-lg gap-2 text-xs px-6 py-2.5"
+          >
+            <Zap className="h-4 w-4 fill-slate-950" />
+            <span>Instant UPI Unlock: ₹49 Pass</span>
+          </Button>
+
           <Link href="/auth/register?referral=competitive_seo">
-            <Button className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold shadow-md">
+            <Button className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold shadow-md text-xs">
               Sign Up Free (Claim ₹20 Pass Credit)
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-4 w-4 ml-1.5" />
             </Button>
           </Link>
           <Link href={`/competitive/${examSlug}`}>
@@ -348,18 +335,29 @@ export function InteractiveCompetitiveTest({
                 Unlock Complete 500+ Test Bank & Solutions
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                Free diagnostic accounts receive full step-by-step video proofs, negative marking analytics, and ₹20 bonus credit towards premium test series.
+                Choose 1-click UPI unlock for instant access, or create a free account to claim ₹20 bonus credit.
               </p>
             </div>
 
             <div className="space-y-2.5">
+              <Button
+                onClick={() => {
+                  setShowAuthGate(false)
+                  setCheckoutProductId('prod_assess_preboard_49')
+                }}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-5 rounded-xl text-xs gap-2 shadow-lg shadow-emerald-600/30"
+              >
+                <Zap className="h-4 w-4" />
+                <span>Instant UPI Unlock: ₹49 Pass</span>
+              </Button>
+
               <Link href={`/auth/register?redirect=competitive/${examSlug}`} className="w-full block">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-xl">
+                <Button variant="outline" className="w-full text-slate-800 dark:text-slate-200 font-bold py-4 rounded-xl text-xs">
                   Sign Up in 1 Click (Get ₹20 Credit)
                 </Button>
               </Link>
               <Link href={`/auth/login?redirect=competitive/${examSlug}`} className="w-full block">
-                <Button variant="ghost" className="w-full text-slate-600 dark:text-slate-300 text-xs">
+                <Button variant="ghost" className="w-full text-slate-500 text-xs">
                   Already have an account? Sign in
                 </Button>
               </Link>
@@ -374,6 +372,45 @@ export function InteractiveCompetitiveTest({
           </div>
         </div>
       )}
+
+      {/* Sticky Bottom Bar on Mobile for Instant UPI Access */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between gap-3 shadow-2xl">
+        <div className="flex flex-col">
+          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{examTitle}</span>
+          <span className="text-xs font-black text-slate-900 dark:text-white">₹49 All Tests Pass</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <a
+            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button size="sm" variant="outline" className="text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800 h-9 px-2.5">
+              <Share2 className="h-4 w-4" />
+            </Button>
+          </a>
+
+          <Button
+            size="sm"
+            onClick={() => setCheckoutProductId('prod_assess_preboard_49')}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-4 gap-1.5 shadow-md"
+          >
+            <Zap className="h-3.5 w-3.5" />
+            <span>Unlock ₹49</span>
+          </Button>
+        </div>
+      </div>
+
+      <RazorpayCheckoutModal
+        isOpen={Boolean(checkoutProductId)}
+        onClose={() => setCheckoutProductId(null)}
+        productId={checkoutProductId}
+        onSuccess={() => {
+          setIsUnlocked(true)
+          setCheckoutProductId(null)
+        }}
+      />
     </div>
   )
 }

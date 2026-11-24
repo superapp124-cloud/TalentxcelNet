@@ -85,6 +85,7 @@ export function getCoreSitemapUrls(): SitemapEntry[] {
   const staticPublicPages: SitemapEntry[] = [
     { url: `${BASE_URL}`, changeFrequency: 'daily', priority: 1.0, lastModified: today },
     { url: `${BASE_URL}/practice`, changeFrequency: 'daily', priority: 1.0, lastModified: today },
+    { url: `${BASE_URL}/challenge`, changeFrequency: 'daily', priority: 1.0, lastModified: today },
     { url: `${BASE_URL}/assessment`, changeFrequency: 'daily', priority: 1.0, lastModified: today },
     { url: `${BASE_URL}/skills`, changeFrequency: 'daily', priority: 0.95, lastModified: today },
     { url: `${BASE_URL}/academic`, changeFrequency: 'daily', priority: 0.95, lastModified: today },
