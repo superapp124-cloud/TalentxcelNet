@@ -28,11 +28,11 @@ export function parseQuestionId(id: string, defaultBoard: BoardCode = 'CBSE'): P
 
   let subjectCode: SubjectCode = 'science'
   const s = rawSubj.toLowerCase()
-  if (s === 'math') subjectCode = 'math'
-  else if (s === 'sci') subjectCode = 'science'
-  else if (s === 'eng') subjectCode = 'english'
-  else if (s === 'hin') subjectCode = 'hindi'
-  else if (s === 'soc') subjectCode = 'social_science'
+  if (s === 'math' || s === 'maths') subjectCode = 'math'
+  else if (s === 'sci' || s === 'science') subjectCode = 'science'
+  else if (s === 'eng' || s === 'english') subjectCode = 'english'
+  else if (s === 'hin' || s === 'hindi') subjectCode = 'hindi'
+  else if (s === 'soc' || s === 'sst' || s === 'social_science') subjectCode = 'social_science'
 
   const chapterId = `${s}_c${rawClass}_ch${rawCh}`
 

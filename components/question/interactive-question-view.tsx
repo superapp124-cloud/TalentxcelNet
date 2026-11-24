@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import {
   CheckCircle2,
@@ -16,6 +16,10 @@ import {
   Share2,
   Download,
   Check,
+  Timer,
+  Flame,
+  RotateCcw,
+  Smartphone,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -63,11 +67,69 @@ export function InteractiveQuestionView({
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [checkoutProductId, setCheckoutProductId] = useState<string | null>(null)
 
-  const isCorrect = isSubmitted && selectedId === correctOptionId
+  // 60-Second Viral Speed Challenge Mode
+  const [isChallengeActive, setIsChallengeActive] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(60)
+  const [timeSpent, setTimeSpent] = useState(0)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Check URL query param for ?challenge=1 on client mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('challenge') === '1') {
+        startChallenge()
+      }
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [])
+
+  const startChallenge = () => {
+    if (isSubmitted) return
+    setIsChallengeActive(true)
+    setTimeLeft(60)
+    if (timerRef.current) clearInterval(timerRef.current)
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current)
+          handleTimeOut()
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const handleTimeOut = () => {
+    setIsSubmitted(true)
+    setTimeSpent(60)
+  }
 
   const handleCheck = () => {
     if (!selectedId) return
+    if (timerRef.current) clearInterval(timerRef.current)
+    setTimeSpent(60 - timeLeft)
     setIsSubmitted(true)
+  }
+
+  const isCorrect = isSubmitted && selectedId === correctOptionId
+
+  // WhatsApp share generator
+  const getWhatsAppShareUrl = (isSpeedRecord = false) => {
+    const textSnippet = questionText.length > 80 ? `${questionText.slice(0, 77)}...` : questionText
+    let message = ''
+
+    if (isSpeedRecord && isCorrect) {
+      message = `⚡ *I solved this in ${timeSpent}s!* 🏆\n"${textSnippet}"\n\nThink you're faster? Take the 60-second challenge here:\n👉 https://talentxcel.net/question/${questionId}?challenge=1\n\n_Sent via TalentXcel Board Prep 2026_`
+    } else {
+      message = `🚨 *Can you solve this question?* 📚\n"${textSnippet}"\n\nTry solving it here with instant scoring & step-by-step solution:\n👉 https://talentxcel.net/question/${questionId}?challenge=1\n\n_Sent via TalentXcel Board Prep 2026_`
+    }
+
+    return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`
   }
 
   return (
@@ -75,31 +137,61 @@ export function InteractiveQuestionView({
       {/* Main Question Card */}
       <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
         {/* Viral Challenge Banner (Always Visible to 100% of organic search traffic) */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 rounded-2xl border border-blue-200/70 dark:border-blue-900/50">
-          <div className="flex items-center gap-2">
-            <span className="text-base">🔥</span>
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/40 dark:via-indigo-950/40 dark:to-purple-950/40 rounded-2xl border border-blue-200/80 dark:border-blue-900/60 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xl">🔥</span>
             <div>
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
-                Challenge Your Study Group / Classmates
+                Study Group Viral Challenge
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                Can they solve this question? 80% students get this wrong.
+              <span className="text-[11px] text-slate-600 dark:text-slate-300">
+                Can your classmates solve this in under 60 seconds? 80% get it wrong.
               </span>
             </div>
           </div>
-          <a
-            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-              `🚨 *Can you solve this question?* 📚\n"${questionText.slice(0, 95)}..."\n\nTry solving it here with instant scoring & step-by-step solution:\n👉 https://talentxcel.net/question/${questionId}\n\n_Sent via TalentXcel Board Prep 2026_`
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm">
-              <Share2 className="h-3.5 w-3.5" />
-              Share on WhatsApp
-            </Button>
-          </a>
+
+          <div className="flex items-center gap-2">
+            {!isChallengeActive && !isSubmitted ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={startChallenge}
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 border-indigo-300 dark:border-indigo-800 hover:bg-indigo-50 gap-1.5"
+              >
+                <Timer className="h-3.5 w-3.5" />
+                Start 60s Speed Test
+              </Button>
+            ) : null}
+
+            <a href={getWhatsAppShareUrl()} target="_blank" rel="noopener noreferrer">
+              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm">
+                <Share2 className="h-3.5 w-3.5" />
+                Share on WhatsApp
+              </Button>
+            </a>
+          </div>
         </div>
+
+        {/* 60-Second Challenge Active Header & Progress Bar */}
+        {isChallengeActive && !isSubmitted && (
+          <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-2 animate-in fade-in">
+            <div className="flex items-center justify-between text-xs font-bold text-amber-900 dark:text-amber-200">
+              <span className="flex items-center gap-1.5">
+                <Timer className="h-4 w-4 text-amber-600 animate-pulse" />
+                60-Second Speed Challenge Active
+              </span>
+              <span className="text-sm font-mono">{timeLeft}s remaining</span>
+            </div>
+            <div className="w-full bg-amber-200 dark:bg-amber-900/60 h-2 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-1000 ${
+                  timeLeft > 20 ? 'bg-amber-500' : 'bg-rose-500'
+                }`}
+                style={{ width: `${(timeLeft / 60) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
           <div className="flex items-center gap-2">
@@ -168,20 +260,32 @@ export function InteractiveQuestionView({
               Check Answer
             </Button>
           ) : (
-            <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-3">
               <div className="flex items-center gap-2">
                 {isCorrect ? (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="h-4 w-4" /> Correct Answer! (+{marks} XP)
-                  </span>
+                  <div className="space-y-0.5">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle2 className="h-4 w-4" /> Correct Answer! (+{marks} XP)
+                    </span>
+                    {timeSpent > 0 && (
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">
+                        ⏱️ Solved in {timeSpent}s — Faster than 91% of peers!
+                      </span>
+                    )}
+                  </div>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 dark:text-rose-400">
-                    <XCircle className="h-4 w-4" /> Incorrect Option
-                  </span>
+                  <div className="space-y-0.5">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 dark:text-rose-400">
+                      <XCircle className="h-4 w-4" /> Incorrect Option
+                    </span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">
+                      Correct: Option {options.find((o) => o.id === correctOptionId)?.text}
+                    </span>
+                  </div>
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
                 <Button
                   variant="outline"
                   size="sm"
@@ -192,18 +296,13 @@ export function InteractiveQuestionView({
                   Unlock Step-by-Step AI Proof
                 </Button>
 
-                <a
-                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                    `Can you solve this question? "${questionText.slice(0, 90)}..." Try it here: https://talentxcel.net/question/${questionId}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={getWhatsAppShareUrl(isCorrect)} target="_blank" rel="noopener noreferrer">
                   <Button
                     size="sm"
                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5"
                   >
-                    <span>Share on WhatsApp</span>
+                    <Share2 className="h-3.5 w-3.5" />
+                    <span>{isCorrect ? 'Share Score to WhatsApp' : 'Challenge Friends'}</span>
                   </Button>
                 </a>
               </div>
@@ -324,6 +423,31 @@ export function InteractiveQuestionView({
           </div>
         </div>
       )}
+
+      {/* Sticky Bottom Bar on Mobile for Instant UPI Unlock & Sharing */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between gap-3 shadow-2xl">
+        <div className="flex flex-col">
+          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Exam Pass</span>
+          <span className="text-xs font-black text-slate-900 dark:text-white">₹49 All Solutions</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <a href={getWhatsAppShareUrl(isCorrect)} target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" className="text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800 h-9 px-2.5">
+              <Share2 className="h-4 w-4" />
+            </Button>
+          </a>
+
+          <Button
+            size="sm"
+            onClick={() => setCheckoutProductId('prod_assess_preboard_49')}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-4 gap-1.5 shadow-md"
+          >
+            <Zap className="h-3.5 w-3.5" />
+            <span>Unlock ₹49</span>
+          </Button>
+        </div>
+      </div>
 
       <RazorpayCheckoutModal
         isOpen={Boolean(checkoutProductId)}

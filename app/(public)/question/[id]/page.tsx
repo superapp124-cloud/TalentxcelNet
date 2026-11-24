@@ -11,9 +11,15 @@ import {
   Sparkles,
   ArrowRight,
   FileText,
+  Calculator,
+  Compass,
+  GraduationCap,
+  Download,
+  Target,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { getCurriculumChapters } from '@/packages/core/src'
 import { resolveQuestionById, parseQuestionId } from '@/lib/seo/question-resolver'
 import { InteractiveQuestionView } from '@/components/question/interactive-question-view'
 
@@ -78,6 +84,29 @@ export default async function QuestionPage({ params }: PageProps) {
     : undefined
 
   const chapterPracticeUrl = `/practice/${q.boardCode.toLowerCase()}/class-${q.classNumber}/${q.subjectCode}/${q.chapterId}`
+  const formulaSheetUrl = `/formulas/class-${q.classNumber}/${q.subjectCode}`
+
+  // Adaptive Sitemap & Deep Crawl Link Mesh
+  const totalChapterQuestions = q.classNumber >= 11 ? 180 : q.classNumber >= 9 ? 120 : q.classNumber >= 6 ? 60 : 30
+  const currentQNum = parsed?.questionIndex || 1
+
+  const jumpAnchors = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 120, 150, 180].filter(
+    (n) => n <= totalChapterQuestions
+  )
+  const windowRange = [
+    currentQNum - 3,
+    currentQNum - 2,
+    currentQNum - 1,
+    currentQNum,
+    currentQNum + 1,
+    currentQNum + 2,
+    currentQNum + 3,
+  ].filter((n) => n >= 1 && n <= totalChapterQuestions)
+
+  const siblingNumbers = Array.from(new Set([...jumpAnchors, ...windowRange])).sort((a, b) => a - b)
+
+  // Subject Chapter Crawl Highway
+  const subjectChapters = getCurriculumChapters(q.classNumber, q.subjectCode, q.boardCode)
 
   // Google QAPage Schema for Position 0 Featured Snippet
   const qaJsonLd = {
@@ -188,7 +217,7 @@ export default async function QuestionPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4 sm:px-6 lg:px-8 pb-24 sm:pb-12">
       {/* Inject Google Schema.org structured data */}
       <script
         type="application/ld+json"
@@ -275,26 +304,31 @@ export default async function QuestionPage({ params }: PageProps) {
             prevQuestionId={prevQuestionId}
             nextQuestionId={nextQuestionId}
             chapterPracticeUrl={chapterPracticeUrl}
-            formulaSheetUrl={`/formulas/class-${q.classNumber}/${q.subjectCode}`}
+            formulaSheetUrl={formulaSheetUrl}
           />
         </main>
 
-        {/* Sibling Questions Navigation Mesh */}
+        {/* Multiplier 1: Sibling Questions Adaptive Navigation Mesh */}
         <section className="pt-8 border-t border-slate-200 dark:border-slate-800 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-              More Questions from this Chapter
-            </h3>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Chapter Question Navigation Mesh ({totalChapterQuestions} Questions)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Browse questions, jump anchors & step-by-step NCERT / RD Sharma practice
+              </p>
+            </div>
             <Link
               href={chapterPracticeUrl}
-              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 shrink-0"
             >
               Full Chapter Diagnostic <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+          <div className="flex flex-wrap gap-2 pt-1">
+            {siblingNumbers.map((num) => {
               const qId = `${q.chapterId}_q${String(num).padStart(4, '0')}`
               const isCurrent = qId === q.id
 
@@ -302,7 +336,7 @@ export default async function QuestionPage({ params }: PageProps) {
                 <Link
                   key={num}
                   href={`/question/${qId}`}
-                  className={`h-9 w-9 rounded-xl flex items-center justify-center text-xs font-bold border transition-colors ${
+                  className={`h-9 min-w-9 px-2 rounded-xl flex items-center justify-center text-xs font-bold border transition-colors ${
                     isCurrent
                       ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                       : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-blue-500'
@@ -314,6 +348,166 @@ export default async function QuestionPage({ params }: PageProps) {
             })}
           </div>
         </section>
+
+        {/* Multiplier 2: Full Subject Curriculum Crawl Highway */}
+        <section className="pt-8 border-t border-slate-200 dark:border-slate-800 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <GraduationCap className="h-4 w-4 text-blue-600" />
+                Class {q.classNumber} {q.subjectName} — All Syllabus Chapters
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Direct access to solved practice sets & board exam question banks
+              </p>
+            </div>
+            <Link
+              href={formulaSheetUrl}
+              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 shrink-0"
+            >
+              <Download className="h-3 w-3" /> Formula Sheet
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {subjectChapters.slice(0, 8).map((ch) => (
+              <Link
+                key={ch.id}
+                href={`/question/${ch.id}_q0001`}
+                className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-blue-500/70 dark:hover:border-blue-500/70 transition-all flex items-center justify-between group shadow-2xs"
+              >
+                <div className="min-w-0 pr-2">
+                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
+                    Chapter {ch.chapterNumber}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate block group-hover:text-blue-600 transition-colors">
+                    {ch.title.split(':')[0]}
+                  </span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 shrink-0 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Multiplier 3: High-Intent Examination Tools & Calculators */}
+        <section className="pt-8 border-t border-slate-200 dark:border-slate-800 space-y-4">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+            <Calculator className="h-4 w-4 text-amber-500" />
+            Free Academic Calculators & Board Predictors
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link
+              href="/tools/board-percentage-calculator"
+              className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/60 to-orange-50/60 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200/60 dark:border-amber-900/40 hover:border-amber-400 transition-colors group"
+            >
+              <span className="text-xs font-bold text-slate-900 dark:text-white block group-hover:text-amber-600">
+                Board % Calculator
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                Calculate overall percentage across CBSE & CISCE marks
+              </span>
+            </Link>
+
+            <Link
+              href="/tools/cbse-best-of-five-calculator"
+              className="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/60 to-indigo-50/60 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200/60 dark:border-blue-900/40 hover:border-blue-400 transition-colors group"
+            >
+              <span className="text-xs font-bold text-slate-900 dark:text-white block group-hover:text-blue-600">
+                Best of 5 Rule Calculator
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                Verify top 5 scoring subjects under official board rules
+              </span>
+            </Link>
+
+            <Link
+              href={q.classNumber >= 11 ? '/tools/jee-neet-rank-predictor' : '/tools/cbse-cgpa-calculator'}
+              className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50/60 to-teal-50/60 dark:from-emerald-950/20 dark:to-teal-950/20 border border-emerald-200/60 dark:border-emerald-900/40 hover:border-emerald-400 transition-colors group"
+            >
+              <span className="text-xs font-bold text-slate-900 dark:text-white block group-hover:text-emerald-600">
+                {q.classNumber >= 11 ? 'JEE / NEET Rank Predictor' : 'CGPA to % Converter'}
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                {q.classNumber >= 11 ? 'Estimate percentile and AIR rank' : 'Official 9.5 multiplier conversion'}
+              </span>
+            </Link>
+          </div>
+        </section>
+
+        {/* Multiplier 4: Competitive Exams & Defence SSB Pathways */}
+        {q.classNumber >= 9 && (
+          <section className="pt-8 border-t border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Target className="h-4 w-4 text-purple-600" />
+                  National Competitive & Officer Exam Practice
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Full solved papers, psychological batteries & syllabus mock sets
+                </p>
+              </div>
+              <Link
+                href="/competitive"
+                className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 shrink-0"
+              >
+                All 6 Exams <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <Link
+                href="/competitive/ssb-oir"
+                className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-purple-500 transition-colors text-center group"
+              >
+                <span className="text-xs font-bold text-slate-900 dark:text-white block group-hover:text-purple-600">
+                  SSB OIR & Psych
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Officer Battery
+                </span>
+              </Link>
+
+              <Link
+                href="/competitive/nda"
+                className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-purple-500 transition-colors text-center group"
+              >
+                <span className="text-xs font-bold text-slate-900 dark:text-white block group-hover:text-purple-600">
+                  NDA Maths & GAT
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  10-Year PYQ
+                </span>
+              </Link>
+
+              <Link
+                href="/competitive/jee-main"
+                className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-purple-500 transition-colors text-center group"
+              >
+                <span className="text-xs font-bold text-slate-900 dark:text-white block group-hover:text-purple-600">
+                  JEE Main
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Physics & Maths
+                </span>
+              </Link>
+
+              <Link
+                href="/competitive/neet-ug"
+                className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-purple-500 transition-colors text-center group"
+              >
+                <span className="text-xs font-bold text-slate-900 dark:text-white block group-hover:text-purple-600">
+                  NEET UG
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  NCERT Drill
+                </span>
+              </Link>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )
