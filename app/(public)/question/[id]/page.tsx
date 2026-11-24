@@ -275,6 +275,7 @@ export default async function QuestionPage({ params }: PageProps) {
             prevQuestionId={prevQuestionId}
             nextQuestionId={nextQuestionId}
             chapterPracticeUrl={chapterPracticeUrl}
+            formulaSheetUrl={`/formulas/class-${q.classNumber}/${q.subjectCode}`}
           />
         </main>
 
