@@ -46,16 +46,32 @@ async function run() {
     await jwtClient.authorize()
     console.log('\x1b[32m[OK]\x1b[0m')
 
-    // 2. Submit / Verify Sitemap in Google Search Console
-    console.log('\n2. Submitting / Re-pinging Sitemap in Google Search Console...')
-    try {
-      await webmasters.sitemaps.submit({
-        siteUrl: SITE_DOMAIN,
-        feedpath: SITEMAP_URL,
-      })
-      console.log(`   \x1b[32m✓ Sitemap successfully refreshed in GSC:\x1b[0m ${SITEMAP_URL}`)
-    } catch (sitemapErr) {
-      console.log(`   \x1b[31m✗ Sitemap submission note:\x1b[0m ${sitemapErr.message}`)
+    // 2. Submit / Verify Sitemaps in Google Search Console
+    console.log('\n2. Submitting / Re-pinging All Sitemaps in Google Search Console...')
+    const allSitemaps = [
+      'https://talentxcel.net/sitemap.xml',
+      'https://talentxcel.net/sitemap-index.xml',
+      'https://talentxcel.net/sitemap-core.xml',
+      'https://talentxcel.net/sitemap-competitive.xml',
+      'https://talentxcel.net/sitemap-tools.xml',
+      'https://talentxcel.net/sitemap-formulas.xml',
+      'https://talentxcel.net/sitemap-practice.xml',
+      'https://talentxcel.net/sitemap-ncert.xml',
+      'https://talentxcel.net/sitemap-questions-1.xml',
+      'https://talentxcel.net/sitemap-questions-2.xml',
+      'https://talentxcel.net/sitemap-questions-3.xml',
+    ]
+
+    for (const sm of allSitemaps) {
+      try {
+        await webmasters.sitemaps.submit({
+          siteUrl: SITE_DOMAIN,
+          feedpath: sm,
+        })
+        console.log(`   \x1b[32m✓ Sitemap submitted to GSC:\x1b[0m ${sm}`)
+      } catch (sitemapErr) {
+        console.log(`   \x1b[33m! Sitemap submission note for ${sm}:\x1b[0m ${sitemapErr.message}`)
+      }
     }
 
     // 3. Batch Publish High-Priority Season URLs to Google Indexing API
