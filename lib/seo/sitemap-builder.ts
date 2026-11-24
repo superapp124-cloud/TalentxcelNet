@@ -246,7 +246,8 @@ export function getAllQuestionUrls(): SitemapEntry[] {
       for (const subj of cls.subjects) {
         const chapters = getCurriculumChapters(cls.classNumber, subj.code, board)
         for (const ch of chapters) {
-          const qCount = cls.classNumber >= 11 ? 35 : cls.classNumber >= 9 ? 20 : 10
+          // Comprehensive coverage of all NCERT exercises, RD Sharma/RS Aggarwal problems & 10-Year Board PYQs (100k+ Scale)
+          const qCount = cls.classNumber >= 11 ? 180 : cls.classNumber >= 9 ? 120 : cls.classNumber >= 6 ? 60 : 30
           for (let qIdx = 1; qIdx <= qCount; qIdx++) {
             const qId = `${ch.id}_q${String(qIdx).padStart(4, '0')}`
             urls.push({

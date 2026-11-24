@@ -60,6 +60,15 @@ async function run() {
       'https://talentxcel.net/sitemap-questions-1.xml',
       'https://talentxcel.net/sitemap-questions-2.xml',
       'https://talentxcel.net/sitemap-questions-3.xml',
+      'https://talentxcel.net/sitemap-questions-4.xml',
+      'https://talentxcel.net/sitemap-questions-5.xml',
+      'https://talentxcel.net/sitemap-questions-6.xml',
+      'https://talentxcel.net/sitemap-questions-7.xml',
+      'https://talentxcel.net/sitemap-questions-8.xml',
+      'https://talentxcel.net/sitemap-questions-9.xml',
+      'https://talentxcel.net/sitemap-questions-10.xml',
+      'https://talentxcel.net/sitemap-questions-11.xml',
+      'https://talentxcel.net/sitemap-questions-12.xml',
     ]
 
     for (const sm of allSitemaps) {
