@@ -124,6 +124,10 @@ async function run() {
       'https://talentxcel.net/formulas/class-9/science',
       'https://talentxcel.net/assessment',
       'https://talentxcel.net/academic',
+      // High-volume maths calculators (nCr/nPr signals in GSC)
+      'https://talentxcel.net/tools/combination-calculator',
+      'https://talentxcel.net/tools/permutation-calculator',
+      'https://talentxcel.net/tools/factorial-calculator',
     ]
 
     let submittedCount = 0

@@ -16,16 +16,18 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
-  title: 'Free CBSE & Competitive Exam Calculators & Tools | TalentXcel',
+  title: 'Free Maths & Academic Calculators — nCr, nPr, CBSE, JEE | TalentXcel',
   description:
-    'Free online academic and entrance calculators: CBSE 10th CGPA to Percentage Calculator, SSB Armed Forces Age Eligibility (NDA/CDS/AFCAT), and JEE Main Rank Estimators.',
+    'Free online calculators: Combination nCr, Permutation nPr, Factorial n!, CBSE CGPA, SSB Age Eligibility, JEE Rank Predictor. Instant answers for Class 11-12 Maths and competitive exams.',
   keywords: [
+    'combination calculator nCr',
+    'permutation calculator nPr',
+    'factorial calculator n!',
+    '5c3 value calculator',
     'CBSE CGPA to percentage calculator',
-    'CBSE percentage calculator online free',
     'SSB age calculator NDA CDS',
-    'defence eligibility calculator 2026',
     'JEE rank predictor percentile',
-    'online academic tools India',
+    'free maths calculators online India',
   ],
   alternates: {
     canonical: 'https://talentxcel.net/tools',
@@ -46,36 +48,14 @@ export default function ToolsIndexPage() {
     name: 'TalentXcel Academic & Competitive Exam Calculators',
     description: 'Free interactive calculators for CBSE students and competitive exam aspirants.',
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'CBSE Class 10 CGPA to Percentage Calculator',
-        url: 'https://talentxcel.net/tools/cbse-cgpa-calculator',
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'SSB Armed Forces Age Eligibility Calculator',
-        url: 'https://talentxcel.net/tools/ssb-eligibility-calculator',
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: 'Class 10 & 12 Board Percentage Calculator',
-        url: 'https://talentxcel.net/tools/board-percentage-calculator',
-      },
-      {
-        '@type': 'ListItem',
-        position: 4,
-        name: 'CBSE Best-of-Five Marks Calculator',
-        url: 'https://talentxcel.net/tools/cbse-best-of-five-calculator',
-      },
-      {
-        '@type': 'ListItem',
-        position: 5,
-        name: 'JEE Main & NEET Rank vs Percentile Predictor',
-        url: 'https://talentxcel.net/tools/jee-neet-rank-predictor',
-      },
+      { '@type': 'ListItem', position: 1, name: 'CBSE Class 10 CGPA to Percentage Calculator', url: 'https://talentxcel.net/tools/cbse-cgpa-calculator' },
+      { '@type': 'ListItem', position: 2, name: 'SSB Armed Forces Age Eligibility Calculator', url: 'https://talentxcel.net/tools/ssb-eligibility-calculator' },
+      { '@type': 'ListItem', position: 3, name: 'Class 10 & 12 Board Percentage Calculator', url: 'https://talentxcel.net/tools/board-percentage-calculator' },
+      { '@type': 'ListItem', position: 4, name: 'CBSE Best-of-Five Marks Calculator', url: 'https://talentxcel.net/tools/cbse-best-of-five-calculator' },
+      { '@type': 'ListItem', position: 5, name: 'JEE Main & NEET Rank vs Percentile Predictor', url: 'https://talentxcel.net/tools/jee-neet-rank-predictor' },
+      { '@type': 'ListItem', position: 6, name: 'Combination Calculator nCr', url: 'https://talentxcel.net/tools/combination-calculator' },
+      { '@type': 'ListItem', position: 7, name: 'Permutation Calculator nPr', url: 'https://talentxcel.net/tools/permutation-calculator' },
+      { '@type': 'ListItem', position: 8, name: 'Factorial Calculator n!', url: 'https://talentxcel.net/tools/factorial-calculator' },
     ],
   }
 
@@ -123,6 +103,33 @@ export default function ToolsIndexPage() {
       href: '/tools/ssb-eligibility-calculator',
       category: 'Defence SSB Recruitment',
       icon: Calendar,
+      color: 'emerald',
+    },
+    {
+      title: 'Combination Calculator — nCr Value',
+      description: 'Instantly find 5C3=10, 10C2=45, or any C(n,r) value with formula steps. Covers all Class 11 & 12 Maths, JEE, NDA combination problems.',
+      badge: '5C3 • 10C2 • nCr',
+      href: '/tools/combination-calculator',
+      category: 'Maths Calculators',
+      icon: Calculator,
+      color: 'blue',
+    },
+    {
+      title: 'Permutation Calculator — nPr Value',
+      description: 'Instantly find 5P3=60, 4P2=12, or any P(n,r) value with formula steps. Used in Class 11 & 12 Maths ordered arrangement problems.',
+      badge: '5P3 • nPr',
+      href: '/tools/permutation-calculator',
+      category: 'Maths Calculators',
+      icon: Sparkles,
+      color: 'purple',
+    },
+    {
+      title: 'Factorial Calculator — n! Value',
+      description: 'Compute 5!=120, 10!=3628800, or any n! instantly. Essential for permutations, combinations, and Class 11 & 12 Maths probability.',
+      badge: '5! • 10! • n!',
+      href: '/tools/factorial-calculator',
+      category: 'Maths Calculators',
+      icon: Zap,
       color: 'emerald',
     },
   ]

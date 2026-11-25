@@ -162,6 +162,10 @@ export function getToolsSitemapUrls(): SitemapEntry[] {
     { url: `${BASE_URL}/tools/board-percentage-calculator`, lastModified: today, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE_URL}/tools/cbse-best-of-five-calculator`, lastModified: today, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE_URL}/tools/jee-neet-rank-predictor`, lastModified: today, changeFrequency: 'weekly', priority: 0.95 },
+    // High-volume maths calculators (nCr / nPr / n! — GSC-verified impressions signal)
+    { url: `${BASE_URL}/tools/combination-calculator`, lastModified: today, changeFrequency: 'weekly', priority: 1.0 },
+    { url: `${BASE_URL}/tools/permutation-calculator`, lastModified: today, changeFrequency: 'weekly', priority: 1.0 },
+    { url: `${BASE_URL}/tools/factorial-calculator`, lastModified: today, changeFrequency: 'weekly', priority: 0.95 },
   ]
 }
 
