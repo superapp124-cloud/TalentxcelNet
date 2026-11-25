@@ -99,3 +99,20 @@
   - Added NCERT Action Bar with instant ₹49 UPI pass and Full Syllabus NCERT Chapter Traverser across all textbook solution pages (`/solutions/ncert/...`).
   - All 25 test files and 248 tests passing; 0 TypeScript errors. Deployed live to production.
 
+
+- [x] [TASK-12] nCr / nPr / n! Maths Calculator Expansion (GSC Signal-Driven)
+  - Completed on 2026-11-25.
+  - GSC analysis: "5c3" = 375 impressions, "5c3 value" = 219 impressions, "5c3 combination" = 63, "value of 5c3" = 61 — high-intent zero-click math queries.
+  - Launched 3 new dedicated calculator pages:
+    - `/tools/combination-calculator` (nCr) — targets all "XcY value" queries
+    - `/tools/permutation-calculator` (nPr) — targets all "XpY value" queries  
+    - `/tools/factorial-calculator` (n!) — targets "n factorial" queries
+  - Each page has: FAQPage JSON-LD (direct answer rich results for top queries like "5C3=10"), WebApplication JSON-LD, WhatsApp viral share, quick-access reference table of popular values, formula explanation.
+  - Updated `lib/seo/sitemap-builder.ts` → tools sitemap now includes all 3 new URLs at priority 1.0.
+  - Updated `/tools` index page with 3 new maths calculator cards.
+  - Updated `scripts/gsc-manager.mjs` to submit the 3 new URLs to Google Indexing API.
+  - Bumped `tsconfig.json` target ES2017 → ES2020 (arithmetic compatibility; Turbopack compiles modern JS).
+  - 0 TypeScript errors; 25 test files, 248/248 Vitest tests passing.
+  - Committed `e356592` and pushed to `phase-1b-staging` + `main`.
+  - GSC re-ping and Indexing API submission running.
+
