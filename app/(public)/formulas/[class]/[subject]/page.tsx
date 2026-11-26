@@ -24,6 +24,8 @@ import {
 } from '@/packages/core/src'
 import type { BoardCode, SubjectCode } from '@/packages/core/src'
 
+export const revalidate = 86400
+
 interface PageProps {
   params: Promise<{
     class: string

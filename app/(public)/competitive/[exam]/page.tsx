@@ -23,6 +23,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getCompetitiveExamBySlug, COMPETITIVE_EXAMS } from '@/lib/competitive/exam-data'
 
+export const revalidate = 86400
+
 interface ExamPageProps {
   params: Promise<{
     exam: string

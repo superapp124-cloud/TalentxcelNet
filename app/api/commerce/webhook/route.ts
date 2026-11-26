@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyWebhookSignature } from '@/lib/commerce/razorpay'
-import { createClient } from '@/lib/supabase/server'
-import { revokeEntitlement } from '@/lib/commerce/entitlements'
+import { createServiceRoleClient } from '@/lib/supabase/admin'
+import {
+  fulfillCommercialOrderFromWebhook,
+  markCommercialOrderFailed,
+  revokeEntitlement,
+} from '@/lib/commerce/entitlements'
 import {
   acquireWebhookLease,
   completeWebhookProcessing,
@@ -95,7 +99,8 @@ export async function POST(req: NextRequest) {
     }
 
     const eventId =
-      event.id || `${event.event}_${event.payload?.payment?.entity?.id || Date.now()}`
+      event.id ||
+      `${event.event}_${event.payload?.payment?.entity?.id || event.payload?.order?.entity?.id || Date.now()}`
 
     // 4. Atomic Distributed Processing Lease (Mutex & Concurrency Protection)
     const workerId = generateWorkerId()
@@ -126,35 +131,94 @@ export async function POST(req: NextRequest) {
     }
 
     const paymentEntity = event.payload?.payment?.entity
-    const notes = paymentEntity?.notes ?? {}
+    const orderEntity = event.payload?.order?.entity
+    const notes = {
+      ...(orderEntity?.notes ?? {}),
+      ...(paymentEntity?.notes ?? {}),
+    } as Record<string, string | undefined>
+
     const orderNumber = notes.orderNumber
     const userId = notes.userId
     const programmeSlug = notes.programmeSlug
-    const amountPaise = paymentEntity?.amount ?? 0
-    const paymentId = paymentEntity?.id ?? `pay_${Date.now()}`
+    const productId = notes.productId
+    const email = notes.email
+    const razorpayOrderId: string | undefined = paymentEntity?.order_id || orderEntity?.id
+    const currency: string = paymentEntity?.currency || orderEntity?.currency || 'INR'
+    const amountPaise: number =
+      paymentEntity?.amount ?? orderEntity?.amount_paid ?? orderEntity?.amount ?? 0
+    const paymentId: string = paymentEntity?.id ?? razorpayOrderId ?? `pay_${eventId}`
+    const paymentStatus: string | undefined = paymentEntity?.status
+    const orderStatus: string | undefined = orderEntity?.status
 
     // 5. Execute Business Operations (Fails with 5xx on error so provider retries)
     try {
       if (event.event === 'payment.captured' || event.event === 'order.paid') {
-        await executeAtomicPaymentCaptured({
+        const isPaymentUncaptured = Boolean(paymentStatus && paymentStatus !== 'captured')
+        const isOrderUnpaid = Boolean(
+          event.event === 'order.paid' && orderStatus && orderStatus !== 'paid'
+        )
+        if (isPaymentUncaptured || isOrderUnpaid) {
+          await completeWebhookProcessing({
+            provider: 'razorpay',
+            eventId,
+            workerId,
+          })
+          return NextResponse.json(
+            { status: 'ignored', reason: 'payment_or_order_not_captured' },
+            { status: 400 }
+          )
+        }
+
+        // A. Commercial Pass Fulfilment (when productId note or stored commercial_order matches)
+        const commercialResult = await fulfillCommercialOrderFromWebhook({
           orderNumber,
+          razorpayOrderId,
           paymentId,
+          productId,
           userId,
-          programmeSlug,
+          email,
           amountPaise,
-          eventName: event.event,
+          currency,
         })
+
+        if (commercialResult.outcome === 'rejected') {
+          await completeWebhookProcessing({
+            provider: 'razorpay',
+            eventId,
+            workerId,
+          })
+          return NextResponse.json(
+            { error: 'Webhook order validation failed', reason: commercialResult.reason },
+            { status: 400 }
+          )
+        }
+
+        // B. Programme Order Fulfilment (when not a commercial pass and programmeSlug is present)
+        if (commercialResult.outcome === 'not_commercial') {
+          if (programmeSlug || orderNumber) {
+            await executeAtomicPaymentCaptured({
+              orderNumber,
+              paymentId,
+              userId,
+              programmeSlug,
+              amountPaise,
+              eventName: event.event,
+            })
+          } else {
+            console.warn(`[Commerce Webhook] Event ${eventId} missing orderNumber/programmeSlug/productId; skipping fulfilment.`)
+          }
+        }
       } else if (event.event === 'payment.failed') {
-        try {
-          const supabase = await createClient()
+        await markCommercialOrderFailed({ orderNumber, razorpayOrderId })
+
+        if (process.env.NODE_ENV !== 'test' || process.env.TEST_USE_LIVE_DB) {
+          const supabase = createServiceRoleClient()
           if (orderNumber) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase.from('orders') as any)
               .update({ status: 'failed', updated_at: new Date().toISOString() })
               .eq('order_number', orderNumber)
           }
-        } catch (dbErr) {
-          if (process.env.NODE_ENV !== 'test') throw dbErr
         }
       } else if (event.event === 'refund.processed' || event.event === 'payment.refunded') {
         await revokeEntitlement({
@@ -162,18 +226,17 @@ export async function POST(req: NextRequest) {
           paymentId,
           userId,
           reason: 'refunded',
+          useServiceRole: true,
         })
 
-        try {
-          const supabase = await createClient()
+        if (process.env.NODE_ENV !== 'test' || process.env.TEST_USE_LIVE_DB) {
+          const supabase = createServiceRoleClient()
           if (orderNumber) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase.from('orders') as any)
               .update({ status: 'refunded', updated_at: new Date().toISOString() })
               .eq('order_number', orderNumber)
           }
-        } catch (dbErr) {
-          if (process.env.NODE_ENV !== 'test') throw dbErr
         }
       }
 

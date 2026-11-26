@@ -29,7 +29,22 @@ interface PageProps {
   }>
 }
 
+import { classifyQuestionSeoQuality } from '@/lib/seo/question-quality'
+
+export const revalidate = 86400
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const q = resolveQuestionById(id)
+  const baseMeta = await buildQuestionMetadata({ params })
+  const seoQuality = classifyQuestionSeoQuality(q)
+  return {
+    ...baseMeta,
+    robots: seoQuality.index ? { index: true, follow: true } : { index: false, follow: true },
+  }
+}
+
+async function buildQuestionMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
   const q = resolveQuestionById(id)
   if (!q) {

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/admin'
 import {
   ALL_COMMERCIAL_PRODUCTS,
   calculateCommercialOrderSummary,
@@ -11,10 +12,87 @@ import type {
 } from '@/packages/core/src/types'
 
 // In-memory fallback cache for development, fast reads, and sandbox testing
+interface StoredCommercialOrder {
+  orderNumber: string
+  userIdentifier: string
+  productId: string
+  domain: ProductDomain
+  totalPayableRupees: number
+  status: 'created' | 'paid' | 'failed' | 'refunded'
+  razorpayOrderId?: string
+  providerPaymentId?: string
+}
+
 const MEMORY_ENTITLEMENTS = new Map<string, LearnerEntitlement>()
 const FULFILLED_ORDERS = new Map<string, LearnerEntitlement>()
 const FULFILLED_PAYMENTS = new Map<string, LearnerEntitlement>()
+const PENDING_COMMERCIAL_ORDERS = new Map<string, StoredCommercialOrder>()
+const RAZORPAY_ORDER_INDEX = new Map<string, string>()
 const MEMORY_FUNNEL_EVENTS: FunnelAnalyticsEvent[] = []
+
+function getDbClient(useServiceRole?: boolean) {
+  if (useServiceRole && (process.env.NODE_ENV !== 'test' || process.env.TEST_USE_LIVE_DB)) {
+    return createServiceRoleClient()
+  }
+  return null
+}
+
+/**
+ * Persists a newly created commercial order in 'created' state so that
+ * subsequent webhook deliveries can validate product, user, and amount
+ * against server-authoritative order data rather than trusting webhook notes alone.
+ */
+export async function recordPendingCommercialOrder(params: {
+  orderNumber: string
+  userId: string
+  productId: string
+  razorpayOrderId?: string
+}): Promise<void> {
+  const { orderNumber, userId, productId, razorpayOrderId } = params
+  const product = ALL_COMMERCIAL_PRODUCTS[productId]
+  if (!product) return
+
+  const summary = calculateCommercialOrderSummary(productId)
+  const record: StoredCommercialOrder = {
+    orderNumber,
+    userIdentifier: userId,
+    productId: product.id,
+    domain: product.domain,
+    totalPayableRupees: summary.totalPayableRupees,
+    status: 'created',
+    razorpayOrderId,
+  }
+  PENDING_COMMERCIAL_ORDERS.set(orderNumber, record)
+  if (razorpayOrderId) {
+    RAZORPAY_ORDER_INDEX.set(razorpayOrderId, orderNumber)
+  }
+
+  try {
+    const supabase = await createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('commercial_orders') as any).upsert(
+      {
+        order_number: orderNumber,
+        user_identifier: userId,
+        product_id: product.id,
+        domain: product.domain,
+        base_price_rupees: summary.basePriceRupees,
+        gst_rupees: summary.gstAmountRupees,
+        total_payable_rupees: summary.totalPayableRupees,
+        status: 'created',
+        provider: 'razorpay',
+        metadata: {
+          productTitle: product.title,
+          razorpayOrderId: razorpayOrderId || null,
+        },
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'order_number' }
+    )
+  } catch (dbErr) {
+    console.warn('[Commerce] Pending commercial order DB sync note:', dbErr)
+  }
+}
 
 /**
  * Grants paid entitlement server-side after cryptographically verified payment.
@@ -28,8 +106,9 @@ export async function grantEntitlement(params: {
   userId?: string
   email?: string
   notes?: Record<string, string>
+  useServiceRole?: boolean
 }): Promise<LearnerEntitlement> {
-  const { orderNumber, paymentId, productId, userId, email } = params
+  const { orderNumber, paymentId, productId, userId, email, useServiceRole } = params
 
   // 0. Idempotency check: return existing entitlement on replayed verification
   if (orderNumber && FULFILLED_ORDERS.has(orderNumber)) {
@@ -72,7 +151,8 @@ export async function grantEntitlement(params: {
 
   // Sync to database if available
   try {
-    const supabase = await createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const supabase = (getDbClient(useServiceRole) ?? (await createClient())) as any
 
     // 1. Record commercial order
     const summary = calculateCommercialOrderSummary(productId)
@@ -99,18 +179,30 @@ export async function grantEntitlement(params: {
       { onConflict: 'order_number' }
     )
 
-    // 2. Record learner entitlement
+    // 2. Record learner entitlement (idempotently skip insert if already active for same user+product)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('learner_entitlements') as any).insert({
-      id: entitlement.id,
-      user_identifier: effectiveUserId,
-      product_id: product.id,
-      domain: product.domain,
-      target_id: entitlement.unlockedTargetId,
-      attempts_remaining: entitlement.attemptsRemaining,
-      valid_until: entitlement.validUntil,
-      is_active: true,
-    })
+    const { data: existingEnt } = await (supabase.from('learner_entitlements') as any)
+      .select('id')
+      .eq('user_identifier', effectiveUserId)
+      .eq('product_id', product.id)
+      .eq('is_active', true)
+      .gt('valid_until', now.toISOString())
+      .limit(1)
+      .maybeSingle()
+
+    if (!existingEnt) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('learner_entitlements') as any).insert({
+        id: entitlement.id,
+        user_identifier: effectiveUserId,
+        product_id: product.id,
+        domain: product.domain,
+        target_id: entitlement.unlockedTargetId,
+        attempts_remaining: entitlement.attemptsRemaining,
+        valid_until: entitlement.validUntil,
+        is_active: true,
+      })
+    }
   } catch (dbErr) {
     console.warn('[Commerce] DB Entitlement sync note (falling back to memory ledger):', dbErr)
   }
@@ -199,8 +291,9 @@ export async function revokeEntitlement(params: {
   paymentId?: string
   userId?: string
   reason?: 'refunded' | 'failed' | 'chargeback' | 'expired'
+  useServiceRole?: boolean
 }): Promise<boolean> {
-  const { orderNumber, paymentId, userId, reason = 'refunded' } = params
+  const { orderNumber, paymentId, userId, reason = 'refunded', useServiceRole } = params
   let memoryRevoked = false
   let targetProductId: string | undefined
   let targetUserId: string | undefined = userId
@@ -246,7 +339,8 @@ export async function revokeEntitlement(params: {
 
   // 2. Durable database revocation
   try {
-    const supabase = await createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const supabase = (getDbClient(useServiceRole) ?? (await createClient())) as any
 
     if (orderNumber) {
       // Look up product_id and user_identifier from commercial_orders
@@ -450,4 +544,228 @@ export function getTruthfulGrowthMetrics() {
       note: '1 million users by Day 30 is the ambition target, not a verified forecast. All metrics under measuredActuals represent real, un-padded learner data.',
     },
   }
+}
+
+export interface CommercialWebhookFulfillmentResult {
+  outcome: 'fulfilled' | 'already_fulfilled' | 'rejected' | 'not_commercial'
+  reason?: string
+  entitlement?: LearnerEntitlement
+}
+
+/**
+ * Validates and fulfills a commercial pass purchase from a verified Razorpay webhook.
+ * Correlates against stored commercial_orders (by order_number or razorpayOrderId),
+ * verifies product, user, currency, and amount, and prevents duplicate entitlement grants.
+ */
+export async function fulfillCommercialOrderFromWebhook(params: {
+  orderNumber?: string
+  razorpayOrderId?: string
+  paymentId: string
+  productId?: string
+  userId?: string
+  email?: string
+  amountPaise: number
+  currency?: string
+}): Promise<CommercialWebhookFulfillmentResult> {
+  const {
+    orderNumber: noteOrderNumber,
+    razorpayOrderId,
+    paymentId,
+    productId: noteProductId,
+    userId: noteUserId,
+    email,
+    amountPaise,
+    currency = 'INR',
+  } = params
+
+  if (currency.toUpperCase() !== 'INR') {
+    return { outcome: 'rejected', reason: 'unsupported_currency' }
+  }
+
+  // 1. Resolve stored order from memory or database
+  let resolvedOrderNumber =
+    noteOrderNumber || (razorpayOrderId ? RAZORPAY_ORDER_INDEX.get(razorpayOrderId) : undefined)
+  let storedOrder = resolvedOrderNumber ? PENDING_COMMERCIAL_ORDERS.get(resolvedOrderNumber) : undefined
+
+  if (!storedOrder && (process.env.NODE_ENV !== 'test' || process.env.TEST_USE_LIVE_DB)) {
+    const supabase = createServiceRoleClient()
+    if (resolvedOrderNumber) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase.from('commercial_orders') as any)
+        .select('*')
+        .eq('order_number', resolvedOrderNumber)
+        .maybeSingle()
+      if (data) {
+        storedOrder = {
+          orderNumber: data.order_number,
+          userIdentifier: data.user_identifier,
+          productId: data.product_id,
+          domain: data.domain,
+          totalPayableRupees: Number(data.total_payable_rupees),
+          status: data.status,
+          providerPaymentId: data.provider_payment_id ?? undefined,
+          razorpayOrderId: data.metadata?.razorpayOrderId ?? undefined,
+        }
+      }
+    } else if (razorpayOrderId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase.from('commercial_orders') as any)
+        .select('*')
+        .filter('metadata->>razorpayOrderId', 'eq', razorpayOrderId)
+        .maybeSingle()
+      if (data) {
+        resolvedOrderNumber = data.order_number
+        storedOrder = {
+          orderNumber: data.order_number,
+          userIdentifier: data.user_identifier,
+          productId: data.product_id,
+          domain: data.domain,
+          totalPayableRupees: Number(data.total_payable_rupees),
+          status: data.status,
+          providerPaymentId: data.provider_payment_id ?? undefined,
+          razorpayOrderId,
+        }
+      }
+    }
+  }
+
+  // Not a commercial order if neither stored order nor productId note exists
+  if (!storedOrder && !noteProductId) {
+    return { outcome: 'not_commercial' }
+  }
+
+  // 2. Validate authoritative product, user, and amount
+  const effectiveProductId = storedOrder?.productId || noteProductId
+  if (!effectiveProductId || !ALL_COMMERCIAL_PRODUCTS[effectiveProductId]) {
+    return { outcome: 'rejected', reason: 'unknown_product' }
+  }
+
+  if (storedOrder && noteProductId && noteProductId !== storedOrder.productId) {
+    return { outcome: 'rejected', reason: 'product_mismatch' }
+  }
+
+  const effectiveOrderNumber = storedOrder?.orderNumber || resolvedOrderNumber
+  const effectiveUserId = storedOrder?.userIdentifier || noteUserId
+  if (!effectiveOrderNumber || !effectiveUserId) {
+    return { outcome: 'rejected', reason: 'missing_order_or_user' }
+  }
+
+  if (storedOrder && noteUserId && noteUserId !== storedOrder.userIdentifier) {
+    return { outcome: 'rejected', reason: 'user_mismatch' }
+  }
+
+  const expectedPaise = storedOrder
+    ? Math.round(storedOrder.totalPayableRupees * 100)
+    : calculateCommercialOrderSummary(effectiveProductId).totalPayablePaise
+
+  if (!Number.isFinite(amountPaise) || amountPaise < expectedPaise) {
+    return { outcome: 'rejected', reason: 'amount_mismatch' }
+  }
+
+  if (storedOrder?.status === 'refunded') {
+    return { outcome: 'rejected', reason: 'order_already_refunded' }
+  }
+
+  // 3. Idempotent short-circuit for already-fulfilled orders/payments
+  if (FULFILLED_ORDERS.has(effectiveOrderNumber)) {
+    return {
+      outcome: 'already_fulfilled',
+      entitlement: FULFILLED_ORDERS.get(effectiveOrderNumber)!,
+    }
+  }
+  if (paymentId && FULFILLED_PAYMENTS.has(paymentId)) {
+    return {
+      outcome: 'already_fulfilled',
+      entitlement: FULFILLED_PAYMENTS.get(paymentId)!,
+    }
+  }
+  if (storedOrder?.status === 'paid') {
+    const existing = await getActiveEntitlements(effectiveUserId)
+    const matched = existing.find((e) => e.productId === effectiveProductId)
+    if (matched) {
+      return { outcome: 'already_fulfilled', entitlement: matched }
+    }
+  }
+
+  // 4. Grant entitlement & record payment transaction
+  const entitlement = await grantEntitlement({
+    orderNumber: effectiveOrderNumber,
+    paymentId,
+    productId: effectiveProductId,
+    userId: effectiveUserId,
+    email,
+    useServiceRole: true,
+  })
+
+  if (storedOrder) {
+    storedOrder.status = 'paid'
+    storedOrder.providerPaymentId = paymentId
+    PENDING_COMMERCIAL_ORDERS.set(effectiveOrderNumber, storedOrder)
+  }
+
+  if (process.env.NODE_ENV !== 'test' || process.env.TEST_USE_LIVE_DB) {
+    const supabase = createServiceRoleClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('payment_transactions') as any)
+      .upsert(
+        {
+          amount_cents: amountPaise,
+          status: 'succeeded',
+          provider: 'razorpay',
+          transaction_reference: paymentId,
+          metadata: {
+            orderNumber: effectiveOrderNumber,
+            productId: effectiveProductId,
+            userId: effectiveUserId,
+          },
+          created_at: new Date().toISOString(),
+        },
+        { onConflict: 'transaction_reference', ignoreDuplicates: true }
+      )
+  }
+
+  return { outcome: 'fulfilled', entitlement }
+}
+
+/**
+ * Marks a commercial order as failed when payment.failed is received,
+ * without overwriting already paid or refunded orders.
+ */
+export async function markCommercialOrderFailed(params: {
+  orderNumber?: string
+  razorpayOrderId?: string
+}): Promise<void> {
+  const resolvedOrderNumber =
+    params.orderNumber ||
+    (params.razorpayOrderId ? RAZORPAY_ORDER_INDEX.get(params.razorpayOrderId) : undefined)
+
+  if (resolvedOrderNumber) {
+    const stored = PENDING_COMMERCIAL_ORDERS.get(resolvedOrderNumber)
+    if (stored && stored.status === 'created') {
+      stored.status = 'failed'
+      PENDING_COMMERCIAL_ORDERS.set(resolvedOrderNumber, stored)
+    }
+  }
+
+  if (process.env.NODE_ENV !== 'test' || process.env.TEST_USE_LIVE_DB) {
+    const supabase = createServiceRoleClient()
+    if (resolvedOrderNumber) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('commercial_orders') as any)
+        .update({ status: 'failed', updated_at: new Date().toISOString() })
+        .eq('order_number', resolvedOrderNumber)
+        .eq('status', 'created')
+    } else if (params.razorpayOrderId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('commercial_orders') as any)
+        .update({ status: 'failed', updated_at: new Date().toISOString() })
+        .filter('metadata->>razorpayOrderId', 'eq', params.razorpayOrderId)
+        .eq('status', 'created')
+    }
+  }
+}
+
+export function resetCommercialOrdersForTesting(): void {
+  PENDING_COMMERCIAL_ORDERS.clear()
+  RAZORPAY_ORDER_INDEX.clear()
 }

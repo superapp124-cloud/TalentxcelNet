@@ -39,6 +39,16 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Cloudflare / vinext
+.cloudflare/
+.vinext/
+dist/
+.wrangler/
+.dev.vars
+.dev.vars.*
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.vinext/
+.cloudflare/

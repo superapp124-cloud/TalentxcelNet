@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Clock, Calendar, Share2, BookOpen, User, CheckCircle2 } from 'lucide-react'
 
+export const revalidate = 86400
+
 const blogPosts: Record<string, {
   title: string
   category: string

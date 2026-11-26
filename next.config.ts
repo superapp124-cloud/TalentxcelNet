@@ -33,13 +33,28 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  // Redirect www to non-www
+  // Redirect www to non-www and legacy 404 paths
   async redirects() {
     return [
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'www.talentxcel.net' }],
         destination: 'https://talentxcel.net/:path*',
+        permanent: true,
+      },
+      {
+        source: '/about',
+        destination: '/how-it-works',
+        permanent: true,
+      },
+      {
+        source: '/return-refund-policy',
+        destination: '/legal/refunds',
+        permanent: true,
+      },
+      {
+        source: '/locations/:path*',
+        destination: '/',
         permanent: true,
       },
     ]

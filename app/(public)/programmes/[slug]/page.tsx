@@ -26,6 +26,8 @@ import { getProgrammeBySlug } from '@/lib/lms/programme-universe'
 import { ProgrammePricingPlans } from '@/components/public/programme-pricing-plans'
 import { Class9FoundationSalesExperience } from '@/components/public/class-9-foundation-sales-experience'
 
+export const revalidate = 86400
+
 interface ProjectRoadmapItem {
   title: string
   stack: string

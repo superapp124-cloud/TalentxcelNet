@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardLayoutClient } from '@/components/dashboard/dashboard-layout-client'
+import { getUserActiveEntitlements } from '@/lib/commerce/user-entitlements'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,6 +49,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       user?.identities?.some((id) => id.provider === 'google')
   )
 
+  const { activeDomains, isPaidCustomer } = await getUserActiveEntitlements(user.id, email)
+
   return (
     <DashboardLayoutClient
       user={{
@@ -56,6 +59,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         displayName,
         avatarUrl,
         isGoogleUser,
+        isPaidCustomer,
+        activeDomains,
       }}
     >
       {children}

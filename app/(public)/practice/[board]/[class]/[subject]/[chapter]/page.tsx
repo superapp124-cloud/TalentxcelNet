@@ -23,6 +23,8 @@ import {
 import type { BoardCode, SubjectCode } from '@/packages/core/src'
 import { InteractiveChapterPractice } from '@/components/practice/interactive-chapter-practice'
 
+export const revalidate = 86400
+
 interface PageProps {
   params: Promise<{
     board: string
@@ -143,15 +145,16 @@ export default async function ChapterPracticePage({ params }: PageProps) {
     hasPart: practiceQuestions.map((q) => ({
       '@type': 'Question',
       name: q.questionText,
-      suggestedAnswer: q.options.map((opt, i) => ({
+      learningResourceType: 'Practice problem',
+      eduQuestionType: 'Multiple choice',
+      suggestedAnswer: q.options.map((opt) => ({
         '@type': 'Answer',
         text: opt,
-        position: i + 1,
       })),
       acceptedAnswer: {
         '@type': 'Answer',
         text: q.options[q.correctOptionIndex],
-        comment: {
+        answerExplanation: {
           '@type': 'Comment',
           text: q.explanationSnippet,
         },

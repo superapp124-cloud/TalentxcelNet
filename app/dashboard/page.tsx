@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { UnifiedLearnerDashboard } from '@/components/dashboard/unified-learner-dashboard'
+import { PaidCustomerDashboard } from '@/components/dashboard/paid-customer-dashboard'
+import { getUserActiveEntitlements } from '@/lib/commerce/user-entitlements'
 
 export const dynamic = 'force-dynamic'
 
@@ -82,18 +84,22 @@ export default async function DashboardPage() {
       user?.identities?.some((id) => id.provider === 'google')
   )
 
-  return (
-    <UnifiedLearnerDashboard
-      user={{
-        id: user.id,
-        email,
-        displayName,
-        avatarUrl,
-        isGoogleUser,
-        streakDays,
-        accuracyPercentage: accuracyPercentage ?? undefined,
-        testsCompleted,
-      }}
-    />
-  )
+  const { entitlements, isPaidCustomer } = await getUserActiveEntitlements(user.id, email)
+
+  const dashboardUser = {
+    id: user.id,
+    email,
+    displayName,
+    avatarUrl,
+    isGoogleUser,
+    streakDays,
+    accuracyPercentage: accuracyPercentage ?? undefined,
+    testsCompleted,
+  }
+
+  if (isPaidCustomer) {
+    return <PaidCustomerDashboard user={dashboardUser} entitlements={entitlements} />
+  }
+
+  return <UnifiedLearnerDashboard user={dashboardUser} />
 }

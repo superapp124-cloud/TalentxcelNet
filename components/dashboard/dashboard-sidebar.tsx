@@ -22,12 +22,16 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+import type { ProductDomain } from '@/packages/core/src/types'
+
 export interface DashboardUserProps {
   id: string
   email?: string
   displayName?: string
   avatarUrl?: string | null
   isGoogleUser?: boolean
+  isPaidCustomer?: boolean
+  activeDomains?: ProductDomain[]
 }
 
 interface DashboardSidebarProps {
@@ -144,6 +148,30 @@ const navItems: NavItem[] = [
   },
 ]
 
+const DOMAIN_NAV_IDS: Record<ProductDomain, string[]> = {
+  assessment: ['diagnostic', 'question-bank', 'reports'],
+  skill: ['skills', 'projects'],
+  academic: ['academic', 'question-bank', 'notes'],
+}
+
+export function getVisibleDashboardNavItems(
+  isPaidCustomer?: boolean,
+  activeDomains: ProductDomain[] = []
+): NavItem[] {
+  if (!isPaidCustomer || activeDomains.length === 0) {
+    return navItems
+  }
+  const allowedIds = new Set<string>(['overview', 'plans', 'settings'])
+  for (const domain of activeDomains) {
+    for (const id of DOMAIN_NAV_IDS[domain] || []) {
+      allowedIds.add(id)
+    }
+  }
+  return navItems
+    .filter((item) => allowedIds.has(item.id))
+    .map((item) => (item.id === 'overview' ? { ...item, label: 'My Services' } : item))
+}
+
 export function DashboardSidebar({
   user,
   mobileOpen = false,
@@ -151,6 +179,7 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const pathname = usePathname()
   const [activeItem, setActiveItem] = useState<string>('overview')
+  const visibleItems = getVisibleDashboardNavItems(user.isPaidCustomer, user.activeDomains)
 
   const isNavActive = (item: NavItem) => {
     if (item.id === 'overview') {
@@ -182,7 +211,7 @@ export function DashboardSidebar({
 
   const NavLinks = () => (
     <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto" aria-label="Dashboard navigation">
-      {navItems.map((item) => {
+      {visibleItems.map((item) => {
         const Icon = item.icon
         const active = isNavActive(item)
 
@@ -268,7 +297,7 @@ export function DashboardSidebar({
               </button>
             </div>
             <NavLinks />
-            <UpgradeCard />
+            {!user.isPaidCustomer && <UpgradeCard />}
           </aside>
         </div>
       )}
@@ -279,7 +308,7 @@ export function DashboardSidebar({
         aria-label="Dashboard navigation"
       >
         <NavLinks />
-        <UpgradeCard />
+        {!user.isPaidCustomer && <UpgradeCard />}
       </aside>
     </>
   )

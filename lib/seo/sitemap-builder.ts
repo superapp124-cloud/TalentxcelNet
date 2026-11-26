@@ -91,7 +91,7 @@ export function getCoreSitemapUrls(): SitemapEntry[] {
     { url: `${BASE_URL}/academic`, changeFrequency: 'daily', priority: 0.95, lastModified: today },
     { url: `${BASE_URL}/plans`, changeFrequency: 'weekly', priority: 0.9, lastModified: today },
     { url: `${BASE_URL}/faq`, changeFrequency: 'monthly', priority: 0.8, lastModified: today },
-    { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.8, lastModified: today },
+    { url: `${BASE_URL}/how-it-works`, changeFrequency: 'monthly', priority: 0.8, lastModified: today },
     { url: `${BASE_URL}/programmes`, changeFrequency: 'weekly', priority: 0.9, lastModified: today },
     { url: `${BASE_URL}/how-it-works`, changeFrequency: 'monthly', priority: 0.7, lastModified: today },
     { url: `${BASE_URL}/fees`, changeFrequency: 'monthly', priority: 0.8, lastModified: today },

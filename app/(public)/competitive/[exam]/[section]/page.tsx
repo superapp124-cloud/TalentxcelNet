@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { getExamSection } from '@/lib/competitive/exam-data'
 import { InteractiveCompetitiveTest } from '@/components/competitive/interactive-competitive-test'
 
+export const revalidate = 86400
+
 interface SectionPracticePageProps {
   params: Promise<{
     exam: string
@@ -58,25 +60,28 @@ export default async function CompetitiveSectionPracticePage({ params }: Section
     '@type': 'Quiz',
     name: `${exam.shortName} - ${section.title}`,
     description: section.subtitle,
+    about: {
+      '@type': 'Thing',
+      name: `${exam.shortName} ${section.title}`,
+    },
     hasPart: section.sampleQuestions.map((q) => ({
       '@type': 'Question',
       name: q.questionText,
       learningResourceType: 'Practice problem',
+      eduQuestionType: 'Multiple choice',
       educationalAlignment: {
         '@type': 'AlignmentObject',
         alignmentType: 'educationalSubject',
         targetName: exam.shortName,
       },
-      suggestedAnswer: q.options.map((opt, idx) => ({
+      suggestedAnswer: q.options.map((opt) => ({
         '@type': 'Answer',
-        position: idx + 1,
         text: opt,
       })),
       acceptedAnswer: {
         '@type': 'Answer',
-        position: q.correctIndex + 1,
         text: q.options[q.correctIndex],
-        comment: {
+        answerExplanation: {
           '@type': 'Comment',
           text: q.explanation,
         },

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/admin'
 import { randomBytes } from 'crypto'
 
 export type WebhookLeaseOutcome = 'acquired' | 'already_processed' | 'busy'
@@ -48,8 +48,8 @@ export async function acquireWebhookLease(params: {
     return acquireMockWebhookLease(provider, eventId, eventType, workerId, leaseSeconds)
   }
 
-  // Production & Staging: Atomic PostgreSQL RPC call with FOR UPDATE row locks
-  const supabase = await createClient()
+  // Production & Staging: Atomic PostgreSQL RPC call with FOR UPDATE row locks (requires service_role)
+  const supabase = createServiceRoleClient()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.rpc as any)('acquire_webhook_processing_lease', {
@@ -94,7 +94,7 @@ export async function completeWebhookProcessing(params: {
     return
   }
 
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: success, error } = await (supabase.rpc as any)('complete_webhook_processing', {
@@ -126,7 +126,7 @@ export async function failWebhookProcessing(params: {
     return failMockWebhookProcessing(provider, eventId, workerId, errorMessage)
   }
 
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: success, error } = await (supabase.rpc as any)('fail_webhook_processing', {
     p_provider: provider,
@@ -173,7 +173,7 @@ export async function executeAtomicPaymentCaptured(params: {
     }
   }
 
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.rpc as any)('apply_payment_captured_transaction', {
     p_order_number: orderNumber,

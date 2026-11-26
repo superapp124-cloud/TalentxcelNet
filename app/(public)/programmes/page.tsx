@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { getSupabaseConfig } from '@/lib/supabase/config'
 import type { Tables } from '@/types/database'
+
+export const revalidate = 3600
 import Link from 'next/link'
 import {
   Brain,
@@ -176,20 +178,27 @@ export default async function ProgrammesPage() {
   let displayProgrammes: ProgrammeCardItem[] = ALL_CATALOGUE_PROGRAMMES
 
   try {
-    const supabase = await createClient()
-    const { data: dbProgrammes } = (await supabase
-      .from('programmes')
-      .select('id, slug, title, short_description, status, duration_months, level, category')
-      .eq('status', 'published')
-      .order('created_at', { ascending: true })) as {
-      data: Tables<'programmes'>[] | null
-    }
+    const { url, anonKey } = getSupabaseConfig()
+    const res = await fetch(
+      `${url}/rest/v1/programmes?select=id,slug,title,short_description,status,duration_months,level,category&status=eq.published&order=created_at.asc`,
+      {
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+        },
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(3000),
+      }
+    )
 
-    if (dbProgrammes && dbProgrammes.length > 0) {
-      // Merge or prefer DB records if published
-      const dbSlugs = new Set(dbProgrammes.map((p) => p.slug))
-      const extraFallbacks = ALL_CATALOGUE_PROGRAMMES.filter((p) => !dbSlugs.has(p.slug))
-      displayProgrammes = [...dbProgrammes.map((p) => ({ ...p, has_hardware: true })), ...extraFallbacks]
+    if (res.ok) {
+      const dbProgrammes = (await res.json()) as Tables<'programmes'>[] | null
+      if (dbProgrammes && dbProgrammes.length > 0) {
+        // Merge or prefer DB records if published
+        const dbSlugs = new Set(dbProgrammes.map((p) => p.slug))
+        const extraFallbacks = ALL_CATALOGUE_PROGRAMMES.filter((p) => !dbSlugs.has(p.slug))
+        displayProgrammes = [...dbProgrammes.map((p) => ({ ...p, has_hardware: true })), ...extraFallbacks]
+      }
     }
   } catch {
     // If DB is offline, fallback seamlessly

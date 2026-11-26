@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { calculateCommercialOrderSummary, ALL_COMMERCIAL_PRODUCTS } from '@/packages/core/src/data/product-catalog'
 import { createRazorpayOrder } from '@/lib/commerce/razorpay'
-import { recordFunnelEvent } from '@/lib/commerce/entitlements'
+import { recordFunnelEvent, recordPendingCommercialOrder } from '@/lib/commerce/entitlements'
 import { generateOrderNumber } from '@/lib/utils'
 
 const createOrderSchema = z.object({
@@ -71,7 +71,15 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    // 3. Record verified funnel event: checkout_initiated
+    // 3. Persist pending commercial order for authoritative webhook correlation
+    await recordPendingCommercialOrder({
+      orderNumber,
+      userId: effectiveUserId,
+      productId: product.id,
+      razorpayOrderId: rzpOrder.id,
+    })
+
+    // 4. Record verified funnel event: checkout_initiated
     await recordFunnelEvent({
       eventName: 'checkout_initiated',
       domain: product.domain,

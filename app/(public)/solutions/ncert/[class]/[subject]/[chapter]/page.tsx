@@ -323,3 +323,5 @@ export default async function NcertChapterSolutionsPage({ params }: PageProps) {
     </div>
   )
 }
+
+export const revalidate = 86400
