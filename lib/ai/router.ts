@@ -44,6 +44,106 @@ export function sanitizePrompt(input: string): { isSafe: boolean; sanitized: str
   return { isSafe: true, sanitized: input.trim() }
 }
 
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash'
+const DEFAULT_AI_TIMEOUT_MS = 12_000
+
+function redactSensitiveText(raw: string, secrets: Array<string | undefined>): string {
+  let clean = raw
+  for (const secret of secrets) {
+    if (secret && secret.length >= 6) {
+      clean = clean.split(secret).join('[REDACTED]')
+    }
+  }
+  return clean
+    .replace(/([?&]key=)[^&\s]+/gi, '$1[REDACTED]')
+    .replace(/(Bearer\s+)[A-Za-z0-9._-]+/gi, '$1[REDACTED]')
+    .replace(/AIza[0-9A-Za-z_-]{12,}/g, '[REDACTED_GOOGLE_KEY]')
+    .replace(/sk-[0-9A-Za-z_-]{12,}/g, '[REDACTED_OPENAI_KEY]')
+}
+
+function resolveGeminiModel(configured?: string): string {
+  const candidate = configured?.trim()
+  if (candidate && /^[a-zA-Z0-9._-]+$/.test(candidate)) {
+    return candidate
+  }
+  return DEFAULT_GEMINI_MODEL
+}
+
+function buildGeminiPayload(request: AICompletionRequest, geminiModel: string, fallbackUserText: string) {
+  const systemTexts: string[] = []
+  const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = []
+
+  for (const msg of request.messages) {
+    const trimmed = msg.content?.trim()
+    if (!trimmed) continue
+    if (msg.role === 'system') {
+      systemTexts.push(trimmed)
+    } else {
+      contents.push({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: trimmed }],
+      })
+    }
+  }
+
+  // Gemini 3.x+ rejects requests whose final turn has role 'model' (HTTP 400).
+  while (contents.length > 0 && contents[contents.length - 1]?.role === 'model') {
+    contents.pop()
+  }
+  if (contents.length === 0) {
+    contents.push({
+      role: 'user',
+      parts: [{ text: fallbackUserText || 'Help me understand this topic.' }],
+    })
+  }
+
+  const isLegacyGenerationModel =
+    geminiModel.startsWith('gemini-1.') || geminiModel.startsWith('gemini-2.')
+
+  const generationConfig: Record<string, unknown> = isLegacyGenerationModel
+    ? {
+        temperature: request.temperature ?? 0.3,
+        maxOutputTokens: request.maxTokens ?? 1024,
+      }
+    : {
+        // Gemini 3.x deprecates sampling params (temperature/top_p/top_k) and shares
+        // maxOutputTokens across thinking + response tokens.
+        maxOutputTokens: request.maxTokens ?? 2048,
+        thinkingConfig: {
+          thinkingLevel: 'LOW',
+          includeThoughts: false,
+        },
+      }
+
+  return {
+    ...(systemTexts.length > 0
+      ? { systemInstruction: { parts: [{ text: systemTexts.join('\n\n') }] } }
+      : {}),
+    contents,
+    generationConfig,
+  }
+}
+
+function extractGeminiAnswerText(data: unknown): string {
+  if (!data || typeof data !== 'object') return ''
+  const candidates = (data as { candidates?: unknown }).candidates
+  if (!Array.isArray(candidates) || candidates.length === 0) return ''
+  const parts = (candidates[0] as { content?: { parts?: unknown } })?.content?.parts
+  if (!Array.isArray(parts)) return ''
+
+  return parts
+    .filter(
+      (part): part is { text: string; thought?: boolean } =>
+        Boolean(part) &&
+        typeof part === 'object' &&
+        (part as { thought?: unknown }).thought !== true &&
+        typeof (part as { text?: unknown }).text === 'string'
+    )
+    .map((part) => part.text)
+    .join('')
+    .trim()
+}
+
 export async function executeAIRequest(
   request: AICompletionRequest
 ): Promise<AICompletionResponse> {
@@ -85,16 +185,18 @@ export async function executeAIRequest(
   }
 
   const primaryProvider = (process.env.AI_PRIMARY_PROVIDER as AIProvider) || 'openai'
+  const openAiApiKey = process.env.OPENAI_API_KEY?.trim()
+  const googleApiKey = process.env.GOOGLE_AI_API_KEY?.trim()
   const relevantChunks = retrieveGroundedChunks(userText, 3)
 
   // 3. OpenAI provider attempt
-  if ((primaryProvider === 'openai' || !primaryProvider) && process.env.OPENAI_API_KEY) {
+  if ((primaryProvider === 'openai' || !primaryProvider) && openAiApiKey) {
     try {
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${openAiApiKey}`,
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
@@ -102,67 +204,99 @@ export async function executeAIRequest(
           temperature: request.temperature ?? 0.3,
           max_tokens: request.maxTokens ?? 1000,
         }),
+        signal: AbortSignal.timeout(DEFAULT_AI_TIMEOUT_MS),
       })
 
       if (res.ok) {
         const data = await res.json()
-        const content = data.choices[0]?.message?.content ?? ''
-        const usage = data.usage ?? { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
-        return {
-          content,
-          provider: 'openai',
-          model: 'gpt-4o-mini',
-          tokensUsed: {
-            prompt: usage.prompt_tokens,
-            completion: usage.completion_tokens,
-            total: usage.total_tokens,
-          },
-          latencyMs: Date.now() - startTime,
-          isFallback: false,
-          sources: relevantChunks.map((c) => ({ title: c.title, category: c.category })),
-          canEscalate: true,
-        }
-      }
-    } catch {
-      // Fallback gracefully
-    }
-  }
-
-  // 4. Google Gemini provider attempt
-  if (process.env.GOOGLE_AI_API_KEY) {
-    try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`
-      const promptText = request.messages.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n')
-      const res = await fetch(geminiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }],
-          generationConfig: {
-            temperature: request.temperature ?? 0.3,
-            maxOutputTokens: request.maxTokens ?? 1000,
-          },
-        }),
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-        if (text) {
+        const content = data?.choices?.[0]?.message?.content ?? ''
+        if (typeof content === 'string' && content.trim().length > 0) {
+          const usage = data.usage ?? { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
           return {
-            content: text,
-            provider: 'google',
-            model: 'gemini-1.5-flash',
-            tokensUsed: { prompt: 150, completion: 200, total: 350 },
+            content,
+            provider: 'openai',
+            model: 'gpt-4o-mini',
+            tokensUsed: {
+              prompt: usage.prompt_tokens ?? 0,
+              completion: usage.completion_tokens ?? 0,
+              total: usage.total_tokens ?? 0,
+            },
             latencyMs: Date.now() - startTime,
             isFallback: false,
             sources: relevantChunks.map((c) => ({ title: c.title, category: c.category })),
             canEscalate: true,
           }
         }
+      } else {
+        console.warn(`[AI Router] OpenAI request failed with HTTP ${res.status}; falling back.`)
       }
-    } catch {
-      // Fallback gracefully
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn(
+        `[AI Router] OpenAI error (${redactSensitiveText(msg, [openAiApiKey, googleApiKey])}); falling back.`
+      )
+    }
+  }
+
+  // 4. Google Gemini provider attempt
+  if (googleApiKey) {
+    const geminiModel = resolveGeminiModel(process.env.GEMINI_MODEL)
+    try {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent`
+      const payload = buildGeminiPayload(request, geminiModel, userText)
+      const res = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': googleApiKey,
+        },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(DEFAULT_AI_TIMEOUT_MS),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        const text = extractGeminiAnswerText(data)
+        if (text) {
+          const usageMeta = data?.usageMetadata as
+            | {
+                promptTokenCount?: number
+                candidatesTokenCount?: number
+                thoughtsTokenCount?: number
+                totalTokenCount?: number
+              }
+            | undefined
+          const promptTokens = usageMeta?.promptTokenCount ?? 150
+          const completionTokens =
+            usageMeta?.candidatesTokenCount !== undefined || usageMeta?.thoughtsTokenCount !== undefined
+              ? (usageMeta?.candidatesTokenCount ?? 0) + (usageMeta?.thoughtsTokenCount ?? 0)
+              : 200
+          const totalTokens = usageMeta?.totalTokenCount ?? promptTokens + completionTokens
+
+          return {
+            content: text,
+            provider: 'google',
+            model: geminiModel,
+            tokensUsed: {
+              prompt: promptTokens,
+              completion: completionTokens,
+              total: totalTokens,
+            },
+            latencyMs: Date.now() - startTime,
+            isFallback: false,
+            sources: relevantChunks.map((c) => ({ title: c.title, category: c.category })),
+            canEscalate: true,
+          }
+        }
+        console.warn(`[AI Router] Gemini model ${geminiModel} returned empty answer content; falling back to RAG.`)
+      } else {
+        console.warn(`[AI Router] Gemini model ${geminiModel} returned HTTP ${res.status}; falling back to RAG.`)
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn(
+        `[AI Router] Gemini failure for ${geminiModel} (${redactSensitiveText(msg, [googleApiKey, openAiApiKey])}); falling back to RAG.`
+      )
     }
   }
 
