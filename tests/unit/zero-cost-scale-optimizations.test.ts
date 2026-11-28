@@ -4,6 +4,7 @@ import { NextRequest } from 'next/server'
 import {
   applyPublicEdgeCachePolicy,
   canUseEdgeCacheForRequest,
+  canUseRscEdgeCacheForRequest,
   createQuotaSafeKv,
   shouldBypassKvCacheForRequest,
   type KvNamespaceLike,
@@ -47,6 +48,49 @@ describe('Zero-cost edge cache policy', () => {
     ).toBe(false)
     expect(
       canUseEdgeCacheForRequest(new Request('https://academy.talentxcel.net/'))
+    ).toBe(false)
+  })
+
+  it('allows anonymous public RSC prefetch requests to be edge-cached while rejecting private/auth RSC', () => {
+    expect(
+      canUseRscEdgeCacheForRequest(
+        new Request('https://talentxcel.net/question/sci_c10_ch01_q0002', {
+          headers: { rsc: '1' },
+        })
+      )
+    ).toBe(true)
+    expect(
+      canUseRscEdgeCacheForRequest(
+        new Request('https://talentxcel.net/practice', {
+          headers: { 'next-router-prefetch': '1' },
+        })
+      )
+    ).toBe(true)
+    expect(
+      canUseRscEdgeCacheForRequest(
+        new Request('https://talentxcel.net/programmes?_rsc=abc')
+      )
+    ).toBe(true)
+
+    // Rejects non-RSC
+    expect(
+      canUseRscEdgeCacheForRequest(new Request('https://talentxcel.net/practice'))
+    ).toBe(false)
+
+    // Rejects authenticated or private RSC
+    expect(
+      canUseRscEdgeCacheForRequest(
+        new Request('https://talentxcel.net/dashboard', {
+          headers: { rsc: '1' },
+        })
+      )
+    ).toBe(false)
+    expect(
+      canUseRscEdgeCacheForRequest(
+        new Request('https://talentxcel.net/practice', {
+          headers: { rsc: '1', cookie: 'sb-wvuvriewskvvievacida-auth-token=secret' },
+        })
+      )
     ).toBe(false)
   })
 

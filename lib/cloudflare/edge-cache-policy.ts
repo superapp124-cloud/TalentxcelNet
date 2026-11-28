@@ -108,6 +108,17 @@ export function canUseEdgeCacheForRequest(request: Request, parsedUrl?: URL): bo
   return true;
 }
 
+export function canUseRscEdgeCacheForRequest(request: Request, parsedUrl?: URL): boolean {
+  if (request.method !== "GET") return false;
+  const url = parsedUrl ?? new URL(request.url);
+  if (isPrivatePath(url.pathname)) return false;
+  if (isSubdomainRootRequest(url)) return false;
+  if (!isRscDataRequest(request, url)) return false;
+  if (hasSupabaseAuthCookie(request.headers.get("cookie"))) return false;
+  if (request.headers.has("authorization")) return false;
+  return isPublicSeoPath(url.pathname);
+}
+
 export function shouldBypassKvCacheForRequest(pathname: string): boolean {
   // Question pages are 100% deterministic in-memory renders cached by Cloudflare CDN & caches.default.
   // Skipping KV avoids exhausting Cloudflare Free plan's 1,000 KV writes/day and 100k reads/day across 106k+ URLs.
@@ -203,7 +214,10 @@ export function applyPublicEdgeCachePolicy(
   parsedUrl?: URL
 ): { response: Response; shouldEdgeCache: boolean } {
   const url = parsedUrl ?? new URL(request.url);
-  if (!canUseEdgeCacheForRequest(request, url)) {
+  const isHtmlEligible = canUseEdgeCacheForRequest(request, url);
+  const isRscEligible = canUseRscEdgeCacheForRequest(request, url);
+
+  if (!isHtmlEligible && !isRscEligible) {
     return { response, shouldEdgeCache: false };
   }
   if (response.status !== 200 || response.headers.has("set-cookie")) {
@@ -235,7 +249,7 @@ export function applyPublicEdgeCachePolicy(
     );
   }
 
-  if (isSeoRoute && !isSitemapOrRobots) {
+  if (isHtmlEligible && isSeoRoute && !isSitemapOrRobots) {
     // Strip framework RSC Vary fields on anonymous HTML responses so Cloudflare CDN edge can share cache hits.
     normalizedHeaders.set("vary", "Accept-Encoding");
   }
