@@ -5,6 +5,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { Toaster } from 'sonner'
+import { VisitorIntelligenceTracker } from '@/components/analytics/visitor-intelligence-tracker'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -183,6 +184,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
+            <VisitorIntelligenceTracker />
             {children}
             <Toaster richColors position="top-right" />
           </QueryProvider>

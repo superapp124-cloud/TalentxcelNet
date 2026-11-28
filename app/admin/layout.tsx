@@ -10,12 +10,14 @@ import {
   ArrowLeft,
   Calculator,
   Compass,
+  Activity,
 } from 'lucide-react'
 import { Logo } from '@/components/brand/logo'
 import { requireAdminPage } from '@/lib/auth/server-access'
 
 const navItems = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { label: 'Learning Command Center', href: '/admin/intelligence', icon: Activity },
   { label: 'Life Skills (216 Modules)', href: '/admin/life-skills', icon: Compass },
   { label: 'Question Bank (3M Qs)', href: '/admin/question-bank', icon: Calculator },
   { label: 'Ecosystem Growth OS', href: '/admin/growth-os', icon: Globe },

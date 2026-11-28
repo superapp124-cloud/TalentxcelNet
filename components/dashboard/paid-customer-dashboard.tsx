@@ -20,6 +20,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { EnrichedEntitlement } from '@/lib/commerce/user-entitlements'
 import type { ProductDomain } from '@/packages/core/src/types'
+import { LearnerIntelligencePanel } from '@/components/dashboard/learner-intelligence-sections'
+import type { LearnerWorkspaceData } from '@/lib/dashboard/learner-intelligence'
 
 export interface PaidDashboardUser {
   id: string
@@ -35,6 +37,7 @@ export interface PaidDashboardUser {
 interface PaidCustomerDashboardProps {
   user: PaidDashboardUser
   entitlements: EnrichedEntitlement[]
+  workspace?: LearnerWorkspaceData
 }
 
 interface ServiceAction {
@@ -89,7 +92,7 @@ function formatValidUntil(iso: string): string {
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export function PaidCustomerDashboard({ user, entitlements }: PaidCustomerDashboardProps) {
+export function PaidCustomerDashboard({ user, entitlements, workspace }: PaidCustomerDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Focused Paid Customer Header */}
@@ -248,6 +251,8 @@ export function PaidCustomerDashboard({ user, entitlements }: PaidCustomerDashbo
           })}
         </div>
       </section>
+
+      {workspace && <LearnerIntelligencePanel workspace={workspace} variant="paid" />}
     </div>
   )
 }

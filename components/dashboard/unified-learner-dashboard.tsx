@@ -43,6 +43,8 @@ import type {
   ConfidentialQuestionSolution,
 } from '@/packages/core/src/types'
 import { RazorpayCheckoutModal } from '@/components/commerce/razorpay-checkout-modal'
+import { LearnerIntelligencePanel } from '@/components/dashboard/learner-intelligence-sections'
+import type { LearnerWorkspaceData } from '@/lib/dashboard/learner-intelligence'
 
 // Dynamic import for modal to keep initial bundle lean
 const TestRunnerModal = dynamic(
@@ -474,7 +476,10 @@ function renderStatusBadge(status: { text: string; type: string }) {
   }
 }
 
-export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) {
+export function UnifiedLearnerDashboard({
+  user,
+  workspace,
+}: UnifiedLearnerDashboardProps & { workspace?: LearnerWorkspaceData }) {
   const [selectedTargetId, setSelectedTargetId] = useState<string>('class_10')
   const [activeFilterChip, setActiveFilterChip] = useState<string>('Board Exams')
 
@@ -1089,6 +1094,12 @@ export function UnifiedLearnerDashboard({ user }: UnifiedLearnerDashboardProps) 
           </div>
         </div>
       </div>
+
+      {workspace && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+          <LearnerIntelligencePanel workspace={workspace} variant="free" />
+        </div>
+      )}
 
       {/* Test Runner Modal */}
       {isTestRunnerOpen && (

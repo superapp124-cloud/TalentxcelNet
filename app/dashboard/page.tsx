@@ -85,6 +85,8 @@ export default async function DashboardPage() {
   )
 
   const { entitlements, isPaidCustomer } = await getUserActiveEntitlements(user.id, email)
+  const { loadLearnerWorkspaceFromDb } = await import('@/lib/dashboard/learner-intelligence')
+  const workspace = await loadLearnerWorkspaceFromDb(user.id, email)
 
   const dashboardUser = {
     id: user.id,
@@ -98,8 +100,8 @@ export default async function DashboardPage() {
   }
 
   if (isPaidCustomer) {
-    return <PaidCustomerDashboard user={dashboardUser} entitlements={entitlements} />
+    return <PaidCustomerDashboard user={dashboardUser} entitlements={entitlements} workspace={workspace} />
   }
 
-  return <UnifiedLearnerDashboard user={dashboardUser} />
+  return <UnifiedLearnerDashboard user={dashboardUser} workspace={workspace} />
 }
