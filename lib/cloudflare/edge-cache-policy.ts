@@ -54,6 +54,8 @@ const PUBLIC_SEO_EXACT_OR_PREFIXES = [
 
 const HTML_PUBLIC_CACHE_CONTROL =
   "public, max-age=300, s-maxage=86400, stale-while-revalidate=43200";
+const DETERMINISTIC_QUESTION_CACHE_CONTROL =
+  "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400";
 const SITEMAP_PUBLIC_CACHE_CONTROL =
   "public, max-age=3600, s-maxage=86400, stale-while-revalidate=43200";
 
@@ -120,9 +122,14 @@ export function canUseRscEdgeCacheForRequest(request: Request, parsedUrl?: URL):
 }
 
 export function shouldBypassKvCacheForRequest(pathname: string): boolean {
-  // Question pages are 100% deterministic in-memory renders cached by Cloudflare CDN & caches.default.
+  // Question and deterministic curriculum pages are 100% deterministic in-memory renders cached by Cloudflare CDN & caches.default.
   // Skipping KV avoids exhausting Cloudflare Free plan's 1,000 KV writes/day and 100k reads/day across 106k+ URLs.
-  return pathname.startsWith("/question/");
+  return (
+    pathname.startsWith("/question/") ||
+    pathname.startsWith("/solutions/") ||
+    pathname.startsWith("/formulas/") ||
+    pathname.startsWith("/practice/")
+  );
 }
 
 function createNoopKvNamespace(): KvNamespaceLike {
@@ -234,10 +241,17 @@ export function applyPublicEdgeCachePolicy(
     return { response, shouldEdgeCache: false };
   }
 
+  const isDeterministicQuestionRoute =
+    url.pathname.startsWith("/question/") ||
+    url.pathname.startsWith("/solutions/") ||
+    url.pathname.startsWith("/formulas/") ||
+    url.pathname.startsWith("/practice/");
+
   const normalizedHeaders = new Headers(response.headers);
   const needsOverride =
     isSeoRoute &&
     (!rawCacheControl ||
+      isDeterministicQuestionRoute ||
       rawCacheControl.toLowerCase().includes("private") ||
       rawCacheControl.toLowerCase().includes("no-store") ||
       rawCacheControl.toLowerCase().includes("no-cache"));
@@ -245,7 +259,11 @@ export function applyPublicEdgeCachePolicy(
   if (needsOverride || !rawCacheControl) {
     normalizedHeaders.set(
       "cache-control",
-      isSitemapOrRobots ? SITEMAP_PUBLIC_CACHE_CONTROL : HTML_PUBLIC_CACHE_CONTROL
+      isDeterministicQuestionRoute
+        ? DETERMINISTIC_QUESTION_CACHE_CONTROL
+        : isSitemapOrRobots
+        ? SITEMAP_PUBLIC_CACHE_CONTROL
+        : HTML_PUBLIC_CACHE_CONTROL
     );
   }
 

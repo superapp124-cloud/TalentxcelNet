@@ -22,8 +22,8 @@ interface MemoryCacheEntry {
   expires: number;
 }
 
-const MEMORY_CACHE_LIMIT = 250;
-const MEMORY_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes in-memory hot retention
+const MEMORY_CACHE_LIMIT = 500;
+const MEMORY_CACHE_TTL_MS = 60 * 60 * 1000; // 60 minutes in-memory hot retention
 const memoryCache = new Map<string, MemoryCacheEntry>();
 
 function getFromMemoryCache(key: string): Response | null {
@@ -73,6 +73,19 @@ const worker = {
     env: Record<string, unknown> & { VINEXT_KV_CACHE?: KvNamespaceLike },
     ctx: ExecutionContextLike
   ): Promise<Response> {
+    const userAgent = request.headers.get("user-agent") || "";
+    // Instantly shed aggressive, non-traffic-generating bot scrapers (0.01ms CPU)
+    // to preserve Free-tier CPU budget for real users and primary search engines (Googlebot, Bingbot).
+    if (/bytespider|semrushbot|ahrefsbot|petalbot|dotbot|mj12bot|zoominfobot|dataforseo|serpstat|seekport|screaming frog|seokicks|blexbot/i.test(userAgent)) {
+      return new Response("Crawl rate limit exceeded", {
+        status: 429,
+        headers: {
+          "retry-after": "86400",
+          "content-type": "text/plain",
+        },
+      });
+    }
+
     // Bridge Cloudflare Workers secrets and env bindings to process.env
     // so Next.js server components and route handlers can access SUPABASE_SERVICE_ROLE_KEY, etc.
     if (env && typeof process !== "undefined" && process.env) {

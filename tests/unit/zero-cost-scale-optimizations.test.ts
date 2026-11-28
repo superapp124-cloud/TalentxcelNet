@@ -108,8 +108,14 @@ describe('Zero-cost edge cache policy', () => {
     const { response, shouldEdgeCache } = applyPublicEdgeCachePolicy(req, originRes)
     expect(shouldEdgeCache).toBe(true)
     expect(response.headers.get('cache-control')).toContain('public')
-    expect(response.headers.get('cache-control')).toContain('s-maxage=86400')
+    expect(response.headers.get('cache-control')).toContain('s-maxage=604800')
     expect(response.headers.get('vary')).toBe('Accept-Encoding')
+
+    // General SEO page gets standard HTML edge cache control (s-maxage=86400)
+    const genReq = new Request('https://talentxcel.net/programmes')
+    const genRes = applyPublicEdgeCachePolicy(genReq, originRes)
+    expect(genRes.shouldEdgeCache).toBe(true)
+    expect(genRes.response.headers.get('cache-control')).toContain('s-maxage=86400')
   })
 
   it('never caches responses with Set-Cookie or non-200 status', () => {
