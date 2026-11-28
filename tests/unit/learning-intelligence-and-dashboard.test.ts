@@ -291,7 +291,7 @@ describe('Learning Intelligence, Visitor Analytics & Unified Dashboard', () => {
   describe('Phase 8 & 10: Admin Command Center Aggregations & Route Authorization', () => {
     it('computes 7-stage funnel, traffic attribution, date windows, and pagination accurately', async () => {
       const win = resolveDateWindow('7d')
-      const nowIso = new Date().toISOString()
+      const nowIso = win.toIso
 
       const report = buildAdminIntelligenceReport({
         query: { range: '7d', userPage: 1, userPageSize: 1 },

@@ -60,12 +60,22 @@ export async function POST(req: NextRequest) {
     authenticatedUserId = null
   }
 
-  const result = await ingestAnalyticsEvents(events, {
-    authenticatedUserId,
-    userAgent: req.headers.get('user-agent'),
-    countryCode: req.headers.get('cf-ipcountry'),
-    region: req.headers.get('cf-region-code'),
-  })
+  let result: { accepted: number; deduplicated: number; eventIds: string[] }
+  try {
+    result = await ingestAnalyticsEvents(events, {
+      authenticatedUserId,
+      userAgent: req.headers.get('user-agent'),
+      countryCode: req.headers.get('cf-ipcountry'),
+      region: req.headers.get('cf-region-code'),
+    })
+  } catch (err: any) {
+    const errorDetails = err?.message || JSON.stringify(err) || String(err)
+    console.error('[Analytics Ingest API Error]', errorDetails)
+    return NextResponse.json(
+      { error: 'Failed to ingest analytics batch', details: errorDetails },
+      { status: 500 }
+    )
+  }
 
   const res = NextResponse.json(
     {

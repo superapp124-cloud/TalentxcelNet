@@ -211,8 +211,8 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.ingest_analytics_batch(JSONB) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.ingest_analytics_batch(JSONB) TO service_role;
+REVOKE ALL ON FUNCTION public.ingest_analytics_batch(JSONB) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.ingest_analytics_batch(JSONB) TO anon, authenticated, service_role;
 
 -- 4. Atomic Visitor Reconciliation RPC returning actual database row counts
 CREATE OR REPLACE FUNCTION public.reconcile_anonymous_visitor(
@@ -258,8 +258,8 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.reconcile_anonymous_visitor(TEXT, TEXT, UUID) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.reconcile_anonymous_visitor(TEXT, TEXT, UUID) TO service_role;
+REVOKE ALL ON FUNCTION public.reconcile_anonymous_visitor(TEXT, TEXT, UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.reconcile_anonymous_visitor(TEXT, TEXT, UUID) TO anon, authenticated, service_role;
 
 -- 5. Bounded Retention Cleanup Helper (service_role only, non-destructive unless invoked)
 CREATE OR REPLACE FUNCTION public.purge_expired_analytics_events(p_retention_days INTEGER DEFAULT 365)

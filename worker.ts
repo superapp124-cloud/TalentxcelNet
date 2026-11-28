@@ -18,6 +18,16 @@ const worker = {
     env: Record<string, unknown> & { VINEXT_KV_CACHE?: KvNamespaceLike },
     ctx: ExecutionContextLike
   ): Promise<Response> {
+    // Bridge Cloudflare Workers secrets and env bindings to process.env
+    // so Next.js server components and route handlers can access SUPABASE_SERVICE_ROLE_KEY, etc.
+    if (env && typeof process !== "undefined" && process.env) {
+      for (const [key, value] of Object.entries(env)) {
+        if (typeof value === "string" && !process.env[key]) {
+          process.env[key] = value;
+        }
+      }
+    }
+
     const url = new URL(request.url);
     const canUseEdgeCache = canUseEdgeCacheForRequest(request, url);
 
